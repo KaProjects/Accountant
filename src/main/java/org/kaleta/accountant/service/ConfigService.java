@@ -1,6 +1,9 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.backend.manager.ManagerException;
+import org.kaleta.accountant.backend.manager.jaxb.SchemaManager;
 import org.kaleta.accountant.frontend.Initializer;
+import org.kaleta.accountant.frontend.common.ErrorDialog;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,14 +55,13 @@ public class ConfigService {
     public void checkData() {
         File settingsFile = new File(Initializer.DATA_SOURCE + "schema.xml");
         if (!settingsFile.exists()) {
-//            try {
-//                SettingsManager manager = new JaxbSettingsManager();
-//                manager.createSettings();
-//                Initializer.LOG.info("Settings file \"%DATA%/" + settingsFile.getName() + "\" created!");
-//            } catch (ManagerException e) {
-//                Initializer.LOG.severe(e.getMessage());
-//                throw new ServiceFailureException(e);
-//            }
+            try {
+                new SchemaManager().create();
+                Initializer.LOG.info("Settings file \"%DATA%/" + settingsFile.getName() + "\" created!");
+            } catch (ManagerException e) {
+                Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+                throw new ServiceFailureException(e);
+            }
         }
     }
 

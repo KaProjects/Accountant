@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="schema">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="class" minOccurs="8" maxOccurs="8">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="account" minOccurs="0" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:attribute name="id" use="required" type="xs:string"/>
+                                                <xs:attribute name="name" use="required" type="xs:string"/>
+                                                <xs:attribute name="type" use="required" type="xs:string"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="id" use="required" type="xs:string"/>
+                                    <xs:attribute name="name" use="required" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="id" use="required" type="xs:string"/>
+                        <xs:attribute name="name" use="required" type="xs:string"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
