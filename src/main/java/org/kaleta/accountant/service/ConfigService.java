@@ -15,6 +15,10 @@ import java.io.IOException;
  */
 public class ConfigService {
 
+    ConfigService(){
+        // package-private
+    }
+
     /**
      * Checks that every resource is alright, throws ServiceFailureException if not.
      */

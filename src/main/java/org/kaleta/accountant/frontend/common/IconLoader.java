@@ -14,6 +14,10 @@ import java.io.IOException;
 public class IconLoader {
     public static final String NO_ICON = "/icon/no_icon.png";
     public static final String ERROR_ICON = "/icon/error_icon.png";
+    public static final String ADD = "/icon/add.png";
+    public static final String DELETE = "/icon/delete.png";
+    public static final String EDIT = "/icon/edit.png";
+
 
     public static Icon getIcon(String iconPath){
         return getIcon(iconPath, "", null);
