@@ -1,6 +1,6 @@
 package org.kaleta.accountant.frontend.dialog.schema;
 
-import org.kaleta.accountant.backend.entity.Account;
+import org.kaleta.accountant.backend.constants.AccountType;
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.frontend.common.NumberFilter;
 import org.kaleta.accountant.frontend.dialog.Dialog;
@@ -36,11 +36,11 @@ class AccountDialog extends Dialog {
         JLabel labelType = new JLabel("Account Type:");
         JComboBox<String> cbType = new JComboBox<String>(new String[]{"Asset", "Liability", "Expense", "Revenue", "Off Balance"});
         switch (account.getType()) {
-            case Account.Type.ASSET:cbType.setSelectedIndex(0);break;
-            case Account.Type.LIABILITY:cbType.setSelectedIndex(1);break;
-            case Account.Type.EXPENSE:cbType.setSelectedIndex(2);break;
-            case Account.Type.REVENUE:cbType.setSelectedIndex(3);break;
-            case Account.Type.OFF_BALANCE:cbType.setSelectedIndex(4);break;
+            case AccountType.ASSET:cbType.setSelectedIndex(0);break;
+            case AccountType.LIABILITY:cbType.setSelectedIndex(1);break;
+            case AccountType.EXPENSE:cbType.setSelectedIndex(2);break;
+            case AccountType.REVENUE:cbType.setSelectedIndex(3);break;
+            case AccountType.OFF_BALANCE:cbType.setSelectedIndex(4);break;
         }
 
         JButton buttonOk = new JButton("OK");
@@ -48,11 +48,11 @@ class AccountDialog extends Dialog {
             account.setId(tfId.getText());
             account.setName(tfName.getText());
             switch (cbType.getSelectedIndex()) {
-                case 0:account.setType(Account.Type.ASSET);break;
-                case 1:account.setType(Account.Type.LIABILITY);break;
-                case 2:account.setType(Account.Type.EXPENSE);break;
-                case 3:account.setType(Account.Type.REVENUE);break;
-                case 4:account.setType(Account.Type.OFF_BALANCE);break;
+                case 0:account.setType(AccountType.ASSET);break;
+                case 1:account.setType(AccountType.LIABILITY);break;
+                case 2:account.setType(AccountType.EXPENSE);break;
+                case 3:account.setType(AccountType.REVENUE);break;
+                case 4:account.setType(AccountType.OFF_BALANCE);break;
             }
             result = true;
             this.dispose();

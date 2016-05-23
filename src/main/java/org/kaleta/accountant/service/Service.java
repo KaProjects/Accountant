@@ -14,9 +14,7 @@ public class Service {
     public static final ConfigService CONFIG = new ConfigService();
 
     /**
-     * Instance of schema's service class
+     * Instance of account's service class
      */
-    public static final SchemaService SCHEMA = new SchemaService();
-
-
+    public static final AccountService ACCOUNT = new AccountService();
 }

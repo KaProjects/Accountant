@@ -62,7 +62,6 @@ public class SchemaManager implements Manager<Schema> {
         c7.setName("Off Balance");
         newSchema.getClazz().add(c7);
 
-        // just pass new instance to update - JAXB is able to create file
         update(newSchema);
     }
 

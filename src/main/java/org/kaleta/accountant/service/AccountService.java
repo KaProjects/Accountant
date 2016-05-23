@@ -1,8 +1,10 @@
 package org.kaleta.accountant.service;
 
 import org.kaleta.accountant.backend.entity.Schema;
+import org.kaleta.accountant.backend.entity.Semantic;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.jaxb.SchemaManager;
+import org.kaleta.accountant.backend.manager.jaxb.SemanticManager;
 import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.ErrorDialog;
 
@@ -11,9 +13,9 @@ import org.kaleta.accountant.frontend.common.ErrorDialog;
  *
  * todo doc
  */
-public class SchemaService {
+public class AccountService {
 
-    SchemaService(){
+    AccountService(){
         // package-private
     }
 
@@ -35,6 +37,30 @@ public class SchemaService {
     public void setSchema(Schema schema){
         try {
             new SchemaManager().update(schema);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo doc
+     */
+    public Semantic getSemanticAccounts(){
+        try {
+            return new SemanticManager().retrieve();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo doc
+     */
+    public void setSemanticAccounts(Semantic semantic){
+        try {
+            new SemanticManager().update(semantic);
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
             throw new ServiceFailureException(e);

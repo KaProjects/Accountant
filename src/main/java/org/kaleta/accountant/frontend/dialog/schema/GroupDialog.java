@@ -1,6 +1,6 @@
 package org.kaleta.accountant.frontend.dialog.schema;
 
-import org.kaleta.accountant.backend.entity.Account;
+import org.kaleta.accountant.backend.constants.AccountType;
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.common.NumberFilter;
@@ -60,11 +60,11 @@ class GroupDialog extends Dialog {
                         return accounts.get(r).getId();
                     case 1:
                         switch (accounts.get(r).getType()) {
-                            case Account.Type.ASSET:return "Asset";
-                            case Account.Type.LIABILITY:return "Liability";
-                            case Account.Type.EXPENSE:return "Expense";
-                            case Account.Type.REVENUE:return "Revenue";
-                            case Account.Type.OFF_BALANCE:return "Off Balance";
+                            case AccountType.ASSET:return "Asset";
+                            case AccountType.LIABILITY:return "Liability";
+                            case AccountType.EXPENSE:return "Expense";
+                            case AccountType.REVENUE:return "Revenue";
+                            case AccountType.OFF_BALANCE:return "Off Balance";
                         }
                     case 2:
                         return accounts.get(r).getName();

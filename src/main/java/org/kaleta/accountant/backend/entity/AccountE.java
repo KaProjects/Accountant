@@ -3,21 +3,14 @@ package org.kaleta.accountant.backend.entity;
 /**
  * Created by Stanislav Kaleta on 16.04.2016.
  */
-public class Account {
-    public static final class Type{
-        public static final String ASSET = "A";
-        public static final String LIABILITY = "L";
-        public static final String EXPENSE = "E";
-        public static final String REVENUE = "R";
-        public static final String OFF_BALANCE = "X";
-    }
+public class AccountE {
     private final String type;
     private final int clazz;
     private final int group;
     private final int number;
     private final String name;
 
-    public Account(String type, int clazz, int group, int number, String name){
+    public AccountE(String type, int clazz, int group, int number, String name){
         this.type = type;
         this.clazz = clazz;
         this.group = group;
