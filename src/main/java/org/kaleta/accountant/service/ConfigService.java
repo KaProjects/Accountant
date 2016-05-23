@@ -2,6 +2,7 @@ package org.kaleta.accountant.service;
 
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.jaxb.SchemaManager;
+import org.kaleta.accountant.backend.manager.jaxb.SemanticManager;
 import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.ErrorDialog;
 
@@ -34,6 +35,17 @@ public class ConfigService {
             }
         }
 
+        File journalDir = new File(Initializer.DATA_SOURCE + "journal/");
+        if (!journalDir.exists()){
+            boolean result = journalDir.mkdir();
+            if (result) {
+                System.out.println("# Journal directory \"" + dataSourceFile.getName() + "\" created!");
+            } else {
+                System.err.println("ERROR: Journal directory creation failed!");
+                throw new ServiceFailureException("Journal directory creation failed!");
+            }
+        }
+
         File logFile = new File(Initializer.DATA_SOURCE + "log.log");
         if (!logFile.exists()) {
             try {
@@ -57,11 +69,22 @@ public class ConfigService {
      * Checks that data are valid, throws ServiceFailureException if not.
      */
     public void checkData() {
-        File settingsFile = new File(Initializer.DATA_SOURCE + "schema.xml");
-        if (!settingsFile.exists()) {
+        File schemaFile = new File(Initializer.DATA_SOURCE + "schema.xml");
+        if (!schemaFile.exists()) {
             try {
                 new SchemaManager().create();
-                Initializer.LOG.info("Settings file \"%DATA%/" + settingsFile.getName() + "\" created!");
+                Initializer.LOG.info("Settings file \"%DATA%/" + schemaFile.getName() + "\" created!");
+            } catch (ManagerException e) {
+                Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+                throw new ServiceFailureException(e);
+            }
+        }
+
+        File semanticFile = new File(Initializer.DATA_SOURCE + "semantic.xml");
+        if (!semanticFile.exists()) {
+            try {
+                new SemanticManager().create();
+                Initializer.LOG.info("Settings file \"%DATA%/" + semanticFile.getName() + "\" created!");
             } catch (ManagerException e) {
                 Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
                 throw new ServiceFailureException(e);

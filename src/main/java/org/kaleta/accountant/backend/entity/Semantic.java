@@ -76,7 +76,7 @@ public class Semantic {
      */
     public List<Account> getAccount() {
         if (account == null) {
-            account = new ArrayList<Account>();
+            account = new ArrayList<>();
         }
         return this.account;
     }
@@ -107,11 +107,11 @@ public class Semantic {
     public static class Account {
 
         @XmlAttribute(name = "schemaId", required = true)
-        protected String schemaId = "";
+        protected String schemaId;
         @XmlAttribute(name = "id", required = true)
-        protected String id = "";
+        protected String id;
         @XmlAttribute(name = "name", required = true)
-        protected String name = "";
+        protected String name;
         @XmlAttribute(name = "description", required = true)
         protected String description = "";
 

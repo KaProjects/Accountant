@@ -17,4 +17,9 @@ public class Service {
      * Instance of account's service class
      */
     public static final AccountService ACCOUNT = new AccountService();
+
+    /**
+     * Instance of journal's service class
+     */
+    public static final JournalService JOURNAL = new JournalService();
 }
