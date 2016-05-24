@@ -145,8 +145,8 @@ public class Journal {
         protected String description = "";
         @XmlAttribute(name = "amount", required = true)
         protected String amount;
-        @XmlAttribute(name = "debet", required = true)
-        protected String debet;
+        @XmlAttribute(name = "debit", required = true)
+        protected String debit;
         @XmlAttribute(name = "credit", required = true)
         protected String credit;
 
@@ -247,27 +247,27 @@ public class Journal {
         }
 
         /**
-         * Gets the value of the debet property.
+         * Gets the value of the debit property.
          * 
          * @return
          *     possible object is
          *     {@link String }
          *     
          */
-        public String getDebet() {
-            return debet;
+        public String getDebit() {
+            return debit;
         }
 
         /**
-         * Sets the value of the debet property.
+         * Sets the value of the debit property.
          * 
          * @param value
          *     allowed object is
          *     {@link String }
          *     
          */
-        public void setDebet(String value) {
-            this.debet = value;
+        public void setDebit(String value) {
+            this.debit = value;
         }
 
         /**

@@ -1,5 +1,6 @@
 package org.kaleta.accountant.frontend;
 
+import org.kaleta.accountant.frontend.action.menu.OpenAddTransactionDialog;
 import org.kaleta.accountant.frontend.action.menu.OpenSchemaDialog;
 import org.kaleta.accountant.frontend.action.menu.OpenSemanticDialog;
 import org.kaleta.accountant.frontend.action.menu.PerformExit;
@@ -45,6 +46,7 @@ public class AppFrame extends JFrame implements Configuration{
         fileMenu.add(new JSeparator());
         fileMenu.add(new MenuItemWrapper(new OpenSchemaDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK)));
         fileMenu.add(new MenuItemWrapper(new OpenSemanticDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.SHIFT_MASK)));
+        fileMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.SHIFT_MASK)));
         fileMenu.add(new JSeparator());
         fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
     }

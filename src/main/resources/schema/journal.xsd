@@ -9,7 +9,7 @@
                         <xs:attribute name="date" type="xs:string" use="required"/>
                         <xs:attribute name="description" type="xs:string" use="required"/>
                         <xs:attribute name="amount" type="xs:string" use="required"/>
-                        <xs:attribute name="debet" type="xs:string" use="required"/>
+                        <xs:attribute name="debit" type="xs:string" use="required"/>
                         <xs:attribute name="credit" type="xs:string" use="required"/>
                     </xs:complexType>
                 </xs:element>

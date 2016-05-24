@@ -23,7 +23,7 @@ public class JournalService {
      * todo doc
      */
     public List<Integer> getYears(){
-        // TODO: 5/23/16 load children of journal dir
+        // TODO: 5/23/16 load years from config
         return null;
     }
 
@@ -33,6 +33,7 @@ public class JournalService {
     public void createJournal(int year){
         try {
             new JournalManager().create(year);
+            // TODO: 5/24/16 + add to config
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
             throw new ServiceFailureException(e);
@@ -58,6 +59,13 @@ public class JournalService {
         try {
             JournalManager manager = new JournalManager();
             Journal journal = manager.retrieve(year);
+
+            int lastId = 0;
+            for (Journal.Transaction tr : journal.getTransaction()){
+                lastId = (Integer.parseInt(tr.getId()) > lastId) ? Integer.parseInt(tr.getId()) : lastId;
+            }
+            transaction.setId(String.valueOf(lastId + 1));
+
             journal.getTransaction().add(transaction);
             manager.update(journal);
         } catch (ManagerException e){
