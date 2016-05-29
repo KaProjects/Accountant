@@ -1,8 +1,10 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.backend.entity.Procedures;
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.backend.entity.Semantic;
 import org.kaleta.accountant.backend.manager.ManagerException;
+import org.kaleta.accountant.backend.manager.jaxb.ProceduresManager;
 import org.kaleta.accountant.backend.manager.jaxb.SchemaManager;
 import org.kaleta.accountant.backend.manager.jaxb.SemanticManager;
 import org.kaleta.accountant.frontend.Initializer;
@@ -61,6 +63,42 @@ public class AccountService {
     public void setSemanticAccounts(Semantic semantic){
         try {
             new SemanticManager().update(semantic);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo doc
+     */
+    public Procedures getProcedures(){
+        try {
+            return new ProceduresManager().retrieve();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo doc
+     */
+    public void setProcedures(Procedures procedures){
+        try {
+            new ProceduresManager().update(procedures);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    public void createProcedure(Procedures.Procedure procedure){
+        try {
+            ProceduresManager manager = new ProceduresManager();
+            Procedures procedures = manager.retrieve();
+            procedures.getProcedure().add(procedure);
+            manager.update(procedures);
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
             throw new ServiceFailureException(e);

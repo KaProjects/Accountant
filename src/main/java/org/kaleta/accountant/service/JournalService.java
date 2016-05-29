@@ -1,6 +1,7 @@
 package org.kaleta.accountant.service;
 
 import org.kaleta.accountant.backend.entity.Journal;
+import org.kaleta.accountant.backend.entity.Transaction;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.jaxb.JournalManager;
 import org.kaleta.accountant.frontend.Initializer;
@@ -55,13 +56,13 @@ public class JournalService {
     /**
      * todo doc
      */
-    public void addTransaction(Journal.Transaction transaction, int year){
+    public void addTransaction(Transaction transaction, int year){
         try {
             JournalManager manager = new JournalManager();
             Journal journal = manager.retrieve(year);
 
             int lastId = 0;
-            for (Journal.Transaction tr : journal.getTransaction()){
+            for (Transaction tr : journal.getTransaction()){
                 lastId = (Integer.parseInt(tr.getId()) > lastId) ? Integer.parseInt(tr.getId()) : lastId;
             }
             transaction.setId(String.valueOf(lastId + 1));

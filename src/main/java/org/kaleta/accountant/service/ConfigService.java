@@ -1,6 +1,7 @@
 package org.kaleta.accountant.service;
 
 import org.kaleta.accountant.backend.manager.ManagerException;
+import org.kaleta.accountant.backend.manager.jaxb.ProceduresManager;
 import org.kaleta.accountant.backend.manager.jaxb.SchemaManager;
 import org.kaleta.accountant.backend.manager.jaxb.SemanticManager;
 import org.kaleta.accountant.frontend.Initializer;
@@ -73,7 +74,7 @@ public class ConfigService {
         if (!schemaFile.exists()) {
             try {
                 new SchemaManager().create();
-                Initializer.LOG.info("Settings file \"%DATA%/" + schemaFile.getName() + "\" created!");
+                Initializer.LOG.info("File \"%DATA%/" + schemaFile.getName() + "\" created!");
             } catch (ManagerException e) {
                 Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
                 throw new ServiceFailureException(e);
@@ -84,7 +85,18 @@ public class ConfigService {
         if (!semanticFile.exists()) {
             try {
                 new SemanticManager().create();
-                Initializer.LOG.info("Settings file \"%DATA%/" + semanticFile.getName() + "\" created!");
+                Initializer.LOG.info("File \"%DATA%/" + semanticFile.getName() + "\" created!");
+            } catch (ManagerException e) {
+                Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+                throw new ServiceFailureException(e);
+            }
+        }
+
+        File proceduresFile = new File(Initializer.DATA_SOURCE + "procedures.xml");
+        if (!proceduresFile.exists()) {
+            try {
+                new ProceduresManager().create();
+                Initializer.LOG.info("File \"%DATA%/" + proceduresFile.getName() + "\" created!");
             } catch (ManagerException e) {
                 Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
                 throw new ServiceFailureException(e);

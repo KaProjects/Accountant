@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="journal">
+    <xs:element name="procedures">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="transaction" minOccurs="0" maxOccurs="unbounded" type="transaction"/>
+                <xs:element name="procedure" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType >
+                        <xs:sequence>
+                            <xs:element name="transaction" minOccurs="0" maxOccurs="unbounded" type="transaction"/>
+                        </xs:sequence>
+                        <xs:attribute name="name" use="required" type="xs:string"/>
+                    </xs:complexType>
+                </xs:element>
             </xs:sequence>
-            <xs:attribute name="year" use="required" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 
@@ -17,4 +23,6 @@
         <xs:attribute name="debit" type="xs:string" use="required"/>
         <xs:attribute name="credit" type="xs:string" use="required"/>
     </xs:complexType>
+
 </xs:schema>
+
