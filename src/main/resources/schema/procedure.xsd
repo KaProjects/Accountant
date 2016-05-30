@@ -8,6 +8,7 @@
                         <xs:sequence>
                             <xs:element name="transaction" minOccurs="0" maxOccurs="unbounded" type="transaction"/>
                         </xs:sequence>
+                        <xs:attribute name="id" use="required" type="xs:string"/>
                         <xs:attribute name="name" use="required" type="xs:string"/>
                     </xs:complexType>
                 </xs:element>

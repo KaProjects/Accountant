@@ -111,29 +111,9 @@ public class Procedures {
         protected List<Transaction> transaction;
         @XmlAttribute(name = "name", required = true)
         protected String name;
+        @XmlAttribute(name = "id", required = true)
+        protected String id;
 
-        /**
-         * Gets the value of the transaction property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the transaction property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getTransaction().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Transaction }
-         * 
-         * 
-         */
         public List<Transaction> getTransaction() {
             if (transaction == null) {
                 transaction = new ArrayList<>();
@@ -141,30 +121,21 @@ public class Procedures {
             return this.transaction;
         }
 
-        /**
-         * Gets the value of the name property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
         public String getName() {
             return name;
         }
 
-        /**
-         * Sets the value of the name property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
         public void setName(String value) {
             this.name = value;
         }
 
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String value) {
+            this.id = value;
+        }
     }
 
 }

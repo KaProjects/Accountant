@@ -72,6 +72,14 @@ public class AccountService {
     /**
      * todo doc
      */
+    public void createSemanticAccount(Semantic.Account account){
+        // TODO: 5/30/16 impl.
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /**
+     * todo doc
+     */
     public Procedures getProcedures(){
         try {
             return new ProceduresManager().retrieve();
@@ -93,10 +101,21 @@ public class AccountService {
         }
     }
 
+    /**
+     * todo doc
+     */
     public void createProcedure(Procedures.Procedure procedure){
         try {
             ProceduresManager manager = new ProceduresManager();
             Procedures procedures = manager.retrieve();
+
+            int lastId = 0;
+            for (Procedures.Procedure pr : procedures.getProcedure()){
+                int prId = Integer.parseInt(pr.getId());
+                lastId = (prId > lastId) ? prId : lastId;
+            }
+            procedure.setId(String.valueOf(lastId + 1));
+
             procedures.getProcedure().add(procedure);
             manager.update(procedures);
         } catch (ManagerException e){
