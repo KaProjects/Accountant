@@ -123,4 +123,55 @@ public class AccountService {
             throw new ServiceFailureException(e);
         }
     }
+
+
+    /**
+     * todo doc
+     */
+    public String getAccountName(String schemaId){
+        try {
+            final String[] name = new String[]{""};
+            Schema schema = new SchemaManager().retrieve();
+            schema.getClazz().stream().filter(clazz -> clazz.getId().equals(schemaId.substring(0, 1))).forEach(clazz -> {
+                clazz.getGroup().stream().filter(group -> group.getId().equals(schemaId.substring(1, 2))).forEach(group -> {
+                    group.getAccount().stream().filter(acc -> acc.getId().equals(schemaId.substring(2, 3))).forEach(acc -> {
+                        name[0] = acc.getName();
+                    });
+                });
+            });
+            if (name[0].equals("")) {
+                throw new IllegalArgumentException("Account with schema id '" + schemaId + "' not found;");
+            } else {
+                return name[0];
+            }
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo doc
+     */
+    public String getAccountType(String schemaId){ // TODO return AccountModel + trCredit/Debit as Map via date
+        try {
+            final String[] name = new String[]{""};
+            Schema schema = new SchemaManager().retrieve();
+            schema.getClazz().stream().filter(clazz -> clazz.getId().equals(schemaId.substring(0, 1))).forEach(clazz -> {
+                clazz.getGroup().stream().filter(group -> group.getId().equals(schemaId.substring(1, 2))).forEach(group -> {
+                    group.getAccount().stream().filter(acc -> acc.getId().equals(schemaId.substring(2, 3))).forEach(acc -> {
+                        name[0] = acc.getType();
+                    });
+                });
+            });
+            if (name[0].equals("")) {
+                throw new IllegalArgumentException("Account with schema id '" + schemaId + "' not found!");
+            } else {
+                return name[0];
+            }
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
 }

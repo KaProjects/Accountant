@@ -39,10 +39,6 @@ public class Initializer {
         }
     }
 
-
-
-
-
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
             try {
@@ -51,7 +47,8 @@ public class Initializer {
                 Service.CONFIG.checkData();
                 //Service.configService().checkFirstUse();
 
-                //new AppFrame().setVisible(true);
+
+                new AppFrame().setVisible(true);
 
             } catch (Throwable e) {
                 JDialog errorDialog = new ErrorDialog(e);

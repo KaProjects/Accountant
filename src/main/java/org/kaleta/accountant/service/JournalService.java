@@ -8,6 +8,7 @@ import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.ErrorDialog;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Stanislav Kaleta on 23.05.2016.
@@ -69,6 +70,21 @@ public class JournalService {
 
             journal.getTransaction().add(transaction);
             manager.update(journal);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo doc
+     */
+    public List<Transaction> listAccountTransactions(String schemaId, int year){
+        try {
+            JournalManager manager = new JournalManager();
+            return manager.retrieve(year).getTransaction().stream()
+                    .filter(transaction -> transaction.getCredit().startsWith(schemaId) || transaction.getDebit().startsWith(schemaId))
+                    .collect(Collectors.toList());
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
             throw new ServiceFailureException(e);
