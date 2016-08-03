@@ -2,8 +2,12 @@ package org.kaleta.accountant.frontend;
 
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
+import org.kaleta.accountant.frontend.component.BalancePanel;
+import org.kaleta.accountant.frontend.component.JournalPanel;
+import org.kaleta.accountant.frontend.component.ProfitPanel;
 
 import javax.swing.*;
+import java.awt.GridLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -26,9 +30,17 @@ public class AppFrame extends JFrame implements Configuration{
     }
 
     private void initComponents( ){
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Journal", new JournalPanel());
+        tabbedPane.addTab("Balance", new BalancePanel());
+        tabbedPane.addTab("Profit", new ProfitPanel());
 
 
 
+
+
+        this.getContentPane().setLayout(new GridLayout(1,1));
+        this.add(tabbedPane);
     }
 
     private void initMenuBar() {

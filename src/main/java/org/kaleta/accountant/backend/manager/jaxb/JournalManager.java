@@ -25,7 +25,9 @@ public class JournalManager implements Manager<Journal> {
         schemaUri = "/schema/journal.xsd";
         dataSourceDir = Initializer.DATA_SOURCE + "journal/";
     }
+
     @Override
+    @Deprecated
     public void create() throws ManagerException {
         throw new ManagerException(new UnsupportedOperationException("Use create(int year) method instead."));
     }
