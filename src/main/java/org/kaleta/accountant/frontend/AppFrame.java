@@ -3,7 +3,7 @@ package org.kaleta.accountant.frontend;
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
 import org.kaleta.accountant.frontend.component.BalancePanel;
-import org.kaleta.accountant.frontend.component.JournalPanel;
+import org.kaleta.accountant.frontend.component.JournalTable;
 import org.kaleta.accountant.frontend.component.ProfitPanel;
 
 import javax.swing.*;
@@ -36,8 +36,12 @@ public class AppFrame extends JFrame implements Configuration{
 
     private void initComponents( ){
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Journal", new JournalPanel());
+
+        JScrollPane journalPane = new JScrollPane(new JournalTable());
+        tabbedPane.addTab("Journal", journalPane);
+
         tabbedPane.addTab("Balance", new BalancePanel());
+
         tabbedPane.addTab("Profit", new ProfitPanel());
 
 

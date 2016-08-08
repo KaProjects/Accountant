@@ -150,6 +150,22 @@ public class AccountService {
         }
     }
 
+    public String getAccountFullName(String schemaId, String semanticId){
+        try {
+            final String[] name = {""};
+            Semantic semantic = new SemanticManager().retrieve();
+            semantic.getAccount().stream().filter(acc -> acc.getSchemaId().equals(schemaId)).forEach(acc -> {
+                if (acc.getId().equals(semanticId)){
+                    name[0] = acc.getName();
+                }
+            });
+            return schemaId + "-" + semanticId + " " + getAccountName(schemaId) + " - " + name[0];
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
     /**
      * todo doc
      */
