@@ -10,6 +10,9 @@ import org.kaleta.accountant.backend.manager.jaxb.SemanticManager;
 import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.ErrorDialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Stanislav Kaleta on 20.04.2016.
  *
@@ -27,6 +30,46 @@ public class AccountService {
     public Schema getSchema(){
         try {
             return new SchemaManager().retrieve();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns Schema which contains only accounts with specified account type.
+     * @param accountType org.kaleta.accountant.backend.constants.AccountType.*
+     */
+    public Schema getSchemaForAccountType(String accountType){
+        try {
+            Schema schema = new Schema();
+            Schema schemaComplete = new SchemaManager().retrieve();
+            for (Schema.Class clazz : schemaComplete.getClazz()){
+                List<Schema.Class.Group> groupMatch = new ArrayList<>();
+                for (Schema.Class.Group group : clazz.getGroup()){
+                    List<Schema.Class.Group.Account> accountMatch = new ArrayList<>();
+                    for (Schema.Class.Group.Account account : group.getAccount()){
+                        if (account.getType().equals(accountType)){
+                            accountMatch.add(account);
+                        }
+                    }
+                    if (!accountMatch.isEmpty()){
+                        Schema.Class.Group matchedGroup = new Schema.Class.Group();
+                        matchedGroup.setId(group.getId());
+                        matchedGroup.setName(group.getName());
+                        matchedGroup.getAccount().addAll(accountMatch);
+                        groupMatch.add(matchedGroup);
+                    }
+                }
+                if (!groupMatch.isEmpty()){
+                    Schema.Class matchedClass = new Schema.Class();
+                    matchedClass.setId(clazz.getId());
+                    matchedClass.setName(clazz.getName());
+                    matchedClass.getGroup().addAll(groupMatch);
+                    schema.getClazz().add(matchedClass);
+                }
+            }
+            return schema;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
             throw new ServiceFailureException(e);

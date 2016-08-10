@@ -3,7 +3,7 @@ package org.kaleta.accountant.frontend.component;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.InitConfigurableAction;
-import org.kaleta.accountant.frontend.action.configuration.JournalPanelTransactionsUpdated;
+import org.kaleta.accountant.frontend.action.configuration.JournalTableTransactionsUpdated;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class JournalTable extends JTable implements Configurable {
         this.setRowSelectionAllowed(true);
         this.setColumnSelectionAllowed(false);
         this.getTableHeader().setReorderingAllowed(false);
-        this.setPreferredScrollableViewportSize(new Dimension(1000,600));
+        this.setPreferredScrollableViewportSize(new Dimension(1200,800));
         this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         TableColumnModel columnModel = this.getColumnModel();
@@ -44,9 +44,10 @@ public class JournalTable extends JTable implements Configurable {
         columnModel.getColumn(3).setMinWidth(300);
         columnModel.getColumn(4).setMinWidth(300);
         // TODO: 8/8/16 play more with column renderers
+        // TODO: 8/8/16 add on click listenrers + actions
 
         this.getActionMap().put(Configuration.INIT_CONFIG, new InitConfigurableAction(this));
-        this.getActionMap().put(Configuration.TRANSACTION_ACTION, new JournalPanelTransactionsUpdated(this, model));
+        this.getActionMap().put(Configuration.TRANSACTION_ACTION, new JournalTableTransactionsUpdated(this, model));
     }
 
     @Override

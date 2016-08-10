@@ -2,9 +2,9 @@ package org.kaleta.accountant.frontend;
 
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
-import org.kaleta.accountant.frontend.component.BalancePanel;
+import org.kaleta.accountant.frontend.component.BalanceTable;
 import org.kaleta.accountant.frontend.component.JournalTable;
-import org.kaleta.accountant.frontend.component.ProfitPanel;
+import org.kaleta.accountant.frontend.component.ProfitTable;
 
 import javax.swing.*;
 import java.awt.Component;
@@ -19,7 +19,7 @@ import java.awt.event.KeyEvent;
 public class AppFrame extends JFrame implements Configuration{
 
     public AppFrame(){
-        //        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 //        Dimension frameSize = this.getSize();
 //        int centerPosX = (screenSize.width - frameSize.width) / 2;
 //        int centerPosY = (screenSize.height - frameSize.height) / 2;
@@ -40,9 +40,11 @@ public class AppFrame extends JFrame implements Configuration{
         JScrollPane journalPane = new JScrollPane(new JournalTable());
         tabbedPane.addTab("Journal", journalPane);
 
-        tabbedPane.addTab("Balance", new BalancePanel());
+        JScrollPane balancePane = new JScrollPane(new BalanceTable());
+        tabbedPane.addTab("Balance", balancePane);
 
-        tabbedPane.addTab("Profit", new ProfitPanel());
+        JScrollPane profitPane = new JScrollPane(new ProfitTable());
+        tabbedPane.addTab("Profit", profitPane);
 
 
 

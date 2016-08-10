@@ -7,10 +7,11 @@ import org.kaleta.accountant.service.Service;
 /**
  * Created by Stanislav Kaleta on 03.08.2016.
  */
-public class JournalPanelTransactionsUpdated extends ConfigurationAction {
+public class JournalTableTransactionsUpdated extends ConfigurationAction {
     private JournalTable target;
     private JournalTableModel model;
-    public JournalPanelTransactionsUpdated(JournalTable target, JournalTableModel model){
+
+    public JournalTableTransactionsUpdated(JournalTable target, JournalTableModel model){
         super(target);
         this.target = target;
         this.model = model;
