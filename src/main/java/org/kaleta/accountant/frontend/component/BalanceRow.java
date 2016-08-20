@@ -11,11 +11,19 @@ public class BalanceRow {
 
     private String name;
     private String value;
+    private String schemaId;
     private String type;
 
     public BalanceRow(String name, String value, String type){
         this.name = name;
         this.value = value;
+        this.type = type;
+    }
+
+    public BalanceRow(String name, String value, String schemaId, String type){
+        this.name = name;
+        this.value = value;
+        this.schemaId = schemaId;
         this.type = type;
     }
 
@@ -37,6 +45,14 @@ public class BalanceRow {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getSchemaId() {
+        return schemaId;
+    }
+
+    public void setSchemaId(String schemaId) {
+        this.schemaId = schemaId;
     }
 
     public String getType() {

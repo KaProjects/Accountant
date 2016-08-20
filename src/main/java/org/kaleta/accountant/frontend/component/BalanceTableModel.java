@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Stanislav Kaleta on 10.08.2016.
  */
-public class BalanceTableModel extends AbstractTableModel {
+public class BalanceTableModel extends AbstractTableModel{
     private List<BalanceRow> assets;
     private List<BalanceRow> liabilities;
     private BalanceRow assetsBalanceRow;
@@ -81,12 +81,12 @@ public class BalanceTableModel extends AbstractTableModel {
             List<BalanceRow> groups = new ArrayList<>();
             int classBalance = 0;
             for (Schema.Class.Group group : clazz.getGroup()) {
-                //List<BalanceRow> accounts = new ArrayList<>();
+                List<BalanceRow> accounts = new ArrayList<>();
                 int groupBalance = 0;
                 for (Schema.Class.Group.Account account : group.getAccount()) {
                     int accBalance = 0;
+                    String schemaId = clazz.getId() + group.getId() + account.getId();
                     for (Transaction transaction : journal.getTransaction()) {
-                        String schemaId = clazz.getId() + group.getId() + account.getId();
                         if (transaction.getDebit().startsWith(schemaId)) {
                             accBalance += Integer.parseInt(transaction.getAmount());
                         }
@@ -94,11 +94,11 @@ public class BalanceTableModel extends AbstractTableModel {
                             accBalance -= Integer.parseInt(transaction.getAmount());
                         }
                     }
-                    //accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), BalanceRow.ACCOUNT));
+                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
                     groupBalance += accBalance;
                 }
                 groups.add(new BalanceRow(group.getName(), String.valueOf(groupBalance), BalanceRow.GROUP));
-                //groups.addAll(accounts); // TODO: 8/10/16 disabled for now
+                groups.addAll(accounts);
                 classBalance += groupBalance;
             }
             assetsBalance += classBalance;
@@ -113,12 +113,12 @@ public class BalanceTableModel extends AbstractTableModel {
             List<BalanceRow> groups = new ArrayList<>();
             int classBalance = 0;
             for (Schema.Class.Group group : clazz.getGroup()) {
-                //List<BalanceRow> accounts = new ArrayList<>();
+                List<BalanceRow> accounts = new ArrayList<>();
                 int groupBalance = 0;
                 for (Schema.Class.Group.Account account : group.getAccount()) {
                     int accBalance = 0;
+                    String schemaId = clazz.getId() + group.getId() + account.getId();
                     for (Transaction transaction : journal.getTransaction()) {
-                        String schemaId = clazz.getId() + group.getId() + account.getId();
                         if (transaction.getDebit().startsWith(schemaId)) {
                             accBalance -= Integer.parseInt(transaction.getAmount());
                         }
@@ -126,11 +126,11 @@ public class BalanceTableModel extends AbstractTableModel {
                             accBalance += Integer.parseInt(transaction.getAmount());
                         }
                     }
-                    //accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), BalanceRow.ACCOUNT));
+                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
                     groupBalance += accBalance;
                 }
                 groups.add(new BalanceRow(group.getName(), String.valueOf(groupBalance), BalanceRow.GROUP));
-                //groups.addAll(accounts); // TODO: 8/10/16 disabled for now
+                groups.addAll(accounts);
                 classBalance += groupBalance;
             }
             liabilitiesBalance += classBalance;
@@ -161,6 +161,26 @@ public class BalanceTableModel extends AbstractTableModel {
                     return liabilities.get(row).getType();
                 } else {
                     return "";
+                }
+            default: return null;
+        }
+    }
+
+    public String getCellSchemaId(int row, int column) {
+        switch (column){
+            case 0:
+            case 1:
+                if (row < assets.size()){
+                    return assets.get(row).getSchemaId();
+                } else {
+                    return null;
+                }
+            case 2:
+            case 3:
+                if (row < liabilities.size()){
+                    return liabilities.get(row).getSchemaId();
+                } else {
+                    return null;
                 }
             default: return null;
         }

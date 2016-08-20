@@ -24,6 +24,7 @@ public class OpenProceduresDialog extends MenuAction {
                 Service.JOURNAL.addTransaction(transaction, 2016);
                 // TODO: 5/24/16 get year
             }
+            getConfiguration().update(Configuration.TRANSACTION_ACTION);
         }
     }
 }

@@ -72,8 +72,8 @@ public class ProfitTableModel extends AbstractTableModel {
                 int groupBalance = 0;
                 for (Schema.Class.Group.Account account : group.getAccount()) {
                     int accBalance = 0;
+                    String schemaId = clazz.getId() + group.getId() + account.getId();
                     for (Transaction transaction : journal.getTransaction()) {
-                        String schemaId = clazz.getId() + group.getId() + account.getId();
                         if (transaction.getDebit().startsWith(schemaId)) {
                             accBalance += Integer.parseInt(transaction.getAmount());
                         }
@@ -81,7 +81,7 @@ public class ProfitTableModel extends AbstractTableModel {
                             accBalance -= Integer.parseInt(transaction.getAmount());
                         }
                     }
-                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), BalanceRow.ACCOUNT));
+                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
                     groupBalance += accBalance;
                 }
                 groups.add(new BalanceRow(group.getName(), String.valueOf(groupBalance), BalanceRow.GROUP));
@@ -103,8 +103,8 @@ public class ProfitTableModel extends AbstractTableModel {
                 int groupBalance = 0;
                 for (Schema.Class.Group.Account account : group.getAccount()) {
                     int accBalance = 0;
+                    String schemaId = clazz.getId() + group.getId() + account.getId();
                     for (Transaction transaction : journal.getTransaction()) {
-                        String schemaId = clazz.getId() + group.getId() + account.getId();
                         if (transaction.getDebit().startsWith(schemaId)) {
                             accBalance -= Integer.parseInt(transaction.getAmount());
                         }
@@ -112,7 +112,7 @@ public class ProfitTableModel extends AbstractTableModel {
                             accBalance += Integer.parseInt(transaction.getAmount());
                         }
                     }
-                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), BalanceRow.ACCOUNT));
+                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
                     groupBalance += accBalance;
                 }
                 groups.add(new BalanceRow(group.getName(), String.valueOf(groupBalance), BalanceRow.GROUP));
@@ -141,6 +141,26 @@ public class ProfitTableModel extends AbstractTableModel {
                     return revenues.get(row).getType();
                 } else {
                     return "";
+                }
+            default: return null;
+        }
+    }
+
+    public String getCellSchemaId(int row, int column) {
+        switch (column){
+            case 0:
+            case 1:
+                if (row < expenses.size()){
+                    return expenses.get(row).getSchemaId();
+                } else {
+                    return null;
+                }
+            case 2:
+            case 3:
+                if (row < revenues.size()){
+                    return revenues.get(row).getSchemaId();
+                } else {
+                    return null;
                 }
             default: return null;
         }

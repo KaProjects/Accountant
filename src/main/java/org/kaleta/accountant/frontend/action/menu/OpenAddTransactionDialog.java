@@ -21,6 +21,7 @@ public class OpenAddTransactionDialog extends MenuAction {
         if (dialog.getResult()) {
             Service.JOURNAL.addTransaction(dialog.getTransaction(),2016);
             // TODO: 5/24/16 get year
+            getConfiguration().update(Configuration.TRANSACTION_ACTION);
         }
     }
 }

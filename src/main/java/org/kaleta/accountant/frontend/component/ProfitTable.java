@@ -4,6 +4,7 @@ import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.InitConfigurableAction;
 import org.kaleta.accountant.frontend.action.configuration.ProfitTableTransactionsUpdated;
+import org.kaleta.accountant.frontend.action.mouse.BalanceTableClicked;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -73,6 +74,8 @@ public class ProfitTable extends JTable implements Configurable {
             }
         };
         this.setDefaultRenderer(Object.class, cellRenderer);
+
+        this.addMouseListener(new BalanceTableClicked(this, Boolean.FALSE));
 
         this.getActionMap().put(Configuration.INIT_CONFIG, new InitConfigurableAction(this));
         this.getActionMap().put(Configuration.TRANSACTION_ACTION, new ProfitTableTransactionsUpdated(this, model));
