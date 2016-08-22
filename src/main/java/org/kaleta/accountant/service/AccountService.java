@@ -12,6 +12,7 @@ import org.kaleta.accountant.frontend.common.ErrorDialog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Stanislav Kaleta on 20.04.2016.
@@ -82,6 +83,16 @@ public class AccountService {
     public void setSchema(Schema schema){
         try {
             new SchemaManager().update(schema);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    public List<Semantic.Account> getSemanticAccounts(String schemaId){
+        try {
+            Semantic semantic = new SemanticManager().retrieve();
+            return semantic.getAccount().stream().filter(account -> account.getSchemaId().equals(schemaId)).collect(Collectors.toList());
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
             throw new ServiceFailureException(e);
@@ -212,7 +223,7 @@ public class AccountService {
     /**
      * todo doc
      */
-    public String getAccountType(String schemaId){ // TODO return AccountModel + trCredit/Debit as Map via date
+    public String getAccountType(String schemaId){
         try {
             final String[] name = new String[]{""};
             Schema schema = new SchemaManager().retrieve();
