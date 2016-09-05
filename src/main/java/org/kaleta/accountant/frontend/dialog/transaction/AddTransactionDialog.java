@@ -2,7 +2,6 @@ package org.kaleta.accountant.frontend.dialog.transaction;
 
 import org.kaleta.accountant.backend.entity.Transaction;
 import org.kaleta.accountant.frontend.dialog.Dialog;
-import org.kaleta.accountant.frontend.dialog.procedure.TransactionPanel;
 
 import javax.swing.*;
 import java.awt.Component;

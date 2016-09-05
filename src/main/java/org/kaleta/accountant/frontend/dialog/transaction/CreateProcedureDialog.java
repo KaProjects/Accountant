@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.dialog.procedure;
+package org.kaleta.accountant.frontend.dialog.transaction;
 
 import org.kaleta.accountant.backend.entity.Procedures;
 import org.kaleta.accountant.frontend.common.IconLoader;

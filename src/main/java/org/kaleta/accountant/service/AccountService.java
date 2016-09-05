@@ -178,6 +178,49 @@ public class AccountService {
         }
     }
 
+    /**
+     * todo doc
+     */
+    public String getClassName(String schemaId){
+        try {
+            final String[] name = new String[]{""};
+            Schema schema = new SchemaManager().retrieve();
+            schema.getClazz().stream().filter(clazz -> clazz.getId().equals(schemaId.substring(0, 1))).forEach(clazz -> {
+                name[0] = clazz.getName();
+            });
+            if (name[0].equals("")) {
+                throw new IllegalArgumentException("Class with schema id '" + schemaId + "' not found;");
+            } else {
+                return name[0];
+            }
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo doc
+     */
+    public String getGroupName(String schemaId){
+        try {
+            final String[] name = new String[]{""};
+            Schema schema = new SchemaManager().retrieve();
+            schema.getClazz().stream().filter(clazz -> clazz.getId().equals(schemaId.substring(0, 1))).forEach(clazz -> {
+                clazz.getGroup().stream().filter(group -> group.getId().equals(schemaId.substring(1, 2))).forEach(group -> {
+                    name[0] = group.getName();
+                });
+            });
+            if (name[0].equals("")) {
+                throw new IllegalArgumentException("Group with schema id '" + schemaId + "' not found;");
+            } else {
+                return name[0];
+            }
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
 
     /**
      * todo doc
@@ -204,6 +247,9 @@ public class AccountService {
         }
     }
 
+    /**
+     * TODO doc
+     */
     public String getAccountFullName(String schemaId, String semanticId){
         try {
             final String[] name = {""};
