@@ -2,6 +2,7 @@ package org.kaleta.accountant.frontend.dialog.transaction;
 
 import org.kaleta.accountant.backend.entity.Procedures;
 import org.kaleta.accountant.backend.entity.Transaction;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.Dialog;
 import org.kaleta.accountant.service.Service;
 
@@ -17,11 +18,13 @@ import java.util.stream.Collectors;
 public class ProceduresDialog extends Dialog {
     private Procedures procedures;
     private List<TransactionPanel> transactionList;
+    private Configuration config;
 
-    public ProceduresDialog(Component parent) {
-        super(parent, "Procedures");
+    public ProceduresDialog(Configuration parent) {
+        super((Component) parent, "Procedures");
         procedures = Service.ACCOUNT.getProcedures();
         transactionList = new ArrayList<>();
+        config = parent;
         buildDialog();
         this.pack();
     }
@@ -44,7 +47,7 @@ public class ProceduresDialog extends Dialog {
             Procedures.Procedure procedure = procedures.getProcedure().get(comboBoxType.getSelectedIndex());
             boolean first = true;
             for (Transaction transaction : procedure.getTransaction()){
-                TransactionPanel transactionPanel = new TransactionPanel(first);
+                TransactionPanel transactionPanel = new TransactionPanel(config, first);
                 first = false;
                 transactionPanel.setTransaction(transaction);
                 transactionList.add(transactionPanel);
@@ -56,9 +59,17 @@ public class ProceduresDialog extends Dialog {
         });
 
         JButton buttonCancel = new JButton("Cancel");
-        buttonCancel.addActionListener(a -> this.dispose());
+        buttonCancel.addActionListener(a -> {
+            for (TransactionPanel transactionPanel : transactionList) {
+                transactionPanel.toggleActive(false);
+            }
+            dispose();
+        });
         JButton buttonOk = new JButton("Add");
         buttonOk.addActionListener(a -> {
+            for (TransactionPanel transactionPanel : transactionList) {
+                transactionPanel.toggleActive(false);
+            }
             result = true;
             dispose();
         });

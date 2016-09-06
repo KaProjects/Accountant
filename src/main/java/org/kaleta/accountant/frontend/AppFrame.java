@@ -17,6 +17,7 @@ import java.awt.event.KeyEvent;
  * Created by Stanislav Kaleta on 19.04.2016.
  */
 public class AppFrame extends JFrame implements Configuration{
+    private int year;
 
     public AppFrame(){
 //        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -77,6 +78,7 @@ public class AppFrame extends JFrame implements Configuration{
     private void applySettings(){
         // TODO: 8/3/16 load settings and fire update(comand)
 
+        year = 2016; // TODO load from config
 
         update(Configuration.TRANSACTION_ACTION);
 
@@ -104,5 +106,10 @@ public class AppFrame extends JFrame implements Configuration{
         for (Component component : this.getComponents()) {
             updateComponent((JComponent) component, command);
         }
+    }
+
+    @Override
+    public int getActiveYear() {
+        return year;
     }
 }

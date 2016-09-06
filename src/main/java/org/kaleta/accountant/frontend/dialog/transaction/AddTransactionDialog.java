@@ -1,6 +1,7 @@
 package org.kaleta.accountant.frontend.dialog.transaction;
 
 import org.kaleta.accountant.backend.entity.Transaction;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.Dialog;
 
 import javax.swing.*;
@@ -11,21 +12,27 @@ import java.awt.Component;
  */
 public class AddTransactionDialog extends Dialog {
     private TransactionPanel transactionPanel;
+    private Configuration config;
 
-    public AddTransactionDialog(Component parent) {
-        super(parent, "Adding Transaction");
+    public AddTransactionDialog(Configuration parent) {
+        super((Component) parent, "Adding Transaction");
+        config = parent;
         buildDialog();
         this.pack();
     }
 
     @Override
     protected void buildDialog() {
-        transactionPanel = new TransactionPanel(true);
+        transactionPanel = new TransactionPanel(config, true);
 
         JButton buttonCancel = new JButton("Cancel");
-        buttonCancel.addActionListener(a -> this.dispose());
+        buttonCancel.addActionListener(a -> {
+            transactionPanel.toggleActive(false);
+            dispose();
+        });
         JButton buttonOk = new JButton("Add");
         buttonOk.addActionListener(a -> {
+            transactionPanel.toggleActive(false);
             result = true;
             dispose();
         });

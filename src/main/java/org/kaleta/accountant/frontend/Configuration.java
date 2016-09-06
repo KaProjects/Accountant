@@ -19,4 +19,9 @@ public interface Configuration {
      * @param command represents type of config. update
      */
     void update(int command);
+
+    /**
+     * Returns actual year according configuration.
+     */
+    int getActiveYear();
 }

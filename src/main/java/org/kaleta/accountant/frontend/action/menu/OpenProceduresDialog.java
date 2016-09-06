@@ -5,8 +5,6 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.transaction.ProceduresDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.Component;
-
 /**
  * Created by Stanislav Kaleta on 30.05.2016.
  */
@@ -17,12 +15,11 @@ public class OpenProceduresDialog extends MenuAction {
 
     @Override
     protected void actionPerformed() {
-        ProceduresDialog dialog = new ProceduresDialog((Component) getConfiguration());
+        ProceduresDialog dialog = new ProceduresDialog(getConfiguration());
         dialog.setVisible(true);
         if (dialog.getResult()) {
             for (Transaction transaction : dialog.getCreatedTransactions()){
-                Service.JOURNAL.addTransaction(transaction, 2016);
-                // TODO: 5/24/16 get year
+                Service.JOURNAL.addTransaction(transaction, getConfiguration().getActiveYear());
             }
             getConfiguration().update(Configuration.TRANSACTION_ACTION);
         }

@@ -31,7 +31,7 @@ public class BalanceTableClicked extends MouseAction {
                 ((BalanceTableModel) table.getModel()).getCellSchemaId(row, column) :
                 ((ProfitTableModel) table.getModel()).getCellSchemaId(row, column);
         if (schemaId != null){
-            AccountPreviewModel model = new AccountPreviewModel(schemaId, 2016); // TODO: 6/3/16 get year
+            AccountPreviewModel model = new AccountPreviewModel(schemaId, getConfiguration().getActiveYear());
             AccountPreviewFrame frame = new AccountPreviewFrame((Component) getConfiguration(), model);
             frame.setVisible(true);
         }

@@ -19,7 +19,7 @@ public class OpenAccountPreview extends MenuAction {
     protected void actionPerformed() {
         String schemaId = JOptionPane.showInputDialog((Component) getConfiguration(),"Schema ID:");
         if (schemaId != null){
-            AccountPreviewModel model = new AccountPreviewModel(schemaId, 2016); // TODO: 6/3/16 get year
+            AccountPreviewModel model = new AccountPreviewModel(schemaId, getConfiguration().getActiveYear());
             AccountPreviewFrame frame = new AccountPreviewFrame((Component) getConfiguration(), model);
             frame.setVisible(true);
         }

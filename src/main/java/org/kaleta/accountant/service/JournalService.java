@@ -8,6 +8,7 @@ import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.ErrorDialog;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +46,7 @@ public class JournalService {
     /**
      * todo doc
      */
-    public Journal getYournal(int year){
+    public Journal getJournal(int year){
         try {
             return new JournalManager().retrieve(year);
         } catch (ManagerException e){
@@ -85,6 +86,21 @@ public class JournalService {
             return manager.retrieve(year).getTransaction().stream()
                     .filter(transaction -> transaction.getCredit().startsWith(schemaId) || transaction.getDebit().startsWith(schemaId))
                     .collect(Collectors.toList());
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns all used unique descriptions for specified combination of debit and credit accounts.
+     */
+    public Set<String> listTransactionDescriptions(String debitSchemaId, String creditSchemaId, int year){
+        try {
+            return new JournalManager().retrieve(year).getTransaction().stream()
+                    .filter(transaction -> transaction.getDebit().equals(debitSchemaId) && transaction.getCredit().equals(creditSchemaId))
+                    .map(Transaction::getDescription)
+                    .collect(Collectors.toSet());
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
             throw new ServiceFailureException(e);

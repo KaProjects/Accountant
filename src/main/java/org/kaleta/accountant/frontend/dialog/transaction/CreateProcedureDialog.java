@@ -1,6 +1,7 @@
 package org.kaleta.accountant.frontend.dialog.transaction;
 
 import org.kaleta.accountant.backend.entity.Procedures;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.dialog.Dialog;
 
@@ -16,10 +17,12 @@ import java.util.List;
 public class CreateProcedureDialog extends Dialog {
     private List<TransactionPanel> transactionList;
     private JTextField textFieldName;
+    private Configuration config;
 
-    public CreateProcedureDialog(Component parent) {
-        super(parent, "Creating Procedure");
+    public CreateProcedureDialog(Configuration parent) {
+        super((Component) parent, "Creating Procedure");
         transactionList = new ArrayList<>();
+        config = parent;
         buildDialog();
         this.pack();
     }
@@ -32,13 +35,15 @@ public class CreateProcedureDialog extends Dialog {
 
         JPanel transactionsPanel = new JPanel();
         transactionsPanel.setLayout(new BoxLayout(transactionsPanel, BoxLayout.Y_AXIS));
-        TransactionPanel firstTransactionPanel = new TransactionPanel(true);
+        TransactionPanel firstTransactionPanel = new TransactionPanel(config, true);
+        firstTransactionPanel.toggleActive(false);
         transactionsPanel.add(firstTransactionPanel);
         transactionList.add(firstTransactionPanel);
 
         JButton buttonAdd = new JButton(IconLoader.getIcon(IconLoader.ADD));
         buttonAdd.addActionListener(a -> {
-            TransactionPanel transactionPanel = new TransactionPanel(false);
+            TransactionPanel transactionPanel = new TransactionPanel(config, false);
+            transactionPanel.toggleActive(false);
             transactionsPanel.add(transactionPanel);
             transactionList.add(transactionPanel);
             CreateProcedureDialog.this.pack();

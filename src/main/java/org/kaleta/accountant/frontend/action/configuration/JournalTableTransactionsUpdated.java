@@ -19,8 +19,7 @@ public class JournalTableTransactionsUpdated extends ConfigurationAction {
 
     @Override
     protected void actionPerformed() {
-        int year = 2016; // TODO: 8/8/16 Service get active year
-        model.updateJournal(Service.JOURNAL.getYournal(year));
+        model.updateJournal(Service.JOURNAL.getJournal(getConfiguration().getActiveYear()));
         target.revalidate();
         target.repaint();
     }

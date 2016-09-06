@@ -22,7 +22,7 @@ public class ProfitTableTransactionsUpdated extends ConfigurationAction{
     protected void actionPerformed() {
         model.update(Service.ACCOUNT.getSchemaForAccountType(AccountType.REVENUE),
                 Service.ACCOUNT.getSchemaForAccountType(AccountType.EXPENSE),
-                Service.JOURNAL.getYournal(2016)); // // TODO: 8/9/16 get year from service
+                Service.JOURNAL.getJournal(getConfiguration().getActiveYear()));
         target.revalidate();
         target.repaint();
     }

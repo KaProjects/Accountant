@@ -4,8 +4,6 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.transaction.CreateProcedureDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.Component;
-
 /**
  * Created by Stanislav Kaleta on 24.05.2016.
  */
@@ -16,7 +14,7 @@ public class OpenCreateProcedureDialog extends MenuAction {
 
     @Override
     protected void actionPerformed() {
-        CreateProcedureDialog dialog = new CreateProcedureDialog((Component) getConfiguration());
+        CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration());
         dialog.setVisible(true);
         if (dialog.getResult()) {
             Service.ACCOUNT.createProcedure(dialog.getProcedure());
