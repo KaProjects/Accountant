@@ -172,6 +172,7 @@ public class AccountService {
 
             procedures.getProcedure().add(procedure);
             manager.update(procedures);
+            Initializer.LOG.info("Procedure '" + procedure.getName() + "' added.");
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
             throw new ServiceFailureException(e);

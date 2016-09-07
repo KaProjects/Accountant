@@ -31,27 +31,13 @@ public class TransactionPanel extends JPanel implements Configurable, DocumentLi
     public TransactionPanel(Configuration configuration, boolean labeled){
         setConfiguration(configuration);
         isActive = true;
-        JLabel labelDate = new JLabel("Date:");
-        labelDate.setVisible(labeled);
         tfDate = new JTextField();
-
-        JLabel labelDescription = new JLabel("Description:");
-        labelDescription.setVisible(labeled);
         cbDescription = new JComboBox<>();
         cbDescription.setEditable(true);
-
-        JLabel labelAmount = new JLabel("Amount:");
-        labelAmount.setVisible(labeled);
         tfAmount = new JTextField();
-
-        JLabel labelDebit = new JLabel("Debit:");
-        labelDebit.setVisible(labeled);
         tfDebit = new JTextField();
         tfDebit.addMouseListener(new AccountTextFieldClicked(this, true));
         tfDebit.getDocument().addDocumentListener(this);
-
-        JLabel labelCredit = new JLabel("Credit:");
-        labelCredit.setVisible(labeled);
         tfCredit = new JTextField();
         tfCredit.addMouseListener(new AccountTextFieldClicked(this, false));
         tfCredit.getDocument().addDocumentListener(this);
@@ -59,20 +45,20 @@ public class TransactionPanel extends JPanel implements Configurable, DocumentLi
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(layout.createSequentialGroup()
-                .addGap(5).addGroup(layout.createParallelGroup().addComponent(labelDate).addComponent(tfDate,50,50,50))
-                .addGap(5).addGroup(layout.createParallelGroup().addComponent(labelDescription).addComponent(cbDescription,200,200,Short.MAX_VALUE))
-                .addGap(5).addGroup(layout.createParallelGroup().addComponent(labelAmount).addComponent(tfAmount,75,75,75))
-                .addGap(5).addGroup(layout.createParallelGroup().addComponent(labelDebit).addComponent(tfDebit,50,50,50))
-                .addGap(5).addGroup(layout.createParallelGroup().addComponent(labelCredit).addComponent(tfCredit,50,50,50))
+                .addGap(5).addGroup(layout.createParallelGroup().addComponent(tfDate,50,50,50))
+                .addGap(5).addGroup(layout.createParallelGroup().addComponent(cbDescription,200,200,Short.MAX_VALUE))
+                .addGap(5).addGroup(layout.createParallelGroup().addComponent(tfAmount,75,75,75))
+                .addGap(5).addGroup(layout.createParallelGroup().addComponent(tfDebit,50,50,50))
+                .addGap(5).addGroup(layout.createParallelGroup().addComponent(tfCredit,50,50,50))
                 .addGap(5));
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGap(5)
                 .addGroup(layout.createParallelGroup()
-                        .addGroup(layout.createSequentialGroup().addComponent(labelDate).addComponent(tfDate,25,25,25))
-                        .addGroup(layout.createSequentialGroup().addComponent(labelDescription).addComponent(cbDescription,25,25,25))
-                        .addGroup(layout.createSequentialGroup().addComponent(labelAmount).addComponent(tfAmount,25,25,25))
-                        .addGroup(layout.createSequentialGroup().addComponent(labelDebit).addComponent(tfDebit,25,25,25))
-                        .addGroup(layout.createSequentialGroup().addComponent(labelCredit).addComponent(tfCredit,25,25,25)))
+                        .addGroup(layout.createSequentialGroup().addComponent(tfDate,25,25,25))
+                        .addGroup(layout.createSequentialGroup().addComponent(cbDescription,25,25,25))
+                        .addGroup(layout.createSequentialGroup().addComponent(tfAmount,25,25,25))
+                        .addGroup(layout.createSequentialGroup().addComponent(tfDebit,25,25,25))
+                        .addGroup(layout.createSequentialGroup().addComponent(tfCredit,25,25,25)))
                 .addGap(5));
 
         new Thread(() -> {
