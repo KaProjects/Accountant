@@ -1,12 +1,15 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.backend.entity.Config;
 import org.kaleta.accountant.backend.entity.Journal;
 import org.kaleta.accountant.backend.entity.Transaction;
 import org.kaleta.accountant.backend.manager.ManagerException;
+import org.kaleta.accountant.backend.manager.jaxb.ConfigManager;
 import org.kaleta.accountant.backend.manager.jaxb.JournalManager;
 import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.ErrorDialog;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,20 +26,42 @@ public class JournalService {
     }
 
     /**
-     * todo doc
+     * Loads all years from configuration data source.
      */
     public List<Integer> getYears(){
-        // TODO: 5/23/16 load years from config
-        return null;
+        try {
+            List<Integer> years = new ArrayList<>();
+            for (Config.Years.Year year : new ConfigManager().retrieve().getYears().getYear()){
+                years.add(Integer.parseInt(year.getName()));
+            }
+            return years;
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
     }
 
     /**
      * todo doc
+     *
+     * @throws IllegalArgumentException if specified year already exists
      */
-    public void createJournal(int year){
+    public void createJournal(int year) throws IllegalArgumentException{
         try {
+            ConfigManager configManager = new ConfigManager();
+            Config config = configManager.retrieve();
+            for (Config.Years.Year usedYear : config.getYears().getYear()){
+                if (usedYear.getName().equals(String.valueOf(year))){
+                    throw new IllegalArgumentException("year " + year + "already exists!");
+                }
+            }
+
             new JournalManager().create(year);
-            // TODO: 5/24/16 + add to config
+
+            Config.Years.Year newYear = new Config.Years.Year();
+            newYear.setName(String.valueOf(year));
+            config.getYears().getYear().add(newYear);
+            configManager.update(config);
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
             throw new ServiceFailureException(e);

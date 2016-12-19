@@ -1,6 +1,7 @@
 package org.kaleta.accountant.service;
 
 import org.kaleta.accountant.backend.manager.ManagerException;
+import org.kaleta.accountant.backend.manager.jaxb.ConfigManager;
 import org.kaleta.accountant.backend.manager.jaxb.ProceduresManager;
 import org.kaleta.accountant.backend.manager.jaxb.SchemaManager;
 import org.kaleta.accountant.backend.manager.jaxb.SemanticManager;
@@ -70,6 +71,17 @@ public class ConfigService {
      * Checks that data are valid, throws ServiceFailureException if not.
      */
     public void checkData() {
+        File configFile = new File(Initializer.DATA_SOURCE + "config.xml");
+        if (!configFile.exists()) {
+            try {
+                new ConfigManager().create();
+                Initializer.LOG.info("File \"%DATA%/" + configFile.getName() + "\" created!");
+            } catch (ManagerException e) {
+                Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+                throw new ServiceFailureException(e);
+            }
+        }
+
         File schemaFile = new File(Initializer.DATA_SOURCE + "schema.xml");
         if (!schemaFile.exists()) {
             try {
@@ -104,7 +116,17 @@ public class ConfigService {
         }
     }
 
-
+    /**
+     * Loads active year from configuration data source.
+     */
+    public int getActiveYear(){
+        try {
+            return Integer.parseInt(new ConfigManager().retrieve().getYears().getActive());
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
 
 
 

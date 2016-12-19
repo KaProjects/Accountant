@@ -5,6 +5,7 @@ import org.kaleta.accountant.frontend.common.MenuItemWrapper;
 import org.kaleta.accountant.frontend.component.BalanceTable;
 import org.kaleta.accountant.frontend.component.JournalTable;
 import org.kaleta.accountant.frontend.component.ProfitTable;
+import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
 import java.awt.Component;
@@ -78,7 +79,7 @@ public class AppFrame extends JFrame implements Configuration{
     private void applySettings(){
         // TODO: 8/3/16 load settings and fire update(comand)
 
-        year = 2016; // TODO load from config
+        year = Service.CONFIG.getActiveYear();
 
         update(Configuration.TRANSACTION_ACTION);
 
