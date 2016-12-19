@@ -78,7 +78,7 @@ public class TransactionManagementPanel extends JPanel {
     }
 
     public void addNewTransaction(boolean isActive){
-        TransactionPanel transactionPanel = new TransactionPanel(config, !okButton.isEnabled());
+        TransactionPanel transactionPanel = new TransactionPanel(config);
         transactionPanel.toggleActive(isActive);
         transactionPanelList.add(transactionPanel);
         updateComponents();
@@ -91,12 +91,10 @@ public class TransactionManagementPanel extends JPanel {
 
     public void setTransactions(List<Transaction> transactionList) {
         transactionPanelList.clear();
-        boolean first = true;
         for (Transaction transaction : transactionList){
-            TransactionPanel transactionPanel = new TransactionPanel(config, first);
+            TransactionPanel transactionPanel = new TransactionPanel(config);
             transactionPanel.setTransaction(transaction);
             transactionPanelList.add(transactionPanel);
-            first = false;
         }
         updateComponents();
     }

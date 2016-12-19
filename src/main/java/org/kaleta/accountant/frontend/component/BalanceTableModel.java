@@ -20,8 +20,8 @@ public class BalanceTableModel extends AbstractTableModel{
     public BalanceTableModel(){
         assets = new ArrayList<>();
         liabilities = new ArrayList<>();
-        assetsBalanceRow = new BalanceRow("Assets", "X", BalanceRow.SUM);
-        liabilitiesBalanceRow = new BalanceRow("Liabilities", "X", BalanceRow.SUM);
+        assetsBalanceRow = new BalanceRow("Assets", "T", "X", BalanceRow.SUM);
+        liabilitiesBalanceRow = new BalanceRow("Liabilities", "T", "X", BalanceRow.SUM);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class BalanceTableModel extends AbstractTableModel{
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 6;
     }
 
     @Override
@@ -39,9 +39,11 @@ public class BalanceTableModel extends AbstractTableModel{
         if (row == getRowCount() - 1){
             switch (column){
                 case 0: return assetsBalanceRow.getName();
-                case 1: return assetsBalanceRow.getValue();
-                case 2: return liabilitiesBalanceRow.getName();
-                case 3: return liabilitiesBalanceRow.getValue();
+                case 1: return assetsBalanceRow.getTurnover();
+                case 2: return assetsBalanceRow.getValue();
+                case 3: return liabilitiesBalanceRow.getName();
+                case 4: return liabilitiesBalanceRow.getTurnover();
+                case 5: return liabilitiesBalanceRow.getValue();
                 default: throw new IllegalArgumentException("columnIndex");
             }
         }
@@ -54,17 +56,29 @@ public class BalanceTableModel extends AbstractTableModel{
                 }
             case 1:
                 if (row < assets.size()){
-                    return assets.get(row).getValue();
+                    return assets.get(row).getTurnover();
                 } else {
                     return null;
                 }
             case 2:
+                if (row < assets.size()){
+                    return assets.get(row).getValue();
+                } else {
+                    return null;
+                }
+            case 3:
                 if (row < liabilities.size()){
                     return liabilities.get(row).getName();
                 } else {
                     return null;
                 }
-            case 3:
+            case 4:
+                if (row < liabilities.size()){
+                    return liabilities.get(row).getTurnover();
+                } else {
+                    return null;
+                }
+            case 5:
                 if (row < liabilities.size()){
                     return liabilities.get(row).getValue();
                 } else {
@@ -77,46 +91,59 @@ public class BalanceTableModel extends AbstractTableModel{
     public void update(Schema schemaA, Schema schemaL, Journal journal){
         assets.clear();
         int assetsBalance = 0;
+        int assetsTurnover = 0;
         for (Schema.Class clazz : schemaA.getClazz()){
             List<BalanceRow> groups = new ArrayList<>();
             int classBalance = 0;
+            int classTurnover = 0;
             for (Schema.Class.Group group : clazz.getGroup()) {
                 List<BalanceRow> accounts = new ArrayList<>();
                 int groupBalance = 0;
+                int groupTurnover = 0;
                 for (Schema.Class.Group.Account account : group.getAccount()) {
                     int accBalance = 0;
+                    int accTurnover = 0;
                     String schemaId = clazz.getId() + group.getId() + account.getId();
                     for (Transaction transaction : journal.getTransaction()) {
                         if (transaction.getDebit().startsWith(schemaId)) {
                             accBalance += Integer.parseInt(transaction.getAmount());
+                            accTurnover += Integer.parseInt(transaction.getAmount());
                         }
                         if (transaction.getCredit().startsWith(schemaId)) {
                             accBalance -= Integer.parseInt(transaction.getAmount());
                         }
                     }
-                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
                     groupBalance += accBalance;
+                    groupTurnover += accTurnover;
                 }
-                groups.add(new BalanceRow(group.getName(), String.valueOf(groupBalance), BalanceRow.GROUP));
+                groups.add(new BalanceRow(group.getName(), String.valueOf(groupTurnover), String.valueOf(groupBalance), BalanceRow.GROUP));
                 groups.addAll(accounts);
                 classBalance += groupBalance;
+                classTurnover += groupTurnover;
             }
             assetsBalance += classBalance;
-            assets.add(new BalanceRow(clazz.getName(), String.valueOf(classBalance), BalanceRow.CLASS));
+            assetsTurnover += classTurnover;
+            assets.add(new BalanceRow(clazz.getName(), String.valueOf(classTurnover), String.valueOf(classBalance), BalanceRow.CLASS));
             assets.addAll(groups);
         }
         assetsBalanceRow.setValue(String.valueOf(assetsBalance));
+        assetsBalanceRow.setTurnover(String.valueOf(assetsTurnover));
 
         liabilities.clear();
         int liabilitiesBalance = 0;
+        int liabilitiesTurnover = 0;
         for (Schema.Class clazz : schemaL.getClazz()){
             List<BalanceRow> groups = new ArrayList<>();
             int classBalance = 0;
+            int classTurnover = 0;
             for (Schema.Class.Group group : clazz.getGroup()) {
                 List<BalanceRow> accounts = new ArrayList<>();
                 int groupBalance = 0;
+                int groupTurnover = 0;
                 for (Schema.Class.Group.Account account : group.getAccount()) {
                     int accBalance = 0;
+                    int accTurnover = 0;
                     String schemaId = clazz.getId() + group.getId() + account.getId();
                     for (Transaction transaction : journal.getTransaction()) {
                         if (transaction.getDebit().startsWith(schemaId)) {
@@ -124,23 +151,28 @@ public class BalanceTableModel extends AbstractTableModel{
                         }
                         if (transaction.getCredit().startsWith(schemaId)) {
                             accBalance += Integer.parseInt(transaction.getAmount());
+                            accTurnover += Integer.parseInt(transaction.getAmount());
                         }
                     }
-                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
                     groupBalance += accBalance;
+                    groupTurnover += accTurnover;
                 }
-                groups.add(new BalanceRow(group.getName(), String.valueOf(groupBalance), BalanceRow.GROUP));
+                groups.add(new BalanceRow(group.getName(), String.valueOf(groupTurnover), String.valueOf(groupBalance), BalanceRow.GROUP));
                 groups.addAll(accounts);
                 classBalance += groupBalance;
+                classTurnover += groupTurnover;
             }
             liabilitiesBalance += classBalance;
-            liabilities.add(new BalanceRow(clazz.getName(), String.valueOf(classBalance), BalanceRow.CLASS));
+            liabilitiesTurnover += classTurnover;
+            liabilities.add(new BalanceRow(clazz.getName(), String.valueOf(classTurnover), String.valueOf(classBalance), BalanceRow.CLASS));
             liabilities.addAll(groups);
         }
         int profit = assetsBalance - liabilitiesBalance;
-        liabilities.add(new BalanceRow("Profit", String.valueOf(profit), BalanceRow.SUM));
+        liabilities.add(new BalanceRow("Profit", "", String.valueOf(profit), BalanceRow.SUM));
         liabilitiesBalance += profit;
         liabilitiesBalanceRow.setValue(String.valueOf(liabilitiesBalance));
+        liabilitiesBalanceRow.setTurnover(String.valueOf(liabilitiesTurnover));
     }
 
     public String getCellType(int row, int column){
@@ -150,13 +182,15 @@ public class BalanceTableModel extends AbstractTableModel{
         switch (column){
             case 0:
             case 1:
+            case 2:
                 if (row < assets.size()){
                     return assets.get(row).getType();
                 } else {
                     return "";
                 }
-            case 2:
             case 3:
+            case 4:
+            case 5:
                 if (row < liabilities.size()){
                     return liabilities.get(row).getType();
                 } else {
@@ -170,13 +204,15 @@ public class BalanceTableModel extends AbstractTableModel{
         switch (column){
             case 0:
             case 1:
+            case 2:
                 if (row < assets.size()){
                     return assets.get(row).getSchemaId();
                 } else {
                     return null;
                 }
-            case 2:
             case 3:
+            case 4:
+            case 5:
                 if (row < liabilities.size()){
                     return liabilities.get(row).getSchemaId();
                 } else {

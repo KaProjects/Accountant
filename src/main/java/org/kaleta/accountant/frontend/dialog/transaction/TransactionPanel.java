@@ -28,7 +28,7 @@ public class TransactionPanel extends JPanel implements Configurable, DocumentLi
     private boolean isActive;
     private final Object lock = new Object();
 
-    public TransactionPanel(Configuration configuration, boolean labeled){
+    public TransactionPanel(Configuration configuration){
         setConfiguration(configuration);
         isActive = true;
         tfDate = new JTextField();
@@ -76,6 +76,7 @@ public class TransactionPanel extends JPanel implements Configurable, DocumentLi
     }
 
     public Transaction getTransaction() {
+        toggleActive(false);
         Transaction transaction = new Transaction();
         transaction.setDate(tfDate.getText());
         transaction.setDescription(((JTextField) cbDescription.getEditor().getEditorComponent()).getText());

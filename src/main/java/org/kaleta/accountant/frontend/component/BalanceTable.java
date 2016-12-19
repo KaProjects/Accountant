@@ -36,12 +36,17 @@ public class BalanceTable extends JTable implements Configurable {
         this.setRowHeight(30);
 
         TableColumnModel columnModel = this.getColumnModel();
-        columnModel.getColumn(0).setMinWidth(350);
+        columnModel.getColumn(0).setMinWidth(320);
         columnModel.getColumn(1).setMinWidth(140);
         columnModel.getColumn(1).setMaxWidth(140);
-        columnModel.getColumn(2).setMinWidth(350);
-        columnModel.getColumn(3).setMinWidth(140);
-        columnModel.getColumn(3).setMaxWidth(140);
+        columnModel.getColumn(2).setMinWidth(140);
+        columnModel.getColumn(2).setMaxWidth(140);
+
+        columnModel.getColumn(3).setMinWidth(320);
+        columnModel.getColumn(4).setMinWidth(140);
+        columnModel.getColumn(4).setMaxWidth(140);
+        columnModel.getColumn(5).setMinWidth(140);
+        columnModel.getColumn(5).setMaxWidth(140);
 
         DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
             @Override
@@ -63,7 +68,7 @@ public class BalanceTable extends JTable implements Configurable {
                     c.setFont(new Font(c.getFont().getName(), Font.PLAIN, 15));
                     c.setBackground(Color.WHITE);
                 }
-                if (column == 0 || column == 2){
+                if (column == 0 || column == 3){
                     setHorizontalAlignment(JLabel.LEFT);
                     setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
                 } else {

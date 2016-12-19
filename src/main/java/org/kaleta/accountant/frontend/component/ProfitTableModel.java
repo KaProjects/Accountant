@@ -81,15 +81,15 @@ public class ProfitTableModel extends AbstractTableModel {
                             accBalance -= Integer.parseInt(transaction.getAmount());
                         }
                     }
-                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                    accounts.add(new BalanceRow(account.getName(), "T", String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
                     groupBalance += accBalance;
                 }
-                groups.add(new BalanceRow(group.getName(), String.valueOf(groupBalance), BalanceRow.GROUP));
+                groups.add(new BalanceRow(group.getName(), "T", String.valueOf(groupBalance), BalanceRow.GROUP));
                 groups.addAll(accounts);
                 classBalance += groupBalance;
             }
             //expensesBalance += classBalance;
-            expenses.add(new BalanceRow(clazz.getName(), String.valueOf(classBalance), BalanceRow.CLASS));
+            expenses.add(new BalanceRow(clazz.getName(), "T", String.valueOf(classBalance), BalanceRow.CLASS));
             expenses.addAll(groups);
         }
 
@@ -112,15 +112,15 @@ public class ProfitTableModel extends AbstractTableModel {
                             accBalance += Integer.parseInt(transaction.getAmount());
                         }
                     }
-                    accounts.add(new BalanceRow(account.getName(), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                    accounts.add(new BalanceRow(account.getName() ,"T", String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
                     groupBalance += accBalance;
                 }
-                groups.add(new BalanceRow(group.getName(), String.valueOf(groupBalance), BalanceRow.GROUP));
+                groups.add(new BalanceRow(group.getName(), "T", String.valueOf(groupBalance), BalanceRow.GROUP));
                 groups.addAll(accounts);
                 classBalance += groupBalance;
             }
             //revenuesBalance += classBalance;
-            revenues.add(new BalanceRow(clazz.getName(), String.valueOf(classBalance), BalanceRow.CLASS));
+            revenues.add(new BalanceRow(clazz.getName(), "T", String.valueOf(classBalance), BalanceRow.CLASS));
             revenues.addAll(groups);
         }
         // TODO: 8/10/16 profit not showed here (is only in balance) for now
