@@ -6,7 +6,7 @@
 
     <groupId>org.kaleta</groupId>
     <artifactId>accountant</artifactId>
-    <version>0.0</version>
+    <version>0.1-snapshot</version>
 
     <dependencies>
     </dependencies>
