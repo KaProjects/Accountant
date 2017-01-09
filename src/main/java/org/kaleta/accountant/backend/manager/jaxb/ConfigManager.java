@@ -27,7 +27,11 @@ public class ConfigManager implements Manager<Config> {
     }
     @Override
     public void create() throws ManagerException {
-        update(new Config());
+        Config config = new Config();
+        Config.Years years = new Config.Years();
+        years.setActive("-1");
+        config.setYears(years);
+        update(config);
     }
 
     @Override

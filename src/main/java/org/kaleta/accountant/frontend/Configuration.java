@@ -11,6 +11,8 @@ public interface Configuration {
      */
     int INIT_CONFIG = 0;
     int TRANSACTION_ACTION = 1;
+    int YEAR_ADDED = 2;
+    int YEAR_SELECTED = 3;
 
     /**
      * Recursively updates component's tree of app.
@@ -24,4 +26,14 @@ public interface Configuration {
      * Returns actual year according configuration.
      */
     int getActiveYear();
+
+    /**
+     * todo doc.
+     */
+    int getSelectedYear();
+
+    /**
+     * todo doc.
+     */
+    void setSelectedYear(int index);
 }

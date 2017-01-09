@@ -5,6 +5,8 @@ import org.kaleta.accountant.frontend.common.MenuItemWrapper;
 import org.kaleta.accountant.frontend.component.BalanceTable;
 import org.kaleta.accountant.frontend.component.JournalTable;
 import org.kaleta.accountant.frontend.component.ProfitTable;
+import org.kaleta.accountant.frontend.component.year.YearMenu;
+import org.kaleta.accountant.frontend.component.year.YearTabbedPane;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -19,6 +21,7 @@ import java.awt.event.KeyEvent;
  */
 public class AppFrame extends JFrame implements Configuration{
     private int year;
+    private int selectedYearIndex;
 
     public AppFrame(){
 //        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -32,6 +35,7 @@ public class AppFrame extends JFrame implements Configuration{
         initMenuBar();
         initComponents();
         update(Configuration.INIT_CONFIG);
+        update(Configuration.YEAR_ADDED);
         applySettings();
         this.pack();
     }
@@ -53,7 +57,8 @@ public class AppFrame extends JFrame implements Configuration{
 
 
         this.getContentPane().setLayout(new GridLayout(1,1));
-        this.add(tabbedPane);
+        //this.add(tabbedPane);
+        this.add(new YearTabbedPane());
     }
 
     private void initMenuBar() {
@@ -74,6 +79,9 @@ public class AppFrame extends JFrame implements Configuration{
         fileMenu.add(new MenuItemWrapper(new OpenAccountPreview(this)));
         fileMenu.add(new JSeparator());
         fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
+
+        menuBar.add(new JPanel());
+        menuBar.add(new YearMenu());
     }
 
     private void applySettings(){
@@ -112,5 +120,16 @@ public class AppFrame extends JFrame implements Configuration{
     @Override
     public int getActiveYear() {
         return year;
+    }
+
+    @Override
+    public int getSelectedYear(){
+        return selectedYearIndex;
+    }
+
+    @Override
+    public void setSelectedYear(int index){
+        selectedYearIndex = index;
+        update(Configuration.YEAR_SELECTED);
     }
 }

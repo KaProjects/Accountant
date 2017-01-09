@@ -22,4 +22,9 @@ public class Service {
      * Instance of journal's service class
      */
     public static final JournalService JOURNAL = new JournalService();
+
+    /**
+     * Instance of year's service class
+     */
+    public static final YearService YEAR = new YearService();
 }

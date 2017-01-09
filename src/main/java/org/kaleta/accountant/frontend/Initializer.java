@@ -45,8 +45,9 @@ public class Initializer {
                 Service.CONFIG.checkResources();
                 initLogger();
                 Service.CONFIG.checkData();
-                //Service.configService().checkFirstUse();
-
+                if (Service.CONFIG.getActiveYear() == -1){
+                    // TODO: 12/25/16 new year wizard
+                }
 
                 new AppFrame().setVisible(true);
 
