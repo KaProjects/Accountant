@@ -6,7 +6,7 @@ import org.kaleta.accountant.frontend.component.BalanceTable;
 import org.kaleta.accountant.frontend.component.JournalTable;
 import org.kaleta.accountant.frontend.component.ProfitTable;
 import org.kaleta.accountant.frontend.component.year.YearMenu;
-import org.kaleta.accountant.frontend.component.year.YearTabbedPane;
+import org.kaleta.accountant.frontend.component.year.YearPane;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -58,7 +58,7 @@ public class AppFrame extends JFrame implements Configuration{
 
         this.getContentPane().setLayout(new GridLayout(1,1));
         //this.add(tabbedPane);
-        this.add(new YearTabbedPane());
+        this.add(new YearPane());
     }
 
     private void initMenuBar() {
