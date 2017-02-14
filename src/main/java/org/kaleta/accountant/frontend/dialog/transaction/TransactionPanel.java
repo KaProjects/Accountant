@@ -6,12 +6,10 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.mouse.AccountTextFieldClicked;
 import org.kaleta.accountant.frontend.common.ColorConstants;
 import org.kaleta.accountant.frontend.common.SwingWorkerHandler;
-import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.util.Set;
 
 /**
  * Created by Stanislav Kaleta on 24.05.2016.
@@ -140,11 +138,11 @@ public class TransactionPanel extends JPanel implements Configurable, DocumentLi
 
     private void updateDescriptions() {
         synchronized(lock) {
-            Set<String> descList = Service.JOURNAL.listTransactionDescriptions(tfDebit.getText(), tfCredit.getText(), getConfiguration().getActiveYear());
+            //todo Set<String> descList = Service.JOURNAL.listTransactionDescriptions(tfDebit.getText(), tfCredit.getText(), getConfiguration().getActiveYear());
             String cbValue = ((JTextField)cbDescription.getEditor().getEditorComponent()).getText();
             DefaultComboBoxModel model = (DefaultComboBoxModel) cbDescription.getModel();
             model.removeAllElements();
-            descList.forEach(model::addElement);
+            //todo descList.forEach(model::addElement);
             ((JTextField)cbDescription.getEditor().getEditorComponent()).setText(cbValue);
         }
     }

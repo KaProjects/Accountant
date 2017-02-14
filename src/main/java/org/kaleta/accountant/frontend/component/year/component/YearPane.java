@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.component.year;
+package org.kaleta.accountant.frontend.component.year.component;
 
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
@@ -25,27 +25,6 @@ public class YearPane extends JTabbedPane implements Configurable{
 //            }
 //        });
     }
-
-    public void update(YearModel model){
-        this.removeAll();
-
-        SchemaEditor schemaEditor = new SchemaEditor(model);
-        if (model.isActive()){
-            JTabbedPane schemaPane = new JTabbedPane();
-            this.addTab("Schema", schemaPane);
-            schemaPane.addTab("Overview", new JScrollPane(schemaEditor.getOverview()));
-            schemaEditor.updateOverview();
-            schemaPane.addTab("Editor", new JScrollPane(schemaEditor.getEditor()));
-            schemaEditor.updateEditor(this);
-        } else {
-            this.addTab("Schema", new JScrollPane(schemaEditor.getOverview()));
-            schemaEditor.updateOverview();
-        }
-
-
-
-    }
-
 
     @Override
     public void setConfiguration(Configuration configuration) {

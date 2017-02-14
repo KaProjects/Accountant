@@ -3,11 +3,8 @@ package org.kaleta.accountant.frontend.action.mouse;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.component.BalanceTableModel;
 import org.kaleta.accountant.frontend.component.ProfitTableModel;
-import org.kaleta.accountant.frontend.dialog.account.AccountPreviewFrame;
-import org.kaleta.accountant.frontend.dialog.account.AccountPreviewModel;
 
 import javax.swing.*;
-import java.awt.Component;
 import java.awt.event.MouseEvent;
 
 /**
@@ -31,9 +28,9 @@ public class BalanceTableClicked extends MouseAction {
                 ((BalanceTableModel) table.getModel()).getCellSchemaId(row, column) :
                 ((ProfitTableModel) table.getModel()).getCellSchemaId(row, column);
         if (schemaId != null){
-            AccountPreviewModel model = new AccountPreviewModel(schemaId, getConfiguration().getActiveYear());
-            AccountPreviewFrame frame = new AccountPreviewFrame((Component) getConfiguration(), model);
-            frame.setVisible(true);
+            //todo AccountPreviewModel model = new AccountPreviewModel(schemaId, getConfiguration().getActiveYear());
+            //todo AccountPreviewFrame frame = new AccountPreviewFrame((Component) getConfiguration(), model);
+            //todo frame.setVisible(true);
         }
     }
 }

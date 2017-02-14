@@ -1,5 +1,8 @@
 package org.kaleta.accountant.frontend;
 
+
+import org.kaleta.accountant.frontend.component.year.model.YearModel;
+
 /**
  * Created by Stanislav Kaleta on 19.04.2016.
  *
@@ -13,6 +16,7 @@ public interface Configuration {
     int TRANSACTION_ACTION = 1;
     int YEAR_ADDED = 2;
     int YEAR_SELECTED = 3;
+    int SCHEMA_UPDATED = 4;
 
     /**
      * Recursively updates component's tree of app.
@@ -23,17 +27,9 @@ public interface Configuration {
     void update(int command);
 
     /**
-     * Returns actual year according configuration.
-     */
-    int getActiveYear();
-
-    /**
      * todo doc.
      */
-    int getSelectedYear();
+    void selectYear(int yearId);
 
-    /**
-     * todo doc.
-     */
-    void setSelectedYear(int index);
+    YearModel getModel();
 }

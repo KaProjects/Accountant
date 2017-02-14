@@ -6,7 +6,8 @@ import org.kaleta.accountant.frontend.component.BalanceTable;
 import org.kaleta.accountant.frontend.component.JournalTable;
 import org.kaleta.accountant.frontend.component.ProfitTable;
 import org.kaleta.accountant.frontend.component.year.YearMenu;
-import org.kaleta.accountant.frontend.component.year.YearPane;
+import org.kaleta.accountant.frontend.component.year.component.YearPane;
+import org.kaleta.accountant.frontend.component.year.model.YearModel;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -21,7 +22,7 @@ import java.awt.event.KeyEvent;
  */
 public class AppFrame extends JFrame implements Configuration{
     private int year;
-    private int selectedYearIndex;
+    private YearModel model;
 
     public AppFrame(){
 //        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -34,8 +35,6 @@ public class AppFrame extends JFrame implements Configuration{
 
         initMenuBar();
         initComponents();
-        update(Configuration.INIT_CONFIG);
-        update(Configuration.YEAR_ADDED);
         applySettings();
         this.pack();
     }
@@ -85,13 +84,12 @@ public class AppFrame extends JFrame implements Configuration{
     }
 
     private void applySettings(){
-        // TODO: 8/3/16 load settings and fire update(comand)
-
-        year = Service.CONFIG.getActiveYear();
-
-        update(Configuration.TRANSACTION_ACTION);
+        update(Configuration.INIT_CONFIG);
+        model = Service.YEAR.getYearModel(Service.CONFIG.getActiveYear());
+        update(Configuration.YEAR_ADDED);
 
 
+        //update(Configuration.TRANSACTION_ACTION);
     }
 
     private void updateComponent(JComponent component,int command) {
@@ -118,18 +116,13 @@ public class AppFrame extends JFrame implements Configuration{
     }
 
     @Override
-    public int getActiveYear() {
-        return year;
-    }
-
-    @Override
-    public int getSelectedYear(){
-        return selectedYearIndex;
-    }
-
-    @Override
-    public void setSelectedYear(int index){
-        selectedYearIndex = index;
+    public void selectYear(int yearId){
+        model = Service.YEAR.getYearModel(yearId);
         update(Configuration.YEAR_SELECTED);
+    }
+
+    @Override
+    public YearModel getModel() {
+        return model;
     }
 }

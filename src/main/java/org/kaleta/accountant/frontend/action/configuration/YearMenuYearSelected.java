@@ -19,9 +19,9 @@ public class YearMenuYearSelected extends ConfigurationAction {
 
     @Override
     protected void actionPerformed() {
-        List<String> years = Service.YEAR.getYearNames();
-        menu.setText("Year: " + years.get(getConfiguration().getSelectedYear()));
-        if (years.size() - 1 == getConfiguration().getSelectedYear()){
+        List<Integer> yearIds = Service.YEAR.getYearIds();
+        menu.setText("Year: " + getConfiguration().getModel().getYearId());
+        if (yearIds.get(yearIds.size() - 1) == getConfiguration().getModel().getYearId()){
             menu.setForeground(Color.GREEN.darker());
         } else {
             menu.setForeground(Color.BLACK);

@@ -23,19 +23,19 @@ public class YearMenuYearAdded extends ConfigurationAction {
     @Override
     protected void actionPerformed() {
         menu.removeAll();
-        List<String> years = Service.YEAR.getYearNames();
-        for (String year : years){
-            JMenuItem menuItem = new MenuItemWrapper(new MenuAction(menu.getConfiguration(), year) {
+        List<Integer> yearIds = Service.YEAR.getYearIds();
+        for (Integer yearId : yearIds){
+            JMenuItem menuItem = new MenuItemWrapper(new MenuAction(getConfiguration(), String.valueOf(yearId)) {
                 @Override
                 protected void actionPerformed() {
-                    getConfiguration().setSelectedYear(years.indexOf(year));
+                    getConfiguration().selectYear(yearId);
                 }
             });
-            if (years.indexOf(year) == years.size() - 1){
+            if (yearIds.indexOf(yearId) == yearIds.size() - 1){
                 menuItem.setForeground(Color.GREEN.darker());
             }
             menu.add(menuItem);
         }
-        getConfiguration().setSelectedYear(years.size() - 1);
+        getConfiguration().selectYear(yearIds.get(yearIds.size() - 1));
     }
 }
