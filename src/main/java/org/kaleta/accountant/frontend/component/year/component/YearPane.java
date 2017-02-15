@@ -17,13 +17,6 @@ public class YearPane extends JTabbedPane implements Configurable{
 
         this.getActionMap().put(Configuration.INIT_CONFIG, new InitConfigurableAction(this));
         this.getActionMap().put(Configuration.YEAR_SELECTED, new YearPaneYearSelected(this));
-//        this.getActionMap().put(Configuration.SCHEMA_UPDATED, new ConfigurationAction(this) {
-//            @Override
-//            protected void actionPerformed() {
-//                // update model's schema
-//                // update components which use schema (schemaEditor.updateOverview,schemaEditor.updateEditor(configuration),...)
-//            }
-//        });
     }
 
     @Override

@@ -4,8 +4,8 @@ import org.kaleta.accountant.backend.entity.Transaction;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.mouse.AccountTextFieldClicked;
-import org.kaleta.accountant.frontend.common.ColorConstants;
 import org.kaleta.accountant.frontend.common.SwingWorkerHandler;
+import org.kaleta.accountant.frontend.common.constants.ColorConstants;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

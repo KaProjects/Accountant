@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.common;
+package org.kaleta.accountant.frontend.common.constants;
 
 import java.awt.Color;
 

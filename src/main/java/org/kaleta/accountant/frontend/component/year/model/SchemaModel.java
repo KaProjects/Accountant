@@ -7,12 +7,9 @@ import java.util.TreeMap;
  * Created by Stanislav Kaleta on 14.02.2017.
  */
 public class SchemaModel {
-    private Map<Integer, Clazz> classes;
+    private Map<Integer, Clazz> classes = new TreeMap<>();
 
     public Map<Integer, Clazz> getClasses() {
-        if (classes == null) {
-            classes = new TreeMap<>();
-        }
         return classes;
     }
 

@@ -3,6 +3,7 @@ package org.kaleta.accountant.service;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.ErrorDialog;
+import org.kaleta.accountant.frontend.common.constants.AccountType;
 import org.kaleta.accountant.frontend.component.year.model.AccountModel;
 import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
 import org.kaleta.accountant.frontend.component.year.model.YearModel;
@@ -55,8 +56,8 @@ public class YearService {
             model.setSchemaModel(schemaModel);
 
             schemaModel.getClasses().put(0, new SchemaModel.Clazz(0,"Assets"));
-            schemaModel.getClasses().get(0).getGroups().put(0, new SchemaModel.Clazz.Group(0,"nwhm"));
-            schemaModel.getClasses().get(0).getGroups().get(0).getAccounts().put(0,new SchemaModel.Clazz.Group.Account(0,"A", "asdasd"));
+            schemaModel.getClasses().get(0).getGroups().put(0, new SchemaModel.Clazz.Group(0,"TESTGROUP"));
+            schemaModel.getClasses().get(0).getGroups().get(0).getAccounts().put(0,new SchemaModel.Clazz.Group.Account(0,"A", "TESTACC"));
             schemaModel.getClasses().get(0).getGroups().get(0).getAccounts().put(1,new SchemaModel.Clazz.Group.Account(1,"A", "asdasaaa111"));
             schemaModel.getClasses().get(0).getGroups().get(0).getAccounts().put(2,new SchemaModel.Clazz.Group.Account(2,"A", "asdasd222"));
             schemaModel.getClasses().get(0).getGroups().put(9, new SchemaModel.Clazz.Group(9,"Accumulated Depreciation"));
@@ -77,7 +78,7 @@ public class YearService {
             schemaModel.getClasses().put(4, new SchemaModel.Clazz(4,"kap"));
 
             schemaModel.getClasses().put(5, new SchemaModel.Clazz(5,"Expenses"));
-            schemaModel.getClasses().get(5).getGroups().put(8, new SchemaModel.Clazz.Group(9,"Consumption"));
+            schemaModel.getClasses().get(5).getGroups().put(8, new SchemaModel.Clazz.Group(8,"Consumption"));
             schemaModel.getClasses().get(5).getGroups().put(9, new SchemaModel.Clazz.Group(9,"Depreciation"));
 
             schemaModel.getClasses().put(6, new SchemaModel.Clazz(6,"Revenues"));
@@ -86,6 +87,10 @@ public class YearService {
 
             AccountModel accountModel = new AccountModel();
             model.setAccountModel(accountModel);
+
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("000","0", AccountType.ASSET,"HAHA"));
+            model.getAccountModel().getAccounts().get(0).getTransactions().add(new AccountModel.Transaction("1","01012017","zzz","100","000.0","711"));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("000","1", AccountType.ASSET,"HAHA2"));
 
             if (true) {
                 return model;

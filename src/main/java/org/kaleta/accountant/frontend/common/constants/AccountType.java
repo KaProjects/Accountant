@@ -1,4 +1,4 @@
-package org.kaleta.accountant.backend.constants;
+package org.kaleta.accountant.frontend.common.constants;
 
 /**
  * Created by Stanislav Kaleta on 21.05.2016.

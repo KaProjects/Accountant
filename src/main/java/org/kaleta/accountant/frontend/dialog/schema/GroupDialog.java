@@ -1,9 +1,9 @@
 package org.kaleta.accountant.frontend.dialog.schema;
 
-import org.kaleta.accountant.backend.constants.AccountType;
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.common.NumberFilter;
+import org.kaleta.accountant.frontend.common.constants.AccountType;
 import org.kaleta.accountant.frontend.dialog.Dialog;
 
 import javax.swing.*;

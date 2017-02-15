@@ -37,6 +37,7 @@ public class AppFrame extends JFrame implements Configuration{
         initComponents();
         applySettings();
         this.pack();
+        this.setSize(1000,500);
     }
 
     private void initComponents( ){

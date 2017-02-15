@@ -1,7 +1,7 @@
 package org.kaleta.accountant.frontend.dialog.account;
 
-import org.kaleta.accountant.backend.constants.AccountType;
 import org.kaleta.accountant.backend.entity.Transaction;
+import org.kaleta.accountant.frontend.common.constants.AccountType;
 
 import javax.swing.*;
 import java.awt.Component;
