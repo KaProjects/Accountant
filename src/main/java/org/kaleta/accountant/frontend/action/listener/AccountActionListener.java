@@ -51,7 +51,7 @@ public class AccountActionListener extends ActionListener {
                 break;
             }
             case 2: {
-                if (getConfiguration().getModel().getAccountModel().accountDeletable(cId,gId,aId)){
+                if (getConfiguration().getModel().getAccountModel().isAccountDeletable(cId,gId,aId)){
                     deleteAccount();
                 } else {
                     JOptionPane.showMessageDialog(null, "Account type cannot be deleted, because has at least one associated account with non zero turnover.",

@@ -41,7 +41,7 @@ public class GroupActionListener extends ActionListener {
                 break;
             }
             case 2: {
-                if (getConfiguration().getModel().getAccountModel().groupDeletable(cId,gId)){
+                if (getConfiguration().getModel().getAccountModel().isGroupDeletable(cId,gId)){
                     deleteGroup();
                 } else {
                     JOptionPane.showMessageDialog(null, "Group cannot be deleted, because has at least one associated account with non zero turnover.",

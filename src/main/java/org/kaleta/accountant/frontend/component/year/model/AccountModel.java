@@ -12,36 +12,125 @@ import java.util.stream.Collectors;
  */
 public class AccountModel {
     private List<Account> accounts = new ArrayList<>();
+    private List<Transaction> transactions = new ArrayList<>();
 
     public AccountModel(){
-
     }
 
-    public List<Account> getAccounts() {
-        return accounts;
+    public String getAccInitState(Account account) {
+        String type = account.getType();
+        String id = account.getSchemaId() + "." + account.getSemanticId();
+        for (Transaction tr : transactions) {
+            if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
+                if (tr.getDebit().equals(id)
+                        && tr.getCredit().startsWith(DefaultSchemaId.INIT_ACC)) {
+                    return tr.getAmount();
+                }
+            }
+            if (type.equals(AccountType.LIABILITY) || type.equals(AccountType.REVENUE)) {
+                if (tr.getCredit().equals(id)
+                        && tr.getDebit().startsWith(DefaultSchemaId.INIT_ACC)) {
+                    return tr.getAmount();
+                }
+            }
+        }
+        throw new IllegalArgumentException("Account has no initial state");
+    }
+
+    public String getAccFinalState(Account account){
+        String type = account.getType();
+        String id = account.getSchemaId() + "." + account.getSemanticId();
+        for (Transaction tr : transactions){
+            if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
+                if (tr.getCredit().equals(id)
+                        &&tr.getDebit().startsWith(DefaultSchemaId.CLOSING_ACC)){
+                    return tr.getAmount();
+                }
+            }
+            if (type.equals(AccountType.LIABILITY) || type.equals(AccountType.REVENUE)){
+                if (tr.getDebit().equals(id)
+                        && tr.getCredit().startsWith(DefaultSchemaId.CLOSING_ACC)){
+                    return tr.getAmount();
+                }
+            }
+        }
+        throw new IllegalArgumentException("Account has no final state");
+    }
+
+    public String getAccBalance(Account account){
+        String type = account.getType();
+        if (type.equals(AccountType.OFF_BALANCE)){
+            throw new IllegalArgumentException("Off-Balance accounts has no balance");
+        }
+        String id = account.getSchemaId() + "." + account.getSemanticId();
+        System.out.println(id);
+        Integer balance = 0;
+        for (Transaction tr : transactions){
+            if (tr.getCredit().equals(id)){
+                if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
+                    balance -= Integer.parseInt(tr.getAmount());
+                } else {
+                    balance += Integer.parseInt(tr.getAmount());
+                }
+                System.out.println("C "+id + " " + balance);
+            }
+            if (tr.getDebit().equals(id)){
+                if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
+                    balance += Integer.parseInt(tr.getAmount());
+                } else {
+                    balance -= Integer.parseInt(tr.getAmount());
+                }
+                System.out.println("D "+id + " " + balance);
+            }
+        }
+        return String.valueOf(balance);
+    }
+
+    public int getAccTurnover(Account account){
+        // TODO: 2/15/17 decide if A->debitTurnvoer ... or maxTurnover
+        String accId = account.getSchemaId() + "." + account.getSemanticId();
+        int debitTurnover = 0;
+        int creditTurnover = 0;
+        for (Transaction tr : transactions){
+            if (tr.getDebit().equals(accId)){
+                debitTurnover += Integer.parseInt(tr.getAmount());
+            }
+            if (tr.getCredit().equals(accId)){
+                creditTurnover += Integer.parseInt(tr.getAmount());
+            }
+        }
+        return (debitTurnover > creditTurnover) ? debitTurnover : creditTurnover;
+    }
+
+
+    public boolean isGroupDeletable(int cId, int gId){
+        String schemaId = String.valueOf(cId) + String.valueOf(gId);
+        boolean deletable = true;
+        for (Account account : accounts){
+            if (account.getSchemaId().startsWith(schemaId) && getAccTurnover(account) > 0) deletable = false;
+        }
+        return deletable;
+    }
+
+    public boolean isAccountDeletable(int cId, int gId, int aId){
+        String schemaId = String.valueOf(cId) + String.valueOf(gId) + String.valueOf(aId);
+        boolean deletable = true;
+        for (Account account : accounts){
+            if (account.getSchemaId().startsWith(schemaId) && getAccTurnover(account) > 0) deletable = false;
+        }
+        return deletable;
     }
 
     public List<Account> getAccountsBySchema(String schemaId){
         return accounts.stream().filter(account -> account.getSchemaId().startsWith(schemaId)).collect(Collectors.toList());
     }
 
-
-    public boolean groupDeletable(int cId, int gId){
-        String schemaId = String.valueOf(cId) + String.valueOf(gId);
-        boolean deletable = true;
-        for (Account account : accounts){
-            if (account.getSchemaId().startsWith(schemaId) && account.getTurnover() > 0) deletable = false;
-        }
-        return deletable;
+    public List<Account> getAccounts() {
+        return accounts;
     }
 
-    public boolean accountDeletable(int cId, int gId, int aId){
-        String schemaId = String.valueOf(cId) + String.valueOf(gId) + String.valueOf(aId);
-        boolean deletable = true;
-        for (Account account : accounts){
-            if (account.getSchemaId().startsWith(schemaId) && account.getTurnover() > 0) deletable = false;
-        }
-        return deletable;
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
     public static class Account {
@@ -49,7 +138,6 @@ public class AccountModel {
         private String semanticId;
         private String type;
         private String name;
-        private List<Transaction> transactions = new ArrayList<>();
 
         public Account() {
         }
@@ -59,57 +147,6 @@ public class AccountModel {
             this.type = type;
             this.semanticId = semanticId;
             this.name = name;
-        }
-
-        public String getInitState() {
-            for (Transaction tr : transactions) {
-                if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
-                    if (tr.getDebit().startsWith(schemaId)
-                            && tr.getCredit().startsWith(DefaultSchemaId.INIT_ACC)) {
-                        return tr.getAmount();
-                    }
-                }
-                if (type.equals(AccountType.LIABILITY) || type.equals(AccountType.REVENUE)) {
-                    if (tr.getCredit().startsWith(schemaId)
-                            && tr.getDebit().startsWith(DefaultSchemaId.INIT_ACC)) {
-                        return tr.getAmount();
-                    }
-                }
-            }
-            throw new IllegalArgumentException("Account has no initial state");
-        }
-
-        public String getFinalState(){
-            for (Transaction tr : transactions){
-                if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
-                    if (tr.getCredit().startsWith(schemaId)
-                            &&tr.getDebit().startsWith(DefaultSchemaId.CLOSING_ACC)){
-                        return tr.getAmount();
-                    }
-                }
-                if (type.equals(AccountType.LIABILITY) || type.equals(AccountType.REVENUE)){
-                    if (tr.getDebit().startsWith(schemaId)
-                            &&tr.getCredit().startsWith(DefaultSchemaId.CLOSING_ACC)){
-                        return tr.getAmount();
-                    }
-                }
-            }
-            throw new IllegalArgumentException("Account has no final state");
-        }
-
-        public int getTurnover(){
-            // TODO: 2/15/17 decide if A->debitTurnvoer ... or maxTurnover
-            int debitTurnover = 0;
-            int creditTurnover = 0;
-            for (Transaction tr : transactions){
-                if (tr.getDebit().startsWith(schemaId)){
-                    debitTurnover =+ Integer.parseInt(tr.getAmount());
-                }
-                if (tr.getCredit().startsWith(schemaId)){
-                    creditTurnover =+ Integer.parseInt(tr.getAmount());
-                }
-            }
-            return (debitTurnover > creditTurnover) ? debitTurnover : creditTurnover;
         }
 
         public String getType() {
@@ -142,10 +179,6 @@ public class AccountModel {
 
         public void setSemanticId(String semanticId) {
             this.semanticId = semanticId;
-        }
-
-        public List<Transaction> getTransactions() {
-            return transactions;
         }
     }
 

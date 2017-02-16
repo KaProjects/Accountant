@@ -1,9 +1,6 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
-import org.kaleta.accountant.frontend.component.year.component.AccountsEditor;
-import org.kaleta.accountant.frontend.component.year.component.SchemaEditor;
-import org.kaleta.accountant.frontend.component.year.component.SchemaOverview;
-import org.kaleta.accountant.frontend.component.year.component.YearPane;
+import org.kaleta.accountant.frontend.component.year.component.*;
 
 import javax.swing.*;
 
@@ -37,6 +34,11 @@ public class YearPaneYearSelected extends ConfigurationAction {
             accountsEditor.setConfiguration(getConfiguration());
             accountsEditor.update();
             pane.add("Accounts", accountsEditor);
+
+            AssetsEditor assetsEditor = new AssetsEditor();
+            assetsEditor.setConfiguration(getConfiguration());
+            assetsEditor.update();
+            pane.add("Assets", assetsEditor);
         } else {
             pane.addTab("Schema", new JScrollPane(schemaOverview));
         }

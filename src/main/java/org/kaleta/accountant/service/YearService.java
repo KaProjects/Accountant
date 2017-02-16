@@ -89,8 +89,14 @@ public class YearService {
             model.setAccountModel(accountModel);
 
             model.getAccountModel().getAccounts().add(new AccountModel.Account("000","0", AccountType.ASSET,"HAHA"));
-            model.getAccountModel().getAccounts().get(0).getTransactions().add(new AccountModel.Transaction("1","01012017","zzz","100","000.0","711"));
             model.getAccountModel().getAccounts().add(new AccountModel.Account("000","1", AccountType.ASSET,"HAHA2"));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("001","0", AccountType.ASSET,"dasdsad"));
+
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("1","01012017","zzz","100","000.0","711"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("2","01032017","yyy","50","000.1","000.0"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("3","01042017","www","30","001.0","000.1"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("4","01052017","vvv","30","000.0","001.0"));
+
 
             if (true) {
                 return model;

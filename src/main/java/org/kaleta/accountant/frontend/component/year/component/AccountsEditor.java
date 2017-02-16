@@ -32,7 +32,7 @@ public class AccountsEditor extends JPanel implements Configurable {
         panelAccounts.setLayout(new GridBagLayout());
         panelAccounts.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2, true));
         panelOpenAccounts = new JPanel();
-        //panelOpenAccounts.setLayout(new GridBagLayout());
+        panelOpenAccounts.setLayout(new BoxLayout(panelOpenAccounts, BoxLayout.Y_AXIS));
         panelOpenAccounts.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2, true));
 
         this.setLayout(new GridBagLayout());
@@ -123,6 +123,22 @@ public class AccountsEditor extends JPanel implements Configurable {
         this.repaint();
     }
 
+    private void setUpOpenAccountsEditor(int cId, int gId, int aId){
+        String schemaId = String.valueOf(cId) + String.valueOf(gId) + String.valueOf(aId);
+        for (AccountModel.Account account : getConfiguration().getModel().getAccountModel().getAccountsBySchema(schemaId)) {
+            panelOpenAccounts.add(
+                    new JLabel(account.getSchemaId() + "." + account.getSemanticId() + " " + account.getName() + " balance="
+                            + getConfiguration().getModel().getAccountModel().getAccBalance(account) + " turnover="
+                            + getConfiguration().getModel().getAccountModel().getAccTurnover(account))/*,
+            new GridBagConstraints(0, 0, 1, 1, 0, 1, GridBagConstraints.PAGE_START, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0)*/);
+            // TODO: 2/16/17 update / eventually add func.
+        }
+
+
+        panelOpenAccounts.revalidate();
+        panelOpenAccounts.repaint();
+    }
+
     @Override
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
@@ -131,18 +147,5 @@ public class AccountsEditor extends JPanel implements Configurable {
     @Override
     public Configuration getConfiguration() {
         return configuration;
-    }
-
-    private void setUpOpenAccountsEditor(int cId, int gId, int aId){
-        String schemaId = String.valueOf(cId) + String.valueOf(gId) + String.valueOf(aId);
-        for (AccountModel.Account account : getConfiguration().getModel().getAccountModel().getAccountsBySchema(schemaId)){
-           panelOpenAccounts.add(new JLabel(account.getName()));
-            // TODO: 2/15/17 show acc info
-
-        }
-        // TODO: 2/15/17 possibility to add acc. here
-
-        panelOpenAccounts.revalidate();
-        panelOpenAccounts.repaint();
     }
 }
