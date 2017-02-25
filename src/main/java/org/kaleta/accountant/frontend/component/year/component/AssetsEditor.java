@@ -2,11 +2,12 @@ package org.kaleta.accountant.frontend.component.year.component;
 
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.action.listener.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.component.year.model.AccountModel;
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
 
 import javax.swing.*;
-import java.awt.Color;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
@@ -15,8 +16,10 @@ import java.util.List;
 public class AssetsEditor extends JPanel implements Configurable {
     private Configuration configuration;
     private JPanel panelItems;
+    private String schemaFilter;
 
     public AssetsEditor() {
+        schemaFilter = "0";
 
         JPanel panelFilter = new JPanel();
         panelFilter.setVisible(false);
@@ -29,9 +32,7 @@ public class AssetsEditor extends JPanel implements Configurable {
             panelFilter.setVisible(buttonFilter.isSelected());
         });
         JButton buttonAddItem = new JButton("Add");
-        buttonAddItem.addActionListener(e -> {
-            // TODO: 2/16/17 dialog to add asset
-        });
+        buttonAddItem.addActionListener(new OpenAddAssetDialog(this));
         JButton buttonDepreciateAll = new JButton("Depreciate All");
         buttonDepreciateAll.addActionListener(e -> {
             // TODO: 2/16/17 dialog to dep. all
@@ -44,30 +45,31 @@ public class AssetsEditor extends JPanel implements Configurable {
 
 
         panelItems = new JPanel();
+        panelItems.setLayout(new BoxLayout(panelItems, BoxLayout.Y_AXIS));
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(panelButtons);
         this.add(panelFilter);
         this.add(panelItems);
 
+        this.getActionMap().put(Configuration.ACCOUNT_UPDATED, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AssetsEditor.this.update();
+            }
+        });
+
     }
 
     public void update(){
-        // TODO: 2/16/17 for schema set - get accs. - set panelItems
         panelItems.removeAll();
-        for (SchemaModel.Clazz.Group group : getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().values()){
-            for (SchemaModel.Clazz.Group.Account accType : group.getAccounts().values()){
-                String schemaId = "0"+String.valueOf(group.getId()+String.valueOf(accType.getId()));
-                List<AccountModel.Account> accModel = getConfiguration().getModel().getAccountModel().getAccountsBySchema(schemaId);
-                for (AccountModel.Account acc : accModel){
-                    String accId = acc.getSchemaId() + "." + acc.getSemanticId();
-                    for (AccountModel.Transaction tr : getConfiguration().getModel().getAccountModel().getTransactions()){
-                        // TODO: 2/16/17 ... 
-                    }
-                }
-            }
+        List<AccountModel.Account> accounts = getConfiguration().getModel().getAccountModel().getAccountsBySchema(schemaFilter);
+        for (AccountModel.Account account : accounts){
+            if (account.getSchemaId().startsWith("09")) continue;
+            panelItems.add(new AssetPanel(account));
         }
-
+        panelItems.revalidate();
+        panelItems.repaint();
     }
 
     @Override
@@ -78,5 +80,24 @@ public class AssetsEditor extends JPanel implements Configurable {
     @Override
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    private class AssetPanel extends JPanel{
+
+        public AssetPanel(AccountModel.Account account) {
+            JLabel labelAccountName = new JLabel(account.getName());
+            JLabel labelSchema = new JLabel(getConfiguration().getModel().getSchemaModel().getGroupName(account.getSchemaId())
+                    + "-" + getConfiguration().getModel().getSchemaModel().getAccName(account.getSchemaId()));
+
+            String initValue = getConfiguration().getModel().getAccountModel().getAccInitState(account);
+
+
+            JLabel labelInitValue = new JLabel();
+            JLabel labelCurrentValue;
+
+
+            this.add(labelAccountName);
+            this.add(labelSchema);
+        }
     }
 }

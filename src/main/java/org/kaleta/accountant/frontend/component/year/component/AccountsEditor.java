@@ -47,6 +47,17 @@ public class AccountsEditor extends JPanel implements Configurable {
                 AccountsEditor.this.update();
             }
         });
+
+        this.getActionMap().put(Configuration.ACCOUNT_UPDATED, new ConfigurationAction(this) {
+            @Override
+            protected void actionPerformed() {
+                String ttt = panelOpenAccounts.getToolTipText();
+                if (ttt.length() == 3){
+                    AccountsEditor.this.setUpOpenAccountsEditor(Integer.parseInt(ttt.substring(0,1)),Integer.parseInt(ttt.substring(1,2)),Integer.parseInt(ttt.substring(2,3)));
+                    // TODO: 25.2.2017 make this more smoothly...
+                }
+            }
+        });
     }
 
     public void update(){
@@ -56,7 +67,7 @@ public class AccountsEditor extends JPanel implements Configurable {
         panelClasses.removeAll();
         panelGroups.removeAll();
         panelAccounts.removeAll();
-        panelOpenAccounts.removeAll();
+        panelOpenAccounts.removeAll();panelAccounts.setToolTipText("");
         for (SchemaModel.Clazz clazz : getConfiguration ().getModel().getSchemaModel().getClasses().values()){
             JLabel labelClass = new JLabel(" " + clazz.getName() + " ");
             panelClasses.add(labelClass, new GridBagConstraints(0,clazz.getId(),1,1,0,0,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
@@ -72,7 +83,7 @@ public class AccountsEditor extends JPanel implements Configurable {
                     labelClass.setBackground(bgClicked);
                     panelGroups.removeAll();
                     panelAccounts.removeAll();
-                    panelOpenAccounts.removeAll();
+                    panelOpenAccounts.removeAll();panelAccounts.setToolTipText("");
                     for (SchemaModel.Clazz.Group group : clazz.getGroups().values()){
                         JLabel labelGroup = new JLabel(" " + group.getName() + " ");
                         panelGroups.add(labelGroup, new GridBagConstraints(0,group.getId(),1,1,0,0,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
@@ -87,7 +98,7 @@ public class AccountsEditor extends JPanel implements Configurable {
                                 }
                                 labelGroup.setBackground(bgClicked);
                                 panelAccounts.removeAll();
-                                panelOpenAccounts.removeAll();
+                                panelOpenAccounts.removeAll();panelAccounts.setToolTipText("");
                                 for (SchemaModel.Clazz.Group.Account account : group.getAccounts().values()){
                                     JLabel labelAcc = new JLabel(" " + account.getName() + " ");
                                     panelAccounts.add(labelAcc, new GridBagConstraints(0,account.getId(),1,1,0,0,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
@@ -101,7 +112,6 @@ public class AccountsEditor extends JPanel implements Configurable {
                                                 component.setBackground(bgNotFocused);
                                             }
                                             labelAcc.setBackground(bgClicked);
-                                            panelOpenAccounts.removeAll();
                                             setUpOpenAccountsEditor(clazz.getId(), group.getId(), account.getId());
                                         }
                                     });
@@ -124,7 +134,9 @@ public class AccountsEditor extends JPanel implements Configurable {
     }
 
     private void setUpOpenAccountsEditor(int cId, int gId, int aId){
+        panelOpenAccounts.removeAll();
         String schemaId = String.valueOf(cId) + String.valueOf(gId) + String.valueOf(aId);
+        panelOpenAccounts.setToolTipText(schemaId);
         for (AccountModel.Account account : getConfiguration().getModel().getAccountModel().getAccountsBySchema(schemaId)) {
             panelOpenAccounts.add(
                     new JLabel(account.getSchemaId() + "." + account.getSemanticId() + " " + account.getName() + " balance="

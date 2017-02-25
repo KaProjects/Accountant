@@ -63,7 +63,6 @@ public class AccountModel {
             throw new IllegalArgumentException("Off-Balance accounts has no balance");
         }
         String id = account.getSchemaId() + "." + account.getSemanticId();
-        System.out.println(id);
         Integer balance = 0;
         for (Transaction tr : transactions){
             if (tr.getCredit().equals(id)){
@@ -72,7 +71,6 @@ public class AccountModel {
                 } else {
                     balance += Integer.parseInt(tr.getAmount());
                 }
-                System.out.println("C "+id + " " + balance);
             }
             if (tr.getDebit().equals(id)){
                 if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
@@ -80,7 +78,6 @@ public class AccountModel {
                 } else {
                     balance -= Integer.parseInt(tr.getAmount());
                 }
-                System.out.println("D "+id + " " + balance);
             }
         }
         return String.valueOf(balance);
@@ -138,15 +135,17 @@ public class AccountModel {
         private String semanticId;
         private String type;
         private String name;
+        private String metadata;
 
         public Account() {
         }
 
-        public Account(String schemaId, String semanticId, String type, String name) {
+        public Account(String schemaId, String semanticId, String type, String name, String metadata) {
             this.schemaId = schemaId;
             this.type = type;
             this.semanticId = semanticId;
             this.name = name;
+            this.metadata = metadata;
         }
 
         public String getType() {
@@ -179,6 +178,14 @@ public class AccountModel {
 
         public void setSemanticId(String semanticId) {
             this.semanticId = semanticId;
+        }
+
+        public String getMetadata() {
+            return metadata;
+        }
+
+        public void setMetadata(String metadata) {
+            this.metadata = metadata;
         }
     }
 

@@ -3,8 +3,8 @@ package org.kaleta.accountant.frontend.component.year.component;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.configuration.ConfigurationAction;
-import org.kaleta.accountant.frontend.action.listener.AccountActionListener;
-import org.kaleta.accountant.frontend.action.listener.GroupActionListener;
+import org.kaleta.accountant.frontend.action.listener.SchemaEditorAccountAction;
+import org.kaleta.accountant.frontend.action.listener.SchemaEditorGroupAction;
 import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
 
@@ -49,7 +49,7 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                 if (group == null) {
                     JButton buttonAddGroup = new JButton(IconLoader.getIcon(IconLoader.ADD, new Dimension(15, 15)));
                     buttonAddGroup.setBackground(Color.LIGHT_GRAY);
-                    buttonAddGroup.addActionListener(new GroupActionListener(this, GroupActionListener.CREATE, cIdArray[0], gId));
+                    buttonAddGroup.addActionListener(new SchemaEditorGroupAction(this, SchemaEditorGroupAction.CREATE, cIdArray[0], gId));
                     classPanel.add(buttonAddGroup, groupConstraints);
                 } else {
                     JPanel groupPanel = new JPanel();
@@ -62,7 +62,7 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                     buttonEditGroup.setMinimumSize(new Dimension(25, 25));
                     buttonEditGroup.setPreferredSize(new Dimension(25, 25));
                     buttonEditGroup.setMaximumSize(new Dimension(25, 25));
-                    buttonEditGroup.addActionListener(new GroupActionListener(this, GroupActionListener.EDIT, cIdArray[0], gId));
+                    buttonEditGroup.addActionListener(new SchemaEditorGroupAction(this, SchemaEditorGroupAction.EDIT, cIdArray[0], gId));
                     groupPanel.add(buttonEditGroup, new GridBagConstraints(1, 0, 1, 1, 1, 0, GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
                     JButton buttonDelGroup = new JButton(IconLoader.getIcon(IconLoader.DELETE, new Dimension(10, 10)));
@@ -70,7 +70,7 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                     buttonDelGroup.setMinimumSize(new Dimension(25, 25));
                     buttonDelGroup.setPreferredSize(new Dimension(25, 25));
                     buttonDelGroup.setMaximumSize(new Dimension(25, 25));
-                    buttonDelGroup.addActionListener(new GroupActionListener(this, GroupActionListener.DELETE, cIdArray[0], gId));
+                    buttonDelGroup.addActionListener(new SchemaEditorGroupAction(this, SchemaEditorGroupAction.DELETE, cIdArray[0], gId));
                     groupPanel.add(buttonDelGroup, new GridBagConstraints(2, 0, 1, 1, 1, 0, GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
                     int width = new JLabel().getFontMetrics(new JLabel().getFont()).stringWidth(group.getName()) + 20;
@@ -80,10 +80,10 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                         if (account == null) {
                             JButton buttonAddAccount = new JButton(IconLoader.getIcon(IconLoader.ADD, new Dimension(10, 10)));
                             buttonAddAccount.setBackground(Color.LIGHT_GRAY);
-                            buttonAddAccount.addActionListener(new AccountActionListener(this, AccountActionListener.CREATE, cIdArray[0],gId,aId));
+                            buttonAddAccount.addActionListener(new SchemaEditorAccountAction(this, SchemaEditorAccountAction.CREATE, cIdArray[0],gId,aId));
                             groupPanel.add(buttonAddAccount, accConstraints);
                         } else {
-                            String text = " " + account.getType() + " " + account.getName() + " ";
+                            String text = " (" + account.getType() + ") " + account.getName() + " ";
                             JLabel label = new JLabel(text);
                             int labelWidth = label.getFontMetrics(label.getFont()).stringWidth(text) + 10 + 50;
                             width = (labelWidth > width) ? labelWidth : width;
@@ -100,7 +100,7 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                             buttonEdit.setMinimumSize(new Dimension(25, 25));
                             buttonEdit.setPreferredSize(new Dimension(25, 25));
                             buttonEdit.setMaximumSize(new Dimension(25, 25));
-                            buttonEdit.addActionListener(new AccountActionListener(this, AccountActionListener.EDIT, cIdArray[0],gId,aId));
+                            buttonEdit.addActionListener(new SchemaEditorAccountAction(this, SchemaEditorAccountAction.EDIT, cIdArray[0],gId,aId));
                             accPanel.add(buttonEdit);
 
                             JButton buttonDel = new JButton(IconLoader.getIcon(IconLoader.DELETE, new Dimension(10, 10)));
@@ -108,7 +108,7 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                             buttonDel.setMinimumSize(new Dimension(25, 25));
                             buttonDel.setPreferredSize(new Dimension(25, 25));
                             buttonDel.setMaximumSize(new Dimension(25, 25));
-                            buttonDel.addActionListener(new AccountActionListener(this, AccountActionListener.DELETE, cIdArray[0],gId,aId));
+                            buttonDel.addActionListener(new SchemaEditorAccountAction(this, SchemaEditorAccountAction.DELETE, cIdArray[0],gId,aId));
                             accPanel.add(buttonDel);
 
                             groupPanel.add(accPanel, accConstraints);

@@ -17,6 +17,7 @@ public interface Configuration {
     int YEAR_ADDED = 2;
     int YEAR_SELECTED = 3;
     int SCHEMA_UPDATED = 4;
+    int ACCOUNT_UPDATED = 5;
 
     /**
      * Recursively updates component's tree of app.

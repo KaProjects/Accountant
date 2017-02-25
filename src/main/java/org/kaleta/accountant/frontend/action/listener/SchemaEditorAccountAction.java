@@ -2,6 +2,7 @@ package org.kaleta.accountant.frontend.action.listener;
 
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.common.constants.AccountType;
 import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
 import org.kaleta.accountant.service.Service;
 
@@ -10,7 +11,7 @@ import javax.swing.*;
 /**
  * Created by Stanislav Kaleta on 14.02.2017.
  */
-public class AccountActionListener extends ActionListener {
+public class SchemaEditorAccountAction extends ActionListener {
     public static final int CREATE = 0;
     public static final int EDIT = 1;
     public static final int DELETE = 2;
@@ -20,7 +21,7 @@ public class AccountActionListener extends ActionListener {
     private int gId;
     private int aId;
 
-    public AccountActionListener(Configurable configurable, int action, int cId, int gId, int aId) {
+    public SchemaEditorAccountAction(Configurable configurable, int action, int cId, int gId, int aId) {
         super(configurable);
         this.action = action;
         this.cId = cId;
@@ -34,12 +35,36 @@ public class AccountActionListener extends ActionListener {
             case 0: {
                 String name = JOptionPane.showInputDialog("Set Account Name");
                 if (name != null) {
-                    String[] typeTexts = new String[]{"Asset","Liability","Expense","Revenue"};
-                    String[] typeIds = new String[]{"A","L","E","R"};
-                    int typeIndex = JOptionPane.showOptionDialog(null, "types: ","Set Account Type",JOptionPane.DEFAULT_OPTION,
-                            JOptionPane.INFORMATION_MESSAGE, null,typeTexts,"A");
-                    if (typeIndex != -1){
-                        createAccount(name, typeIds[typeIndex]);
+                    switch (cId){
+                        case 0:
+                        case 1: {
+                            createAccount(name, AccountType.ASSET);
+                            break;
+                        }
+                        case 2:
+                        case 3: {
+                            String[] typeTexts = new String[]{"Asset","Liability"};
+                            String[] typeIds = new String[]{AccountType.ASSET,AccountType.LIABILITY};
+                            int typeIndex = JOptionPane.showOptionDialog(null, "types: ","Set Account Type",JOptionPane.DEFAULT_OPTION,
+                                    JOptionPane.INFORMATION_MESSAGE, null,typeTexts,"A");
+                            if (typeIndex != -1){
+                                createAccount(name, typeIds[typeIndex]);
+                            }
+                            break;
+                        }
+                        case 4: {
+                            createAccount(name, AccountType.LIABILITY);
+                            break;
+                        }
+                        case 5: {
+                            createAccount(name, AccountType.EXPENSE);
+                            break;
+                        }
+                        case 6: {
+                            createAccount(name, AccountType.REVENUE);
+                            break;
+                        }
+                        default: throw new IllegalArgumentException("Illegal class id! value="+cId);
                     }
                 }
                 break;
@@ -59,7 +84,7 @@ public class AccountActionListener extends ActionListener {
                 }
                 break;
             }
-            default: throw new IllegalArgumentException("Illegal action identifier!");
+            default: throw new IllegalArgumentException("Illegal action identifier! value="+action);
         }
     }
 

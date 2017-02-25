@@ -61,7 +61,7 @@ public class SchemaOverview extends JPanel implements Configurable {
                     if (account == null){
                         continue;
                     }
-                    String text = account.getType() + " " + account.getName();
+                    String text = "(" + account.getType() + ") " + account.getName();
                     JLabel label = new JLabel(text);
                     int labelWidth = label.getFontMetrics(label.getFont()).stringWidth(text) + 10;
                     width = (labelWidth > width) ? labelWidth : width;

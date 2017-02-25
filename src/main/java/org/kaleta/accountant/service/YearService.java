@@ -4,6 +4,7 @@ import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.ErrorDialog;
 import org.kaleta.accountant.frontend.common.constants.AccountType;
+import org.kaleta.accountant.frontend.common.constants.DefaultSchemaId;
 import org.kaleta.accountant.frontend.component.year.model.AccountModel;
 import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
 import org.kaleta.accountant.frontend.component.year.model.YearModel;
@@ -88,14 +89,17 @@ public class YearService {
             AccountModel accountModel = new AccountModel();
             model.setAccountModel(accountModel);
 
-            model.getAccountModel().getAccounts().add(new AccountModel.Account("000","0", AccountType.ASSET,"HAHA"));
-            model.getAccountModel().getAccounts().add(new AccountModel.Account("000","1", AccountType.ASSET,"HAHA2"));
-            model.getAccountModel().getAccounts().add(new AccountModel.Account("001","0", AccountType.ASSET,"dasdsad"));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("000","0", AccountType.ASSET,"HAHA",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("0","01012017","","0","000.0",DefaultSchemaId.INIT_ACC));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("000","1", AccountType.ASSET,"HAHA2",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("1","01012017","","0","000.1",DefaultSchemaId.INIT_ACC));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("001","0", AccountType.ASSET,"dasdsad",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("2","01012017","","0","001.0",DefaultSchemaId.INIT_ACC));
 
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("1","01012017","zzz","100","000.0","711"));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("2","01032017","yyy","50","000.1","000.0"));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("3","01042017","www","30","001.0","000.1"));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("4","01052017","vvv","30","000.0","001.0"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("3","01012017","zzz","100","000.0","711"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("4","01032017","yyy","50","000.1","000.0"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("5","01042017","www","30","001.0","000.1"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("6","01052017","vvv","30","000.0","001.0"));
 
 
             if (true) {
@@ -110,7 +114,26 @@ public class YearService {
         }
     }
 
+    /**
+     * todo doc.
+     */
     public void updateSchema(SchemaModel model){
+        try {
+            if (true) {
+            } else {
+                throw new ManagerException();
+            }
+            // TODO: 1/5/17 impl. backend
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo doc.
+     */
+    public void updateAccount(AccountModel model){
         try {
             if (true) {
             } else {

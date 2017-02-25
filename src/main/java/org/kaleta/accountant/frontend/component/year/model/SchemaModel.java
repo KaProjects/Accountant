@@ -13,6 +13,21 @@ public class SchemaModel {
         return classes;
     }
 
+    public String getClassName(String schemaId) {
+        return classes.get(Integer.parseInt(schemaId.substring(0, 1))).getName();
+    }
+
+    public String getGroupName(String schemaId) {
+        return classes.get(Integer.parseInt(schemaId.substring(0, 1)))
+                .getGroups().get(Integer.parseInt(schemaId.substring(1, 2))).getName();
+    }
+
+    public String getAccName(String schemaId) {
+        return classes.get(Integer.parseInt(schemaId.substring(0, 1)))
+                .getGroups().get(Integer.parseInt(schemaId.substring(1, 2)))
+                .getAccounts().get(Integer.parseInt(schemaId.substring(2, 3))).getName();
+    }
+
     public static class Clazz {
         private Integer id;
         private String name;
