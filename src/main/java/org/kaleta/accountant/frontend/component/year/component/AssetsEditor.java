@@ -4,10 +4,11 @@ import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.component.year.model.AccountModel;
+import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,39 +19,86 @@ public class AssetsEditor extends JPanel implements Configurable {
     private JPanel panelItems;
     private String schemaFilter;
 
-    public AssetsEditor() {
-        schemaFilter = "0";
+    public AssetsEditor(Configuration configuration) {
+        setConfiguration(configuration);
+
+        JCheckBox toggleFilter = new JCheckBox("Toggle Filter");
+        JComboBox<String> cbGroups = new JComboBox<>();
+        JComboBox<String> cbAccounts = new JComboBox<>();
+        panelItems = new JPanel();
+
+        panelItems.setLayout(new BoxLayout(panelItems, BoxLayout.Y_AXIS));
+
+        cbGroups.setVisible(false);
+        cbGroups.addItem("All");
+        for (SchemaModel.Clazz.Group group : getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().values()){
+            if (group.getId() == 9) continue;
+            cbGroups.addItem(group.getName());
+        }
+        cbGroups.addActionListener(e -> {
+            cbAccounts.removeAllItems();
+            cbAccounts.repaint();
+            cbAccounts.revalidate();
+            int groupIndex = cbGroups.getSelectedIndex() - 1;
+            if (groupIndex >= 0 ){
+                int groupId = new ArrayList<>(getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().values()).get(groupIndex).getId();
+                cbAccounts.addItem("All");
+                for (SchemaModel.Clazz.Group.Account account : getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().get(groupId).getAccounts().values()){
+                    cbAccounts.addItem(account.getName());
+                }
+                cbAccounts.setSelectedIndex(0);
+                schemaFilter = "0" + groupId;
+            } else {
+                schemaFilter = "0";
+            }
+            update();
+        });
+        cbGroups.setSelectedIndex(0);
+
+        cbAccounts.setVisible(false);
+        cbAccounts.addActionListener(e -> {
+            int groupIndex = cbGroups.getSelectedIndex() - 1;
+            if (groupIndex >= 0){
+                int groupId = new ArrayList<>(getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().values()).get(groupIndex).getId();
+                if (cbAccounts.getSelectedIndex() > 0){
+                    schemaFilter = "0" + groupId + "" + new ArrayList<>(getConfiguration().getModel().getSchemaModel().getClasses().get(0)
+                            .getGroups().get(groupId).getAccounts().values()).get(cbAccounts.getSelectedIndex() - 1).getId();
+                } else {
+                    schemaFilter = "0" + groupId;
+                }
+                update();
+            }
+        });
+
+        toggleFilter.addActionListener(e -> {
+            cbAccounts.setVisible(toggleFilter.isSelected());
+            cbGroups.setVisible(toggleFilter.isSelected());
+            cbGroups.setSelectedIndex(0);
+        });
 
         JPanel panelFilter = new JPanel();
-        panelFilter.setVisible(false);
-        panelFilter.add(new JLabel("asdsad"));
-        panelFilter.setBackground(Color.GREEN);
+        panelFilter.setLayout(new BoxLayout(panelFilter, BoxLayout.X_AXIS));
+        panelFilter.add(toggleFilter);
+        panelFilter.add(cbGroups);
+        panelFilter.add(cbAccounts);
 
-
-        JToggleButton buttonFilter = new JToggleButton("Filter");
-        buttonFilter.addActionListener(e -> {
-            panelFilter.setVisible(buttonFilter.isSelected());
-        });
         JButton buttonAddItem = new JButton("Add");
         buttonAddItem.addActionListener(new OpenAddAssetDialog(this));
         JButton buttonDepreciateAll = new JButton("Depreciate All");
         buttonDepreciateAll.addActionListener(e -> {
             // TODO: 2/16/17 dialog to dep. all
         });
-        JPanel panelButtons = new JPanel();
-        panelButtons.setLayout(new BoxLayout(panelButtons, BoxLayout.X_AXIS));
-        panelButtons.add(buttonFilter);
-        panelButtons.add(buttonAddItem);
-        panelButtons.add(buttonDepreciateAll);
 
-
-        panelItems = new JPanel();
-        panelItems.setLayout(new BoxLayout(panelItems, BoxLayout.Y_AXIS));
-
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(panelButtons);
-        this.add(panelFilter);
-        this.add(panelItems);
+        GroupLayout layout = new GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(layout.createParallelGroup()
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(buttonAddItem).addGap(5).addComponent(buttonDepreciateAll).addGap(5).addComponent(panelFilter))
+            .addComponent(panelItems));
+        layout.setVerticalGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup()
+                .addComponent(buttonAddItem,25,25,25).addComponent(buttonDepreciateAll,25,25,25).addComponent(panelFilter,25,25,25))
+            .addComponent(panelItems));
 
         this.getActionMap().put(Configuration.ACCOUNT_UPDATED, new AbstractAction() {
             @Override
@@ -58,7 +106,18 @@ public class AssetsEditor extends JPanel implements Configurable {
                 AssetsEditor.this.update();
             }
         });
-
+        this.getActionMap().put(Configuration.SCHEMA_UPDATED, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cbGroups.removeAllItems();
+                cbGroups.addItem("All");
+                for (SchemaModel.Clazz.Group group : getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().values()){
+                    if (group.getId() == 9) continue;
+                    cbGroups.addItem(group.getName());
+                }
+                cbGroups.setSelectedIndex(0);
+            }
+        });
     }
 
     public void update(){
@@ -91,6 +150,7 @@ public class AssetsEditor extends JPanel implements Configurable {
 
             String initValue = getConfiguration().getModel().getAccountModel().getAccInitState(account);
 
+            // TODO: 5.3.2017 design&impl
 
             JLabel labelInitValue = new JLabel();
             JLabel labelCurrentValue;

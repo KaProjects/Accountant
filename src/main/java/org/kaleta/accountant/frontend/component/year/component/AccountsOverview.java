@@ -14,14 +14,14 @@ import java.awt.event.MouseEvent;
 /**
  * Created by Stanislav Kaleta on 14.02.2017.
  */
-public class AccountsEditor extends JPanel implements Configurable {
+public class AccountsOverview extends JPanel implements Configurable {
     private Configuration configuration;
     private JPanel panelClasses;
     private JPanel panelGroups;
     private JPanel panelAccounts;
     private JPanel panelOpenAccounts;
 
-    public AccountsEditor() {
+    public AccountsOverview() {
         panelClasses = new JPanel();
         panelClasses.setLayout(new GridBagLayout());
         panelClasses.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2, true));
@@ -44,7 +44,7 @@ public class AccountsEditor extends JPanel implements Configurable {
         this.getActionMap().put(Configuration.SCHEMA_UPDATED, new ConfigurationAction(this) {
             @Override
             protected void actionPerformed() {
-                AccountsEditor.this.update();
+                AccountsOverview.this.update();
             }
         });
 
@@ -53,7 +53,7 @@ public class AccountsEditor extends JPanel implements Configurable {
             protected void actionPerformed() {
                 String ttt = panelOpenAccounts.getToolTipText();
                 if (ttt.length() == 3){
-                    AccountsEditor.this.setUpOpenAccountsEditor(Integer.parseInt(ttt.substring(0,1)),Integer.parseInt(ttt.substring(1,2)),Integer.parseInt(ttt.substring(2,3)));
+                    AccountsOverview.this.setUpOpenAccountsEditor(Integer.parseInt(ttt.substring(0,1)),Integer.parseInt(ttt.substring(1,2)),Integer.parseInt(ttt.substring(2,3)));
                     // TODO: 25.2.2017 make this more smoothly...
                 }
             }
@@ -117,14 +117,14 @@ public class AccountsEditor extends JPanel implements Configurable {
                                     });
                                 }
                                 panelAccounts.add(new JPanel(), new GridBagConstraints(0,10,1,1,0,1,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
-                                AccountsEditor.this.revalidate();
-                                AccountsEditor.this.repaint();
+                                AccountsOverview.this.revalidate();
+                                AccountsOverview.this.repaint();
                             }
                         });
                     }
                     panelGroups.add(new JPanel(), new GridBagConstraints(0,10,1,1,0,1,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
-                    AccountsEditor.this.revalidate();
-                    AccountsEditor.this.repaint();
+                    AccountsOverview.this.revalidate();
+                    AccountsOverview.this.repaint();
                 }
             });
         }
@@ -143,7 +143,7 @@ public class AccountsEditor extends JPanel implements Configurable {
                             + getConfiguration().getModel().getAccountModel().getAccBalance(account) + " turnover="
                             + getConfiguration().getModel().getAccountModel().getAccTurnover(account))/*,
             new GridBagConstraints(0, 0, 1, 1, 0, 1, GridBagConstraints.PAGE_START, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0)*/);
-            // TODO: 2/16/17 update / eventually add func.
+            // TODO: 5.3.2017 design&impl
         }
 
 

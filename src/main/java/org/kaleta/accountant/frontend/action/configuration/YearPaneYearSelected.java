@@ -21,6 +21,9 @@ public class YearPaneYearSelected extends ConfigurationAction {
         SchemaOverview schemaOverview = new SchemaOverview();
         schemaOverview.setConfiguration(getConfiguration());
         schemaOverview.update();
+        AccountsOverview accountsOverview = new AccountsOverview();
+        accountsOverview.setConfiguration(getConfiguration());
+        accountsOverview.update();
 
         if (pane.getConfiguration().getModel().isActive()){
             JTabbedPane schemaPane = new JTabbedPane();
@@ -30,17 +33,15 @@ public class YearPaneYearSelected extends ConfigurationAction {
             schemaEditor.update();
             schemaPane.addTab("Editor", new JScrollPane(schemaEditor));
 
-            AccountsEditor accountsEditor = new AccountsEditor();
-            accountsEditor.setConfiguration(getConfiguration());
-            accountsEditor.update();
-            pane.add("Accounts", accountsEditor);
-
-            AssetsEditor assetsEditor = new AssetsEditor();
-            assetsEditor.setConfiguration(getConfiguration());
+            JTabbedPane accountsPane = new JTabbedPane();
+            pane.addTab("Accounts", accountsPane);
+            accountsPane.addTab("Overview", new JScrollPane(accountsOverview));
+            AssetsEditor assetsEditor = new AssetsEditor(getConfiguration());
             assetsEditor.update();
-            pane.add("Assets", assetsEditor);
+            accountsPane.add("Assets", assetsEditor);
         } else {
             pane.addTab("Schema", new JScrollPane(schemaOverview));
+            pane.addTab("Accounts", new JScrollPane(accountsOverview));
         }
         pane.revalidate();
         pane.repaint();
