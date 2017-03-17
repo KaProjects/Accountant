@@ -2,6 +2,7 @@ package org.kaleta.accountant.frontend.component.year.model;
 
 import org.kaleta.accountant.frontend.common.constants.AccountType;
 import org.kaleta.accountant.frontend.common.constants.DefaultSchemaId;
+import org.kaleta.accountant.service.ServiceFailureException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +100,7 @@ public class AccountModel {
         return (debitTurnover > creditTurnover) ? debitTurnover : creditTurnover;
     }
 
-
+    // TODO: 3/17/17 change this to: if a acc./tr. is assigned - create acc. create also transaction - despite 0 value, it can cause errors
     public boolean isGroupDeletable(int cId, int gId){
         String schemaId = String.valueOf(cId) + String.valueOf(gId);
         boolean deletable = true;
@@ -120,6 +121,24 @@ public class AccountModel {
 
     public List<Account> getAccountsBySchema(String schemaId){
         return accounts.stream().filter(account -> account.getSchemaId().startsWith(schemaId)).collect(Collectors.toList());
+    }
+
+    public Account getAccount(String schemaId, String semanticId){
+        if (schemaId.length() != 3){
+            throw new IllegalArgumentException("'" + schemaId + "' is not valid schemaId - should have length 3, but has " + schemaId.length());
+        }
+        List<Account> accountsBySchema = getAccountsBySchema(schemaId);
+        List<Account> accountsBySemantic = accountsBySchema.stream().filter(account -> account.getSemanticId().equals(semanticId)).collect(Collectors.toList());
+        switch (accountsBySemantic.size()){
+            case 0:{
+                throw new NullPointerException("Account not found for schemaId '" + schemaId + "' and semanticId '" + semanticId + "'");
+            }
+            case 1:{
+                return accountsBySemantic.get(0);
+            }
+            default:
+                throw new ServiceFailureException("Critical Error: found " + accountsBySemantic.size() +" accounts for schemaId '" + schemaId + "' and semanticId '" + semanticId + "'. Combination of schmaId & semanticId should be unique!");
+        }
     }
 
     public List<Account> getAccounts() {

@@ -6,7 +6,7 @@ import org.kaleta.accountant.frontend.dialog.Dialog;
 
 import javax.swing.*;
 import javax.swing.text.PlainDocument;
-import java.awt.*;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -94,7 +94,7 @@ public class AddAssetDialog extends Dialog {
                         .addGroup(layout.createSequentialGroup().addComponent(labelAcc,60,60,60).addComponent(comboBoxAcc))
                         .addGroup(layout.createSequentialGroup().addComponent(labelAmount,60,60,60).addComponent(textFieldAmount))
                         .addComponent(separator1)
-                        .addGroup(layout.createSequentialGroup().addComponent(labelDate).addGap(5).addComponent(textFieldDate,60,60,60).addComponent(buttonToday))
+                        .addGroup(layout.createSequentialGroup().addComponent(labelDate).addGap(5).addComponent(textFieldDate,80,80,80).addComponent(buttonToday))
                         .addGroup(layout.createSequentialGroup().addComponent(labelMonthlyDep).addGap(5).addComponent(textFieldMonthlyDep))
                         .addComponent(separator2)
                         .addGroup(layout.createSequentialGroup()

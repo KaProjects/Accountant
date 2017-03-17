@@ -91,15 +91,30 @@ public class YearService {
 
             model.getAccountModel().getAccounts().add(new AccountModel.Account("000","0", AccountType.ASSET,"HAHA",""));
             model.getAccountModel().getTransactions().add(new AccountModel.Transaction("0","01012017","","0","000.0",DefaultSchemaId.INIT_ACC));
-            model.getAccountModel().getAccounts().add(new AccountModel.Account("000","1", AccountType.ASSET,"HAHA2",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("1","01012017","","0","000.1",DefaultSchemaId.INIT_ACC));
-            model.getAccountModel().getAccounts().add(new AccountModel.Account("001","0", AccountType.ASSET,"dasdsad",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("2","01012017","","0","001.0",DefaultSchemaId.INIT_ACC));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("090","0-0", AccountType.LIABILITY,"ac dep of HAHA",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("1","01012017","","0",DefaultSchemaId.INIT_ACC,"090.0-0"));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("590","0-0", AccountType.EXPENSE,"dep of HAHA",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("2","01012017","","0","590.0-0",DefaultSchemaId.INIT_ACC));
 
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("3","01012017","zzz","100","000.0","711"));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("4","01032017","yyy","50","000.1","000.0"));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("5","01042017","www","30","001.0","000.1"));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("6","01052017","vvv","30","000.0","001.0"));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("000","1", AccountType.ASSET,"HAHA2",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("3","01012017","","0","000.1",DefaultSchemaId.INIT_ACC));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("090","0-1", AccountType.LIABILITY,"ac dep of HAHA2",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("4","01012017","","0",DefaultSchemaId.INIT_ACC,"090.0-1"));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("590","0-1", AccountType.EXPENSE,"dep of HAHA2",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("5","01012017","","0","590.0-1",DefaultSchemaId.INIT_ACC));
+
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("001","0", AccountType.ASSET,"dasdsad",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("6","01012017","","0","001.0",DefaultSchemaId.INIT_ACC));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("090","1-0", AccountType.LIABILITY,"ac dep of dasdsad",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("7","01012017","","0",DefaultSchemaId.INIT_ACC,"090.1-0"));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("590","1-0", AccountType.EXPENSE,"dep of dasdsad",""));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("8","01012017","","0","590.1-0",DefaultSchemaId.INIT_ACC));
+
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("9","01012017","zzz","1000000","000.0","711"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("10","01032017","yyy","50","000.1","000.0"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("11","01042017","www","30","001.0","000.1"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("12","01052017","vvv","30","000.0","001.0"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("13","01052017","dep","75","590.0-0","090.0-0"));
 
 
             if (true) {
