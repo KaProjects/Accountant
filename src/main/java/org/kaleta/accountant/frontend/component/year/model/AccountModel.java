@@ -141,6 +141,26 @@ public class AccountModel {
         }
     }
 
+    public List<Transaction> getTransactions(String debit, String credit){
+        List<Transaction> trList = new ArrayList<>();
+        for (Transaction tr : getTransactions()){
+            if (tr.getCredit().equals(credit) && tr.getDebit().equals(debit)){
+                trList.add(tr);
+            }
+        }
+
+        return trList;
+    }
+
+    public String getNextTransactionId(){
+        int lastTrId = 0;
+        for (AccountModel.Transaction tr : getTransactions()) {
+            int thisTrId = Integer.parseInt(tr.getId());
+            if (thisTrId > lastTrId) lastTrId = thisTrId;
+        }
+        return String.valueOf(++lastTrId);
+    }
+
     public List<Account> getAccounts() {
         return accounts;
     }
@@ -165,6 +185,10 @@ public class AccountModel {
             this.semanticId = semanticId;
             this.name = name;
             this.metadata = metadata;
+        }
+
+        public String getFullId(){
+            return schemaId+"."+semanticId;
         }
 
         public String getType() {

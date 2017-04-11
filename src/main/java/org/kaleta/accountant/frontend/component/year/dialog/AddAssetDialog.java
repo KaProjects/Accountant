@@ -140,7 +140,7 @@ public class AddAssetDialog extends Dialog {
         return textFieldAmount.getText();
     }
 
-    public String getMonthlyDep(){
-        return textFieldMonthlyDep.getText();
+    public String getDepMetaData(){
+        return textFieldMonthlyDep.getText()+","+textFieldDate.getText().substring(0,2);
     }
 }

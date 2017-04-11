@@ -9,7 +9,7 @@ import org.kaleta.accountant.frontend.component.year.model.AccountModel;
 import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.*;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,30 +43,24 @@ public class OpenAddAssetDialog extends ActionListener {
             String semanticId = String.valueOf(lastSemanticId + 1);
             String assocSemanticId = schemaId.substring(2, 3) + "-" + semanticId;
 
-            int lastTrId = 0;
-            for (AccountModel.Transaction tr : model.getTransactions()) {
-                int thisTrId = Integer.parseInt(tr.getId());
-                if (thisTrId > lastTrId) lastTrId = thisTrId;
-            }
-
             String name = dialog.getAccName();
             String date = dialog.getDate();
             String initValue = dialog.getInitValue();
-            String monthlyDep = dialog.getMonthlyDep();
+            String depMetaData = dialog.getDepMetaData();
 
 
             model.getAccounts().add(new AccountModel.Account(schemaId, semanticId, AccountType.ASSET, name, ""));
-            model.getTransactions().add(new AccountModel.Transaction(String.valueOf(++lastTrId), date, "open",
+            model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
                     initValue, schemaId + "." + semanticId, DefaultSchemaId.INIT_ACC));
 
             model.getAccounts().add(new AccountModel.Account("09" + schemaId.substring(1, 2),
-                    assocSemanticId, AccountType.LIABILITY, "A. Dep. of " + name, monthlyDep));
-            model.getTransactions().add(new AccountModel.Transaction(String.valueOf(++lastTrId), date, "open",
+                    assocSemanticId, AccountType.LIABILITY, "A. Dep. of " + name, depMetaData));
+            model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
                     "0", DefaultSchemaId.INIT_ACC, "09" + schemaId.substring(1, 2) + "." + assocSemanticId));
 
             model.getAccounts().add(new AccountModel.Account("59" + schemaId.substring(1, 2),
                     assocSemanticId, AccountType.EXPENSE, "Dep. of " + name, ""));
-            model.getTransactions().add(new AccountModel.Transaction(String.valueOf(++lastTrId), date, "open",
+            model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
                     "0", "59" + schemaId.substring(1, 2) + "." + assocSemanticId, DefaultSchemaId.INIT_ACC));
 
             Service.YEAR.updateAccount(model);

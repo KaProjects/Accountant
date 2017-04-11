@@ -34,6 +34,7 @@ public class AccountsOverview extends JPanel implements Configurable {
         panelOpenAccounts = new JPanel();
         panelOpenAccounts.setLayout(new BoxLayout(panelOpenAccounts, BoxLayout.Y_AXIS));
         panelOpenAccounts.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2, true));
+        panelOpenAccounts.setToolTipText("");
 
         this.setLayout(new GridBagLayout());
         this.add(panelClasses, new GridBagConstraints(0,0,1,1,0,1,GridBagConstraints.FIRST_LINE_START,GridBagConstraints.VERTICAL,new Insets(0,0,0,0),0,0));

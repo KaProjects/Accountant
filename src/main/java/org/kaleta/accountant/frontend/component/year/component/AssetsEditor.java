@@ -3,6 +3,7 @@ package org.kaleta.accountant.frontend.component.year.component;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.OpenAddAssetDialog;
+import org.kaleta.accountant.frontend.action.listener.OpenDepreciateDialog;
 import org.kaleta.accountant.frontend.common.constants.ColorConstants;
 import org.kaleta.accountant.frontend.component.year.model.AccountModel;
 import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
@@ -21,11 +22,18 @@ import java.util.List;
 public class AssetsEditor extends JPanel implements Configurable {
     private Configuration configuration;
     private JPanel panelItems;
+    private JButton buttonDepreciateAll;
     private String schemaFilter;
     private int activeFilter;
 
     public AssetsEditor(Configuration configuration) {
         setConfiguration(configuration);
+
+        buttonDepreciateAll = new JButton("Depreciate All");
+        buttonDepreciateAll.addActionListener(new OpenDepreciateDialog(this, new ArrayList<AccountModel.Account>()));
+
+        JButton buttonAddItem = new JButton("Add");
+        buttonAddItem.addActionListener(new OpenAddAssetDialog(this));
 
         JCheckBox toggleFilter = new JCheckBox("Toggle Filter");
         JComboBox<String> cbGroups = new JComboBox<>();
@@ -98,13 +106,6 @@ public class AssetsEditor extends JPanel implements Configurable {
             cbActive.setSelectedIndex(0);
         });
 
-        JButton buttonAddItem = new JButton("Add");
-        buttonAddItem.addActionListener(new OpenAddAssetDialog(this));
-        JButton buttonDepreciateAll = new JButton("Depreciate All");
-        buttonDepreciateAll.addActionListener(e -> {
-            // TODO: 2/16/17 dialog to dep. all
-        });
-
         JScrollPane paneItems = new JScrollPane(panelItems);
 
         GroupLayout layout = new GroupLayout(this);
@@ -142,9 +143,13 @@ public class AssetsEditor extends JPanel implements Configurable {
 
     public void update(){
         panelItems.removeAll();
-        List<AccountModel.Account> accounts = getConfiguration().getModel().getAccountModel().getAccountsBySchema(schemaFilter);
-        for (AccountModel.Account account : accounts){
+        List<AccountModel.Account> filteredAccounts = getConfiguration().getModel().getAccountModel().getAccountsBySchema(schemaFilter);
+        List<AccountModel.Account> suitableAccounts = new ArrayList<>();
+        for (AccountModel.Account account : filteredAccounts){
             if (account.getSchemaId().startsWith("09")) continue;
+            suitableAccounts.add(account);
+        }
+        for (AccountModel.Account account : suitableAccounts){
             AssetPanel panel = new AssetPanel(account);
             if ((panel.isActive && activeFilter == 1) || (!panel.isActive && activeFilter == 2) || (activeFilter == 0)){
                 panelItems.add(panel);
@@ -152,6 +157,9 @@ public class AssetsEditor extends JPanel implements Configurable {
         }
         panelItems.revalidate();
         panelItems.repaint();
+
+        buttonDepreciateAll.removeActionListener(buttonDepreciateAll.getActionListeners()[0]);
+        buttonDepreciateAll.addActionListener(new OpenDepreciateDialog(this, suitableAccounts));
     }
 
     @Override
@@ -166,8 +174,10 @@ public class AssetsEditor extends JPanel implements Configurable {
 
     private class AssetPanel extends JPanel {
         private boolean isActive;
+        private AccountModel.Account account;
 
-        public AssetPanel(AccountModel.Account account) {
+        public AssetPanel(AccountModel.Account assetAccount) {
+            this.account = assetAccount;
             Font boldFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 25);
             AccountModel accModel = getConfiguration().getModel().getAccountModel();
             String assetValue = accModel.getAccBalance(account);
@@ -186,9 +196,7 @@ public class AssetsEditor extends JPanel implements Configurable {
             labelCurrentValue.setFont(boldFont);
 
             JButton buttonDep = new JButton("Depreciate");
-            buttonDep.addActionListener(e -> {
-                // TODO: 3/17/17 dep dialog (find day, amount,.. => setup dep transaction \ info = list deps.,... )
-            });
+            buttonDep.addActionListener(new OpenDepreciateDialog(AssetsEditor.this, account));
             JButton buttonExclude = new JButton("Exclude");
             buttonExclude.addActionListener(e -> {
                 // TODO: 3/17/17 open ex dialog - setup ex. transaction (dar,predaj,vyhodenie, stranie,...)
@@ -244,6 +252,10 @@ public class AssetsEditor extends JPanel implements Configurable {
                             .addComponent(separator,50,50,50)
                             .addComponent(panelActions))
                     .addGap(5));
+        }
+
+        public AccountModel.Account getAccount() {
+            return account;
         }
     }
 }
