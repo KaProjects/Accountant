@@ -3,8 +3,8 @@ package org.kaleta.accountant.frontend.action.listener;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.constants.DefaultSchemaId;
+import org.kaleta.accountant.frontend.component.year.dialog.DepreciateDialog;
 import org.kaleta.accountant.frontend.component.year.model.AccountModel;
-import org.kaleta.accountant.frontend.dialog.DepreciateDialog;
 import org.kaleta.accountant.service.Service;
 
 import java.awt.Component;
@@ -42,7 +42,6 @@ public class OpenDepreciateDialog extends ActionListener {
             int assetValue = Integer.parseInt(model.getAccBalance(account));
             int depSum = Integer.parseInt(model.getAccBalance(accumDepAcc));
             montlyDepHint = ((assetValue-depSum) < Integer.parseInt(montlyDepHint)) ? String.valueOf(assetValue-depSum) : montlyDepHint;
-            montlyDepHint = (montlyDepHint.equals("0")) ? "x" : montlyDepHint;
 
             String dayHint = (accumDepAcc.getMetadata().split(",").length == 2) ? accumDepAcc.getMetadata().split(",")[1] : "1";
 
@@ -57,26 +56,31 @@ public class OpenDepreciateDialog extends ActionListener {
             if (monthHint.equals("0")){
                 monthHint = String.valueOf(1 + Integer.parseInt(getConfiguration().getModel().getAccountModel().getTransactions(account.getFullId(), DefaultSchemaId.INIT_ACC).get(0).getDate().substring(2,4)));
             }
+            String dateHint;
             if (monthHint.equals("13") || montlyDepHint.equals("0")){
-                monthHint = "xx";
-                dayHint = "xx";
-                yearHint = "xxxx";
+                dateHint = "x";
+                montlyDepHint = "x";
+            } else {
+                dateHint  = String.format("%02d", Integer.parseInt(dayHint))+String.format("%02d", Integer.parseInt(monthHint))+yearHint;
             }
-            String dateHint  = String.format("%02d", Integer.parseInt(dayHint))+String.format("%02d", Integer.parseInt(monthHint))+yearHint;
-            configs.add(new DepreciateDialog.Config(account, accumDepAcc, dateHint, montlyDepHint));
+            configs.add(new DepreciateDialog.Config(account, accumDepAcc, dateHint, montlyDepHint, (assetValue-depSum), true));
         }
         DepreciateDialog dialog = new DepreciateDialog((Component) getConfiguration(), configs);
         dialog.setVisible(true);
         if (dialog.getResult()){
             AccountModel model = getConfiguration().getModel().getAccountModel();
-
-
-            // TODO: 4/11/17 setup dep transaction
-
-
-
-
-
+            for (DepreciateDialog.Config config : dialog.getConfigs()){
+                if (config.isEnabled()){
+                    String expenseAccId = "59" + config.getDepAccount().getSchemaId().substring(2,3)+"."+config.getDepAccount().getSemanticId();
+                    model.getTransactions().add(new AccountModel.Transaction(
+                            model.getNextTransactionId(),
+                            config.getDateHint(),
+                            "monthly depreciation",
+                            config.getValueHint(),
+                            expenseAccId,
+                            config.getDepAccount().getFullId()));
+                }
+            }
             Service.YEAR.updateAccount(model);
             getConfiguration().update(Configuration.ACCOUNT_UPDATED);
         }
