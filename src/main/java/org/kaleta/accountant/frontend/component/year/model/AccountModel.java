@@ -1,5 +1,6 @@
 package org.kaleta.accountant.frontend.component.year.model;
 
+import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.constants.AccountType;
 import org.kaleta.accountant.frontend.common.constants.DefaultSchemaId;
 import org.kaleta.accountant.service.ServiceFailureException;
@@ -12,10 +13,23 @@ import java.util.stream.Collectors;
  * Created by Stanislav Kaleta on 14.02.2017.
  */
 public class AccountModel {
-    private List<Account> accounts = new ArrayList<>();
-    private List<Transaction> transactions = new ArrayList<>();
+    private List<Account> accounts = new ArrayList<Account>(){// TODO: 8/18/17 this is only for DEBUG purposes
+        @Override
+        public boolean add(Account account) {
+            Initializer.LOG.info("Account added: " + account.getFullId() + " \"" + account.getName() + "\"");
+            return super.add(account);
+        }
+    };
+    private List<Transaction> transactions = new ArrayList<Transaction>(){// TODO: 8/18/17 this is only for DEBUG purposes
+        @Override
+        public boolean add(Transaction tr) {
+            Initializer.LOG.info("Transaction added: " + tr.getDate() + " " + tr.getDebit() + "/" + tr.getCredit() + " " + tr.getAmount() + " " + tr.getDescription());
+            return super.add(tr);
+        }
+    };
 
     public AccountModel(){
+
     }
 
     public String getAccInitState(Account account) {

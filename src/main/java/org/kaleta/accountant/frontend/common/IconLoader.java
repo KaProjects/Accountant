@@ -17,6 +17,8 @@ public class IconLoader {
     public static final String ADD = "/icon/add.png";
     public static final String DELETE = "/icon/delete.png";
     public static final String EDIT = "/icon/edit.png";
+    public static final String TOGGLE_EXPAND = "/icon/toggleExpand.png";
+    public static final String TOGGLE_HIDE = "/icon/toggleHide.png";
 
 
     public static Icon getIcon(String iconPath){

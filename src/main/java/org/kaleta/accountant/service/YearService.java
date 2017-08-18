@@ -72,6 +72,11 @@ public class YearService {
             schemaModel.getClasses().get(1).getGroups().get(1).getAccounts().put(1,new SchemaModel.Clazz.Group.Account(1,"A", "clask"));
 
             schemaModel.getClasses().put(2, new SchemaModel.Clazz(2,"Finance"));
+            schemaModel.getClasses().get(2).getGroups().put(1, new SchemaModel.Clazz.Group(1,"Penazne prostriedky"));
+            schemaModel.getClasses().get(2).getGroups().get(1).getAccounts().put(1, new SchemaModel.Clazz.Group.Account(1,AccountType.ASSET, "Hotovost"));
+            schemaModel.getClasses().get(2).getGroups().get(1).getAccounts().put(2, new SchemaModel.Clazz.Group.Account(2,AccountType.ASSET, "Stravenky"));
+            schemaModel.getClasses().get(2).getGroups().put(2, new SchemaModel.Clazz.Group(2,"Bankove Ucty"));
+            schemaModel.getClasses().get(2).getGroups().get(2).getAccounts().put(1, new SchemaModel.Clazz.Group.Account(1, AccountType.ASSET, "Debetne"));
 
             schemaModel.getClasses().put(3, new SchemaModel.Clazz(3,"Zuc cstary"));
             schemaModel.getClasses().get(3).getGroups().put(1, new SchemaModel.Clazz.Group(1,"zavazky"));
@@ -115,6 +120,13 @@ public class YearService {
             model.getAccountModel().getTransactions().add(new AccountModel.Transaction("11","01042017","www","30","001.0","000.1"));
             model.getAccountModel().getTransactions().add(new AccountModel.Transaction("12","01052017","vvv","30","000.0","001.0"));
             model.getAccountModel().getTransactions().add(new AccountModel.Transaction("13","01052017","dep","75","590.0-0","090.0-0"));
+
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("100","0", AccountType.ASSET,"default",""));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("580","0-0", AccountType.ASSET,"default-exp",""));
+
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("211","0", AccountType.ASSET,"koruny",""));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("211","1", AccountType.ASSET,"eura",""));
+            model.getAccountModel().getAccounts().add(new AccountModel.Account("212","0", AccountType.ASSET,"default",""));
 
 
             if (true) {
