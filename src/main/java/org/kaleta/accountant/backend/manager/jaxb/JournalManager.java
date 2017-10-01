@@ -17,6 +17,7 @@ import java.io.File;
 /**
  * Created by Stanislav Kaleta on 23.05.2016.
  */
+@Deprecated
 public class JournalManager implements Manager<Journal> {
     private final String schemaUri;
     private final String dataSourceDir;

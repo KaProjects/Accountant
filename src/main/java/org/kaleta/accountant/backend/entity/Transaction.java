@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "transaction")
+@Deprecated
 public class Transaction {
 
     @XmlAttribute(name = "id", required = true)

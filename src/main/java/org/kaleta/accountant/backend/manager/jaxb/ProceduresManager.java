@@ -17,6 +17,7 @@ import java.io.File;
 /**
  * Created by Stanislav Kaleta on 24.05.2016.
  */
+@Deprecated
 public class ProceduresManager implements Manager<Procedures> {
     private final String schemaUri;
     private final String proceduresFileUri;

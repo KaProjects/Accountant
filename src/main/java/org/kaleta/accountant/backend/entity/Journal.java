@@ -38,6 +38,7 @@ import java.util.List;
     "transaction"
 })
 @XmlRootElement(name = "journal")
+@Deprecated
 public class Journal {
 
     protected List<Transaction> transaction;

@@ -71,6 +71,7 @@ import java.util.List;
     "clazz"
 })
 @XmlRootElement(name = "schema")
+@Deprecated
 public class Schema {
 
     @XmlElement(name = "class", required = true)

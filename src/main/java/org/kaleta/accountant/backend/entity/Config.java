@@ -17,6 +17,7 @@ import java.util.List;
     "years"
 })
 @XmlRootElement(name = "config")
+@Deprecated
 public class Config {
 
     @XmlElement(required = true)

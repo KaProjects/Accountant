@@ -48,6 +48,7 @@ import java.util.List;
     "account"
 })
 @XmlRootElement(name = "semantic")
+@Deprecated
 public class Semantic {
 
     protected List<Account> account;

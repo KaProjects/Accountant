@@ -42,12 +42,17 @@ public class Initializer {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                Service.CONFIG.checkResources();
+                Service.CONFIG.checkResources(); // TODO: 9/22/17 update
                 initLogger();
-                Service.CONFIG.checkData();
+                Service.CONFIG.checkData(); // TODO: 9/22/17 update
                 if (Service.CONFIG.getActiveYear() == -1){
                     // TODO: 12/25/16 new year wizard
                 }
+
+
+
+
+
 
                 new AppFrame().setVisible(true);
 

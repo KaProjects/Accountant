@@ -1,8 +1,6 @@
-package org.kaleta.accountant.backend.manager.jaxb;
+package org.kaleta.accountant.backend.manager;
 
-import org.kaleta.accountant.backend.entity.Schema;
-import org.kaleta.accountant.backend.manager.Manager;
-import org.kaleta.accountant.backend.manager.ManagerException;
+import org.kaleta.accountant.backend.model.Schema;
 import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -14,17 +12,13 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 
-/**
- * Created by Stanislav Kaleta on 16.04.2016.
- */
-@Deprecated
 public class SchemaManager implements Manager<Schema> {
     private final String schemaUri;
     private final String schemaFileUri;
 
-    public SchemaManager() {
+    public SchemaManager(String year) {
         schemaUri = "/schema/schema.xsd";
-        schemaFileUri = Initializer.DATA_SOURCE + "schema.xml";
+        schemaFileUri = Initializer.DATA_SOURCE + year + "-schema.xml";
     }
 
     @Override
@@ -32,11 +26,11 @@ public class SchemaManager implements Manager<Schema> {
         Schema newSchema = new Schema();
         Schema.Class c0 = new Schema.Class();
         c0.setId("0");
-        c0.setName("Long-term Assets");
+        c0.setName("Assets");
         newSchema.getClazz().add(c0);
         Schema.Class c1 = new Schema.Class();
         c1.setId("1");
-        c1.setName("Current Assets");
+        c1.setName("Resources");
         newSchema.getClazz().add(c1);
         Schema.Class c2 = new Schema.Class();
         c2.setId("2");

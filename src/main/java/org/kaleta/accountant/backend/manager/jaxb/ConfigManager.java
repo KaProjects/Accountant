@@ -17,6 +17,7 @@ import java.io.File;
 /**
  * Created by Stanislav Kaleta on 19.12.2016.
  */
+@Deprecated
 public class ConfigManager implements Manager<Config> {
     private final String schemaUri;
     private final String ConfigFileUri;
