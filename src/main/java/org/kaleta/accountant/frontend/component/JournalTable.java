@@ -9,7 +9,7 @@ import org.kaleta.accountant.service.Service;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import java.awt.Dimension;
+import java.awt.*;
 
 /**
  * Created by Stanislav Kaleta on 03.08.2016.
@@ -47,7 +47,7 @@ public class JournalTable extends JTable implements Configurable {
         // TODO: 8/8/16 add on click listenrers + actions
 
         this.getActionMap().put(Configuration.INIT_CONFIG, new InitConfigurableAction(this));
-        this.getActionMap().put(Configuration.TRANSACTION_ACTION, new JournalTableTransactionsUpdated(this, model));
+        this.getActionMap().put(Configuration.TRANSACTION_UPDATED, new JournalTableTransactionsUpdated(this, model));
     }
 
     @Override

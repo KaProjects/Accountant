@@ -1,6 +1,7 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
 import org.kaleta.accountant.frontend.component.year.component.*;
+import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
 
@@ -25,7 +26,7 @@ public class YearPaneYearSelected extends ConfigurationAction {
         accountsOverview.setConfiguration(getConfiguration());
         accountsOverview.update();
 
-        if (pane.getConfiguration().getModel().isActive()){
+        if (pane.getConfiguration().getSelectedYear().equals(Service.CONFIG.getActiveYear())){
             JTabbedPane schemaPane = new JTabbedPane();
             pane.addTab("Schema", schemaPane);
             schemaPane.addTab("Overview", new JScrollPane(schemaOverview));

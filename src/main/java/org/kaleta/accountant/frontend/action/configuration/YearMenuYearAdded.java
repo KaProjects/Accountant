@@ -6,8 +6,7 @@ import org.kaleta.accountant.frontend.component.year.YearMenu;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
-import java.awt.Color;
-import java.util.List;
+import java.awt.*;
 
 /**
  * Created by Stanislav Kaleta on 05.01.2017.
@@ -23,19 +22,17 @@ public class YearMenuYearAdded extends ConfigurationAction {
     @Override
     protected void actionPerformed() {
         menu.removeAll();
-        List<Integer> yearIds = Service.YEAR.getYearIds();
-        for (Integer yearId : yearIds){
-            JMenuItem menuItem = new MenuItemWrapper(new MenuAction(getConfiguration(), String.valueOf(yearId)) {
+        for (String year : Service.CONFIG.getYears()){
+            JMenuItem menuItem = new MenuItemWrapper(new MenuAction(getConfiguration(), year) {
                 @Override
                 protected void actionPerformed() {
-                    getConfiguration().selectYear(yearId);
+                    getConfiguration().selectYear(year);
                 }
             });
-            if (yearIds.indexOf(yearId) == yearIds.size() - 1){
+            if (year.equals(Service.CONFIG.getActiveYear())){
                 menuItem.setForeground(Color.GREEN.darker());
             }
             menu.add(menuItem);
         }
-        getConfiguration().selectYear(yearIds.get(yearIds.size() - 1));
     }
 }

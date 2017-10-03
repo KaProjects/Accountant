@@ -1,6 +1,6 @@
 package org.kaleta.accountant.backend.manager;
 
-import org.kaleta.accountant.backend.model.Schema;
+import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -12,87 +12,88 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 
-public class SchemaManager implements Manager<Schema> {
+public class SchemaManager implements Manager<SchemaModel> {
     private final String schemaUri;
     private final String schemaFileUri;
 
     public SchemaManager(String year) {
         schemaUri = "/schema/schema.xsd";
-        schemaFileUri = Initializer.DATA_SOURCE + year + "-schema.xml";
+        schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "schema.xml";
     }
 
     @Override
     public void create() throws ManagerException {
-        Schema newSchema = new Schema();
-        Schema.Class c0 = new Schema.Class();
+        SchemaModel newSchemaModel = new SchemaModel();
+        SchemaModel.Class c0 = new SchemaModel.Class();
         c0.setId("0");
         c0.setName("Assets");
-        newSchema.getClazz().add(c0);
-        Schema.Class c1 = new Schema.Class();
+        newSchemaModel.getClazz().add(c0);
+        SchemaModel.Class c1 = new SchemaModel.Class();
         c1.setId("1");
         c1.setName("Resources");
-        newSchema.getClazz().add(c1);
-        Schema.Class c2 = new Schema.Class();
+        newSchemaModel.getClazz().add(c1);
+        SchemaModel.Class c2 = new SchemaModel.Class();
         c2.setId("2");
         c2.setName("Finance");
-        newSchema.getClazz().add(c2);
-        Schema.Class c3 = new Schema.Class();
+        newSchemaModel.getClazz().add(c2);
+        SchemaModel.Class c3 = new SchemaModel.Class();
         c3.setId("4");
         c3.setName("Relations");
-        newSchema.getClazz().add(c3);
-        Schema.Class c4 = new Schema.Class();
+        newSchemaModel.getClazz().add(c3);
+        SchemaModel.Class c4 = new SchemaModel.Class();
         c4.setId("4");
         c4.setName("Funding");
-        newSchema.getClazz().add(c4);
-        Schema.Class c5 = new Schema.Class();
+        newSchemaModel.getClazz().add(c4);
+        SchemaModel.Class c5 = new SchemaModel.Class();
         c5.setId("5");
         c5.setName("Expenses");
-        newSchema.getClazz().add(c5);
-        Schema.Class c6 = new Schema.Class();
+        newSchemaModel.getClazz().add(c5);
+        SchemaModel.Class c6 = new SchemaModel.Class();
         c6.setId("6");
         c6.setName("Revenues");
-        newSchema.getClazz().add(c6);
-        Schema.Class c7 = new Schema.Class();
+        newSchemaModel.getClazz().add(c6);
+        SchemaModel.Class c7 = new SchemaModel.Class();
         c7.setId("7");
         c7.setName("Off Balance");
-        newSchema.getClazz().add(c7);
+        newSchemaModel.getClazz().add(c7);
 
-        update(newSchema);
+        update(newSchemaModel);
+        Initializer.LOG.info("File \"" + schemaFileUri + "\" created!");
     }
 
     @Override
-    public Schema retrieve() throws ManagerException {
+    public SchemaModel retrieve() throws ManagerException {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             javax.xml.validation.Schema xmlSchema = schemaFactory.newSchema(this.getClass().getResource(schemaUri));
 
-            JAXBContext context = JAXBContext.newInstance(Schema.class);
+            JAXBContext context = JAXBContext.newInstance(SchemaModel.class);
 
             Unmarshaller unmarshaller = context.createUnmarshaller();
             unmarshaller.setSchema(xmlSchema);
 
             File file = new File(schemaFileUri);
-            return (Schema) unmarshaller.unmarshal(file);
+            return (SchemaModel) unmarshaller.unmarshal(file);
         } catch (Exception e) {
             throw new ManagerException("Error while retrieving schema data: ",e);
         }
     }
 
     @Override
-    public void update(Schema schema) throws ManagerException {
+    public void update(SchemaModel schemaModel) throws ManagerException {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             javax.xml.validation.Schema xmlSchema = schemaFactory.newSchema(this.getClass().getResource(schemaUri));
 
-            JAXBContext context = JAXBContext.newInstance(Schema.class);
+            JAXBContext context = JAXBContext.newInstance(SchemaModel.class);
 
             Marshaller marshaller = context.createMarshaller();
             marshaller.setSchema(xmlSchema);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
             File file = new File(schemaFileUri);
-            marshaller.marshal(schema,new DefaultHandler());
-            marshaller.marshal(schema, file);
+            marshaller.marshal(schemaModel,new DefaultHandler());
+            marshaller.marshal(schemaModel, file);
         } catch (Exception e) {
             throw new ManagerException("Error while updating schema data: ",e);
         }

@@ -20,7 +20,7 @@ public class OpenAddTransactionDialog extends MenuAction {
             for (Transaction transaction : dialog.getCreatedTransactions()){
                 //todo Service.JOURNAL.addTransaction(transaction, getConfiguration().getActiveYear());
             }
-            getConfiguration().update(Configuration.TRANSACTION_ACTION);
+            getConfiguration().update(Configuration.TRANSACTION_UPDATED);
         }
     }
 }

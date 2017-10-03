@@ -7,5 +7,5 @@ Released: 25.12.2016
 	    - dialogs via menu
 	    - journal, balance and profit tables and thier UI
 
-# 0.1
+# 1.0
 Released: in progress

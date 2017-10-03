@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Created by Stanislav Kaleta on 05.01.2017.
  */
+@Deprecated
 public class YearService {
 
     YearService(){

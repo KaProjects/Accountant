@@ -3,8 +3,7 @@ package org.kaleta.accountant.frontend.action.configuration;
 import org.kaleta.accountant.frontend.component.year.YearMenu;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.Color;
-import java.util.List;
+import java.awt.*;
 
 /**
  * Created by Stanislav Kaleta on 10.01.2017.
@@ -19,9 +18,8 @@ public class YearMenuYearSelected extends ConfigurationAction {
 
     @Override
     protected void actionPerformed() {
-        List<Integer> yearIds = Service.YEAR.getYearIds();
-        menu.setText("Year: " + getConfiguration().getModel().getYearId());
-        if (yearIds.get(yearIds.size() - 1) == getConfiguration().getModel().getYearId()){
+        menu.setText("Year: " + getConfiguration().getSelectedYear());
+        if (getConfiguration().getSelectedYear().equals(Service.CONFIG.getActiveYear())){
             menu.setForeground(Color.GREEN.darker());
         } else {
             menu.setForeground(Color.BLACK);

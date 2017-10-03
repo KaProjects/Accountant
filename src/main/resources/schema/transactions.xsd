@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="transactions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="transaction" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="id" use="required" type="xs:string"/>
+                        <xs:attribute name="date" use="required" type="xs:string"/>
+                        <xs:attribute name="description" use="required" type="xs:string"/>
+                        <xs:attribute name="amount" use="required" type="xs:string"/>
+                        <xs:attribute name="debit" use="required" type="xs:string"/>
+                        <xs:attribute name="credit" use="required" type="xs:string"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

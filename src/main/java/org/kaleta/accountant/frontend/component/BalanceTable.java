@@ -9,10 +9,7 @@ import org.kaleta.accountant.frontend.action.mouse.BalanceTableClicked;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 
 /**
  * Created by Stanislav Kaleta on 03.08.2016.
@@ -83,7 +80,7 @@ public class BalanceTable extends JTable implements Configurable {
         this.addMouseListener(new BalanceTableClicked(this, Boolean.TRUE));
 
         this.getActionMap().put(Configuration.INIT_CONFIG, new InitConfigurableAction(this));
-        this.getActionMap().put(Configuration.TRANSACTION_ACTION, new BalanceTableTransactionsUpdated(this, model));
+        this.getActionMap().put(Configuration.TRANSACTION_UPDATED, new BalanceTableTransactionsUpdated(this, model));
     }
 
     @Override

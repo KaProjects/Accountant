@@ -13,15 +13,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by Stanislav Kaleta on 16.04.2016.
- *
  * Performs initialization of this app. Includes data and resources checks, app. wide constants and default logger.
  */
 public class Initializer {
     public static final String NAME = "Accountant";
     public static final String VERSION = "0.1-snapshot";
     public static final String DATA_SOURCE = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation()
-            .getPath()).getParentFile().getPath() + "/" + NAME + "-" + VERSION + "-DATA/";
+            .getPath()).getParentFile().getPath() + File.separator + NAME + "-" + VERSION + "-DATA" + File.separator;
     public static final Logger LOG = Logger.getLogger("Logger");
 
     private static void initLogger(){
@@ -42,17 +40,12 @@ public class Initializer {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                Service.CONFIG.checkResources(); // TODO: 9/22/17 update
+                Service.CONFIG.checkResources();
                 initLogger();
-                Service.CONFIG.checkData(); // TODO: 9/22/17 update
-                if (Service.CONFIG.getActiveYear() == -1){
-                    // TODO: 12/25/16 new year wizard
+                Service.CONFIG.checkData();
+                if (Service.CONFIG.getActiveYear().equals("-1")){
+                    // TODO: 12/25/16 init 1st year wizard
                 }
-
-
-
-
-
 
                 new AppFrame().setVisible(true);
 

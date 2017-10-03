@@ -38,7 +38,7 @@ public class AccountService {
     }
 
     /**
-     * Returns Schema which contains only accounts with specified account type.
+     * Returns SchemaModel which contains only accounts with specified account type.
      * @param accountType org.kaleta.accountant.frontend.common.constants.AccountType.*
      */
     public Schema getSchemaForAccountType(String accountType){
