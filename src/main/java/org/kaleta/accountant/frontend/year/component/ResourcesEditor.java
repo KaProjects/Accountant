@@ -1,19 +1,15 @@
-package org.kaleta.accountant.frontend.component.year.component;
+package org.kaleta.accountant.frontend.year.component;
 
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.OpenAddResourcesDialog;
 import org.kaleta.accountant.frontend.common.IconLoader;
-import org.kaleta.accountant.frontend.common.constants.AccountType;
-import org.kaleta.accountant.frontend.common.constants.DefaultSchemaId;
-import org.kaleta.accountant.frontend.component.year.model.AccountModel;
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
+import org.kaleta.accountant.frontend.year.model.AccountModel;
+import org.kaleta.accountant.frontend.year.model.SchemaModel;
 
 import javax.swing.*;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -206,15 +202,15 @@ public class ResourcesEditor extends JPanel implements Configurable {
                 String date = String.format("%1$02d%2$02d%3$04d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
 
                 model.getAccounts().add(new AccountModel.Account(schemaId,
-                        nextSemId, AccountType.ASSET, textFieldName.getText(), ""));
+                        nextSemId, Constants.AccountType.ASSET, textFieldName.getText(), ""));
                 model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                        "0", schemaId + "." + nextSemId, DefaultSchemaId.INIT_ACC));
+                        "0", schemaId + "." + nextSemId, Constants.Schema.INIT_ACC_ID));
 
                 String expenseSemanticId = schemaId.substring(2, 3) + "-" + nextSemId;
                 model.getAccounts().add(new AccountModel.Account("58" + schemaId.substring(1, 2),
-                        expenseSemanticId, AccountType.EXPENSE, "Dep. of " + textFieldName.getText(), ""));
+                        expenseSemanticId, Constants.AccountType.EXPENSE, "Dep. of " + textFieldName.getText(), ""));
                 model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                        "0", "58" + schemaId.substring(1, 2) + "." + expenseSemanticId, DefaultSchemaId.INIT_ACC));
+                        "0", "58" + schemaId.substring(1, 2) + "." + expenseSemanticId, Constants.Schema.INIT_ACC_ID));
 
                 getConfiguration().update(Configuration.ACCOUNT_UPDATED);
             });

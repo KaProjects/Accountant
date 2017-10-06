@@ -1,17 +1,15 @@
-package org.kaleta.accountant.frontend.component.year.component;
+package org.kaleta.accountant.frontend.year.component;
 
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenDepreciateDialog;
-import org.kaleta.accountant.frontend.common.constants.ColorConstants;
-import org.kaleta.accountant.frontend.component.year.model.AccountModel;
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
+import org.kaleta.accountant.frontend.year.model.AccountModel;
+import org.kaleta.accountant.frontend.year.model.SchemaModel;
 
 import javax.swing.*;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -222,7 +220,7 @@ public class AssetsEditor extends JPanel implements Configurable {
                 labelInitValue = new JLabel("Excluded", SwingConstants.RIGHT);
                 labelInitValue.setForeground(Color.RED);
                 labelCurrentValue.setVisible(false);
-                this.setBackground(ColorConstants.EXPENSE_RED);
+                this.setBackground(Constants.Color.EXPENSE_RED);
                 panelActions.setVisible(false);
             }
 

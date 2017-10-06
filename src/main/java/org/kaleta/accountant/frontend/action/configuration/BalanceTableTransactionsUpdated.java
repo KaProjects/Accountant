@@ -1,11 +1,12 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
-import org.kaleta.accountant.frontend.component.BalanceTable;
-import org.kaleta.accountant.frontend.component.BalanceTableModel;
+import org.kaleta.accountant.frontend.dep.BalanceTable;
+import org.kaleta.accountant.frontend.dep.BalanceTableModel;
 
 /**
  * Created by Stanislav Kaleta on 09.08.2016.
  */
+@Deprecated
 public class BalanceTableTransactionsUpdated extends ConfigurationAction {
     private BalanceTable target;
     private BalanceTableModel model;

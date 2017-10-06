@@ -1,8 +1,6 @@
-package org.kaleta.accountant.frontend.component.year.model;
+package org.kaleta.accountant.frontend.year.model;
 
-import org.kaleta.accountant.frontend.Initializer;
-import org.kaleta.accountant.frontend.common.constants.AccountType;
-import org.kaleta.accountant.frontend.common.constants.DefaultSchemaId;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.service.ServiceFailureException;
 
 import java.util.ArrayList;
@@ -12,18 +10,19 @@ import java.util.stream.Collectors;
 /**
  * Created by Stanislav Kaleta on 14.02.2017.
  */
+@Deprecated
 public class AccountModel {
     private List<Account> accounts = new ArrayList<Account>(){// TODO: 8/18/17 this is only for DEBUG purposes
         @Override
         public boolean add(Account account) {
-            Initializer.LOG.info("Account added: " + account.getFullId() + " \"" + account.getName() + "\"");
+            //Initializer.LOG.info("Account added: " + account.getFullId() + " \"" + account.getName() + "\"");
             return super.add(account);
         }
     };
     private List<Transaction> transactions = new ArrayList<Transaction>(){// TODO: 8/18/17 this is only for DEBUG purposes
         @Override
         public boolean add(Transaction tr) {
-            Initializer.LOG.info("Transaction added: " + tr.getDate() + " " + tr.getDebit() + "/" + tr.getCredit() + " " + tr.getAmount() + " " + tr.getDescription());
+            //Initializer.LOG.info("Transaction added: " + tr.getDate() + " " + tr.getDebit() + "/" + tr.getCredit() + " " + tr.getAmount() + " " + tr.getDescription());
             return super.add(tr);
         }
     };
@@ -36,15 +35,15 @@ public class AccountModel {
         String type = account.getType();
         String id = account.getSchemaId() + "." + account.getSemanticId();
         for (Transaction tr : transactions) {
-            if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
+            if (type.equals(Constants.AccountType.ASSET) || type.equals(Constants.AccountType.EXPENSE)) {
                 if (tr.getDebit().equals(id)
-                        && tr.getCredit().startsWith(DefaultSchemaId.INIT_ACC)) {
+                        && tr.getCredit().startsWith(Constants.Schema.INIT_ACC_ID)) {
                     return tr.getAmount();
                 }
             }
-            if (type.equals(AccountType.LIABILITY) || type.equals(AccountType.REVENUE)) {
+            if (type.equals(Constants.AccountType.LIABILITY) || type.equals(Constants.AccountType.REVENUE)) {
                 if (tr.getCredit().equals(id)
-                        && tr.getDebit().startsWith(DefaultSchemaId.INIT_ACC)) {
+                        && tr.getDebit().startsWith(Constants.Schema.INIT_ACC_ID)) {
                     return tr.getAmount();
                 }
             }
@@ -56,15 +55,15 @@ public class AccountModel {
         String type = account.getType();
         String id = account.getSchemaId() + "." + account.getSemanticId();
         for (Transaction tr : transactions){
-            if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
+            if (type.equals(Constants.AccountType.ASSET) || type.equals(Constants.AccountType.EXPENSE)) {
                 if (tr.getCredit().equals(id)
-                        &&tr.getDebit().startsWith(DefaultSchemaId.CLOSING_ACC)){
+                        &&tr.getDebit().startsWith(Constants.Schema.CLOSING_ACC_ID)){
                     return tr.getAmount();
                 }
             }
-            if (type.equals(AccountType.LIABILITY) || type.equals(AccountType.REVENUE)){
+            if (type.equals(Constants.AccountType.LIABILITY) || type.equals(Constants.AccountType.REVENUE)){
                 if (tr.getDebit().equals(id)
-                        && tr.getCredit().startsWith(DefaultSchemaId.CLOSING_ACC)){
+                        && tr.getCredit().startsWith(Constants.Schema.CLOSING_ACC_ID)){
                     return tr.getAmount();
                 }
             }
@@ -74,21 +73,21 @@ public class AccountModel {
 
     public String getAccBalance(Account account){
         String type = account.getType();
-        if (type.equals(AccountType.OFF_BALANCE)){
+        if (type.equals(Constants.AccountType.OFF_BALANCE)){
             throw new IllegalArgumentException("Off-Balance accounts has no balance");
         }
         String id = account.getSchemaId() + "." + account.getSemanticId();
         Integer balance = 0;
         for (Transaction tr : transactions){
             if (tr.getCredit().equals(id)){
-                if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
+                if (type.equals(Constants.AccountType.ASSET) || type.equals(Constants.AccountType.EXPENSE)) {
                     balance -= Integer.parseInt(tr.getAmount());
                 } else {
                     balance += Integer.parseInt(tr.getAmount());
                 }
             }
             if (tr.getDebit().equals(id)){
-                if (type.equals(AccountType.ASSET) || type.equals(AccountType.EXPENSE)) {
+                if (type.equals(Constants.AccountType.ASSET) || type.equals(Constants.AccountType.EXPENSE)) {
                     balance += Integer.parseInt(tr.getAmount());
                 } else {
                     balance -= Integer.parseInt(tr.getAmount());

@@ -2,8 +2,8 @@ package org.kaleta.accountant.frontend.dialog.transaction;
 
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.backend.entity.Semantic;
+import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Initializer;
-import org.kaleta.accountant.frontend.common.ErrorDialog;
 import org.kaleta.accountant.frontend.dialog.Dialog;
 import org.kaleta.accountant.service.Service;
 
@@ -11,7 +11,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.Component;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,8 +119,8 @@ public class SelectAccountDialog extends Dialog {
             tree.clearSelection();
             tree.addSelectionPath(new TreePath(path.toArray()));
         } catch (NumberFormatException | IndexOutOfBoundsException e){
-            Initializer.LOG.warning(ErrorDialog.getExceptionStackTrace(e));
-            new ErrorDialog(e).setVisible(true);
+            Initializer.LOG.warning(ErrorHandler.getThrowableStackTrace(e));
+            ErrorHandler.getThrowableDialog(e).setVisible(true);
         }
     }
 

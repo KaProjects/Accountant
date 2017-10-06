@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.component;
+package org.kaleta.accountant.frontend.dep;
 
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;

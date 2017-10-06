@@ -5,11 +5,12 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.schema.SchemaDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Created by Stanislav Kaleta on 19.04.2016.
  */
+@Deprecated
 public class OpenSchemaDialog extends MenuAction {
     public OpenSchemaDialog(Configuration config) {
         super(config, "Schema");

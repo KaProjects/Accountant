@@ -1,10 +1,10 @@
-package org.kaleta.accountant.frontend.component.year.component;
+package org.kaleta.accountant.frontend.year.component;
 
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.configuration.ConfigurationAction;
-import org.kaleta.accountant.frontend.component.year.model.AccountModel;
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
+import org.kaleta.accountant.frontend.year.model.AccountModel;
+import org.kaleta.accountant.frontend.year.model.SchemaModel;
 
 import javax.swing.*;
 import java.awt.*;

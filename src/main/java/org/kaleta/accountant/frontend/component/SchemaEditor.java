@@ -1,32 +1,31 @@
-package org.kaleta.accountant.frontend.component.year.component;
+package org.kaleta.accountant.frontend.component;
 
+import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.configuration.ConfigurationAction;
 import org.kaleta.accountant.frontend.action.listener.SchemaEditorAccountAction;
 import org.kaleta.accountant.frontend.action.listener.SchemaEditorGroupAction;
 import org.kaleta.accountant.frontend.common.IconLoader;
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
+import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Stanislav Kaleta on 14.02.2017.
- */
 public class SchemaEditor extends JTabbedPane implements Configurable {
     private Configuration configuration;
-    private int[][] classesDef = new int[][]{{0,9},{1,10}}; // [classId,numberOfEditableGroups]
+    private int[][] classesDef = new int[][]{{0,9},{1,10},{2,10},{3,10},{4,10},{5,8},{6,10}}; // [classId,numberOfEditableGroups]
     private Map<Integer, JPanel> editorClassPanels;
 
     public SchemaEditor(Configuration configuration){
         setConfiguration(configuration);
         editorClassPanels = new HashMap<>();
+        Map<Integer, SchemaModel.Class> classMap = Service.SCHEMA.getSchemaClassMap(getConfiguration().getSelectedYear());
         for (int[] cidArray : classesDef) {
             JPanel classPanel = new JPanel();
-            this.addTab(getConfiguration().getModel().getSchemaModel().getClasses().get(cidArray[0]).getName(), classPanel);
+            this.addTab(classMap.get(cidArray[0]).getName(), classPanel);
             classPanel.setLayout(new GridBagLayout());
             editorClassPanels.put(cidArray[0], classPanel);
         }
@@ -40,12 +39,13 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
     }
 
     public void update(){
+        Map<Integer, SchemaModel.Class> classMap = Service.SCHEMA.getSchemaClassMap(getConfiguration().getSelectedYear());
         for (int[] cIdArray : classesDef) {
             JPanel classPanel = editorClassPanels.get(cIdArray[0]);
             classPanel.removeAll();
             for (int gId = 0; gId < cIdArray[1]; gId++) {
                 GridBagConstraints groupConstraints = new GridBagConstraints(gId, 0, 1, 1, 1, 1, GridBagConstraints.LINE_START, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0);
-                SchemaModel.Clazz.Group group = getConfiguration().getModel().getSchemaModel().getClasses().get(cIdArray[0]).getGroups().get(gId);
+                SchemaModel.Class.Group group = Service.SCHEMA.getSchemaGroupMap(classMap.get(cIdArray[0])).get(gId);
                 if (group == null) {
                     JButton buttonAddGroup = new JButton(IconLoader.getIcon(IconLoader.ADD, new Dimension(15, 15)));
                     buttonAddGroup.setBackground(Color.LIGHT_GRAY);
@@ -76,7 +76,7 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                     int width = new JLabel().getFontMetrics(new JLabel().getFont()).stringWidth(group.getName()) + 20;
                     for (int aId = 0; aId < 10; aId++) {
                         GridBagConstraints accConstraints = new GridBagConstraints(0, aId + 1, 3, 1, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0);
-                        SchemaModel.Clazz.Group.Account account = group.getAccounts().get(aId);
+                        SchemaModel.Class.Group.Account account = Service.SCHEMA.getSchemaAccountMap(group).get(aId);
                         if (account == null) {
                             JButton buttonAddAccount = new JButton(IconLoader.getIcon(IconLoader.ADD, new Dimension(10, 10)));
                             buttonAddAccount.setBackground(Color.LIGHT_GRAY);

@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.component.year;
+package org.kaleta.accountant.frontend.year;
 
 import java.util.ArrayList;
 import java.util.List;

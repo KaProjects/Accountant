@@ -1,9 +1,9 @@
-package org.kaleta.accountant.frontend.component.year;
+package org.kaleta.accountant.frontend.year;
 
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
+import org.kaleta.accountant.frontend.year.model.SchemaModel;
 
 import javax.swing.*;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 

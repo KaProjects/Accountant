@@ -1,13 +1,10 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
-import org.kaleta.accountant.frontend.component.year.YearMenu;
+import org.kaleta.accountant.frontend.component.YearMenu;
 import org.kaleta.accountant.service.Service;
 
 import java.awt.*;
 
-/**
- * Created by Stanislav Kaleta on 10.01.2017.
- */
 public class YearMenuYearSelected extends ConfigurationAction {
     private YearMenu menu;
 

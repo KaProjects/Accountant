@@ -6,11 +6,12 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.semantic.SemanticDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Created by Stanislav Kaleta on 23.05.2016.
  */
+@Deprecated
 public class OpenSemanticDialog extends MenuAction {
     public OpenSemanticDialog(Configuration config) {
         super(config, "Accounts");

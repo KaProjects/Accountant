@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.component.year.model;
+package org.kaleta.accountant.frontend.year.model;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -6,6 +6,7 @@ import java.util.TreeMap;
 /**
  * Created by Stanislav Kaleta on 14.02.2017.
  */
+@Deprecated
 public class SchemaModel {
     private Map<Integer, Clazz> classes = new TreeMap<>();
 

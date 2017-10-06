@@ -8,8 +8,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Created by Stanislav Kaleta on 03.08.2016.
- *
  * Basic class for every action which impacts on configuration.
  */
 public abstract class ConfigurationAction extends AbstractAction {

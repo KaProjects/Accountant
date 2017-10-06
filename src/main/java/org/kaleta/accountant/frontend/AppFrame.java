@@ -2,9 +2,9 @@ package org.kaleta.accountant.frontend;
 
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
-import org.kaleta.accountant.frontend.component.year.YearMenu;
-import org.kaleta.accountant.frontend.component.year.component.YearPane;
-import org.kaleta.accountant.frontend.component.year.model.YearModel;
+import org.kaleta.accountant.frontend.component.YearMenu;
+import org.kaleta.accountant.frontend.component.YearPane;
+import org.kaleta.accountant.frontend.year.model.YearModel;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -13,9 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-/**
- * Created by Stanislav Kaleta on 19.04.2016.
- */
 public class AppFrame extends JFrame implements Configuration{
     private String selectedYear;
     private YearModel model; // TODO: 3.10.2017 to del
@@ -33,7 +30,7 @@ public class AppFrame extends JFrame implements Configuration{
         initComponents();
         applySettings();
         this.pack();
-        this.setSize(1000,500);
+        this.setSize(1100,1000);
     }
 
     private void initMenuBar() {

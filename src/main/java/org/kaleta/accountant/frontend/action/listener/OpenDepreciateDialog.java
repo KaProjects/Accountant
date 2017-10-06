@@ -1,13 +1,13 @@
 package org.kaleta.accountant.frontend.action.listener;
 
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.common.constants.DefaultSchemaId;
-import org.kaleta.accountant.frontend.component.year.dialog.DepreciateDialog;
-import org.kaleta.accountant.frontend.component.year.model.AccountModel;
+import org.kaleta.accountant.frontend.year.dialog.DepreciateDialog;
+import org.kaleta.accountant.frontend.year.model.AccountModel;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.Component;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class OpenDepreciateDialog extends ActionListener {
                     monthHint = (month >= Integer.parseInt(monthHint)) ? String.valueOf(++month) : monthHint;
             }
             if (monthHint.equals("0")){
-                monthHint = String.valueOf(1 + Integer.parseInt(getConfiguration().getModel().getAccountModel().getTransactions(account.getFullId(), DefaultSchemaId.INIT_ACC).get(0).getDate().substring(2,4)));
+                monthHint = String.valueOf(1 + Integer.parseInt(getConfiguration().getModel().getAccountModel().getTransactions(account.getFullId(), Constants.Schema.INIT_ACC_ID).get(0).getDate().substring(2,4)));
             }
             String dateHint;
             if (monthHint.equals("13") || montlyDepHint.equals("0")){

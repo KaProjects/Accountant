@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.component;
+package org.kaleta.accountant.frontend.dep;
 
 /**
  * Created by Stanislav Kaleta on 10.08.2016.

@@ -1,11 +1,12 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
-import org.kaleta.accountant.frontend.component.JournalTable;
-import org.kaleta.accountant.frontend.component.JournalTableModel;
+import org.kaleta.accountant.frontend.dep.JournalTable;
+import org.kaleta.accountant.frontend.dep.JournalTableModel;
 
 /**
  * Created by Stanislav Kaleta on 03.08.2016.
  */
+@Deprecated
 public class JournalTableTransactionsUpdated extends ConfigurationAction {
     private JournalTable target;
     private JournalTableModel model;

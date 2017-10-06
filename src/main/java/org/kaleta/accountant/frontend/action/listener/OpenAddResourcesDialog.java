@@ -1,12 +1,12 @@
 package org.kaleta.accountant.frontend.action.listener;
 
 import org.kaleta.accountant.frontend.Configurable;
-import org.kaleta.accountant.frontend.component.year.dialog.AddResourcesDialog;
-import org.kaleta.accountant.frontend.component.year.model.AccountModel;
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
-import org.kaleta.accountant.frontend.component.year.model.YearModel;
+import org.kaleta.accountant.frontend.year.dialog.AddResourcesDialog;
+import org.kaleta.accountant.frontend.year.model.AccountModel;
+import org.kaleta.accountant.frontend.year.model.SchemaModel;
+import org.kaleta.accountant.frontend.year.model.YearModel;
 
-import java.awt.Component;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -7,6 +7,7 @@ import org.kaleta.accountant.frontend.dialog.transaction.ProceduresDialog;
 /**
  * Created by Stanislav Kaleta on 30.05.2016.
  */
+@Deprecated
 public class OpenProceduresDialog extends MenuAction {
     public OpenProceduresDialog(Configuration config) {
         super(config, "Procedures");

@@ -1,8 +1,9 @@
-package org.kaleta.accountant.frontend.component.year.model;
+package org.kaleta.accountant.frontend.year.model;
 
 /**
  * Created by Stanislav Kaleta on 14.02.2017.
  */
+@Deprecated
 public class YearModel {
     private int yearId;
     private boolean isActive;

@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 /**
  * Created by Stanislav Kaleta on 05.09.2016.
  */
+@Deprecated
 public class AccountTextFieldClicked extends MouseAction {
     private boolean isDebit;
 

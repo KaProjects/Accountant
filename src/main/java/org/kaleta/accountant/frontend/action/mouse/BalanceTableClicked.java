@@ -1,8 +1,8 @@
 package org.kaleta.accountant.frontend.action.mouse;
 
 import org.kaleta.accountant.frontend.Configurable;
-import org.kaleta.accountant.frontend.component.BalanceTableModel;
-import org.kaleta.accountant.frontend.component.ProfitTableModel;
+import org.kaleta.accountant.frontend.dep.BalanceTableModel;
+import org.kaleta.accountant.frontend.dep.ProfitTableModel;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;
@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 /**
  * Created by Stanislav Kaleta on 20.08.2016.
  */
+@Deprecated
 public class BalanceTableClicked extends MouseAction {
     private JTable table;
     private Boolean isBalance;

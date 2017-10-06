@@ -1,12 +1,12 @@
-package org.kaleta.accountant.frontend.component.year.dialog;
+package org.kaleta.accountant.frontend.year.dialog;
 
 import org.kaleta.accountant.frontend.common.NumberFilter;
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
 import org.kaleta.accountant.frontend.dialog.Dialog;
+import org.kaleta.accountant.frontend.year.model.SchemaModel;
 
 import javax.swing.*;
 import javax.swing.text.PlainDocument;
-import java.awt.Component;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.component.year;
+package org.kaleta.accountant.frontend.component;
 
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
@@ -9,9 +9,6 @@ import org.kaleta.accountant.frontend.action.configuration.YearMenuYearSelected;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 
-/**
- * Created by Stanislav Kaleta on 05.01.2017.
- */
 public class YearMenu extends JMenu implements Configurable {
     private Configuration configuration;
 

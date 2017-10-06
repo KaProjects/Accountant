@@ -2,8 +2,8 @@ package org.kaleta.accountant.service;
 
 import org.kaleta.accountant.backend.manager.*;
 import org.kaleta.accountant.backend.model.ConfigModel;
+import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Initializer;
-import org.kaleta.accountant.frontend.common.ErrorDialog;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Stanislav Kaleta on 16.04.2016.
- *
  * Provides access to data source which is related to configuration.
  */
 public class ConfigService {
@@ -66,7 +64,7 @@ public class ConfigService {
             try {
                 new ConfigManager().create();
             } catch (ManagerException e) {
-                Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+                Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
                 throw new ServiceFailureException(e);
             }
         }
@@ -106,7 +104,7 @@ public class ConfigService {
             configModel.getYears().getYearList().add(configYear);
             configManager.update(configModel);
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -118,7 +116,7 @@ public class ConfigService {
         try {
             return new ConfigManager().retrieve().getYears().getActive();
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -134,7 +132,7 @@ public class ConfigService {
             }
             return yearList;
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }

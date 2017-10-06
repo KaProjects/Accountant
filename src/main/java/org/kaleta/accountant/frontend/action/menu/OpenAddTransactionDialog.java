@@ -7,6 +7,7 @@ import org.kaleta.accountant.frontend.dialog.transaction.AddTransactionDialog;
 /**
  * Created by Stanislav Kaleta on 24.05.2016.
  */
+@Deprecated
 public class OpenAddTransactionDialog extends MenuAction {
     public OpenAddTransactionDialog(Configuration config) {
         super(config, "Add Transaction");

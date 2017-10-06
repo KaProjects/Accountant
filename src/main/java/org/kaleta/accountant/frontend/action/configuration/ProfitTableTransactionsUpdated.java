@@ -1,11 +1,12 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
-import org.kaleta.accountant.frontend.component.ProfitTable;
-import org.kaleta.accountant.frontend.component.ProfitTableModel;
+import org.kaleta.accountant.frontend.dep.ProfitTable;
+import org.kaleta.accountant.frontend.dep.ProfitTableModel;
 
 /**
  * Created by Stanislav Kaleta on 10.08.2016.
  */
+@Deprecated
 public class ProfitTableTransactionsUpdated extends ConfigurationAction{
     private ProfitTable target;
     private ProfitTableModel model;

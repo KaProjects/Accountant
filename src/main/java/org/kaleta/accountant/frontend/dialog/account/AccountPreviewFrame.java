@@ -1,11 +1,10 @@
 package org.kaleta.accountant.frontend.dialog.account;
 
 import org.kaleta.accountant.backend.entity.Transaction;
-import org.kaleta.accountant.frontend.common.constants.AccountType;
+import org.kaleta.accountant.common.Constants;
 
 import javax.swing.*;
-import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.*;
 
 /**
  * Created by Stanislav Kaleta on 22.08.2016.
@@ -65,7 +64,7 @@ public class AccountPreviewFrame extends JFrame {
 
             JLabel labelBalance = new JLabel();
             labelBalance.setToolTipText("Closing Balance");
-            if (model.getAccountType().equals(AccountType.ASSET) || model.getAccountType().equals(AccountType.EXPENSE)){
+            if (model.getAccountType().equals(Constants.AccountType.ASSET) || model.getAccountType().equals(Constants.AccountType.EXPENSE)){
                 labelBalance.setText(String.valueOf(turnoverD - turnoverC));
                 panelD.add(labelBalance);
                 panelC.add(new JLabel(" "));

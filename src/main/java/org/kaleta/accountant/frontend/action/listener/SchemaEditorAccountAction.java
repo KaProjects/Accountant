@@ -1,9 +1,9 @@
 package org.kaleta.accountant.frontend.action.listener;
 
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.common.constants.AccountType;
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
+import org.kaleta.accountant.frontend.year.model.SchemaModel;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -38,13 +38,13 @@ public class SchemaEditorAccountAction extends ActionListener {
                     switch (cId){
                         case 0:
                         case 1: {
-                            createAccount(name, AccountType.ASSET);
+                            createAccount(name, Constants.AccountType.ASSET);
                             break;
                         }
                         case 2:
                         case 3: {
                             String[] typeTexts = new String[]{"Asset","Liability"};
-                            String[] typeIds = new String[]{AccountType.ASSET,AccountType.LIABILITY};
+                            String[] typeIds = new String[]{Constants.AccountType.ASSET,Constants.AccountType.LIABILITY};
                             int typeIndex = JOptionPane.showOptionDialog(null, "types: ","Set Account Type",JOptionPane.DEFAULT_OPTION,
                                     JOptionPane.INFORMATION_MESSAGE, null,typeTexts,"A");
                             if (typeIndex != -1){
@@ -53,15 +53,15 @@ public class SchemaEditorAccountAction extends ActionListener {
                             break;
                         }
                         case 4: {
-                            createAccount(name, AccountType.LIABILITY);
+                            createAccount(name, Constants.AccountType.LIABILITY);
                             break;
                         }
                         case 5: {
-                            createAccount(name, AccountType.EXPENSE);
+                            createAccount(name, Constants.AccountType.EXPENSE);
                             break;
                         }
                         case 6: {
-                            createAccount(name, AccountType.REVENUE);
+                            createAccount(name, Constants.AccountType.REVENUE);
                             break;
                         }
                         default: throw new IllegalArgumentException("Illegal class id! value="+cId);

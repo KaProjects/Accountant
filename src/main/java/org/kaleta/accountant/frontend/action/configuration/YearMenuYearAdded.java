@@ -2,15 +2,12 @@ package org.kaleta.accountant.frontend.action.configuration;
 
 import org.kaleta.accountant.frontend.action.menu.MenuAction;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
-import org.kaleta.accountant.frontend.component.year.YearMenu;
+import org.kaleta.accountant.frontend.component.YearMenu;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Created by Stanislav Kaleta on 05.01.2017.
- */
 public class YearMenuYearAdded extends ConfigurationAction {
     private YearMenu menu;
 

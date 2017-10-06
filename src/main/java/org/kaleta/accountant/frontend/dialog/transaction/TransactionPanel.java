@@ -1,11 +1,11 @@
 package org.kaleta.accountant.frontend.dialog.transaction;
 
 import org.kaleta.accountant.backend.entity.Transaction;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.mouse.AccountTextFieldClicked;
 import org.kaleta.accountant.frontend.common.SwingWorkerHandler;
-import org.kaleta.accountant.frontend.common.constants.ColorConstants;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -67,7 +67,7 @@ public class TransactionPanel extends JPanel implements Configurable, DocumentLi
                         && tfAmount.getText() != null && !tfAmount.getText().trim().isEmpty()
                         && tfCredit.getText() != null && !tfCredit.getText().trim().isEmpty() && tfCredit.getText().length() > 2
                         && tfDebit.getText() != null && !tfDebit.getText().trim().isEmpty() && tfDebit.getText().length() > 2;
-                TransactionPanel.this.setBackground((filled) ? ColorConstants.INCOME_GREEN : ColorConstants.EXPENSE_RED);
+                TransactionPanel.this.setBackground((filled) ? Constants.Color.INCOME_GREEN : Constants.Color.EXPENSE_RED);
             }
             TransactionPanel.this.setBackground(new JPanel().getBackground());
         }).start();

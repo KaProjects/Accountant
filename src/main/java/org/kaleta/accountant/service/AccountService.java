@@ -7,8 +7,8 @@ import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.jaxb.ProceduresManager;
 import org.kaleta.accountant.backend.manager.jaxb.SchemaManager;
 import org.kaleta.accountant.backend.manager.jaxb.SemanticManager;
+import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Initializer;
-import org.kaleta.accountant.frontend.common.ErrorDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
  *
  * todo doc
  */
+@Deprecated
 public class AccountService {
 
     AccountService(){
@@ -32,7 +33,7 @@ public class AccountService {
         try {
             return new SchemaManager().retrieve();
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -72,7 +73,7 @@ public class AccountService {
             }
             return schema;
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -84,7 +85,7 @@ public class AccountService {
         try {
             new SchemaManager().update(schema);
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -94,7 +95,7 @@ public class AccountService {
             Semantic semantic = new SemanticManager().retrieve();
             return semantic.getAccount().stream().filter(account -> account.getSchemaId().equals(schemaId)).collect(Collectors.toList());
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -106,7 +107,7 @@ public class AccountService {
         try {
             return new SemanticManager().retrieve();
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -118,7 +119,7 @@ public class AccountService {
         try {
             new SemanticManager().update(semantic);
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -138,7 +139,7 @@ public class AccountService {
         try {
             return new ProceduresManager().retrieve();
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -150,7 +151,7 @@ public class AccountService {
         try {
             new ProceduresManager().update(procedures);
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -174,7 +175,7 @@ public class AccountService {
             manager.update(procedures);
             Initializer.LOG.info("Procedure '" + procedure.getName() + "' added.");
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -195,7 +196,7 @@ public class AccountService {
                 return name[0];
             }
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -218,7 +219,7 @@ public class AccountService {
                 return name[0];
             }
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -243,7 +244,7 @@ public class AccountService {
                 return name[0];
             }
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -262,7 +263,7 @@ public class AccountService {
             });
             return schemaId + "-" + semanticId + " " + getAccountName(schemaId) + " - " + name[0];
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -287,7 +288,7 @@ public class AccountService {
                 return name[0];
             }
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }

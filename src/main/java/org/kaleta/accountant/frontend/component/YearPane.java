@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.component.year.component;
+package org.kaleta.accountant.frontend.component;
 
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
@@ -7,9 +7,6 @@ import org.kaleta.accountant.frontend.action.configuration.YearPaneYearSelected;
 
 import javax.swing.*;
 
-/**
- * Created by Stanislav Kaleta on 05.01.2017.
- */
 public class YearPane extends JTabbedPane implements Configurable{
     private Configuration configuration;
 

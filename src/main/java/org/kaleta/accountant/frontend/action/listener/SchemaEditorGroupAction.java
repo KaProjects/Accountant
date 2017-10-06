@@ -1,9 +1,9 @@
 package org.kaleta.accountant.frontend.action.listener;
 
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.common.constants.AccountType;
-import org.kaleta.accountant.frontend.component.year.model.SchemaModel;
+import org.kaleta.accountant.frontend.year.model.SchemaModel;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -66,13 +66,13 @@ public class SchemaEditorGroupAction extends ActionListener {
                 SchemaModel.Clazz.Group.Account accumulatedDepreciationAccount = new SchemaModel.Clazz.Group.Account();
                 accumulatedDepreciationAccount.setId(gId);
                 accumulatedDepreciationAccount.setName("A. D. of " + name);
-                accumulatedDepreciationAccount.setType(AccountType.LIABILITY);
+                accumulatedDepreciationAccount.setType(Constants.AccountType.LIABILITY);
                 model.getClasses().get(cId).getGroups().get(9).getAccounts().put(gId,accumulatedDepreciationAccount);
 
                 SchemaModel.Clazz.Group.Account depreciationAccount = new SchemaModel.Clazz.Group.Account();
                 depreciationAccount.setId(gId);
                 depreciationAccount.setName("D. of " + name);
-                depreciationAccount.setType(AccountType.EXPENSE);
+                depreciationAccount.setType(Constants.AccountType.EXPENSE);
                 model.getClasses().get(5).getGroups().get(9).getAccounts().put(gId,depreciationAccount);
                 break;
             }
@@ -80,7 +80,7 @@ public class SchemaEditorGroupAction extends ActionListener {
                 SchemaModel.Clazz.Group.Account consumptionAccount = new SchemaModel.Clazz.Group.Account();
                 consumptionAccount.setId(gId);
                 consumptionAccount.setName("C. of " + name);
-                consumptionAccount.setType(AccountType.EXPENSE);
+                consumptionAccount.setType(Constants.AccountType.EXPENSE);
                 model.getClasses().get(5).getGroups().get(8).getAccounts().put(gId,consumptionAccount);
                 break;
             }

@@ -1,10 +1,9 @@
 package org.kaleta.accountant.frontend;
 
-import org.kaleta.accountant.frontend.common.ErrorDialog;
+import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.common.LogFormatter;
 import org.kaleta.accountant.service.Service;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
@@ -50,8 +49,7 @@ public class Initializer {
                 new AppFrame().setVisible(true);
 
             } catch (Throwable e) {
-                JDialog errorDialog = new ErrorDialog(e);
-                errorDialog.setVisible(true);
+                ErrorHandler.getThrowableDialog(e).setVisible(true);
                 System.exit(1);
             }
         });

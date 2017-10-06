@@ -1,7 +1,7 @@
 package org.kaleta.accountant.frontend;
 
 
-import org.kaleta.accountant.frontend.component.year.model.YearModel;
+import org.kaleta.accountant.frontend.year.model.YearModel;
 
 /**
  *  Provides major app. wide configuration operations.
