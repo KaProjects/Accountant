@@ -50,17 +50,17 @@ public class OpenAddAssetDialog extends ActionListener {
 
             model.getAccounts().add(new AccountModel.Account(schemaId, semanticId, Constants.AccountType.ASSET, name, ""));
             model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                    initValue, schemaId + "." + semanticId, Constants.Schema.INIT_ACC_ID));
+                    initValue, schemaId + "." + semanticId, Constants.Account.INIT_ACC_ID));
 
             model.getAccounts().add(new AccountModel.Account("09" + schemaId.substring(1, 2),
                     assocSemanticId, Constants.AccountType.LIABILITY, "A. Dep. of " + name, depMetaData));
             model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                    "0", Constants.Schema.INIT_ACC_ID, "09" + schemaId.substring(1, 2) + "." + assocSemanticId));
+                    "0", Constants.Account.INIT_ACC_ID, "09" + schemaId.substring(1, 2) + "." + assocSemanticId));
 
             model.getAccounts().add(new AccountModel.Account("59" + schemaId.substring(1, 2),
                     assocSemanticId, Constants.AccountType.EXPENSE, "Dep. of " + name, ""));
             model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                    "0", "59" + schemaId.substring(1, 2) + "." + assocSemanticId, Constants.Schema.INIT_ACC_ID));
+                    "0", "59" + schemaId.substring(1, 2) + "." + assocSemanticId, Constants.Account.INIT_ACC_ID));
 
             Service.YEAR.updateAccount(model);
             getConfiguration().update(Configuration.ACCOUNT_UPDATED);

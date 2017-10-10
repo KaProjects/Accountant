@@ -13,6 +13,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 
+import static org.kaleta.accountant.common.Constants.Schema.*;
+
 public class SchemaManager implements Manager<SchemaModel> {
     private final String schemaUri;
     private final String schemaFileUri;
@@ -25,37 +27,80 @@ public class SchemaManager implements Manager<SchemaModel> {
     @Override
     public void create() throws ManagerException {
         SchemaModel newSchemaModel = new SchemaModel();
+
         SchemaModel.Class c0 = new SchemaModel.Class();
         c0.setId("0");
-        c0.setName(Constants.Schema.DEFAULT_CLASS_0);
+        c0.setName(CLASS_0_NAME);
+        SchemaModel.Class.Group c0AccumulatedDepreciationGroup = new SchemaModel.Class.Group();
+        c0AccumulatedDepreciationGroup.setId(ACCUMULATED_DEP_GROUP_ID);
+        c0AccumulatedDepreciationGroup.setName(ACCUMULATED_DEP_GROUP_NAME);
+        c0.getGroup().add(c0AccumulatedDepreciationGroup);
         newSchemaModel.getClazz().add(c0);
+
         SchemaModel.Class c1 = new SchemaModel.Class();
         c1.setId("1");
-        c1.setName(Constants.Schema.DEFAULT_CLASS_1);
+        c1.setName(CLASS_1_NAME);
         newSchemaModel.getClazz().add(c1);
+
         SchemaModel.Class c2 = new SchemaModel.Class();
         c2.setId("2");
-        c2.setName(Constants.Schema.DEFAULT_CLASS_2);
+        c2.setName(CLASS_2_NAME);
         newSchemaModel.getClazz().add(c2);
+
         SchemaModel.Class c3 = new SchemaModel.Class();
         c3.setId("3");
-        c3.setName(Constants.Schema.DEFAULT_CLASS_3);
+        c3.setName(CLASS_3_NAME);
         newSchemaModel.getClazz().add(c3);
+
         SchemaModel.Class c4 = new SchemaModel.Class();
         c4.setId("4");
-        c4.setName(Constants.Schema.DEFAULT_CLASS_4);
+        c4.setName(CLASS_4_NAME);
         newSchemaModel.getClazz().add(c4);
+
         SchemaModel.Class c5 = new SchemaModel.Class();
         c5.setId("5");
-        c5.setName(Constants.Schema.DEFAULT_CLASS_5);
+        c5.setName(CLASS_5_NAME);
+        SchemaModel.Class.Group c5ConsumptionGroup = new SchemaModel.Class.Group();
+        c5ConsumptionGroup.setId(CONSUMPTION_GROUP_ID);
+        c5ConsumptionGroup.setName(CONSUMPTION_GROUP_NAME);
+        c5.getGroup().add(c5ConsumptionGroup);
+        SchemaModel.Class.Group c5DepreciationGroup = new SchemaModel.Class.Group();
+        c5DepreciationGroup.setId(DEPRECIATION_GROUP_ID);
+        c5DepreciationGroup.setName(DEPRECIATION_GROUP_NAME);
+        c5.getGroup().add(c5DepreciationGroup);
         newSchemaModel.getClazz().add(c5);
+
         SchemaModel.Class c6 = new SchemaModel.Class();
         c6.setId("6");
-        c6.setName(Constants.Schema.DEFAULT_CLASS_6);
+        c6.setName(CLASS_6_NAME);
         newSchemaModel.getClazz().add(c6);
+
         SchemaModel.Class c7 = new SchemaModel.Class();
         c7.setId("7");
-        c7.setName(Constants.Schema.DEFAULT_CLASS_7);
+        c7.setName(CLASS_7_NAME);
+        SchemaModel.Class.Group c7BalanceGroup = new SchemaModel.Class.Group();
+        c7BalanceGroup.setId(BALANCE_GROUP_ID);
+        c7BalanceGroup.setName(BALANCE_GROUP_NAME);
+        SchemaModel.Class.Group.Account c7InitBalanceAcc = new SchemaModel.Class.Group.Account();
+        c7InitBalanceAcc.setId(INIT_BALANCE_ACCOUNT_ID);
+        c7InitBalanceAcc.setName(INIT_BALANCE_ACCOUNT_NAME);
+        c7InitBalanceAcc.setType(Constants.AccountType.OFF_BALANCE);
+        c7BalanceGroup.getAccount().add(c7InitBalanceAcc);
+        SchemaModel.Class.Group.Account c7ClosingBalanceAcc = new SchemaModel.Class.Group.Account();
+        c7ClosingBalanceAcc.setId(CLOSING_BALANCE_ACCOUNT_ID);
+        c7ClosingBalanceAcc.setName(CLOSING_BALANCE_ACCOUNT_NAME);
+        c7ClosingBalanceAcc.setType(Constants.AccountType.OFF_BALANCE);
+        c7BalanceGroup.getAccount().add(c7ClosingBalanceAcc);
+        c7.getGroup().add(c7BalanceGroup);
+        SchemaModel.Class.Group c7ProfitGroup = new SchemaModel.Class.Group();
+        c7ProfitGroup.setId(PROFIT_GROUP_ID);
+        c7ProfitGroup.setName(PROFIT_GROUP_NAME);
+        SchemaModel.Class.Group.Account c7ProfitStatAcc = new SchemaModel.Class.Group.Account();
+        c7ProfitStatAcc.setId(PROFIT_STATEMENT_ACCOUNT_ID);
+        c7ProfitStatAcc.setName(PROFIT_STATEMENT_ACCOUNT_NAME);
+        c7ProfitStatAcc.setType(Constants.AccountType.OFF_BALANCE);
+        c7ProfitGroup.getAccount().add(c7ProfitStatAcc);
+        c7.getGroup().add(c7ProfitGroup);
         newSchemaModel.getClazz().add(c7);
 
         update(newSchemaModel);

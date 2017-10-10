@@ -37,13 +37,13 @@ public class AccountModel {
         for (Transaction tr : transactions) {
             if (type.equals(Constants.AccountType.ASSET) || type.equals(Constants.AccountType.EXPENSE)) {
                 if (tr.getDebit().equals(id)
-                        && tr.getCredit().startsWith(Constants.Schema.INIT_ACC_ID)) {
+                        && tr.getCredit().startsWith(Constants.Account.INIT_ACC_ID)) {
                     return tr.getAmount();
                 }
             }
             if (type.equals(Constants.AccountType.LIABILITY) || type.equals(Constants.AccountType.REVENUE)) {
                 if (tr.getCredit().equals(id)
-                        && tr.getDebit().startsWith(Constants.Schema.INIT_ACC_ID)) {
+                        && tr.getDebit().startsWith(Constants.Account.INIT_ACC_ID)) {
                     return tr.getAmount();
                 }
             }
@@ -57,13 +57,13 @@ public class AccountModel {
         for (Transaction tr : transactions){
             if (type.equals(Constants.AccountType.ASSET) || type.equals(Constants.AccountType.EXPENSE)) {
                 if (tr.getCredit().equals(id)
-                        &&tr.getDebit().startsWith(Constants.Schema.CLOSING_ACC_ID)){
+                        &&tr.getDebit().startsWith(Constants.Account.CLOSING_ACC_ID)){
                     return tr.getAmount();
                 }
             }
             if (type.equals(Constants.AccountType.LIABILITY) || type.equals(Constants.AccountType.REVENUE)){
                 if (tr.getDebit().equals(id)
-                        && tr.getCredit().startsWith(Constants.Schema.CLOSING_ACC_ID)){
+                        && tr.getCredit().startsWith(Constants.Account.CLOSING_ACC_ID)){
                     return tr.getAmount();
                 }
             }

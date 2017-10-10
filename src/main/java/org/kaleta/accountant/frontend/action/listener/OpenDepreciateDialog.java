@@ -54,7 +54,7 @@ public class OpenDepreciateDialog extends ActionListener {
                     monthHint = (month >= Integer.parseInt(monthHint)) ? String.valueOf(++month) : monthHint;
             }
             if (monthHint.equals("0")){
-                monthHint = String.valueOf(1 + Integer.parseInt(getConfiguration().getModel().getAccountModel().getTransactions(account.getFullId(), Constants.Schema.INIT_ACC_ID).get(0).getDate().substring(2,4)));
+                monthHint = String.valueOf(1 + Integer.parseInt(getConfiguration().getModel().getAccountModel().getTransactions(account.getFullId(), Constants.Account.INIT_ACC_ID).get(0).getDate().substring(2,4)));
             }
             String dateHint;
             if (monthHint.equals("13") || montlyDepHint.equals("0")){

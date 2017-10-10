@@ -204,13 +204,13 @@ public class ResourcesEditor extends JPanel implements Configurable {
                 model.getAccounts().add(new AccountModel.Account(schemaId,
                         nextSemId, Constants.AccountType.ASSET, textFieldName.getText(), ""));
                 model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                        "0", schemaId + "." + nextSemId, Constants.Schema.INIT_ACC_ID));
+                        "0", schemaId + "." + nextSemId, Constants.Account.INIT_ACC_ID));
 
                 String expenseSemanticId = schemaId.substring(2, 3) + "-" + nextSemId;
                 model.getAccounts().add(new AccountModel.Account("58" + schemaId.substring(1, 2),
                         expenseSemanticId, Constants.AccountType.EXPENSE, "Dep. of " + textFieldName.getText(), ""));
                 model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                        "0", "58" + schemaId.substring(1, 2) + "." + expenseSemanticId, Constants.Schema.INIT_ACC_ID));
+                        "0", "58" + schemaId.substring(1, 2) + "." + expenseSemanticId, Constants.Account.INIT_ACC_ID));
 
                 getConfiguration().update(Configuration.ACCOUNT_UPDATED);
             });

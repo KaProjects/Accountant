@@ -24,6 +24,7 @@ public class YearService {
     /**
      * todo doc.
      */
+    @Deprecated
     public List<Integer> getYearIds(){
         try {
             List<Integer> years = new ArrayList<>();
@@ -48,6 +49,7 @@ public class YearService {
     /**
      * todo doc.
      */
+    @Deprecated
     public YearModel getYearModel(int yearId){
         try {
             YearModel model = new YearModel();
@@ -95,25 +97,25 @@ public class YearService {
             model.setAccountModel(accountModel);
 
             model.getAccountModel().getAccounts().add(new AccountModel.Account("000","0", Constants.AccountType.ASSET,"HAHA",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("0","01012017","","0","000.0", Constants.Schema.INIT_ACC_ID));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("0","01012017","","0","000.0", Constants.Account.INIT_ACC_ID));
             model.getAccountModel().getAccounts().add(new AccountModel.Account("090","0-0", Constants.AccountType.LIABILITY,"ac dep of HAHA",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("1","01012017","","0",Constants.Schema.INIT_ACC_ID,"090.0-0"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("1","01012017","","0",Constants.Account.INIT_ACC_ID,"090.0-0"));
             model.getAccountModel().getAccounts().add(new AccountModel.Account("590","0-0", Constants.AccountType.EXPENSE,"dep of HAHA",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("2","01012017","","0","590.0-0",Constants.Schema.INIT_ACC_ID));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("2","01012017","","0","590.0-0",Constants.Account.INIT_ACC_ID));
 
             model.getAccountModel().getAccounts().add(new AccountModel.Account("000","1", Constants.AccountType.ASSET,"HAHA2",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("3","01012017","","0","000.1",Constants.Schema.INIT_ACC_ID));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("3","01012017","","0","000.1",Constants.Account.INIT_ACC_ID));
             model.getAccountModel().getAccounts().add(new AccountModel.Account("090","0-1", Constants.AccountType.LIABILITY,"ac dep of HAHA2",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("4","01012017","","0",Constants.Schema.INIT_ACC_ID,"090.0-1"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("4","01012017","","0",Constants.Account.INIT_ACC_ID,"090.0-1"));
             model.getAccountModel().getAccounts().add(new AccountModel.Account("590","0-1", Constants.AccountType.EXPENSE,"dep of HAHA2",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("5","01012017","","0","590.0-1",Constants.Schema.INIT_ACC_ID));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("5","01012017","","0","590.0-1",Constants.Account.INIT_ACC_ID));
 
             model.getAccountModel().getAccounts().add(new AccountModel.Account("001","0", Constants.AccountType.ASSET,"dasdsad",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("6","01012017","","0","001.0",Constants.Schema.INIT_ACC_ID));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("6","01012017","","0","001.0",Constants.Account.INIT_ACC_ID));
             model.getAccountModel().getAccounts().add(new AccountModel.Account("090","1-0", Constants.AccountType.LIABILITY,"ac dep of dasdsad",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("7","01012017","","0",Constants.Schema.INIT_ACC_ID,"090.1-0"));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("7","01012017","","0",Constants.Account.INIT_ACC_ID,"090.1-0"));
             model.getAccountModel().getAccounts().add(new AccountModel.Account("590","1-0", Constants.AccountType.EXPENSE,"dep of dasdsad",""));
-            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("8","01012017","","0","590.1-0",Constants.Schema.INIT_ACC_ID));
+            model.getAccountModel().getTransactions().add(new AccountModel.Transaction("8","01012017","","0","590.1-0",Constants.Account.INIT_ACC_ID));
 
             model.getAccountModel().getTransactions().add(new AccountModel.Transaction("9","01012017","zzz","1000000","000.0","711"));
             model.getAccountModel().getTransactions().add(new AccountModel.Transaction("10","01032017","yyy","50","000.1","000.0"));
@@ -141,9 +143,7 @@ public class YearService {
         }
     }
 
-    /**
-     * todo doc.
-     */
+    @Deprecated
     public void updateSchema(SchemaModel model){
         try {
             if (true) {
@@ -160,6 +160,7 @@ public class YearService {
     /**
      * todo doc.
      */
+    @Deprecated
     public void updateAccount(AccountModel model){
         try {
             if (true) {
@@ -176,6 +177,7 @@ public class YearService {
     /**
      * todo
      */
+    @Deprecated
     public void createYear(){
         try {
             //mgner create DS, add mandatory groups,acc.
