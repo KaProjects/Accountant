@@ -16,7 +16,8 @@ import java.util.Map;
 
 public class SchemaEditor extends JTabbedPane implements Configurable {
     private Configuration configuration;
-    private int[][] classesDef = new int[][]{{0,9},{1,10},{2,10},{3,10},{4,10},{5,8},{6,10}}; // [classId,numberOfEditableGroups]
+    // [classId, firstEditableGroupId, lastEditableGroupId] = couple of first/last groups can be forbidden to edit
+    private int[][] classesDef = new int[][]{{0,0,8},{1,0,9},{2,0,9},{3,2,9},{4,1,9},{5,2,9},{6,0,9}};
     private Map<Integer, JPanel> editorClassPanels;
 
     public SchemaEditor(Configuration configuration){
@@ -38,12 +39,12 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
         });
     }
 
-    public void update(){
+    public void update() {
         Map<Integer, SchemaModel.Class> classMap = Service.SCHEMA.getSchemaClassMap(getConfiguration().getSelectedYear());
         for (int[] cIdArray : classesDef) {
             JPanel classPanel = editorClassPanels.get(cIdArray[0]);
             classPanel.removeAll();
-            for (int gId = 0; gId < cIdArray[1]; gId++) {
+            for (int gId = cIdArray[1]; gId <= cIdArray[2]; gId++) {
                 GridBagConstraints groupConstraints = new GridBagConstraints(gId, 0, 1, 1, 1, 1, GridBagConstraints.LINE_START, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0);
                 SchemaModel.Class.Group group = Service.SCHEMA.getSchemaGroupMap(classMap.get(cIdArray[0])).get(gId);
                 if (group == null) {
@@ -75,15 +76,18 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
 
                     int width = new JLabel().getFontMetrics(new JLabel().getFont()).stringWidth(group.getName()) + 20;
                     for (int aId = 0; aId < 10; aId++) {
-                        GridBagConstraints accConstraints = new GridBagConstraints(0, aId + 1, 3, 1, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0);
+                        GridBagConstraints accConstraints = new GridBagConstraints(0, aId + 1, 3, 1, 1, 0, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0);
                         SchemaModel.Class.Group.Account account = Service.SCHEMA.getSchemaAccountMap(group).get(aId);
                         if (account == null) {
                             JButton buttonAddAccount = new JButton(IconLoader.getIcon(IconLoader.ADD, new Dimension(10, 10)));
+                            buttonAddAccount.setMinimumSize(new Dimension(25, 25));
+                            buttonAddAccount.setPreferredSize(new Dimension(25, 25));
+                            buttonAddAccount.setMaximumSize(new Dimension(25, 25));
                             buttonAddAccount.setBackground(Color.LIGHT_GRAY);
-                            buttonAddAccount.addActionListener(new SchemaEditorAccountAction(this, SchemaEditorAccountAction.CREATE, cIdArray[0],gId,aId));
+                            buttonAddAccount.addActionListener(new SchemaEditorAccountAction(this, SchemaEditorAccountAction.CREATE, cIdArray[0], gId, aId));
                             groupPanel.add(buttonAddAccount, accConstraints);
                         } else {
-                            String text = " (" + account.getType() + ") " + account.getName() + " ";
+                            String text = "   " + account.getName() + "  ";
                             JLabel label = new JLabel(text);
                             int labelWidth = label.getFontMetrics(label.getFont()).stringWidth(text) + 10 + 50;
                             width = (labelWidth > width) ? labelWidth : width;
@@ -100,7 +104,7 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                             buttonEdit.setMinimumSize(new Dimension(25, 25));
                             buttonEdit.setPreferredSize(new Dimension(25, 25));
                             buttonEdit.setMaximumSize(new Dimension(25, 25));
-                            buttonEdit.addActionListener(new SchemaEditorAccountAction(this, SchemaEditorAccountAction.EDIT, cIdArray[0],gId,aId));
+                            buttonEdit.addActionListener(new SchemaEditorAccountAction(this, SchemaEditorAccountAction.EDIT, cIdArray[0], gId, aId));
                             accPanel.add(buttonEdit);
 
                             JButton buttonDel = new JButton(IconLoader.getIcon(IconLoader.DELETE, new Dimension(10, 10)));
@@ -108,12 +112,19 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                             buttonDel.setMinimumSize(new Dimension(25, 25));
                             buttonDel.setPreferredSize(new Dimension(25, 25));
                             buttonDel.setMaximumSize(new Dimension(25, 25));
-                            buttonDel.addActionListener(new SchemaEditorAccountAction(this, SchemaEditorAccountAction.DELETE, cIdArray[0],gId,aId));
+                            buttonDel.addActionListener(new SchemaEditorAccountAction(this, SchemaEditorAccountAction.DELETE, cIdArray[0], gId, aId));
                             accPanel.add(buttonDel);
+
+                            accPanel.setMinimumSize(new Dimension(accPanel.getPreferredSize().width, 25));
+                            accPanel.setPreferredSize(new Dimension(accPanel.getPreferredSize().width, 25));
+                            accPanel.setMaximumSize(new Dimension(accPanel.getPreferredSize().width, 25));
 
                             groupPanel.add(accPanel, accConstraints);
                         }
                     }
+                    JPanel paddingPanel = new JPanel();
+                    paddingPanel.setOpaque(false);
+                    groupPanel.add(paddingPanel, new GridBagConstraints(0, 11, 3, 1, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
                     groupPanel.setMinimumSize(new Dimension(width, 0));
                     groupPanel.setPreferredSize(new Dimension(width, groupPanel.getPreferredSize().height));
                     classPanel.add(groupPanel, groupConstraints);

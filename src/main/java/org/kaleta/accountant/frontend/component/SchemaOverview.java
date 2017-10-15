@@ -55,9 +55,9 @@ public class SchemaOverview extends JPanel implements Configurable {
                     JLabel label = new JLabel(text);
                     int labelWidth = label.getFontMetrics(label.getFont()).stringWidth(text) + 10;
                     width = (labelWidth > width) ? labelWidth : width;
-                    groupPanel.add(label, new GridBagConstraints(0,accountList.indexOf(account),1,1,0,0,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
+                    groupPanel.add(label, new GridBagConstraints(0,accountList.indexOf(account),1,1,1,0,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
                 }
-                groupPanel.add(new JLabel(), new GridBagConstraints(0,10,1,1,0,0,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
+                groupPanel.add(new JLabel(), new GridBagConstraints(0,10,1,1,0,1,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
                 groupPanel.setMinimumSize(new Dimension(width,0));
                 groupPanel.setPreferredSize(new Dimension(width,groupPanel.getPreferredSize().height));
                 clazzPanel.add(groupPanel, new GridBagConstraints(groupList.indexOf(group),0,1,1,0,0,GridBagConstraints.LINE_START,GridBagConstraints.VERTICAL,new Insets(0,0,0,0),0,0));

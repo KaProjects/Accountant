@@ -46,6 +46,8 @@ public class Initializer {
                     // TODO: 12/25/16 init 1st year wizard
                 }
 
+
+
                 new AppFrame().setVisible(true);
 
             } catch (Throwable e) {
