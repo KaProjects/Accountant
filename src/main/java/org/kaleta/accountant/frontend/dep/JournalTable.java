@@ -22,7 +22,7 @@ public class JournalTable extends JTable implements Configurable {
     }
 
     private void initComponents(){
-        JournalTableModel model = new JournalTableModel(Service.ACCOUNT.getSchema(), Service.ACCOUNT.getSemanticAccounts());
+        JournalTableModel model = new JournalTableModel(Service.DEPACCOUNT.getSchema(), Service.DEPACCOUNT.getSemanticAccounts());
         this.setModel(model);
         this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.setRowSelectionAllowed(true);

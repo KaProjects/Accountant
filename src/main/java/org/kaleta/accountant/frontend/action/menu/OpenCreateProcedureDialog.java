@@ -18,7 +18,7 @@ public class OpenCreateProcedureDialog extends MenuAction {
         CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration());
         dialog.setVisible(true);
         if (dialog.getResult()) {
-            Service.ACCOUNT.createProcedure(dialog.getProcedure());
+            Service.DEPACCOUNT.createProcedure(dialog.getProcedure());
         }
     }
 }

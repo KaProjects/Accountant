@@ -32,7 +32,7 @@ public class SelectAccountDialog extends Dialog {
     @Override
     protected void buildDialog() {
         Map<String, List<Semantic.Account>> accountMap = new HashMap<>();
-        for (Semantic.Account account : Service.ACCOUNT.getSemanticAccounts().getAccount()){
+        for (Semantic.Account account : Service.DEPACCOUNT.getSemanticAccounts().getAccount()){
             String schemaId = account.getSchemaId();
             if (accountMap.keySet().contains(schemaId)){
                 accountMap.get(schemaId).add(account);
@@ -43,7 +43,7 @@ public class SelectAccountDialog extends Dialog {
         }
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-        for (Schema.Class clazz : Service.ACCOUNT.getSchema().getClazz()){
+        for (Schema.Class clazz : Service.DEPACCOUNT.getSchema().getClazz()){
             DefaultMutableTreeNode classNode = new DefaultMutableTreeNode(clazz.getName());
             root.add(classNode);
             for (Schema.Class.Group group : clazz.getGroup()){

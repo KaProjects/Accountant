@@ -12,12 +12,22 @@ import java.util.List;
 public class AccountsModel {
 
     protected List<Account> account;
+    @XmlAttribute(name = "year", required = true)
+    protected String year;
 
     public List<Account> getAccount() {
         if (account == null) {
             account = new ArrayList<>();
         }
         return this.account;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String value) {
+        this.year = value;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -28,8 +38,6 @@ public class AccountsModel {
         protected String schemaId;
         @XmlAttribute(name = "semanticId", required = true)
         protected String semanticId;
-        @XmlAttribute(name = "type", required = true)
-        protected String type;
         @XmlAttribute(name = "name", required = true)
         protected String name;
         @XmlAttribute(name = "metadata", required = true)
@@ -49,14 +57,6 @@ public class AccountsModel {
 
         public void setSemanticId(String value) {
             this.semanticId = value;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String value) {
-            this.type = value;
         }
 
         public String getName() {

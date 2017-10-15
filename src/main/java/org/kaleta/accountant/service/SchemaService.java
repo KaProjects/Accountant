@@ -323,7 +323,21 @@ public class SchemaService {
         }
     }
 
-
+    /**
+     * Returns account type for schema id.
+     */
+    public String getSchemaAccountType(String year, String schemaId) {
+        try {
+            SchemaModel schemaModel = new SchemaManager(year).retrieve();
+            return getAccountById(getGroupById(getClassById(schemaModel,
+                    schemaId.substring(0, 1)),
+                    schemaId.substring(1, 2)),
+                    schemaId.substring(2, 3)).getType();
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
 
 
 

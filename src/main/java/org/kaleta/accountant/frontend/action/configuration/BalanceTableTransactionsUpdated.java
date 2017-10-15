@@ -19,8 +19,8 @@ public class BalanceTableTransactionsUpdated extends ConfigurationAction {
 
     @Override
     protected void actionPerformed() {
-        // todo model.update(Service.ACCOUNT.getSchemaForAccountType(AccountType.ASSET),
-        // todo        Service.ACCOUNT.getSchemaForAccountType(AccountType.LIABILITY),
+        // todo model.update(Service.DEPACCOUNT.getSchemaForAccountType(AccountType.ASSET),
+        // todo        Service.DEPACCOUNT.getSchemaForAccountType(AccountType.LIABILITY),
         // todo        Service.JOURNAL.getJournal(getConfiguration().getActiveYear()));
         target.revalidate();
         target.repaint();

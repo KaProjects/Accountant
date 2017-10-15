@@ -12,12 +12,22 @@ import java.util.List;
 public class TransactionsModel {
 
     protected List<Transaction> transaction;
+    @XmlAttribute(name = "year", required = true)
+    protected String year;
 
     public List<Transaction> getTransaction() {
         if (transaction == null) {
             transaction = new ArrayList<>();
         }
         return this.transaction;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String value) {
+        this.year = value;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

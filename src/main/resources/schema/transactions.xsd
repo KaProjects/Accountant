@@ -14,6 +14,7 @@
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
+            <xs:attribute name="year" use="required" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 </xs:schema>

@@ -7,12 +7,12 @@
                     <xs:complexType>
                         <xs:attribute name="schemaId" use="required" type="xs:string"/>
                         <xs:attribute name="semanticId" use="required" type="xs:string"/>
-                        <xs:attribute name="type" use="required" type="xs:string"/>
                         <xs:attribute name="name" use="required" type="xs:string"/>
                         <xs:attribute name="metadata" use="required" type="xs:string"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
+            <xs:attribute name="year" use="required" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 </xs:schema>

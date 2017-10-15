@@ -8,8 +8,7 @@ import org.kaleta.accountant.frontend.dialog.Dialog;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
-import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ public class ProceduresDialog extends Dialog {
 
     public ProceduresDialog(Configuration parent) {
         super((Component) parent, "Procedures");
-        procedures = Service.ACCOUNT.getProcedures();
+        procedures = Service.DEPACCOUNT.getProcedures();
         transactionManagementPanel = new TransactionManagementPanel(parent);
         buildDialog();
         this.pack();

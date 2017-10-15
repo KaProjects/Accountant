@@ -19,10 +19,10 @@ public class AccountPreviewModel {
 
     public AccountPreviewModel(String schemaId, int year){
         this.schemaId = schemaId;
-        accType = Service.ACCOUNT.getAccountType(schemaId);
-        accName = Service.ACCOUNT.getAccountName(schemaId);
+        accType = Service.DEPACCOUNT.getAccountType(schemaId);
+        accName = Service.DEPACCOUNT.getAccountName(schemaId);
         transactionList = Service.JOURNAL.listAccountTransactions(schemaId, year);
-        semanticList = Service.ACCOUNT.getSemanticAccounts(schemaId);
+        semanticList = Service.DEPACCOUNT.getSemanticAccounts(schemaId);
         accounts = new LinkedHashMap<>();
         for (int i=0; i<=semanticList.size(); i++){
             Map<String, List<Transaction>> transactions = new HashMap<>();

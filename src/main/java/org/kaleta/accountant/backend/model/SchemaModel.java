@@ -14,12 +14,22 @@ public class SchemaModel {
 
     @XmlElement(name = "class", required = true)
     protected List<SchemaModel.Class> clazz;
+    @XmlAttribute(name = "year", required = true)
+    protected String year;
 
     public List<SchemaModel.Class> getClazz() {
         if (clazz == null) {
             clazz = new ArrayList<>();
         }
         return this.clazz;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String value) {
+        this.year = value;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

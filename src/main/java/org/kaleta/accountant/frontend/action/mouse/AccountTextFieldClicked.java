@@ -31,12 +31,12 @@ public class AccountTextFieldClicked extends MouseAction {
                 source.setText(dialog.getSelectedAcc());
                 if (accId.length() > 2){
                     String text = (accId.contains("-"))
-                            ? Service.ACCOUNT.getAccountFullName(accId.split("-")[0], accId.split("-")[1])
-                            : accId + " " + Service.ACCOUNT.getAccountName(accId);
+                            ? Service.DEPACCOUNT.getAccountFullName(accId.split("-")[0], accId.split("-")[1])
+                            : accId + " " + Service.DEPACCOUNT.getAccountName(accId);
                     source.setToolTipText(text);
                 } else {
-                    if (accId.length() == 2) source.setToolTipText(Service.ACCOUNT.getGroupName(accId));
-                    if (accId.length() == 1) source.setToolTipText(Service.ACCOUNT.getClassName(accId));
+                    if (accId.length() == 2) source.setToolTipText(Service.DEPACCOUNT.getGroupName(accId));
+                    if (accId.length() == 1) source.setToolTipText(Service.DEPACCOUNT.getClassName(accId));
                 }
 
             }

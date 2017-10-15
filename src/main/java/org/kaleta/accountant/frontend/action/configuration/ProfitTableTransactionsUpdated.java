@@ -19,8 +19,8 @@ public class ProfitTableTransactionsUpdated extends ConfigurationAction{
 
     @Override
     protected void actionPerformed() {
-        // todo model.update(Service.ACCOUNT.getSchemaForAccountType(AccountType.REVENUE),
-        // todo        Service.ACCOUNT.getSchemaForAccountType(AccountType.EXPENSE),
+        // todo model.update(Service.DEPACCOUNT.getSchemaForAccountType(AccountType.REVENUE),
+        // todo        Service.DEPACCOUNT.getSchemaForAccountType(AccountType.EXPENSE),
         // todo        Service.JOURNAL.getJournal(getConfiguration().getActiveYear()));
         target.revalidate();
         target.repaint();

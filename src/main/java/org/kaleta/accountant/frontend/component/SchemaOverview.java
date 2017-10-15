@@ -1,6 +1,7 @@
 package org.kaleta.accountant.frontend.component;
 
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.configuration.ConfigurationAction;
@@ -13,7 +14,6 @@ import java.util.List;
 
 public class SchemaOverview extends JPanel implements Configurable {
     private Configuration configuration;
-
 
     public SchemaOverview(){
         this.setLayout(new GridBagLayout());
@@ -32,27 +32,28 @@ public class SchemaOverview extends JPanel implements Configurable {
         for (SchemaModel.Class clazz : classList) {
             JPanel clazzPanel = new JPanel();
             clazzPanel.setLayout(new GridBagLayout());
-            clazzPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.getHSBColor(160 / 360f, 1, 0.75f)),
+            clazzPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Constants.Color.OVERVIEW_CLASS.brighter()),
                     clazz.getName(),
                     TitledBorder.DEFAULT_JUSTIFICATION,
                     TitledBorder.DEFAULT_POSITION,
                     new JLabel().getFont(),
-                    Color.getHSBColor(160 / 360f, 1f, 0.5f)));
+                    Constants.Color.OVERVIEW_CLASS));
             List<SchemaModel.Class.Group> groupList = clazz.getGroup();
             for (SchemaModel.Class.Group group : groupList) {
                 JPanel groupPanel = new JPanel();
                 groupPanel.setLayout(new GridBagLayout());
-                groupPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.getHSBColor(200 / 360f, 1, 0.75f)),
+                groupPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Constants.Color.OVERVIEW_GROUP.brighter()),
                         group.getName(),
                         TitledBorder.DEFAULT_JUSTIFICATION,
                         TitledBorder.DEFAULT_POSITION,
                         new JLabel().getFont(),
-                        Color.getHSBColor(200 / 360f, 1f, 0.5f)));
+                        Constants.Color.OVERVIEW_GROUP));
                 int width = new JLabel().getFontMetrics(new JLabel().getFont()).stringWidth(group.getName()) + 20;
                 List<SchemaModel.Class.Group.Account> accountList = group.getAccount();
                 for (SchemaModel.Class.Group.Account account : accountList) {
                     String text = "(" + account.getType() + ") " + account.getName();
                     JLabel label = new JLabel(text);
+                    label.setForeground(Constants.Color.OVERVIEW_ACCOUNT);
                     int labelWidth = label.getFontMetrics(label.getFont()).stringWidth(text) + 10;
                     width = (labelWidth > width) ? labelWidth : width;
                     groupPanel.add(label, new GridBagConstraints(0,accountList.indexOf(account),1,1,1,0,GridBagConstraints.PAGE_START,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));

@@ -16,13 +16,21 @@ public class Service {
      */
     public static final SchemaService SCHEMA = new SchemaService();
 
+    /**
+     * Instance of account's service class
+     */
+    public static final AccountsService ACCOUNT = new AccountsService();
 
+    /**
+     * Instance of transaction's service class
+     */
+    public static final TransactionsService TRANSACTIONS = new TransactionsService();
 
 
     /**
      * Instance of account's service class
      */
-    public static final AccountService ACCOUNT = new AccountService();
+    public static final AccountService DEPACCOUNT = new AccountService();
 
     /**
      * Instance of journal's service class

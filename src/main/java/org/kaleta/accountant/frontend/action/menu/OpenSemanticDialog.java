@@ -19,12 +19,12 @@ public class OpenSemanticDialog extends MenuAction {
 
     @Override
     protected void actionPerformed() {
-        Schema schema = Service.ACCOUNT.getSchema();
-        Semantic semantic = Service.ACCOUNT.getSemanticAccounts();
+        Schema schema = Service.DEPACCOUNT.getSchema();
+        Semantic semantic = Service.DEPACCOUNT.getSemanticAccounts();
         SemanticDialog dialog = new SemanticDialog((Component) getConfiguration(), schema, semantic);
         dialog.setVisible(true);
         if (dialog.getResult()) {
-            Service.ACCOUNT.setSemanticAccounts(semantic);
+            Service.DEPACCOUNT.setSemanticAccounts(semantic);
         }
     }
 }
