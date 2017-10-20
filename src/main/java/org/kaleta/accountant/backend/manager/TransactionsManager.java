@@ -15,15 +15,19 @@ import java.io.File;
 public class TransactionsManager implements Manager<TransactionsModel> {
     private final String schemaUri;
     private final String schemaFileUri;
+    private final String year;
 
     public TransactionsManager(String year) {
+        this.year = year;
         schemaUri = "/schema/transactions.xsd";
         schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "transactions.xml";
     }
 
     @Override
     public void create() throws ManagerException {
-        update(new TransactionsModel());
+        TransactionsModel transactionsModel = new TransactionsModel();
+        transactionsModel.setYear(year);
+        update(transactionsModel);
         Initializer.LOG.info("File \"" + schemaFileUri + "\" created!");
     }
 

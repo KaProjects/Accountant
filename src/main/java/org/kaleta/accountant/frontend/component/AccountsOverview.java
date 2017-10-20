@@ -14,6 +14,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
+import java.util.List;
+
 
 public class AccountsOverview extends JPanel implements Configurable {
     private Configuration configuration;
@@ -68,7 +70,6 @@ public class AccountsOverview extends JPanel implements Configurable {
         this.add(accountTreeScrollPane);
         this.add(accountOverviewScrollPane);
 
-
         this.getActionMap().put(Configuration.SCHEMA_UPDATED, new ConfigurationAction(this) {
             @Override
             protected void actionPerformed() {
@@ -112,11 +113,17 @@ public class AccountsOverview extends JPanel implements Configurable {
     private void updateAccountOverview() {
         accountOverviewPanel.removeAll();
         if (selectedSchemaAccount.equals("-1")) {
+            accountOverviewPanel.add(new JLabel("Select a Schema Account to see its overview."));
             return;
         }
 
+        List<AccountsModel.Account> accountList = Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),selectedSchemaAccount);
+        if (accountList.size() == 0) {
+            accountOverviewPanel.add(new JLabel("Selected Schema Account has no accounts assigned."));
+            return;
+        }
 
-        for (AccountsModel.Account account : Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),selectedSchemaAccount)) {
+        for (AccountsModel.Account account : accountList) {
             String text = account.getSchemaId() + "." + account.getSemanticId() + " '" + account.getName() + "'  turnover="
                     +Service.ACCOUNT.getAccountTurnover(getConfiguration().getSelectedYear(), account) + "  balance="
                     +Service.ACCOUNT.getAccountBalance(getConfiguration().getSelectedYear(), account);

@@ -18,8 +18,10 @@ import static org.kaleta.accountant.common.Constants.Schema.*;
 public class SchemaManager implements Manager<SchemaModel> {
     private final String schemaUri;
     private final String schemaFileUri;
+    private final String year;
 
     public SchemaManager(String year) {
+        this.year = year;
         schemaUri = "/schema/schema.xsd";
         schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "schema.xml";
     }
@@ -27,6 +29,7 @@ public class SchemaManager implements Manager<SchemaModel> {
     @Override
     public void create() throws ManagerException {
         SchemaModel newSchemaModel = new SchemaModel();
+        newSchemaModel.setYear(year);
 
         SchemaModel.Class c0 = new SchemaModel.Class();
         c0.setId("0");

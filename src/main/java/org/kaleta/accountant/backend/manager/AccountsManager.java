@@ -15,15 +15,19 @@ import java.io.File;
 public class AccountsManager implements Manager<AccountsModel> {
     private final String schemaUri;
     private final String schemaFileUri;
+    private final String year;
 
     public AccountsManager(String year) {
+        this.year = year;
         schemaUri = "/schema/accounts.xsd";
         schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "accounts.xml";
     }
 
     @Override
     public void create() throws ManagerException {
-        update(new AccountsModel());
+        AccountsModel accountsModel = new AccountsModel();
+        accountsModel.setYear(year);
+        update(accountsModel);
         Initializer.LOG.info("File \"" + schemaFileUri + "\" created!");
     }
 
