@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.dialog.schema;
+package org.kaleta.accountant.frontend.dep.dialog.schema;
 
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.frontend.common.IconLoader;
@@ -9,8 +9,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.PlainDocument;
-import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -41,10 +41,26 @@ public class AccountsModel {
         @XmlAttribute(name = "name", required = true)
         protected String name;
         @XmlAttribute(name = "metadata", required = true)
-        protected String metadata;
+        protected String metadata = "";
 
         public String getSchemaId() {
             return schemaId;
+        }
+
+        public String getFullId(){
+            return schemaId + "." + semanticId;
+        }
+
+        public String getClassId(){
+            return schemaId.substring(0,1);
+        }
+
+        public String getGroupId(){
+            return schemaId.substring(1,2);
+        }
+
+        public String getSchemaAccountId(){
+            return schemaId.substring(2,3);
         }
 
         public void setSchemaId(String value) {

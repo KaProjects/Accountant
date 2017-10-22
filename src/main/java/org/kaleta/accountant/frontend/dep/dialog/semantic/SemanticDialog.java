@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.dialog.semantic;
+package org.kaleta.accountant.frontend.dep.dialog.semantic;
 
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.backend.entity.Semantic;
@@ -7,9 +7,7 @@ import org.kaleta.accountant.frontend.dialog.Dialog;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

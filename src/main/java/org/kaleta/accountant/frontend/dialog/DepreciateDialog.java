@@ -1,7 +1,6 @@
-package org.kaleta.accountant.frontend.year.dialog;
+package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.frontend.common.NumberFilter;
-import org.kaleta.accountant.frontend.dialog.Dialog;
 import org.kaleta.accountant.frontend.year.model.AccountModel;
 
 import javax.swing.*;

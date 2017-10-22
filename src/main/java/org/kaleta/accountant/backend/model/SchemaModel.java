@@ -44,6 +44,11 @@ public class SchemaModel {
         @XmlAttribute(name = "name", required = true)
         protected String name = "";
 
+        @Override
+        public String toString() {
+            return name;
+        }
+
         public List<SchemaModel.Class.Group> getGroup() {
             if (group == null) {
                 group = new ArrayList<>();
@@ -85,6 +90,11 @@ public class SchemaModel {
                 return Integer.parseInt(this.getId()) - Integer.parseInt(o.getId());
             }
 
+            @Override
+            public String toString() {
+                return name;
+            }
+
             public List<SchemaModel.Class.Group.Account> getAccount() {
                 if (account == null) {
                     account = new ArrayList<>();
@@ -123,6 +133,11 @@ public class SchemaModel {
                 @Override
                 public int compareTo(Account o) {
                     return Integer.parseInt(this.getId()) - Integer.parseInt(o.getId());
+                }
+
+                @Override
+                public String toString() {
+                    return name;
                 }
 
                 public String getId() {

@@ -2,7 +2,7 @@ package org.kaleta.accountant.frontend.action.menu;
 
 import org.kaleta.accountant.backend.entity.Transaction;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.dialog.transaction.AddTransactionDialog;
+import org.kaleta.accountant.frontend.dep.dialog.transaction.AddTransactionDialog;
 
 /**
  * Created by Stanislav Kaleta on 24.05.2016.

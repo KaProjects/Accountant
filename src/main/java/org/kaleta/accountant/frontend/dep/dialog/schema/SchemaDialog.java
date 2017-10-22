@@ -1,10 +1,10 @@
-package org.kaleta.accountant.frontend.dialog.schema;
+package org.kaleta.accountant.frontend.dep.dialog.schema;
 
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.frontend.dialog.Dialog;
 
 import javax.swing.*;
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Created by Stanislav Kaleta on 19.04.2016.

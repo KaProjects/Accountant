@@ -1,12 +1,10 @@
-package org.kaleta.accountant.frontend.dialog.schema;
+package org.kaleta.accountant.frontend.dep.dialog.schema;
 
 import org.kaleta.accountant.backend.entity.Schema;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 

@@ -1,7 +1,7 @@
 package org.kaleta.accountant.frontend.action.mouse;
 
 import org.kaleta.accountant.frontend.Configurable;
-import org.kaleta.accountant.frontend.dialog.transaction.SelectAccountDialog;
+import org.kaleta.accountant.frontend.dep.dialog.transaction.SelectAccountDialog;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;

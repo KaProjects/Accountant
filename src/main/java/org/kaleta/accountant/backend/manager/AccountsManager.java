@@ -1,6 +1,7 @@
 package org.kaleta.accountant.backend.manager;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -27,6 +28,25 @@ public class AccountsManager implements Manager<AccountsModel> {
     public void create() throws ManagerException {
         AccountsModel accountsModel = new AccountsModel();
         accountsModel.setYear(year);
+
+        AccountsModel.Account initAcc = new AccountsModel.Account();
+        initAcc.setName(Constants.Schema.INIT_BALANCE_ACCOUNT_NAME);
+        initAcc.setSchemaId(Constants.Account.INIT_ACC_ID.split("\\.")[0]);
+        initAcc.setSemanticId(Constants.Account.INIT_ACC_ID.split("\\.")[1]);
+        accountsModel.getAccount().add(initAcc);
+
+        AccountsModel.Account closingAcc = new AccountsModel.Account();
+        closingAcc.setName(Constants.Schema.CLOSING_BALANCE_ACCOUNT_NAME);
+        closingAcc.setSchemaId(Constants.Account.CLOSING_ACC_ID.split("\\.")[0]);
+        closingAcc.setSemanticId(Constants.Account.CLOSING_ACC_ID.split("\\.")[1]);
+        accountsModel.getAccount().add(closingAcc);
+
+        AccountsModel.Account profitAcc = new AccountsModel.Account();
+        profitAcc.setName(Constants.Schema.PROFIT_STATEMENT_ACCOUNT_NAME);
+        profitAcc.setSchemaId(Constants.Account.PROFIT_ACC_ID.split("\\.")[0]);
+        profitAcc.setSemanticId(Constants.Account.PROFIT_ACC_ID.split("\\.")[1]);
+        accountsModel.getAccount().add(profitAcc);
+
         update(accountsModel);
         Initializer.LOG.info("File \"" + schemaFileUri + "\" created!");
     }

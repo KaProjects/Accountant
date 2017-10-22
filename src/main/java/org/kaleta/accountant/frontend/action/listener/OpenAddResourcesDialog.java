@@ -1,7 +1,7 @@
 package org.kaleta.accountant.frontend.action.listener;
 
 import org.kaleta.accountant.frontend.Configurable;
-import org.kaleta.accountant.frontend.year.dialog.AddResourcesDialog;
+import org.kaleta.accountant.frontend.dialog.AddResourcesDialog;
 import org.kaleta.accountant.frontend.year.model.AccountModel;
 import org.kaleta.accountant.frontend.year.model.SchemaModel;
 import org.kaleta.accountant.frontend.year.model.YearModel;

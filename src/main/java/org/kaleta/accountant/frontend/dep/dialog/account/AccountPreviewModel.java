@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.dialog.account;
+package org.kaleta.accountant.frontend.dep.dialog.account;
 
 import org.kaleta.accountant.backend.entity.Semantic;
 import org.kaleta.accountant.backend.entity.Transaction;

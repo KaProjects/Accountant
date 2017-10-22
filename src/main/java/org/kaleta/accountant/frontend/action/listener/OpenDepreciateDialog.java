@@ -3,7 +3,7 @@ package org.kaleta.accountant.frontend.action.listener;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.year.dialog.DepreciateDialog;
+import org.kaleta.accountant.frontend.dialog.DepreciateDialog;
 import org.kaleta.accountant.frontend.year.model.AccountModel;
 import org.kaleta.accountant.service.Service;
 

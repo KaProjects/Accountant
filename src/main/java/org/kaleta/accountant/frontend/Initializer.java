@@ -47,7 +47,6 @@ public class Initializer {
                 }
 
 
-
                 new AppFrame().setVisible(true);
 
             } catch (Throwable e) {

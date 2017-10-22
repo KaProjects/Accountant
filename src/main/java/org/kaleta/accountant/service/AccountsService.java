@@ -10,7 +10,9 @@ import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Initializer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides access to data source which is related to accounts.
@@ -34,6 +36,28 @@ public class AccountsService {
                 }
             }
             return eligibleAccounts;
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo
+     */
+    public Map<String, List<AccountsModel.Account>> getAccountsViaSchemaMap(String year){
+        try {
+            Map<String, List<AccountsModel.Account>> accountMap = new HashMap<>();
+            for (AccountsModel.Account account : new AccountsManager(year).retrieve().getAccount()){
+                String schemaId = account.getSchemaId();
+                if (accountMap.keySet().contains(schemaId)){
+                    accountMap.get(schemaId).add(account);
+                } else {
+                    accountMap.put(schemaId, new ArrayList<>());
+                    accountMap.get(schemaId).add(account);
+                }
+            }
+            return accountMap;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -99,4 +123,70 @@ public class AccountsService {
             throw new ServiceFailureException(e);
         }
     }
+
+    /**
+     * Composes full id of accumulated depreciation account of specified asset's account.
+     */
+    public String getAccumulatedDepAccountId(String schemaId, String semanticId) {
+        if (!schemaId.startsWith("0") || schemaId.startsWith("09")){
+            throw new IllegalArgumentException("Only accounts of class 0 and groups 0-8 have accumulated depreciation accounts");
+        }
+        return "0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID + schemaId.substring(1, 2)
+                + "." + schemaId.substring(2, 3) + "-" + semanticId;
+    }
+
+    /**
+     * Composes full id of depreciation account of specified asset's account.
+     */
+    public String getDepreciationAccountId(String schemaId, String semanticId) {
+        if (!schemaId.startsWith("0") || schemaId.startsWith("09")){
+            throw new IllegalArgumentException("Only accounts of class 0 and groups 0-8 have depreciation accounts");
+        }
+        return "5" + Constants.Schema.DEPRECIATION_GROUP_ID + schemaId.substring(1, 2)
+                + "." + schemaId.substring(2, 3) + "-" + semanticId;
+    }
+
+    /**
+     * todo
+     */
+    public AccountsModel.Account getAccumulatedDepAccount(String year, AccountsModel.Account account){
+        String accDepId = getAccumulatedDepAccountId(account.getSchemaId(), account.getSemanticId());
+        try {
+            for (AccountsModel.Account acc : new AccountsManager(year).retrieve().getAccount()) {
+                if (acc.getFullId().equals(accDepId)) {
+                    return acc;
+                }
+            }
+            throw new IllegalArgumentException("Accumulated depreciation account not found for '" + account.getFullId() + "'");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo
+     */
+    public void createAccount(String year, String name, String schemaId, String semanticId, String metadata){
+        try {
+            AccountsManager accountsManager = new AccountsManager(year);
+            AccountsModel accountsModel = accountsManager.retrieve();
+
+            AccountsModel.Account account = new AccountsModel.Account();
+            account.setName(name);
+            account.setSchemaId(schemaId);
+            account.setSemanticId(semanticId);
+            account.setMetadata(metadata);
+            accountsModel.getAccount().add(account);
+
+            accountsManager.update(accountsModel);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+
+
+
 }

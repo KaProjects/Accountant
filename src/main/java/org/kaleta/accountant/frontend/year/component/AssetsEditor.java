@@ -1,12 +1,12 @@
 package org.kaleta.accountant.frontend.year.component;
 
+import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.OpenAddAssetDialog;
-import org.kaleta.accountant.frontend.action.listener.OpenDepreciateDialog;
-import org.kaleta.accountant.frontend.year.model.AccountModel;
-import org.kaleta.accountant.frontend.year.model.SchemaModel;
+import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,9 +14,6 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Stanislav Kaleta on 16.02.2017.
- */
 public class AssetsEditor extends JPanel implements Configurable {
     private Configuration configuration;
     private JPanel panelItems;
@@ -26,53 +23,52 @@ public class AssetsEditor extends JPanel implements Configurable {
 
     public AssetsEditor(Configuration configuration) {
         setConfiguration(configuration);
+        schemaFilter = "0";
+        activeFilter = 0;
 
         buttonDepreciateAll = new JButton("Depreciate All");
-        buttonDepreciateAll.addActionListener(new OpenDepreciateDialog(this, new ArrayList<AccountModel.Account>()));
+        // TODO: 22.10.2017
+        //buttonDepreciateAll.addActionListener(new OpenDepreciateDialog(this, new ArrayList<AccountModel.Account>()));
 
         JButton buttonAddItem = new JButton("Add");
         buttonAddItem.addActionListener(new OpenAddAssetDialog(this));
 
         JCheckBox toggleFilter = new JCheckBox("Toggle Filter");
-        JComboBox<String> cbGroups = new JComboBox<>();
-        JComboBox<String> cbAccounts = new JComboBox<>();
+        JComboBox<Object> cbGroups = new JComboBox<>();
+        JComboBox<Object> cbAccounts = new JComboBox<>();
         JComboBox<String> cbActive = new JComboBox<>();
         panelItems = new JPanel();
 
         panelItems.setLayout(new BoxLayout(panelItems, BoxLayout.Y_AXIS));
 
         cbGroups.addItem("All");
-        for (SchemaModel.Clazz.Group group : getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().values()) {
-            if (group.getId() == 9) continue;
-            cbGroups.addItem(group.getName());
+        for (SchemaModel.Class.Group group : Service.SCHEMA.getSchemaClassMap(getConfiguration().getSelectedYear()).get(0).getGroup()) {
+            if (group.getId().equals(Constants.Schema.ACCUMULATED_DEP_GROUP_ID)) continue;
+            cbGroups.addItem(group);
         }
         cbGroups.addActionListener(e -> {
             cbAccounts.removeAllItems();
             cbAccounts.repaint();
             cbAccounts.revalidate();
-            int groupIndex = cbGroups.getSelectedIndex() - 1;
-            if (groupIndex >= 0) {
-                int groupId = new ArrayList<>(getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().values()).get(groupIndex).getId();
+
+            if (cbGroups.getSelectedItem() instanceof SchemaModel.Class.Group){
                 cbAccounts.addItem("All");
-                for (SchemaModel.Clazz.Group.Account account : getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().get(groupId).getAccounts().values()) {
-                    cbAccounts.addItem(account.getName());
+                SchemaModel.Class.Group selectedGroup = (SchemaModel.Class.Group) cbGroups.getSelectedItem();
+                for (SchemaModel.Class.Group.Account account : selectedGroup.getAccount()){
+                    cbAccounts.addItem(account);
                 }
                 cbAccounts.setSelectedIndex(0);
-                schemaFilter = "0" + groupId;
             } else {
                 schemaFilter = "0";
+                update();
             }
-            update();
         });
-        cbGroups.setSelectedIndex(0);
 
         cbAccounts.addActionListener(e -> {
-            int groupIndex = cbGroups.getSelectedIndex() - 1;
-            if (groupIndex >= 0) {
-                int groupId = new ArrayList<>(getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().values()).get(groupIndex).getId();
-                if (cbAccounts.getSelectedIndex() > 0) {
-                    schemaFilter = "0" + groupId + "" + new ArrayList<>(getConfiguration().getModel().getSchemaModel().getClasses().get(0)
-                            .getGroups().get(groupId).getAccounts().values()).get(cbAccounts.getSelectedIndex() - 1).getId();
+            if (cbGroups.getSelectedItem() instanceof SchemaModel.Class.Group) {
+                String groupId = ((SchemaModel.Class.Group)cbGroups.getSelectedItem()).getId();
+                if (cbAccounts.getSelectedItem() instanceof SchemaModel.Class.Group.Account) {
+                    schemaFilter = "0" + groupId + ((SchemaModel.Class.Group.Account)cbAccounts.getSelectedItem()).getId();
                 } else {
                     schemaFilter = "0" + groupId;
                 }
@@ -87,7 +83,6 @@ public class AssetsEditor extends JPanel implements Configurable {
             activeFilter = cbActive.getSelectedIndex();
             update();
         });
-        cbActive.setSelectedIndex(0);
 
         JPanel panelFilter = new JPanel();
         panelFilter.setPreferredSize(new Dimension(Short.MAX_VALUE,0));
@@ -125,14 +120,20 @@ public class AssetsEditor extends JPanel implements Configurable {
                 AssetsEditor.this.update();
             }
         });
+        this.getActionMap().put(Configuration.TRANSACTION_UPDATED, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AssetsEditor.this.update();
+            }
+        });
         this.getActionMap().put(Configuration.SCHEMA_UPDATED, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cbGroups.removeAllItems();
                 cbGroups.addItem("All");
-                for (SchemaModel.Clazz.Group group : getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups().values()) {
-                    if (group.getId() == 9) continue;
-                    cbGroups.addItem(group.getName());
+                for (SchemaModel.Class.Group group : Service.SCHEMA.getSchemaClassMap(getConfiguration().getSelectedYear()).get(0).getGroup()) {
+                    if (group.getId().equals(Constants.Schema.ACCUMULATED_DEP_GROUP_ID)) continue;
+                    cbGroups.addItem(group);
                 }
                 cbGroups.setSelectedIndex(0);
             }
@@ -141,13 +142,17 @@ public class AssetsEditor extends JPanel implements Configurable {
 
     public void update(){
         panelItems.removeAll();
-        List<AccountModel.Account> filteredAccounts = getConfiguration().getModel().getAccountModel().getAccountsBySchema(schemaFilter);
-        List<AccountModel.Account> suitableAccounts = new ArrayList<>();
-        for (AccountModel.Account account : filteredAccounts){
-            if (account.getSchemaId().startsWith("09")) continue;
-            suitableAccounts.add(account);
+        List<AccountsModel.Account> filteredAccounts = new ArrayList<>();
+        if (schemaFilter.equals("0")){
+            for (AccountsModel.Account account : Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),schemaFilter)){
+                if (account.getSchemaId().startsWith(schemaFilter + Constants.Schema.ACCUMULATED_DEP_GROUP_ID)) continue;
+                filteredAccounts.add(account);
+            }
+        } else {
+            filteredAccounts.addAll(Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),schemaFilter));
         }
-        for (AccountModel.Account account : suitableAccounts){
+
+        for (AccountsModel.Account account : filteredAccounts){
             AssetPanel panel = new AssetPanel(account);
             if ((panel.isActive && activeFilter == 1) || (!panel.isActive && activeFilter == 2) || (activeFilter == 0)){
                 panelItems.add(panel);
@@ -156,8 +161,9 @@ public class AssetsEditor extends JPanel implements Configurable {
         panelItems.revalidate();
         panelItems.repaint();
 
-        buttonDepreciateAll.removeActionListener(buttonDepreciateAll.getActionListeners()[0]);
-        buttonDepreciateAll.addActionListener(new OpenDepreciateDialog(this, suitableAccounts));
+        // TODO: 22.10.2017
+//        buttonDepreciateAll.removeActionListener(buttonDepreciateAll.getActionListeners()[0]);
+        //buttonDepreciateAll.addActionListener(new OpenDepreciateDialog(this, filteredAccounts));
     }
 
     @Override
@@ -172,21 +178,21 @@ public class AssetsEditor extends JPanel implements Configurable {
 
     private class AssetPanel extends JPanel {
         private boolean isActive;
-        private AccountModel.Account account;
+        private AccountsModel.Account account;
 
-        public AssetPanel(AccountModel.Account assetAccount) {
+        public AssetPanel(AccountsModel.Account assetAccount) {
             this.account = assetAccount;
-            Font boldFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 25);
-            AccountModel accModel = getConfiguration().getModel().getAccountModel();
-            String assetValue = accModel.getAccBalance(account);
-            String accDepValue = accModel.getAccBalance(accModel.getAccount("09" + account.getSchemaId().substring(1, 2), account.getSchemaId().substring(2, 3) + "-" + account.getSemanticId()));
+            String year = getConfiguration().getSelectedYear();
+            String assetValue = Service.ACCOUNT.getAccountBalance(year, account);
+            String accDepValue = Service.ACCOUNT.getAccountBalance(year, Service.ACCOUNT.getAccumulatedDepAccount(year, account));
             String currentValue = String.valueOf(Integer.parseInt(assetValue) - Integer.parseInt(accDepValue));
 
+            Font boldFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 25);
             JLabel labelAccountName = new JLabel(account.getName());
             labelAccountName.setFont(boldFont);
-            JLabel labelGroup = new JLabel("> " + getConfiguration().getModel().getSchemaModel().getGroupName(account.getSchemaId()));
+            JLabel labelGroup = new JLabel("> " + Service.SCHEMA.getGroupName(year, account.getClassId(), account.getGroupId()));
             labelGroup.setToolTipText("Group");
-            JLabel labelAccType = new JLabel(">> " + getConfiguration().getModel().getSchemaModel().getAccName(account.getSchemaId()));
+            JLabel labelAccType = new JLabel(">> " + Service.SCHEMA.getAccountName(year, account.getClassId(), account.getGroupId(), account.getSchemaAccountId()));
             labelAccType.setToolTipText("Account Type");
             JLabel labelInitValue;
             JLabel labelCurrentValue = new JLabel(currentValue, SwingConstants.RIGHT);
@@ -194,7 +200,8 @@ public class AssetsEditor extends JPanel implements Configurable {
             labelCurrentValue.setFont(boldFont);
 
             JButton buttonDep = new JButton("Depreciate");
-            buttonDep.addActionListener(new OpenDepreciateDialog(AssetsEditor.this, account));
+            // TODO: 22.10.2017
+            //buttonDep.addActionListener(new OpenDepreciateDialog(AssetsEditor.this, account));
             JButton buttonExclude = new JButton("Exclude");
             buttonExclude.addActionListener(e -> {
                 // TODO: 3/17/17 open ex dialog - setup ex. transaction (dar,predaj,vyhodenie, stranie,...)
@@ -252,7 +259,7 @@ public class AssetsEditor extends JPanel implements Configurable {
                     .addGap(5));
         }
 
-        public AccountModel.Account getAccount() {
+        public AccountsModel.Account getAccount() {
             return account;
         }
     }

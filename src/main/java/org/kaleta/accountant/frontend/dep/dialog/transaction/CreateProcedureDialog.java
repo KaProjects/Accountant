@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.dialog.transaction;
+package org.kaleta.accountant.frontend.dep.dialog.transaction;
 
 import org.kaleta.accountant.backend.entity.Procedures;
 import org.kaleta.accountant.frontend.Configuration;
@@ -6,9 +6,7 @@ import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.dialog.Dialog;
 
 import javax.swing.*;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 
 /**
  * Created by Stanislav Kaleta on 24.05.2016.

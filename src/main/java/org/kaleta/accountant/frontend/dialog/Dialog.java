@@ -1,11 +1,8 @@
 package org.kaleta.accountant.frontend.dialog;
 
 import javax.swing.*;
-import java.awt.Component;
+import java.awt.*;
 
-/**
- * Created by Stanislav Kaleta on 19.04.2016.
- */
 public abstract class Dialog extends JDialog {
     protected boolean result;
 

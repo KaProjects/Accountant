@@ -1,11 +1,11 @@
-package org.kaleta.accountant.frontend.dialog.transaction;
+package org.kaleta.accountant.frontend.dep.dialog.transaction;
 
 import org.kaleta.accountant.backend.entity.Transaction;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.IconLoader;
 
 import javax.swing.*;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

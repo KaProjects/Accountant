@@ -57,8 +57,10 @@ public class AccountsOverview extends JPanel implements Configurable {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             if (node instanceof SchemaAccountTreeNode) {
                 selectedSchemaAccount = ((SchemaAccountTreeNode) node).getSchemaId();
-                updateAccountOverview();
+            } else {
+                selectedSchemaAccount = "-1";
             }
+            updateAccountOverview();
         });
         JScrollPane accountTreeScrollPane = new JScrollPane(tree);
 
@@ -113,24 +115,25 @@ public class AccountsOverview extends JPanel implements Configurable {
     private void updateAccountOverview() {
         accountOverviewPanel.removeAll();
         if (selectedSchemaAccount.equals("-1")) {
-            accountOverviewPanel.add(new JLabel("Select a Schema Account to see its overview."));
+            //accountOverviewPanel.add(new JLabel("Select a Schema Account to see its overview."));
+            this.revalidate();
+            this.repaint();
             return;
         }
 
         List<AccountsModel.Account> accountList = Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),selectedSchemaAccount);
+        System.out.println(accountList.size());
         if (accountList.size() == 0) {
             accountOverviewPanel.add(new JLabel("Selected Schema Account has no accounts assigned."));
-            return;
+        } else {
+            for (AccountsModel.Account account : accountList) {
+                String text = account.getSchemaId() + "." + account.getSemanticId() + " '" + account.getName() + "'  turnover="
+                        +Service.ACCOUNT.getAccountTurnover(getConfiguration().getSelectedYear(), account) + "  balance="
+                        +Service.ACCOUNT.getAccountBalance(getConfiguration().getSelectedYear(), account);
+                accountOverviewPanel.add(new JLabel(text));
+                // TODO: 5.3.2017 design&impl
+            }
         }
-
-        for (AccountsModel.Account account : accountList) {
-            String text = account.getSchemaId() + "." + account.getSemanticId() + " '" + account.getName() + "'  turnover="
-                    +Service.ACCOUNT.getAccountTurnover(getConfiguration().getSelectedYear(), account) + "  balance="
-                    +Service.ACCOUNT.getAccountBalance(getConfiguration().getSelectedYear(), account);
-            accountOverviewPanel.add(new JLabel(text));
-            // TODO: 5.3.2017 design&impl
-        }
-
         this.revalidate();
         this.repaint();
     }

@@ -2,7 +2,7 @@ package org.kaleta.accountant.frontend.action.menu;
 
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.dialog.schema.SchemaDialog;
+import org.kaleta.accountant.frontend.dep.dialog.schema.SchemaDialog;
 import org.kaleta.accountant.service.Service;
 
 import java.awt.*;

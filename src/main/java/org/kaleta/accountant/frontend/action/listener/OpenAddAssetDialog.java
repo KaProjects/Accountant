@@ -1,22 +1,19 @@
 package org.kaleta.accountant.frontend.action.listener;
 
+import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.year.dialog.AddAssetDialog;
-import org.kaleta.accountant.frontend.year.model.AccountModel;
-import org.kaleta.accountant.frontend.year.model.SchemaModel;
+import org.kaleta.accountant.frontend.dialog.AddAssetDialog;
 import org.kaleta.accountant.service.Service;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-/**
- * Created by Stanley on 24.2.2017.
- */
 public class OpenAddAssetDialog extends ActionListener {
 
     public OpenAddAssetDialog(Configurable configurable) {
@@ -25,45 +22,41 @@ public class OpenAddAssetDialog extends ActionListener {
 
     @Override
     protected void actionPerformed() {
-        Map<Integer, SchemaModel.Clazz.Group> groupMap = new HashMap<>(getConfiguration().getModel().getSchemaModel().getClasses().get(0).getGroups());
+        String year = getConfiguration().getSelectedYear();
+        Map<Integer, SchemaModel.Class.Group> groupMap = Service.SCHEMA.getSchemaGroupMap(Service.SCHEMA.getSchemaClassMap(year).get(0));
         groupMap.remove(9);
-        AddAssetDialog dialog = new AddAssetDialog((Component) getConfiguration(),new ArrayList<>(groupMap.values()));
+        Map<String, java.util.List<AccountsModel.Account>> creditAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(year);
+        Set<String> keySet = new HashSet<>(creditAccountMap.keySet());
+        for (String schemaId : keySet){
+            if (schemaId.startsWith("0") || schemaId.startsWith("1") || schemaId.startsWith("5") || schemaId.startsWith("7")){
+                creditAccountMap.remove(schemaId);
+            }
+        }
+        AddAssetDialog dialog = new AddAssetDialog((Component) getConfiguration(),
+                new ArrayList<>(groupMap.values()), creditAccountMap,
+                Service.SCHEMA.getSchemaClassList(year));
         dialog.setVisible(true);
         if (dialog.getResult()) {
-            AccountModel model = getConfiguration().getModel().getAccountModel();
+            String semanticId = String.valueOf(Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),dialog.getSchemaId()).size());
 
-            String schemaId = dialog.getSchemaId();
-            List<AccountModel.Account> tempAccs = model.getAccountsBySchema(schemaId);
-            int lastSemanticId = 0;
-            for (AccountModel.Account tempAcc : tempAccs) {
-                int thisAccId = Integer.parseInt(tempAcc.getSemanticId());
-                if (thisAccId > lastSemanticId) lastSemanticId = thisAccId;
-            }
-            String semanticId = String.valueOf(lastSemanticId + 1);
-            String assocSemanticId = schemaId.substring(2, 3) + "-" + semanticId;
+            Service.ACCOUNT.createAccount(year, dialog.getAccName(), dialog.getSchemaId(), semanticId, "");
 
-            String name = dialog.getAccName();
-            String date = dialog.getDate();
-            String initValue = dialog.getInitValue();
-            String depMetaData = dialog.getDepMetaData();
+            String accId = dialog.getSchemaId() + "." + semanticId;
+            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), "0", accId, Constants.Account.INIT_ACC_ID, "open");
+            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), dialog.getInitValue(), accId, dialog.getCreditAccount(), "purchase");
 
+            String accDepId = Service.ACCOUNT.getAccumulatedDepAccountId(dialog.getSchemaId(), semanticId);
+            Service.ACCOUNT.createAccount(year, Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + dialog.getAccName(),
+                    accDepId.split("\\.")[0], accDepId.split("\\.")[1], dialog.getDepMetaData());
 
-            model.getAccounts().add(new AccountModel.Account(schemaId, semanticId, Constants.AccountType.ASSET, name, ""));
-            model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                    initValue, schemaId + "." + semanticId, Constants.Account.INIT_ACC_ID));
+            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), "0", accDepId, Constants.Account.INIT_ACC_ID, "open");
 
-            model.getAccounts().add(new AccountModel.Account("09" + schemaId.substring(1, 2),
-                    assocSemanticId, Constants.AccountType.LIABILITY, "A. Dep. of " + name, depMetaData));
-            model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                    "0", Constants.Account.INIT_ACC_ID, "09" + schemaId.substring(1, 2) + "." + assocSemanticId));
+            String depId = Service.ACCOUNT.getDepreciationAccountId(dialog.getSchemaId(), semanticId);
+            Service.ACCOUNT.createAccount(year, Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + dialog.getAccName(),
+                    depId.split("\\.")[0], depId.split("\\.")[1], "");
 
-            model.getAccounts().add(new AccountModel.Account("59" + schemaId.substring(1, 2),
-                    assocSemanticId, Constants.AccountType.EXPENSE, "Dep. of " + name, ""));
-            model.getTransactions().add(new AccountModel.Transaction(model.getNextTransactionId(), date, "open",
-                    "0", "59" + schemaId.substring(1, 2) + "." + assocSemanticId, Constants.Account.INIT_ACC_ID));
-
-            Service.YEAR.updateAccount(model);
             getConfiguration().update(Configuration.ACCOUNT_UPDATED);
+            getConfiguration().update(Configuration.TRANSACTION_UPDATED);
         }
     }
 }

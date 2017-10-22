@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.dialog.schema;
+package org.kaleta.accountant.frontend.dep.dialog.schema;
 
 import org.kaleta.accountant.backend.entity.Schema;
 import org.kaleta.accountant.common.Constants;
