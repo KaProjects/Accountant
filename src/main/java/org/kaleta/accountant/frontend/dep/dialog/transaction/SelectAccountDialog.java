@@ -23,7 +23,7 @@ import java.util.Map;
 public class SelectAccountDialog extends Dialog {
     private JTree tree;
 
-    public SelectAccountDialog(Component parent, boolean isDebit) {
+    public SelectAccountDialog(Frame parent, boolean isDebit) {
         super(parent, "Select " + ((isDebit)?"Debit":"Credit") + " Account");
         buildDialog();
         this.setSize(300,500);

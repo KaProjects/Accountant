@@ -44,7 +44,7 @@ public class OpenAddResourcesDialog extends ActionListener {
                 }
             }
         }
-        AddResourcesDialog dialog = new AddResourcesDialog((Component) getConfiguration(), resourcesGroupList, resourcesSemanticMap, payableClassesList, payableSemanticMap);
+        AddResourcesDialog dialog = new AddResourcesDialog((Frame) getConfiguration(), resourcesGroupList, resourcesSemanticMap, payableClassesList, payableSemanticMap);
         dialog.setVisible(true);
         if (dialog.getResult()) {
             AccountModel accountModel = getConfiguration().getModel().getAccountModel();

@@ -19,7 +19,7 @@ public class OpenSchemaDialog extends MenuAction {
     @Override
     protected void actionPerformed() {
         Schema schema = Service.DEPACCOUNT.getSchema();
-        SchemaDialog dialog = new SchemaDialog((Component) getConfiguration(), schema);
+        SchemaDialog dialog = new SchemaDialog((Frame) getConfiguration(), schema);
         dialog.setVisible(true);
         if (dialog.getResult()) {
             Service.DEPACCOUNT.setSchema(schema);

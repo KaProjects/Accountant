@@ -12,7 +12,7 @@ import java.awt.*;
 public class SchemaDialog extends Dialog {
     private final Schema schema;
 
-    public SchemaDialog(Component parent, Schema schema) {
+    public SchemaDialog(Frame parent, Schema schema) {
         super(parent, "Schema Editor");
         this.schema = schema;
         buildDialog();

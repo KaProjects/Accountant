@@ -1,10 +1,6 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
-import org.kaleta.accountant.frontend.component.AccountsOverview;
-import org.kaleta.accountant.frontend.component.SchemaEditor;
-import org.kaleta.accountant.frontend.component.SchemaOverview;
-import org.kaleta.accountant.frontend.component.YearPane;
-import org.kaleta.accountant.frontend.year.component.AssetsEditor;
+import org.kaleta.accountant.frontend.component.*;
 import org.kaleta.accountant.frontend.year.component.ResourcesEditor;
 import org.kaleta.accountant.service.Service;
 

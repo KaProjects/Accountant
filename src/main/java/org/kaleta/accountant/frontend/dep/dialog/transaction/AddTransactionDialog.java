@@ -16,7 +16,7 @@ public class AddTransactionDialog extends Dialog {
     private TransactionManagementPanel transactionManagementPanel;
 
     public AddTransactionDialog(Configuration parent) {
-        super((Component) parent, "Adding Transaction(s)");
+        super((Frame) parent, "Adding Transaction(s)");
         transactionManagementPanel = new TransactionManagementPanel(parent);
         buildDialog();
         transactionManagementPanel.addNewTransaction(true);

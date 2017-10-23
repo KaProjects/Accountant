@@ -20,7 +20,7 @@ class ClassDialog extends Dialog {
     private final Schema.Class clazz;
     private final List<Schema.Class.Group> groups;
 
-    public ClassDialog(Schema.Class clazz, Component parent) {
+    public ClassDialog(Schema.Class clazz, Frame parent) {
         super(parent, "Class Editor");
         this.clazz = clazz;
         groups = new ArrayList<>(clazz.getGroup());
@@ -73,7 +73,7 @@ class ClassDialog extends Dialog {
         JButton buttonAddGroup = new JButton(IconLoader.getIcon(IconLoader.ADD, new Dimension(10, 10)));
         buttonAddGroup.addActionListener(l -> {
             Schema.Class.Group newGroup = new Schema.Class.Group();
-            GroupDialog dialog = new GroupDialog(newGroup, this);
+            GroupDialog dialog = new GroupDialog(newGroup, (Frame) ClassDialog.this.getParent());
             dialog.setVisible(true);
             if (dialog.getResult()) {
                 groups.add(newGroup);
@@ -86,7 +86,7 @@ class ClassDialog extends Dialog {
         buttonEditGroup.addActionListener(l -> {
             int selectedRow = tableGroups.getSelectedRow();
             if (selectedRow >= 0) {
-                GroupDialog dialog = new GroupDialog(groups.get(selectedRow), this);
+                GroupDialog dialog = new GroupDialog(groups.get(selectedRow), (Frame) ClassDialog.this.getParent());
                 dialog.setVisible(true);
                 if (dialog.getResult()) {
                     tableGroups.revalidate();

@@ -1,7 +1,7 @@
 package org.kaleta.accountant.frontend.dialog;
 
+import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.frontend.common.NumberFilter;
-import org.kaleta.accountant.frontend.year.model.AccountModel;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -10,15 +10,11 @@ import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.util.List;
 
-/**
- * Created by Stanislav Kaleta on 11.04.2017.
- * TODO add possibility to preview earlier depreciations
- */
 public class DepreciateDialog extends Dialog {
     private List<Config> configs;
 
-    public DepreciateDialog(Component parent, List<Config> configs) {
-        super(parent, "Depreciate Asset(s) Dialog");
+    public DepreciateDialog(Frame parent, List<Config> configs) {
+        super(parent, "Depreciating Asset(s) Dialog");
         this.configs = configs;
         buildDialog();
         pack();
@@ -30,6 +26,9 @@ public class DepreciateDialog extends Dialog {
         panelItems.setLayout(new BoxLayout(panelItems, BoxLayout.Y_AXIS));
         JScrollPane pane = new JScrollPane(panelItems);
         for (Config config : configs) {
+            if (!config.isEnabled()) continue;
+
+
             JCheckBox checkBoxEnabled = new JCheckBox("", config.isEnabled());
             checkBoxEnabled.addItemListener(e -> config.setEnabled(checkBoxEnabled.isSelected()));
             checkBoxEnabled.setToolTipText("Exclude/Include from Depreciation Process");
@@ -123,7 +122,7 @@ public class DepreciateDialog extends Dialog {
     private boolean validator(){
         for (Config config : configs){
             if (config.isEnabled()){
-                if (config.getDateHint().isEmpty() || config.getDateHint().trim().isEmpty() || config.getDateHint().length() != 8 || config.getDateHint().contains("x")){
+                if (config.getDateHint().isEmpty() || config.getDateHint().trim().isEmpty() || config.getDateHint().length() != 4 || config.getDateHint().contains("x")){
                     JOptionPane.showMessageDialog(this, "Inserted Date for '" + config.getAccount().getName() + "' is invalid!", "Not Valid", JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
@@ -142,14 +141,14 @@ public class DepreciateDialog extends Dialog {
     }
 
     public static class Config{
-        private AccountModel.Account account;
-        private AccountModel.Account depAccount;
+        private AccountsModel.Account account;
+        private AccountsModel.Account depAccount;
         private String dateHint;
         private String valueHint;
         private Integer maxDepValue;
         private Boolean enabled;
 
-        public Config(AccountModel.Account account, AccountModel.Account depAccount, String dateHint, String valueHint, Integer maxDepValue, Boolean enabled) {
+        public Config(AccountsModel.Account account, AccountsModel.Account depAccount, String dateHint, String valueHint, Integer maxDepValue, Boolean enabled) {
             this.account = account;
             this.depAccount = depAccount;
             this.dateHint = dateHint;
@@ -158,19 +157,19 @@ public class DepreciateDialog extends Dialog {
             this.enabled = enabled;
         }
 
-        public AccountModel.Account getAccount() {
+        public AccountsModel.Account getAccount() {
             return account;
         }
 
-        public void setAccount(AccountModel.Account account) {
+        public void setAccount(AccountsModel.Account account) {
             this.account = account;
         }
 
-        public AccountModel.Account getDepAccount() {
+        public AccountsModel.Account getDepAccount() {
             return depAccount;
         }
 
-        public void setDepAccount(AccountModel.Account depAccount) {
+        public void setDepAccount(AccountsModel.Account depAccount) {
             this.depAccount = depAccount;
         }
 

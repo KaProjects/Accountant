@@ -16,7 +16,7 @@ public class CreateProcedureDialog extends Dialog {
     private JTextField textFieldName;
 
     public CreateProcedureDialog(Configuration parent) {
-        super((Component) parent, "Creating Procedure");
+        super((Frame) parent, "Creating Procedure");
         transactionManagementPanel = new TransactionManagementPanel(parent);
         buildDialog();
         transactionManagementPanel.addNewTransaction(false);

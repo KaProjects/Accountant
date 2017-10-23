@@ -20,7 +20,7 @@ public class SemanticDialog extends Dialog {
     private Schema schema;
     private Semantic semantic;
 
-    public SemanticDialog(Component parent, Schema schema, Semantic semantic) {
+    public SemanticDialog(Frame parent, Schema schema, Semantic semantic) {
         super(parent, "Semantic Accounts");
         this.schema = schema;
         this.semantic = semantic;

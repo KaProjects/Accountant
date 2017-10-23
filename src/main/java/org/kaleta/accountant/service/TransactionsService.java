@@ -6,6 +6,9 @@ import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Initializer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Provides access to data source which is related to transactions.
  */
@@ -14,23 +17,6 @@ public class TransactionsService {
     TransactionsService(){
         // package-private
     }
-
-    /**
-     * todo = maybe marge with accounts service
-     */
-
-
-//    /**
-//     * todo
-//     */
-//    public String getNextTransactionId(String year){
-//        try {
-//            return String.valueOf(new TransactionsManager(year).retrieve().getTransaction().size());
-//        } catch (ManagerException e){
-//            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-//            throw new ServiceFailureException(e);
-//        }
-//    }
 
     /**
      * todo
@@ -50,6 +36,38 @@ public class TransactionsService {
             model.getTransaction().add(transaction);
 
             manager.update(model);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns transactions for specified debit and credit.
+     * Use 'null' for debit/credit if you want to list transaction only for credit/debit
+     */
+    public List<TransactionsModel.Transaction> getTransactions(String year, String debit, String credit) {
+        try {
+            TransactionsModel model = new TransactionsManager(year).retrieve();
+            List<TransactionsModel.Transaction> transactionList = new ArrayList<>();
+            for (TransactionsModel.Transaction transaction : model.getTransaction()){
+                if (debit == null && credit != null){
+                    if (transaction.getCredit().equals(credit)){
+                        transactionList.add(transaction);
+                    }
+                }
+                if (debit != null && credit == null){
+                    if (transaction.getDebit().equals(debit)){
+                        transactionList.add(transaction);
+                    }
+                }
+                if (debit != null && credit != null){
+                    if (transaction.getDebit().equals(debit) && transaction.getCredit().equals(credit)){
+                        transactionList.add(transaction);
+                    }
+                }
+            }
+            return transactionList;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

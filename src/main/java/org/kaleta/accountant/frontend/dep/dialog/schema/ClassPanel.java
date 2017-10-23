@@ -31,7 +31,7 @@ class ClassPanel extends JPanel {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     if (e.getClickCount() == 1) {
                         setBackground(Color.LIGHT_GRAY);
-                        ClassDialog dialog = new ClassDialog(clazz, ClassPanel.this);
+                        ClassDialog dialog = new ClassDialog(clazz, (Frame) ClassPanel.this.parent.getParent());
                         dialog.setVisible(true);
                         if (dialog.getResult()) {
                             reset();

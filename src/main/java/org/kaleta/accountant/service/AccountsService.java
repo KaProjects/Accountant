@@ -167,6 +167,56 @@ public class AccountsService {
     /**
      * todo
      */
+    public AccountsModel.Account getDepreciationAccount(String year, AccountsModel.Account account){
+        String depId = getDepreciationAccountId(account.getSchemaId(), account.getSemanticId());
+        try {
+            for (AccountsModel.Account acc : new AccountsManager(year).retrieve().getAccount()) {
+                if (acc.getFullId().equals(depId)) {
+                    return acc;
+                }
+            }
+            throw new IllegalArgumentException("Depreciation account not found for '" + account.getFullId() + "'");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo
+     */
+    public String getLastDepreciationDate(String year, AccountsModel.Account account){
+        try {
+            String depAccId = getDepreciationAccountId(account.getSchemaId(), account.getSemanticId());
+            String accDepAccId = getAccumulatedDepAccountId(account.getSchemaId(), account.getSemanticId());
+
+            TransactionsModel model = new TransactionsManager(year).retrieve();
+            TransactionsModel.Transaction lastDepTransaction = null;
+            for (TransactionsModel.Transaction transaction : model.getTransaction()){
+                if (transaction.getDebit().equals(depAccId) && transaction.getCredit().equals(accDepAccId)){
+                    if (lastDepTransaction == null){
+                        lastDepTransaction = transaction;
+                    } else {
+                        int newTrId = Integer.parseInt(transaction.getId());
+                        int lastTrId = Integer.parseInt(lastDepTransaction.getId());
+                        lastDepTransaction = (newTrId > lastTrId) ? transaction : lastDepTransaction;
+                    }
+                }
+            }
+            if (lastDepTransaction != null){
+                return lastDepTransaction.getDate();
+            } else {
+                return null;
+            }
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * todo
+     */
     public void createAccount(String year, String name, String schemaId, String semanticId, String metadata){
         try {
             AccountsManager accountsManager = new AccountsManager(year);

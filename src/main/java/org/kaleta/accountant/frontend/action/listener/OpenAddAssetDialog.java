@@ -32,7 +32,7 @@ public class OpenAddAssetDialog extends ActionListener {
                 creditAccountMap.remove(schemaId);
             }
         }
-        AddAssetDialog dialog = new AddAssetDialog((Component) getConfiguration(),
+        AddAssetDialog dialog = new AddAssetDialog((Frame) getConfiguration(),
                 new ArrayList<>(groupMap.values()), creditAccountMap,
                 Service.SCHEMA.getSchemaClassList(year));
         dialog.setVisible(true);
@@ -42,14 +42,14 @@ public class OpenAddAssetDialog extends ActionListener {
             Service.ACCOUNT.createAccount(year, dialog.getAccName(), dialog.getSchemaId(), semanticId, "");
 
             String accId = dialog.getSchemaId() + "." + semanticId;
-            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), "0", accId, Constants.Account.INIT_ACC_ID, "open");
-            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), dialog.getInitValue(), accId, dialog.getCreditAccount(), "purchase");
+            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), "0", accId, Constants.Account.INIT_ACC_ID, Constants.Transaction.OPEN_DESCRIPTION);
+            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), dialog.getInitValue(), accId, dialog.getCreditAccount(), Constants.Transaction.PURCHASE_DESCRIPTION);
 
             String accDepId = Service.ACCOUNT.getAccumulatedDepAccountId(dialog.getSchemaId(), semanticId);
             Service.ACCOUNT.createAccount(year, Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + dialog.getAccName(),
                     accDepId.split("\\.")[0], accDepId.split("\\.")[1], dialog.getDepMetaData());
 
-            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), "0", accDepId, Constants.Account.INIT_ACC_ID, "open");
+            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), "0", accDepId, Constants.Account.INIT_ACC_ID, Constants.Transaction.OPEN_DESCRIPTION);
 
             String depId = Service.ACCOUNT.getDepreciationAccountId(dialog.getSchemaId(), semanticId);
             Service.ACCOUNT.createAccount(year, Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + dialog.getAccName(),

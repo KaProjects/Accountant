@@ -21,7 +21,7 @@ class GroupDialog extends Dialog {
     private final Schema.Class.Group group;
     private final List<Schema.Class.Group.Account> accounts;
 
-    public GroupDialog(Schema.Class.Group group, Component parent) {
+    public GroupDialog(Schema.Class.Group group, Frame parent) {
         super(parent, "Group Editor");
         this.group = group;
         accounts = new ArrayList<>(group.getAccount());
@@ -84,7 +84,7 @@ class GroupDialog extends Dialog {
         JButton buttonAddAcc = new JButton(IconLoader.getIcon(IconLoader.ADD, new Dimension(10, 10)));
         buttonAddAcc.addActionListener(l -> {
             Schema.Class.Group.Account newAcc = new Schema.Class.Group.Account();
-            AccountDialog dialog = new AccountDialog(newAcc, this);
+            AccountDialog dialog = new AccountDialog(newAcc, (Frame) this.getParent());
             dialog.setVisible(true);
             if (dialog.getResult()) {
                 accounts.add(newAcc);
@@ -97,7 +97,7 @@ class GroupDialog extends Dialog {
         buttonEditAcc.addActionListener(l -> {
             int selectedRow = tableAccounts.getSelectedRow();
             if (selectedRow >= 0) {
-                AccountDialog dialog = new AccountDialog(accounts.get(selectedRow), this);
+                AccountDialog dialog = new AccountDialog(accounts.get(selectedRow), (Frame) this.getParent());
                 dialog.setVisible(true);
                 if (dialog.getResult()) {
                     tableAccounts.revalidate();

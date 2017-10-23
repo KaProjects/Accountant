@@ -27,7 +27,7 @@ public class AddAssetDialog extends Dialog {
 
     private String creditAcc;
 
-    public AddAssetDialog(Component parent, List<SchemaModel.Class.Group> groups, Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> classList) {
+    public AddAssetDialog(Frame parent, List<SchemaModel.Class.Group> groups, Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> classList) {
         super(parent, "Adding Asset");
         this.groups = groups;
         this.creditAccountMap = creditAccountMap;
@@ -92,7 +92,7 @@ public class AddAssetDialog extends Dialog {
         creditAcc = "";
         JButton buttonSelectCreditAcc = new JButton("Select");
         buttonSelectCreditAcc.addActionListener(e -> {
-            SelectAccountDialog selectCreditAccountDialog = new SelectAccountDialog(AddAssetDialog.this, creditAccountMap, classList);
+            SelectAccountDialog selectCreditAccountDialog = new SelectAccountDialog((Frame) AddAssetDialog.this.getParent(), creditAccountMap, classList);
             selectCreditAccountDialog.setVisible(true);
             if (selectCreditAccountDialog.getResult()){
                 creditAcc = selectCreditAccountDialog.getSelectedAccountId();

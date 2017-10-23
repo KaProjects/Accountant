@@ -5,6 +5,7 @@ import org.kaleta.accountant.frontend.dep.dialog.transaction.SelectAccountDialog
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 
 /**
@@ -23,7 +24,7 @@ public class AccountTextFieldClicked extends MouseAction {
     protected void actionPerformed(MouseEvent e) {
         if (e.getClickCount() > 1){
             JTextField source = (JTextField) e.getSource();
-            SelectAccountDialog dialog = new SelectAccountDialog(source, isDebit);
+            SelectAccountDialog dialog = new SelectAccountDialog((Frame) getConfiguration(), isDebit);
             dialog.preselectPath(source.getText());
             dialog.setVisible(true);
             if (dialog.getResult()){

@@ -19,7 +19,7 @@ public class ProceduresDialog extends Dialog {
     private TransactionManagementPanel transactionManagementPanel;
 
     public ProceduresDialog(Configuration parent) {
-        super((Component) parent, "Procedures");
+        super((Frame) parent, "Procedures");
         procedures = Service.DEPACCOUNT.getProcedures();
         transactionManagementPanel = new TransactionManagementPanel(parent);
         buildDialog();

@@ -32,7 +32,7 @@ public class AddResourcesDialog extends Dialog {
 
     private List<ResourcePanel> resourcePanelList;
 
-    public AddResourcesDialog(Component parent, List<SchemaModel.Clazz.Group> resourcesGroupList, Map<String, List<AccountModel.Account>> resourcesSemanticMap,
+    public AddResourcesDialog(Frame parent, List<SchemaModel.Clazz.Group> resourcesGroupList, Map<String, List<AccountModel.Account>> resourcesSemanticMap,
                               List<SchemaModel.Clazz> payableClassesList, Map<String, List<AccountModel.Account>> payableSemanticMap) {
         super(parent, "Adding Resources");
         this.resourcesGroupList = resourcesGroupList;

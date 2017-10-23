@@ -87,4 +87,10 @@ public class Constants {
         public static final String REVENUE = "R";
         public static final String OFF_BALANCE = "X";
     }
+
+    public static class Transaction {
+        public static final String OPEN_DESCRIPTION = "open";
+        public static final String PURCHASE_DESCRIPTION = "purchase";
+        public static final String MONTHLY_DEP_DESCRIPTION = "monthly depreciation";
+    }
 }

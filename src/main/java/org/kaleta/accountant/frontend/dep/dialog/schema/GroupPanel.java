@@ -32,7 +32,7 @@ class GroupPanel extends JPanel {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     if (e.getClickCount() == 1) {
                         setBackground(Color.LIGHT_GRAY);
-                        GroupDialog dialog = new GroupDialog(group, GroupPanel.this);
+                        GroupDialog dialog = new GroupDialog(group, (Frame) GroupPanel.this.getParent());
                         dialog.setVisible(true);
                         if (dialog.getResult()) {
                             reset();

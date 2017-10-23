@@ -15,7 +15,7 @@ import java.awt.*;
 class AccountDialog extends Dialog {
     private final Schema.Class.Group.Account account;
 
-    public AccountDialog(Schema.Class.Group.Account account, Component parent) {
+    public AccountDialog(Schema.Class.Group.Account account, Frame parent) {
         super(parent, "Account Editor");
         this.account = account;
         buildDialog();

@@ -19,7 +19,7 @@ public class SelectAccountDialog extends Dialog {
     private String selectedAccountId;
     private String selectedAccountName;
 
-    public SelectAccountDialog(Component parent, Map<String, java.util.List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> classList) {
+    public SelectAccountDialog(Frame parent, Map<String, java.util.List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> classList) {
         super(parent, "Selecting Account");
         this.creditAccountMap = creditAccountMap;
         this.classList = classList;

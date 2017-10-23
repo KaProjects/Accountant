@@ -1,29 +1,27 @@
 package org.kaleta.accountant.frontend.action.listener;
 
+import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.DepreciateDialog;
-import org.kaleta.accountant.frontend.year.model.AccountModel;
 import org.kaleta.accountant.service.Service;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Stanislav Kaleta on 11.04.2017.
- */
 public class OpenDepreciateDialog extends ActionListener {
-    private List<AccountModel.Account> accounts;
+    private List<AccountsModel.Account> accounts;
 
-    public OpenDepreciateDialog(Configurable configurable, AccountModel.Account account) {
+    public OpenDepreciateDialog(Configurable configurable, AccountsModel.Account account) {
         super(configurable);
         accounts = new ArrayList<>();
         accounts.add(account);
     }
 
-    public OpenDepreciateDialog(Configurable configurable, List<AccountModel.Account> accounts) {
+    public OpenDepreciateDialog(Configurable configurable, List<AccountsModel.Account> accounts) {
         super(configurable);
         this.accounts = accounts;
     }
@@ -31,58 +29,47 @@ public class OpenDepreciateDialog extends ActionListener {
     @Override
     protected void actionPerformed() {
         List<DepreciateDialog.Config> configs = new ArrayList<>();
-        for (AccountModel.Account account : accounts){
-            AccountModel model = getConfiguration().getModel().getAccountModel();
-            String accumDepAccSchemaId = "09" + account.getSchemaId().substring(1,2);
-            String accumDepAccSemanticId = account.getSchemaId().substring(2, 3) + "-" + account.getSemanticId();
-            AccountModel.Account accumDepAcc = model.getAccount(accumDepAccSchemaId, accumDepAccSemanticId);
+        String year = getConfiguration().getSelectedYear();
+        for (AccountsModel.Account account : accounts){
+            AccountsModel.Account accDepAccount = Service.ACCOUNT.getAccumulatedDepAccount(year, account);
 
-            String montlyDepHint = (accumDepAcc.getMetadata().split(",").length == 2) ? accumDepAcc.getMetadata().split(",")[0] : "0";
+            String monthlyDepHint = accDepAccount.getMetadata().split(",")[0];
+            int assetValue = Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
+            int accDepSum = Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, accDepAccount));
+            monthlyDepHint = ((assetValue-accDepSum) < Integer.parseInt(monthlyDepHint)) ? String.valueOf(assetValue-accDepSum) : monthlyDepHint;
+            if (monthlyDepHint.equals("0")) monthlyDepHint = "x";
 
-            int assetValue = Integer.parseInt(model.getAccBalance(account));
-            int depSum = Integer.parseInt(model.getAccBalance(accumDepAcc));
-            montlyDepHint = ((assetValue-depSum) < Integer.parseInt(montlyDepHint)) ? String.valueOf(assetValue-depSum) : montlyDepHint;
-
-            String dayHint = (accumDepAcc.getMetadata().split(",").length == 2) ? accumDepAcc.getMetadata().split(",")[1] : "1";
-
-            String yearHint = String.valueOf(getConfiguration().getModel().getYearId());
-
-            String monthHint = "0";
-            for (AccountModel.Transaction tr : getConfiguration().getModel().getAccountModel().getTransactions(
-                    "59"+account.getSchemaId().substring(1,2)+"."+accumDepAccSemanticId, accumDepAccSchemaId+"."+accumDepAccSemanticId)){
-                    Integer month = Integer.parseInt(tr.getDate().substring(2,4));
-                    monthHint = (month >= Integer.parseInt(monthHint)) ? String.valueOf(++month) : monthHint;
-            }
-            if (monthHint.equals("0")){
-                monthHint = String.valueOf(1 + Integer.parseInt(getConfiguration().getModel().getAccountModel().getTransactions(account.getFullId(), Constants.Account.INIT_ACC_ID).get(0).getDate().substring(2,4)));
-            }
-            String dateHint;
-            if (monthHint.equals("13") || montlyDepHint.equals("0")){
-                dateHint = "x";
-                montlyDepHint = "x";
-            } else {
-                dateHint  = String.format("%02d", Integer.parseInt(dayHint))+String.format("%02d", Integer.parseInt(monthHint))+yearHint;
-            }
-            configs.add(new DepreciateDialog.Config(account, accumDepAcc, dateHint, montlyDepHint, (assetValue-depSum), true));
-        }
-        DepreciateDialog dialog = new DepreciateDialog((Component) getConfiguration(), configs);
-        dialog.setVisible(true);
-        if (dialog.getResult()){
-            AccountModel model = getConfiguration().getModel().getAccountModel();
-            for (DepreciateDialog.Config config : dialog.getConfigs()){
-                if (config.isEnabled()){
-                    String expenseAccId = "59" + config.getDepAccount().getSchemaId().substring(2,3)+"."+config.getDepAccount().getSemanticId();
-                    model.getTransactions().add(new AccountModel.Transaction(
-                            model.getNextTransactionId(),
-                            config.getDateHint(),
-                            "monthly depreciation",
-                            config.getValueHint(),
-                            expenseAccId,
-                            config.getDepAccount().getFullId()));
+            String lastDepDate = Service.ACCOUNT.getLastDepreciationDate(year,account);
+            if (lastDepDate == null){
+                for (TransactionsModel.Transaction tr : Service.TRANSACTIONS.getTransactions(year, account.getFullId(), null)){
+                    if (tr.getDescription().contains(Constants.Transaction.PURCHASE_DESCRIPTION)){
+                        lastDepDate = tr.getDate();
+                    }
+                }
+                if (lastDepDate == null) {
+                    lastDepDate = String.format("%02d", Integer.parseInt(accDepAccount.getMetadata().split(",")[1])) + "00";
                 }
             }
-            Service.YEAR.updateAccount(model);
-            getConfiguration().update(Configuration.ACCOUNT_UPDATED);
+            String dateHint = (lastDepDate.substring(2,4).equals("12"))
+                    ? "x"
+                    : lastDepDate.substring(0,2) + String.format("%02d", (1 + Integer.parseInt(lastDepDate.substring(2,4))));
+
+            boolean enabled = (!dateHint.equals("x") && !monthlyDepHint.equals("x"));
+
+            configs.add(new DepreciateDialog.Config(account, accDepAccount, dateHint, monthlyDepHint, (assetValue-accDepSum), enabled));
+        }
+        DepreciateDialog dialog = new DepreciateDialog((Frame) getConfiguration(), configs);
+        dialog.setVisible(true);
+        if (dialog.getResult()){
+            for (DepreciateDialog.Config config : dialog.getConfigs()){
+                if (config.isEnabled()){
+                    Service.TRANSACTIONS.addTransaction(year, config.getDateHint(), config.getValueHint(),
+                            Service.ACCOUNT.getDepreciationAccount(year, config.getAccount()).getFullId(),
+                            config.getDepAccount().getFullId(), Constants.Transaction.MONTHLY_DEP_DESCRIPTION);
+
+                }
+            }
+            getConfiguration().update(Configuration.TRANSACTION_UPDATED);
         }
     }
 }
