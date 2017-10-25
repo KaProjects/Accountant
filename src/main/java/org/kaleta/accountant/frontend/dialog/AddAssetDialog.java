@@ -120,7 +120,7 @@ public class AddAssetDialog extends Dialog {
                         .addComponent(separator2)
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(5, 5, Short.MAX_VALUE)
-                                .addComponent(buttonCancel).addGap(5).addComponent(buttonOk).addGap(5)))
+                                .addComponent(buttonCancel).addGap(5).addComponent(buttonOk)))
                 .addGap(10));
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGap(10)

@@ -9,20 +9,31 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class SelectAccountDialog extends Dialog {
-    private Map<String, List<AccountsModel.Account>> creditAccountMap;
+    private Map<String, List<AccountsModel.Account>> accountMap;
     private List<SchemaModel.Class> classList;
 
     private String selectedAccountId;
     private String selectedAccountName;
 
-    public SelectAccountDialog(Frame parent, Map<String, java.util.List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> classList) {
+    public SelectAccountDialog(Frame parent, Map<String, java.util.List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
         super(parent, "Selecting Account");
-        this.creditAccountMap = creditAccountMap;
+        this.accountMap = accountMap;
         this.classList = classList;
+        selectedAccountId = "";
+        buildDialog();
+        this.setSize(300, 500);
+    }
+
+    public SelectAccountDialog(Frame parent, Map<String, java.util.List<AccountsModel.Account>> accountMap, SchemaModel.Class clazz) {
+        super(parent, "Selecting Account");
+        this.accountMap = accountMap;
+        this.classList = new ArrayList<>();
+        classList.add(clazz);
         selectedAccountId = "";
         buildDialog();
         this.setSize(300, 500);
@@ -52,7 +63,7 @@ public class SelectAccountDialog extends Dialog {
                 DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(group.getName());
                 for (SchemaModel.Class.Group.Account acc : group.getAccount()) {
                     DefaultMutableTreeNode accNode = new DefaultMutableTreeNode(acc.getName());
-                    List<AccountsModel.Account> accountList = creditAccountMap.get(clazz.getId() + group.getId() + acc.getId());
+                    List<AccountsModel.Account> accountList = accountMap.get(clazz.getId() + group.getId() + acc.getId());
                     if (accountList != null) {
                         classHasAccount = true;
                         groupHasAccount = true;
@@ -72,6 +83,7 @@ public class SelectAccountDialog extends Dialog {
 
         JTree tree = new JTree(root);
         tree.setRootVisible(false);
+        tree.setToggleClickCount(1);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setCellRenderer(new DefaultTreeCellRenderer() {
             @Override
@@ -110,10 +122,12 @@ public class SelectAccountDialog extends Dialog {
 
         GroupLayout layout = new GroupLayout(this.getContentPane());
         this.getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(layout.createParallelGroup()
+        layout.setHorizontalGroup(layout.createSequentialGroup().addGap(5)
+                .addGroup(layout.createParallelGroup()
                 .addComponent(accountTreeScrollPane)
                 .addGroup(layout.createSequentialGroup()
-                        .addGap(5, 5, Short.MAX_VALUE).addComponent(buttonCancel).addGap(5).addComponent(buttonOk).addGap(5)));
+                        .addGap(5, 5, Short.MAX_VALUE).addComponent(buttonCancel).addGap(5).addComponent(buttonOk)))
+                .addGap(5));
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGap(5)
                 .addComponent(accountTreeScrollPane)

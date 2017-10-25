@@ -9,10 +9,8 @@ import org.kaleta.accountant.frontend.dialog.AddAssetDialog;
 import org.kaleta.accountant.service.Service;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 public class OpenAddAssetDialog extends ActionListener {
 
@@ -25,7 +23,7 @@ public class OpenAddAssetDialog extends ActionListener {
         String year = getConfiguration().getSelectedYear();
         Map<Integer, SchemaModel.Class.Group> groupMap = Service.SCHEMA.getSchemaGroupMap(Service.SCHEMA.getSchemaClassMap(year).get(0));
         groupMap.remove(9);
-        Map<String, java.util.List<AccountsModel.Account>> creditAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(year);
+        Map<String, List<AccountsModel.Account>> creditAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(year);
         Set<String> keySet = new HashSet<>(creditAccountMap.keySet());
         for (String schemaId : keySet){
             if (schemaId.startsWith("0") || schemaId.startsWith("1") || schemaId.startsWith("5") || schemaId.startsWith("7")){

@@ -254,7 +254,7 @@ public class AssetsEditor extends JPanel implements Configurable {
                             .addComponent(labelCurrentValue, 150, 150, 150))
                     .addGap(10)
                     .addComponent(separator, 5, 5, 5)
-                    .addComponent(depPanel, 150, 150, 150)
+                    .addComponent(depPanel, 200, 200, 200)
                     .addComponent(panelSeparator)
                     .addComponent(buttonExclude)
                     .addGap(25));

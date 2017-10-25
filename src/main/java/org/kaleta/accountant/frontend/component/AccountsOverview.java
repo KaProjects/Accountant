@@ -29,6 +29,7 @@ public class AccountsOverview extends JPanel implements Configurable {
         accountTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
         JTree tree = new JTree(accountTreeModel);
         tree.setRootVisible(false);
+        tree.setToggleClickCount(1);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setCellRenderer(new DefaultTreeCellRenderer() {
             @Override
@@ -122,7 +123,6 @@ public class AccountsOverview extends JPanel implements Configurable {
         }
 
         List<AccountsModel.Account> accountList = Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),selectedSchemaAccount);
-        System.out.println(accountList.size());
         if (accountList.size() == 0) {
             accountOverviewPanel.add(new JLabel("Selected Schema Account has no accounts assigned."));
         } else {

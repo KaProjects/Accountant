@@ -90,7 +90,7 @@ public class DepreciateDialog extends Dialog {
                     .addGroup(layoutItem.createParallelGroup().addComponent(checkBoxEnabled).addComponent(labelName)).addGap(4)
                     .addGroup(layoutItem.createParallelGroup()
                             .addComponent(labelDate,25,25,25).addComponent(textFieldDate,25,25,25)
-                            .addComponent(labelValue,25,25,25).addComponent(textFieldValue,25,25,25)).addGap(25));
+                            .addComponent(labelValue,25,25,25).addComponent(textFieldValue,25,25,25)).addGap(10));
 
             panelItems.add(panelItem);
         }
@@ -108,12 +108,12 @@ public class DepreciateDialog extends Dialog {
 
         GroupLayout layout = new GroupLayout(this.getContentPane());
         this.getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(layout.createSequentialGroup().addGap(5)
+        layout.setHorizontalGroup(layout.createSequentialGroup().addGap(10)
                 .addGroup(layout.createParallelGroup()
                         .addComponent(pane)
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(5, 5, Short.MAX_VALUE)
-                                .addComponent(buttonCancel).addGap(5).addComponent(buttonOk).addGap(5))).addGap(10));
+                                .addComponent(buttonCancel).addGap(5).addComponent(buttonOk).addGap(1))).addGap(10));
         layout.setVerticalGroup(layout.createSequentialGroup().addGap(10)
                 .addComponent(pane).addGap(5)
                 .addGroup(layout.createParallelGroup().addComponent(buttonCancel).addComponent(buttonOk)).addGap(10));
