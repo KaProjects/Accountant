@@ -287,7 +287,7 @@ public class AssetsEditor extends JPanel implements Configurable {
                 try {
                     String lastDepDate = Service.ACCOUNT.getLastDepreciationDate(year, account);
                     if (lastDepDate != null) {
-                        buttonDep.setEnabled(!lastDepDate.substring(2, 4).equals("12"));
+                        buttonDep.setEnabled(!(lastDepDate.substring(2, 4).equals("12") || currentValue.equals("0")));
                         lastDepDate = new SimpleDateFormat("dd.MM.").format(new SimpleDateFormat("ddMM").parse(lastDepDate));
                         labelDepInfo.setText("Last Depreciation: " + lastDepDate);
                     } else {

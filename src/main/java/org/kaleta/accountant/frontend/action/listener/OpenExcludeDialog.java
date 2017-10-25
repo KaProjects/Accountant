@@ -23,7 +23,8 @@ public class OpenExcludeDialog extends ActionListener {
 
     @Override
     protected void actionPerformed() {
-        Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
+        String year = getConfiguration().getSelectedYear();
+        Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(year);
         Map<String, List<AccountsModel.Account>> expenseAccountMap = new HashMap<>();
         Map<String, List<AccountsModel.Account>> debitAccountMap = new HashMap<>();
         Map<String, List<AccountsModel.Account>> revenueAccountMap = new HashMap<>();
@@ -40,27 +41,42 @@ public class OpenExcludeDialog extends ActionListener {
                 revenueAccountMap.put(schemaId, allAccountMap.get(schemaId));
             }
         }
-        SchemaModel.Class expenseClass = Service.SCHEMA.getSchemaClassMap(getConfiguration().getSelectedYear()).get(5);
+        SchemaModel.Class expenseClass = Service.SCHEMA.getSchemaClassMap(year).get(5);
         List<SchemaModel.Class> debitClasses = new ArrayList<>();
-        debitClasses.add(Service.SCHEMA.getSchemaClassMap(getConfiguration().getSelectedYear()).get(2));
-        debitClasses.add(Service.SCHEMA.getSchemaClassMap(getConfiguration().getSelectedYear()).get(3));
-        SchemaModel.Class revenueClass = Service.SCHEMA.getSchemaClassMap(getConfiguration().getSelectedYear()).get(6);
+        debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(2));
+        debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(3));
+        SchemaModel.Class revenueClass = Service.SCHEMA.getSchemaClassMap(year).get(6);
 
 
-        // TODO: 10/25/17 get accDepAcc
-        // TODO: 10/25/17 determine whether E or not
+        AccountsModel.Account accDepAccount = Service.ACCOUNT.getAccumulatedDepAccount(year,account);
+
+        Integer residualExpense = Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account))
+                - Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, accDepAccount));
 
 
-        ExcludeDialog dialog = (account.getSchemaId().startsWith("000"))
+        ExcludeDialog dialog = (residualExpense == 0)
         ? new ExcludeDialog((Frame) getConfiguration()/*, expenseAccountMap, expenseClass*/,debitAccountMap,debitClasses,revenueAccountMap,revenueClass)
         : new ExcludeDialog((Frame) getConfiguration(), expenseAccountMap, expenseClass,debitAccountMap,debitClasses,revenueAccountMap,revenueClass);
         dialog.setVisible(true);
         if (dialog.getResult()) {
 
-            // TODO: 10/25/17 odpisane:  accDep/asset
-            // TODO: 10/25/17 neodpisane:  skoda,dar,zustatkova cena(prodej)/accDep + accDep/asset
-            // TODO: 10/25/17 vynos: peniaze, pohld.,.../vynos z prodeje
+            if (residualExpense == 0){
+                // TODO: 10/25/17 odpisane:  accDep/asset
 
+            } else {
+                // TODO: 10/25/17 neodpisane:  skoda,dar,zustatkova cena(prodej)/accDep + accDep/asset
+                dialog.getExpenseAccount();
+            }
+            if (dialog.hasRevenue()){
+                // TODO: 10/25/17 vynos: peniaze, pohld.,.../vynos z prodeje
+                dialog.getDebitAccount();
+                dialog.getRevenueAccount();
+                dialog.getRevenueValue();
+            }
+
+
+
+            
             //getConfiguration().update(Configuration.TRANSACTION_UPDATED);
         }
     }
