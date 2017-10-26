@@ -26,7 +26,7 @@ public class SelectAccountDialog extends Dialog {
         this.classList = classList;
         selectedAccountId = "";
         buildDialog();
-        this.setSize(300, 500);
+        this.setSize(300, 100*classList.size() + 200);
     }
 
     public SelectAccountDialog(Frame parent, Map<String, java.util.List<AccountsModel.Account>> accountMap, SchemaModel.Class clazz) {
@@ -36,7 +36,7 @@ public class SelectAccountDialog extends Dialog {
         classList.add(clazz);
         selectedAccountId = "";
         buildDialog();
-        this.setSize(300, 500);
+        this.setSize(300, 300);
     }
 
     @Override

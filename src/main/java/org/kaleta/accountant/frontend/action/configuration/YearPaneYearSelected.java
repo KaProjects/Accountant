@@ -39,7 +39,6 @@ public class YearPaneYearSelected extends ConfigurationAction {
             assetsEditor.update();
             accountsPane.add("Assets", assetsEditor);
             ResourcesEditor resourcesEditor = new ResourcesEditor(getConfiguration());
-            resourcesEditor.update();
             accountsPane.add("Resources", resourcesEditor);
         } else {
             pane.addTab("Schema", new JScrollPane(schemaOverview));

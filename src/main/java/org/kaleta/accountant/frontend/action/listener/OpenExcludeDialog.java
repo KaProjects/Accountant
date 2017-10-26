@@ -4,6 +4,7 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.ExcludeDialog;
 import org.kaleta.accountant.service.Service;
 
@@ -47,37 +48,29 @@ public class OpenExcludeDialog extends ActionListener {
         debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(3));
         SchemaModel.Class revenueClass = Service.SCHEMA.getSchemaClassMap(year).get(6);
 
-
         AccountsModel.Account accDepAccount = Service.ACCOUNT.getAccumulatedDepAccount(year,account);
 
-        Integer residualExpense = Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account))
+        String assetValue = Service.ACCOUNT.getAccountBalance(year, account);
+        Integer residualExpense = Integer.parseInt(assetValue)
                 - Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, accDepAccount));
 
-
         ExcludeDialog dialog = (residualExpense == 0)
-        ? new ExcludeDialog((Frame) getConfiguration()/*, expenseAccountMap, expenseClass*/,debitAccountMap,debitClasses,revenueAccountMap,revenueClass)
+        ? new ExcludeDialog((Frame) getConfiguration(),debitAccountMap,debitClasses,revenueAccountMap,revenueClass)
         : new ExcludeDialog((Frame) getConfiguration(), expenseAccountMap, expenseClass,debitAccountMap,debitClasses,revenueAccountMap,revenueClass);
         dialog.setVisible(true);
         if (dialog.getResult()) {
-
-            if (residualExpense == 0){
-                // TODO: 10/25/17 odpisane:  accDep/asset
-
-            } else {
-                // TODO: 10/25/17 neodpisane:  skoda,dar,zustatkova cena(prodej)/accDep + accDep/asset
-                dialog.getExpenseAccount();
+            if (residualExpense != 0){
+                Service.TRANSACTIONS.addTransaction(year,dialog.getDate(), String.valueOf(residualExpense),
+                        dialog.getExpenseAccount(), accDepAccount.getFullId(),"residual expense");
             }
+
+            Service.TRANSACTIONS.addTransaction(year,dialog.getDate(), assetValue, accDepAccount.getFullId(), account.getFullId(),"excluded");
+
             if (dialog.hasRevenue()){
-                // TODO: 10/25/17 vynos: peniaze, pohld.,.../vynos z prodeje
-                dialog.getDebitAccount();
-                dialog.getRevenueAccount();
-                dialog.getRevenueValue();
+                Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), dialog.getRevenueValue(),
+                        dialog.getDebitAccount(), dialog.getRevenueAccount(), "revenue from excluding asset");
             }
-
-
-
-            
-            //getConfiguration().update(Configuration.TRANSACTION_UPDATED);
+            getConfiguration().update(Configuration.TRANSACTION_UPDATED);
         }
     }
 }

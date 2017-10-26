@@ -1,7 +1,8 @@
 package org.kaleta.accountant.frontend.dialog;
 
+import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.year.model.AccountModel;
-import org.kaleta.accountant.frontend.year.model.SchemaModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,14 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Created by Stanislav Kaleta on 18.08.2017.
- */
 public class AddResourcesDialog extends Dialog {
-    private final List<SchemaModel.Clazz.Group> resourcesGroupList;
-    private final Map<String, List<AccountModel.Account>> resourcesSemanticMap;
-    private final List<SchemaModel.Clazz> payableClassesList;
-    private final Map<String, List<AccountModel.Account>> payableSemanticMap;
+    private Map<String, List<AccountsModel.Account>> resourceAccountMap;
+    private SchemaModel.Class resourceClass;
+    private Map<String, List<AccountsModel.Account>> creditAccountMap;
+    private List<SchemaModel.Class> creditClasses;
 
     private JTextField tfDate;
 
@@ -32,13 +30,13 @@ public class AddResourcesDialog extends Dialog {
 
     private List<ResourcePanel> resourcePanelList;
 
-    public AddResourcesDialog(Frame parent, List<SchemaModel.Clazz.Group> resourcesGroupList, Map<String, List<AccountModel.Account>> resourcesSemanticMap,
-                              List<SchemaModel.Clazz> payableClassesList, Map<String, List<AccountModel.Account>> payableSemanticMap) {
+    public AddResourcesDialog(Frame parent, Map<String, List<AccountsModel.Account>> resourceAccountMap, SchemaModel.Class resourceClass,
+            Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> creditClasses) {
         super(parent, "Adding Resources");
-        this.resourcesGroupList = resourcesGroupList;
-        this.resourcesSemanticMap = resourcesSemanticMap;
-        this.payableClassesList = payableClassesList;
-        this.payableSemanticMap = payableSemanticMap;
+        this.resourceAccountMap = resourceAccountMap;
+        this.resourceClass = resourceClass;
+        this.creditAccountMap = creditAccountMap;
+        this.creditClasses = creditClasses;
         payableGroups = new ArrayList<>();
         payableAccounts = new ArrayList<>();
         payableSemantics = new ArrayList<>();

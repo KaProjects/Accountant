@@ -147,6 +147,17 @@ public class AccountsService {
     }
 
     /**
+     * Composes full id of consumption account of specified resource's account.
+     */
+    public String getConsumptionAccountId(String schemaId, String semanticId) {
+        if (!schemaId.startsWith("1")){
+            throw new IllegalArgumentException("Only accounts of class 1 have consumption accounts");
+        }
+        return "5" + Constants.Schema.CONSUMPTION_GROUP_ID + schemaId.substring(1, 2)
+                + "." + schemaId.substring(2, 3) + "-" + semanticId;
+    }
+
+    /**
      * todo
      */
     public AccountsModel.Account getAccumulatedDepAccount(String year, AccountsModel.Account account){
@@ -215,9 +226,9 @@ public class AccountsService {
     }
 
     /**
-     * todo
+     * Creates semantic account according to specified attributes.
      */
-    public void createAccount(String year, String name, String schemaId, String semanticId, String metadata){
+    public AccountsModel.Account createAccount(String year, String name, String schemaId, String semanticId, String metadata){
         try {
             AccountsManager accountsManager = new AccountsManager(year);
             AccountsModel accountsModel = accountsManager.retrieve();
@@ -230,6 +241,8 @@ public class AccountsService {
             accountsModel.getAccount().add(account);
 
             accountsManager.update(accountsModel);
+            // TODO: 10/26/17 LOG
+            return account;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

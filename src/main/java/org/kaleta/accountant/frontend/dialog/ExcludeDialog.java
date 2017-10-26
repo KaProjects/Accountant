@@ -10,6 +10,7 @@ import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ public class ExcludeDialog extends Dialog {
     private String debitAccount;
     private String revenueAccount;
 
+    private JTextField textFieldDate;
     private JTextField textFieldRevenueValue;
 
     public ExcludeDialog(Frame parent, Map<String, List<AccountsModel.Account>> expenseAccountMap, SchemaModel.Class expenseClass,
@@ -65,7 +67,8 @@ public class ExcludeDialog extends Dialog {
         buttonOk.addActionListener(a -> {
             if ((!hasExpense || !expenseAccount.trim().isEmpty())
                     && (hasRevenue && !debitAccount.trim().isEmpty()
-                        && !revenueAccount.trim().isEmpty() && !textFieldRevenueValue.getText().trim().isEmpty() || !hasRevenue)){
+                        && !revenueAccount.trim().isEmpty() && !textFieldRevenueValue.getText().trim().isEmpty() || !hasRevenue)
+                    && (!textFieldDate.getText().trim().isEmpty() && textFieldDate.getText().length() == 4)){
                 if (JOptionPane.showConfirmDialog(this.getParent(), "Are you sure you want to exclude this asset?",
                         "Excluding Asset", JOptionPane.YES_NO_OPTION) == 0){
                     result = true;
@@ -75,6 +78,16 @@ public class ExcludeDialog extends Dialog {
                 JOptionPane.showMessageDialog(ExcludeDialog.this, "Mandatory attribute is not set!", "Value Missing", JOptionPane.ERROR_MESSAGE);
             }
         });
+
+        JLabel labelDate = new JLabel("Date: ");
+        textFieldDate = new JTextField();
+        ((PlainDocument) textFieldDate.getDocument()).setDocumentFilter(new NumberFilter());
+        JButton buttonToday = new JButton("Today");
+        buttonToday.addActionListener(a -> {
+            Calendar calendar = Calendar.getInstance();
+            textFieldDate.setText(String.format("%1$02d%2$02d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH)+1));
+        });
+
         JPanel panelExpense = new JPanel();
         if (hasExpense) {
             JLabel labelExpense = new JLabel("Residual Expense:");
@@ -184,12 +197,15 @@ public class ExcludeDialog extends Dialog {
         this.getContentPane().setLayout(layout);
         layout.setHorizontalGroup(layout.createSequentialGroup().addGap(10)
             .addGroup(layout.createParallelGroup()
+                    .addGroup(layout.createSequentialGroup().addComponent(labelDate).addComponent(textFieldDate,80,80,Short.MAX_VALUE).addComponent(buttonToday))
                     .addComponent(panelExpense)
                     .addComponent(labelAddRevenue)
                     .addComponent(panelDebit)
                     .addComponent(panelRevenue)
                     .addGroup(layout.createSequentialGroup().addGap(5, 5, Short.MAX_VALUE).addComponent(buttonCancel).addGap(5).addComponent(buttonOk))).addGap(10));
         layout.setVerticalGroup(layout.createSequentialGroup().addGap(10)
+                .addGroup(layout.createParallelGroup().addComponent(labelDate,25,25,25).addComponent(textFieldDate,25,25,25).addComponent(buttonToday,25,25,25))
+                .addGap(5)
                 .addComponent(panelExpense)
                 .addComponent(labelAddRevenue)
                 .addGap(5)
@@ -216,5 +232,9 @@ public class ExcludeDialog extends Dialog {
 
     public String getRevenueValue(){
         return textFieldRevenueValue.getText();
+    }
+
+    public String getDate(){
+        return textFieldDate.getText();
     }
 }

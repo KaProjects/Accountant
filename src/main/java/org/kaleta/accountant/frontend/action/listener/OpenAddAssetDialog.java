@@ -30,9 +30,14 @@ public class OpenAddAssetDialog extends ActionListener {
                 creditAccountMap.remove(schemaId);
             }
         }
+        List<SchemaModel.Class> creditClasses = new ArrayList<>();
+        creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(2));
+        creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(3));
+        creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(4));
+        creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(6));
         AddAssetDialog dialog = new AddAssetDialog((Frame) getConfiguration(),
                 new ArrayList<>(groupMap.values()), creditAccountMap,
-                Service.SCHEMA.getSchemaClassList(year));
+                creditClasses);
         dialog.setVisible(true);
         if (dialog.getResult()) {
             String semanticId = String.valueOf(Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),dialog.getSchemaId()).size());

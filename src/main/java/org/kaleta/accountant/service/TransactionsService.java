@@ -36,6 +36,7 @@ public class TransactionsService {
             model.getTransaction().add(transaction);
 
             manager.update(model);
+            // TODO: 10/26/17 LOG
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
