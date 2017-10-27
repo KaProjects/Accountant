@@ -1,15 +1,17 @@
 package org.kaleta.accountant.frontend.action.mouse;
 
 import org.kaleta.accountant.frontend.Configurable;
-import org.kaleta.accountant.frontend.dialog.transaction.SelectAccountDialog;
+import org.kaleta.accountant.frontend.dep.dialog.transaction.SelectAccountDialog;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 
 /**
  * Created by Stanislav Kaleta on 05.09.2016.
  */
+@Deprecated
 public class AccountTextFieldClicked extends MouseAction {
     private boolean isDebit;
 
@@ -22,7 +24,7 @@ public class AccountTextFieldClicked extends MouseAction {
     protected void actionPerformed(MouseEvent e) {
         if (e.getClickCount() > 1){
             JTextField source = (JTextField) e.getSource();
-            SelectAccountDialog dialog = new SelectAccountDialog(source, isDebit);
+            SelectAccountDialog dialog = new SelectAccountDialog((Frame) getConfiguration(), isDebit);
             dialog.preselectPath(source.getText());
             dialog.setVisible(true);
             if (dialog.getResult()){
@@ -30,12 +32,12 @@ public class AccountTextFieldClicked extends MouseAction {
                 source.setText(dialog.getSelectedAcc());
                 if (accId.length() > 2){
                     String text = (accId.contains("-"))
-                            ? Service.ACCOUNT.getAccountFullName(accId.split("-")[0], accId.split("-")[1])
-                            : accId + " " + Service.ACCOUNT.getAccountName(accId);
+                            ? Service.DEPACCOUNT.getAccountFullName(accId.split("-")[0], accId.split("-")[1])
+                            : accId + " " + Service.DEPACCOUNT.getAccountName(accId);
                     source.setToolTipText(text);
                 } else {
-                    if (accId.length() == 2) source.setToolTipText(Service.ACCOUNT.getGroupName(accId));
-                    if (accId.length() == 1) source.setToolTipText(Service.ACCOUNT.getClassName(accId));
+                    if (accId.length() == 2) source.setToolTipText(Service.DEPACCOUNT.getGroupName(accId));
+                    if (accId.length() == 1) source.setToolTipText(Service.DEPACCOUNT.getClassName(accId));
                 }
 
             }

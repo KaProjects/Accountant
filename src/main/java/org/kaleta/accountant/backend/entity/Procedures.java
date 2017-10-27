@@ -48,6 +48,7 @@ import java.util.List;
     "procedure"
 })
 @XmlRootElement(name = "procedures")
+@Deprecated
 public class Procedures {
 
     protected List<Procedure> procedure;

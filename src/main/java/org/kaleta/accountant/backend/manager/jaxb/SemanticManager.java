@@ -17,6 +17,7 @@ import java.io.File;
 /**
  * Created by Stanislav Kaleta on 21.05.2016.
  */
+@Deprecated
 public class SemanticManager implements Manager<Semantic> {
     private final String schemaUri;
     private final String accFileUri;

@@ -1,10 +1,9 @@
 package org.kaleta.accountant.frontend;
 
-import org.kaleta.accountant.frontend.common.ErrorDialog;
+import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.common.LogFormatter;
 import org.kaleta.accountant.service.Service;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
@@ -13,15 +12,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by Stanislav Kaleta on 16.04.2016.
- *
  * Performs initialization of this app. Includes data and resources checks, app. wide constants and default logger.
  */
 public class Initializer {
     public static final String NAME = "Accountant";
-    public static final String VERSION = "0.0";
+    public static final String VERSION = "1.0-snapshot";
     public static final String DATA_SOURCE = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation()
-            .getPath()).getParentFile().getPath() + "/" + NAME + "-" + VERSION + "-DATA/";
+            .getPath()).getParentFile().getPath() + File.separator + NAME + "-" + VERSION + "-DATA" + File.separator;
     public static final Logger LOG = Logger.getLogger("Logger");
 
     private static void initLogger(){
@@ -45,14 +42,15 @@ public class Initializer {
                 Service.CONFIG.checkResources();
                 initLogger();
                 Service.CONFIG.checkData();
-                //Service.configService().checkFirstUse();
+                if (Service.CONFIG.getActiveYear().equals("-1")){
+                    // TODO: 12/25/16 init 1st year wizard
+                }
 
 
                 new AppFrame().setVisible(true);
 
             } catch (Throwable e) {
-                JDialog errorDialog = new ErrorDialog(e);
-                errorDialog.setVisible(true);
+                ErrorHandler.getThrowableDialog(e).setVisible(true);
                 System.exit(1);
             }
         });

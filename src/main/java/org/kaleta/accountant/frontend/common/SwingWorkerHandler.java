@@ -1,5 +1,6 @@
 package org.kaleta.accountant.frontend.common;
 
+import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.service.ServiceFailureException;
 
@@ -20,10 +21,10 @@ public abstract class SwingWorkerHandler {
                     runInBackground();
                 } catch (ServiceFailureException e){
                     // No need to log here. Cause exc. is (should be) always logged before SFEx is thrown.
-                    new ErrorDialog(e).setVisible(true);
+                    ErrorHandler.getThrowableDialog(e).setVisible(true);
                 } catch (Exception e){
-                    Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
-                    new ErrorDialog(e).setVisible(true);
+                    Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+                    ErrorHandler.getThrowableDialog(e).setVisible(true);
                 }
                 return null;
             }

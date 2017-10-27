@@ -17,6 +17,7 @@ import java.io.File;
 /**
  * Created by Stanislav Kaleta on 16.04.2016.
  */
+@Deprecated
 public class SchemaManager implements Manager<Schema> {
     private final String schemaUri;
     private final String schemaFileUri;

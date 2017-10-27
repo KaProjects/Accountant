@@ -1,8 +1,6 @@
 package org.kaleta.accountant.frontend;
 
 /**
- * Created by Stanislav Kaleta on 19.04.2016.
- *
  * Provides methods for accessing to configuration.
  * Every component which implements this interface is able to retrieve and update app. wide configuration.
  */

@@ -7,6 +7,7 @@ import java.util.Comparator;
 /**
  * Created by Stanislav Kaleta on 08.08.2016.
  */
+@Deprecated
 public class TransactionComparator implements Comparator<Transaction> {
     @Override
     public int compare(Transaction t0, Transaction t1) {

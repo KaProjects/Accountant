@@ -6,8 +6,8 @@ import org.kaleta.accountant.backend.entity.Transaction;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.jaxb.ConfigManager;
 import org.kaleta.accountant.backend.manager.jaxb.JournalManager;
+import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Initializer;
-import org.kaleta.accountant.frontend.common.ErrorDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
  *
  * todo doc
  */
+@Deprecated
 public class JournalService {
 
     JournalService(){
@@ -36,7 +37,7 @@ public class JournalService {
             }
             return years;
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -63,7 +64,7 @@ public class JournalService {
             config.getYears().getYear().add(newYear);
             configManager.update(config);
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -75,7 +76,7 @@ public class JournalService {
         try {
             return new JournalManager().retrieve(year);
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -97,7 +98,7 @@ public class JournalService {
             journal.getTransaction().add(transaction);
             manager.update(journal);
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -112,7 +113,7 @@ public class JournalService {
                     .filter(transaction -> transaction.getCredit().startsWith(schemaId) || transaction.getDebit().startsWith(schemaId))
                     .collect(Collectors.toList());
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
@@ -127,7 +128,7 @@ public class JournalService {
                     .map(Transaction::getDescription)
                     .collect(Collectors.toSet());
         } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorDialog.getExceptionStackTrace(e));
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
