@@ -92,5 +92,7 @@ public class Constants {
         public static final String OPEN_DESCRIPTION = "open";
         public static final String PURCHASE_DESCRIPTION = "purchase";
         public static final String MONTHLY_DEP_DESCRIPTION = "monthly depreciation";
+        public static final String RESOURCE_ACQUIRED = "resource acquired";
+        public static final String RESOURCE_CONSUMED = "resource consumed";
     }
 }

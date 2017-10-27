@@ -43,6 +43,11 @@ public class AccountsModel {
         @XmlAttribute(name = "metadata", required = true)
         protected String metadata = "";
 
+        @Override
+        public String toString() {
+            return this.getName();
+        }
+
         public String getSchemaId() {
             return schemaId;
         }
@@ -90,7 +95,5 @@ public class AccountsModel {
         public void setMetadata(String value) {
             this.metadata = value;
         }
-
     }
-
 }

@@ -2,15 +2,16 @@ package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
-import org.kaleta.accountant.frontend.year.model.AccountModel;
+import org.kaleta.accountant.frontend.common.IconLoader;
+import org.kaleta.accountant.frontend.common.NumberFilter;
 
 import javax.swing.*;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class AddResourcesDialog extends Dialog {
     private Map<String, List<AccountsModel.Account>> resourceAccountMap;
@@ -19,16 +20,12 @@ public class AddResourcesDialog extends Dialog {
     private List<SchemaModel.Class> creditClasses;
 
     private JTextField tfDate;
-
-    private JComboBox<String> cbPayableClass;
-    private List<SchemaModel.Clazz.Group> payableGroups;
-    private JComboBox<String> cbPayableGroup;
-    private List<SchemaModel.Clazz.Group.Account> payableAccounts;
-    private JComboBox<String> cbPayableAccount;
-    private List<AccountModel.Account> payableSemantics;
-    private JComboBox<String> cbPayableSemantic;
-
+    private JComboBox<SchemaModel.Class> cbCreditClass;
+    private JComboBox<SchemaModel.Class.Group> cbCreditGroup;
+    private JComboBox<SchemaModel.Class.Group.Account> cbCreditAccount;
+    private JComboBox<AccountsModel.Account> cbCreditSemantic;
     private List<ResourcePanel> resourcePanelList;
+    private JPanel resourcesPanel;
 
     public AddResourcesDialog(Frame parent, Map<String, List<AccountsModel.Account>> resourceAccountMap, SchemaModel.Class resourceClass,
             Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> creditClasses) {
@@ -37,9 +34,6 @@ public class AddResourcesDialog extends Dialog {
         this.resourceClass = resourceClass;
         this.creditAccountMap = creditAccountMap;
         this.creditClasses = creditClasses;
-        payableGroups = new ArrayList<>();
-        payableAccounts = new ArrayList<>();
-        payableSemantics = new ArrayList<>();
         resourcePanelList = new ArrayList<>();
         buildDialog();
         this.setMinimumSize(new Dimension(500,600));
@@ -56,8 +50,9 @@ public class AddResourcesDialog extends Dialog {
             for (ResourcePanel resourcePanel : resourcePanelList){
                 transactionsValid = transactionsValid && resourcePanel.hasValidValues();
             }
-            if (cbPayableClass.getSelectedIndex() == -1 || cbPayableGroup.getSelectedIndex() == -1 || cbPayableAccount.getSelectedIndex() == -1 || cbPayableSemantic.getSelectedIndex() == -1
-                    || tfDate.getText() == null || tfDate.getText().trim().isEmpty() || !transactionsValid){
+            if (cbCreditClass.getSelectedIndex() == -1 || cbCreditGroup.getSelectedIndex() == -1 || cbCreditAccount.getSelectedIndex() == -1 || cbCreditSemantic.getSelectedIndex() == -1
+                    || tfDate.getText() == null || tfDate.getText().trim().isEmpty() || tfDate.getText().length() != 4
+                    || !transactionsValid){
                 JOptionPane.showMessageDialog(AddResourcesDialog.this, "Mandatory attribute is not set!", "Value Missing", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -70,55 +65,48 @@ public class AddResourcesDialog extends Dialog {
         JButton buttonToday = new JButton("Today");
         buttonToday.addActionListener(a -> {
             Calendar calendar = Calendar.getInstance();
-            String date = String.format("%1$02d%2$02d%3$04d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
+            String date = String.format("%1$02d%2$02d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1);
             tfDate.setText(date);
         });
 
         JLabel labelPayedBy = new JLabel("Payed By: ");
 
-        cbPayableClass = new JComboBox<>(payableClassesList.stream().map(SchemaModel.Clazz::getName).collect(Collectors.toList()).toArray(new String[]{}));
-        cbPayableClass.setSelectedIndex(-1);
-        cbPayableClass.addActionListener(a -> {
-            cbPayableGroup.removeAllItems();
-            payableGroups.clear();
-            payableGroups.addAll(payableClassesList.get(cbPayableClass.getSelectedIndex()).getGroups().values());
-            payableGroups.forEach(group -> cbPayableGroup.addItem(group.getName()));
-            cbPayableGroup.setSelectedIndex(-1);
-        });
+        cbCreditClass = new JComboBox<>();
+        creditClasses.forEach(clazz -> cbCreditClass.addItem(clazz));
+        cbCreditClass.setSelectedIndex(-1);
 
-        cbPayableGroup = new JComboBox<>(payableGroups.stream().map(SchemaModel.Clazz.Group::getName).collect(Collectors.toList()).toArray(new String[]{}));
-        cbPayableGroup.setSelectedIndex(-1);
-        cbPayableGroup.addActionListener(a -> {
-            cbPayableAccount.removeAllItems();
-            payableAccounts.clear();
-            if (cbPayableGroup.getSelectedIndex() >= 0){
-                payableAccounts.addAll(payableGroups.get(cbPayableGroup.getSelectedIndex()).getAccounts().values());
-                payableAccounts.forEach(account -> cbPayableAccount.addItem(account.getName()));
+        cbCreditGroup = new JComboBox<>();
+        cbCreditAccount = new JComboBox<>();
+        cbCreditSemantic = new JComboBox<>();
+
+        cbCreditClass.addActionListener(a -> {
+            cbCreditGroup.removeAllItems();
+            ((SchemaModel.Class)cbCreditClass.getSelectedItem()).getGroup().forEach(group -> cbCreditGroup.addItem(group));
+            cbCreditGroup.setSelectedIndex(-1);
+        });
+        cbCreditGroup.addActionListener(a -> {
+            cbCreditAccount.removeAllItems();
+            if (cbCreditGroup.getSelectedIndex() >= 0){
+                ((SchemaModel.Class.Group)cbCreditGroup.getSelectedItem()).getAccount().forEach(account -> cbCreditAccount.addItem(account));
             }
-            cbPayableAccount.setSelectedIndex(-1);
+            cbCreditAccount.setSelectedIndex(-1);
         });
-
-        cbPayableAccount = new JComboBox<>(payableAccounts.stream().map(SchemaModel.Clazz.Group.Account::getName).collect(Collectors.toList()).toArray(new String[]{}));
-        cbPayableAccount.setSelectedIndex(-1);
-        cbPayableAccount.addActionListener(a -> {
-            cbPayableSemantic.removeAllItems();
-            payableSemantics.clear();
-            if (cbPayableAccount.getSelectedIndex() >= 0) {
-                String schemaId = String.valueOf(payableClassesList.get(cbPayableClass.getSelectedIndex()).getId())
-                        + String.valueOf(payableGroups.get(cbPayableGroup.getSelectedIndex()).getId())
-                        + String.valueOf(payableAccounts.get(cbPayableAccount.getSelectedIndex()).getId());
-                payableSemantics.addAll(payableSemanticMap.get(schemaId));
-                payableSemantics.forEach(semantic -> cbPayableSemantic.addItem(semantic.getName()));
+        cbCreditAccount.addActionListener(a -> {
+            cbCreditSemantic.removeAllItems();
+            if (cbCreditAccount.getSelectedIndex() >= 0) {
+                String schemaId = ((SchemaModel.Class)cbCreditClass.getSelectedItem()).getId()
+                        + ((SchemaModel.Class.Group)cbCreditGroup.getSelectedItem()).getId()
+                        + ((SchemaModel.Class.Group.Account)cbCreditAccount.getSelectedItem()).getId();
+                if (creditAccountMap.get(schemaId) != null) {
+                    creditAccountMap.get(schemaId).forEach(semantic -> cbCreditSemantic.addItem(semantic));
+                }
             }
-            cbPayableSemantic.setSelectedIndex(-1);
+            cbCreditSemantic.setSelectedIndex(-1);
         });
 
-        cbPayableSemantic = new JComboBox<>();
-        cbPayableSemantic.setSelectedIndex(-1);
-
-        JPanel resourcesPanel = new JPanel();
+        resourcesPanel = new JPanel();
         resourcesPanel.setLayout(new BoxLayout(resourcesPanel, BoxLayout.Y_AXIS));
-        ResourcePanel firstResourcePanel = new ResourcePanel();
+        ResourcePanel firstResourcePanel = new ResourcePanel(false);
         resourcesPanel.add(firstResourcePanel);
         resourcePanelList.add(firstResourcePanel);
 
@@ -126,7 +114,7 @@ public class AddResourcesDialog extends Dialog {
 
         JButton buttonAddResource = new JButton("Add Item");
         buttonAddResource.addActionListener(a -> {
-            ResourcePanel resourcePanel = new ResourcePanel();
+            ResourcePanel resourcePanel = new ResourcePanel(true);
             resourcesPanel.add(resourcePanel);
             resourcePanelList.add(resourcePanel);
             resourcesPane.repaint();
@@ -144,7 +132,7 @@ public class AddResourcesDialog extends Dialog {
                         .addComponent(labelDate)
                         .addGroup(layout.createSequentialGroup().addComponent(tfDate,100,100,100).addGap(5).addComponent(buttonToday))
                         .addComponent(labelPayedBy)
-                        .addGroup(layout.createSequentialGroup().addComponent(cbPayableClass).addComponent(cbPayableGroup).addComponent(cbPayableAccount).addComponent(cbPayableSemantic))
+                        .addGroup(layout.createSequentialGroup().addComponent(cbCreditClass).addComponent(cbCreditGroup).addComponent(cbCreditAccount).addComponent(cbCreditSemantic))
                         .addComponent(separator1)
                         .addComponent(resourcesPane)
                         .addComponent(separator2)
@@ -158,7 +146,7 @@ public class AddResourcesDialog extends Dialog {
                 .addGap(5)
                 .addComponent(labelPayedBy)
                 .addGap(2)
-                .addGroup(layout.createParallelGroup().addComponent(cbPayableClass,25,25,25).addComponent(cbPayableGroup,25,25,25).addComponent(cbPayableAccount,25,25,25).addComponent(cbPayableSemantic,25,25,25))
+                .addGroup(layout.createParallelGroup().addComponent(cbCreditClass,25,25,25).addComponent(cbCreditGroup,25,25,25).addComponent(cbCreditAccount,25,25,25).addComponent(cbCreditSemantic,25,25,25))
                 .addComponent(separator1,10,10,10)
                 .addComponent(resourcesPane)
                 .addComponent(separator2,10,10,10)
@@ -170,67 +158,75 @@ public class AddResourcesDialog extends Dialog {
         return tfDate.getText();
     }
 
-    public String getCreditor(){
-        String schemaId = String.valueOf(payableClassesList.get(cbPayableClass.getSelectedIndex()).getId())
-                + String.valueOf(payableGroups.get(cbPayableGroup.getSelectedIndex()).getId())
-                + String.valueOf(payableAccounts.get(cbPayableAccount.getSelectedIndex()).getId());
-        return payableSemanticMap.get(schemaId).get(cbPayableSemantic.getSelectedIndex()).getFullId();
+    public String getCreditAcc(){
+        return ((AccountsModel.Account)cbCreditSemantic.getSelectedItem()).getFullId();
     }
 
-    public List<ResourcePanel> getResourcePanelList(){
-        return resourcePanelList;
+    public List<ResourceData> getResourceData(){
+        List<ResourceData> resourceData = new ArrayList<>();
+        for (ResourcePanel resourcePanel : resourcePanelList){
+            resourceData.add(new ResourceData(resourcePanel.getResourceId(), resourcePanel.getAmount()));
+        }
+        return resourceData;
     }
 
     public class ResourcePanel extends JPanel {
-        private JComboBox<String> cbGroup;
-        private List<SchemaModel.Clazz.Group.Account> accounts;
-        private JComboBox<String> cbAccount;
-        private List<AccountModel.Account> semantics;
-        private JComboBox<String> cbSemantic;
-
+        private JComboBox<SchemaModel.Class.Group> cbGroup;
+        private JComboBox<SchemaModel.Class.Group.Account> cbAccount;
+        private JComboBox<AccountsModel.Account> cbSemantic;
         private JTextField tfAmount;
 
-        private ResourcePanel(){
-            accounts = new ArrayList<>();
-            semantics = new ArrayList<>();
-            cbGroup = new JComboBox<>(resourcesGroupList.stream().map(SchemaModel.Clazz.Group::getName).collect(Collectors.toList()).toArray(new String[]{}));
+        private ResourcePanel(boolean deletable){
+            cbGroup = new JComboBox<>();
+            resourceClass.getGroup().forEach(group -> cbGroup.addItem(group));
             cbGroup.setSelectedIndex(-1);
+
+            cbAccount = new JComboBox<>();
+            cbSemantic = new JComboBox<>();
+
             cbGroup.addActionListener(a -> {
                 cbAccount.removeAllItems();
-                accounts.clear();
-                accounts.addAll(resourcesGroupList.get(cbGroup.getSelectedIndex()).getAccounts().values());
-                accounts.forEach(account -> cbAccount.addItem(account.getName()));
+                if (cbGroup.getSelectedIndex() >= 0) {
+                    ((SchemaModel.Class.Group)cbGroup.getSelectedItem()).getAccount().forEach(account -> cbAccount.addItem(account));
+                }
                 cbAccount.setSelectedIndex(-1);
             });
-
-            cbAccount = new JComboBox<>(accounts.stream().map(SchemaModel.Clazz.Group.Account::getName).collect(Collectors.toList()).toArray(new String[]{}));
-            cbAccount.setSelectedIndex(-1);
             cbAccount.addActionListener(a -> {
                 cbSemantic.removeAllItems();
-                semantics.clear();
                 if (cbAccount.getSelectedIndex() >= 0) {
-                    String schemaId = "1" + String.valueOf(resourcesGroupList.get(cbGroup.getSelectedIndex()).getId())
-                            + String.valueOf(accounts.get(cbAccount.getSelectedIndex()).getId());
-                    semantics.addAll(resourcesSemanticMap.get(schemaId));
-                    semantics.forEach(account -> cbSemantic.addItem(account.getName()));
+                    String schemaId = "1" + ((SchemaModel.Class.Group)cbGroup.getSelectedItem()).getId()
+                            + ((SchemaModel.Class.Group.Account)cbAccount.getSelectedItem()).getId();
+                    resourceAccountMap.get(schemaId).forEach(account -> cbSemantic.addItem(account));
                 }
                 cbSemantic.setSelectedIndex(-1);
             });
 
-            cbSemantic = new JComboBox<>();
-            cbSemantic.setSelectedIndex(-1);
+            JButton buttonDelete = new JButton(IconLoader.getIcon(IconLoader.DELETE,new Dimension(10,10)));
+            buttonDelete.addActionListener(e -> {
+                resourcePanelList.remove(this);
+                resourcesPanel.removeAll();
+                for (ResourcePanel resourcePanel : resourcePanelList){
+                    resourcesPanel.add(resourcePanel);
+                }
+                resourcesPanel.repaint();
+                resourcesPanel.revalidate();
+            });
+            buttonDelete.setEnabled(deletable);
 
             tfAmount = new JTextField();
             tfAmount.setHorizontalAlignment(SwingConstants.RIGHT);
             tfAmount.setToolTipText("Amount");
+            ((PlainDocument) tfAmount.getDocument()).setDocumentFilter(new NumberFilter());
 
             GroupLayout layout = new GroupLayout(this);
             this.setLayout(layout);
-            layout.setHorizontalGroup(layout.createSequentialGroup().addComponent(cbGroup).addComponent(cbAccount).addComponent(cbSemantic).addGap(5).addComponent(tfAmount).addGap(5));
-            layout.setVerticalGroup(layout.createSequentialGroup()
-                    .addGroup(layout.createParallelGroup().addComponent(cbGroup,25,25,25).addComponent(cbAccount,25,25,25).addComponent(cbSemantic,25,25,25).addComponent(tfAmount,25,25,25))
+            layout.setHorizontalGroup(layout.createSequentialGroup().addComponent(buttonDelete,10,10,10)
+                    .addComponent(cbGroup).addComponent(cbAccount).addComponent(cbSemantic).addComponent(tfAmount));
+            layout.setVerticalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup()
+                    .addComponent(buttonDelete,25,25,25)
+                    .addComponent(cbGroup,25,25,25).addComponent(cbAccount,25,25,25).addComponent(cbSemantic,25,25,25)
+                    .addComponent(tfAmount,25,25,25))
                     .addGap(2));
-
         }
 
         public boolean hasValidValues(){
@@ -243,9 +239,25 @@ public class AddResourcesDialog extends Dialog {
         }
 
         public String getResourceId(){
-            String schemaId = "1" + String.valueOf(resourcesGroupList.get(cbGroup.getSelectedIndex()).getId())
-                    + String.valueOf(accounts.get(cbAccount.getSelectedIndex()).getId());
-            return resourcesSemanticMap.get(schemaId).get(cbSemantic.getSelectedIndex()).getFullId();
+            return ((AccountsModel.Account)cbSemantic.getSelectedItem()).getFullId();
+        }
+    }
+
+    public class ResourceData {
+        String resourceId;
+        String amount;
+
+        public ResourceData(String resourceId, String amount) {
+            this.resourceId = resourceId;
+            this.amount = amount;
+        }
+
+        public String getResourceId() {
+            return resourceId;
+        }
+
+        public String getAmount() {
+            return amount;
         }
     }
 }

@@ -2,7 +2,9 @@ package org.kaleta.accountant.frontend.action.listener;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.AddResourcesDialog;
 import org.kaleta.accountant.service.Service;
 
@@ -48,19 +50,19 @@ public class OpenAddResourcesDialog extends ActionListener {
                 resourceClass, creditAccountMap, creditClasses);
         dialog.setVisible(true);
         if (dialog.getResult()) {
-            // TODO: 10/26/17  
-//            AccountModel accountModel = getConfiguration().getModel().getAccountModel();
-//            String date = dialog.getDate();
-//            String creditor = dialog.getCreditor();
-//            for (AddResourcesDialog.ResourcePanel resourcePanel : dialog.getResourcePanelList()){
-//                String resourceFullId = resourcePanel.getResourceId();
-//                String amount = resourcePanel.getAmount();
-//                AccountModel.Transaction trBuy = new AccountModel.Transaction(accountModel.getNextTransactionId(), date, "buy", amount, resourceFullId, creditor);
-//                accountModel.getTransactions().add(trBuy);
-//                String expenseFullId = "58" + resourceFullId.substring(1,2) + "." + resourceFullId.substring(2,3) + "-" + resourceFullId.substring(4);
-//                AccountModel.Transaction trConsume = new AccountModel.Transaction(accountModel.getNextTransactionId(), date, "consume", amount, expenseFullId, resourceFullId);
-//                accountModel.getTransactions().add(trConsume);
-//            }
+            String date = dialog.getDate();
+            String creditId = dialog.getCreditAcc();
+            for (AddResourcesDialog.ResourceData resourceData : dialog.getResourceData()) {
+                Service.TRANSACTIONS.addTransaction(year, date, resourceData.getAmount(),
+                        resourceData.getResourceId(), creditId, Constants.Transaction.RESOURCE_ACQUIRED);
+
+                String[] resId = resourceData.getResourceId().split("\\.");
+                Service.TRANSACTIONS.addTransaction(year, date, resourceData.getAmount(),
+                        Service.ACCOUNT.getConsumptionAccountId(resId[0], resId[1]),
+                        resourceData.getResourceId(), Constants.Transaction.RESOURCE_CONSUMED);
+
+                getConfiguration().update(Configuration.TRANSACTION_UPDATED);
+            }
         }
 
     }
