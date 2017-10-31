@@ -11,7 +11,7 @@ import java.awt.event.MouseEvent;
  * Basic class for every action reacting to mouse action.
  */
 abstract public class MouseAction extends MouseAdapter {
-    private Configurable configurable;
+    private final Configurable configurable;
 
     public MouseAction(Configurable configurable){
         this.configurable = configurable;

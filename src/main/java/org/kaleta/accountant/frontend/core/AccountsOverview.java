@@ -19,8 +19,8 @@ import java.util.List;
 public class AccountsOverview extends JPanel implements Configurable {
     private Configuration configuration;
 
-    private DefaultTreeModel accountTreeModel;
-    private JPanel accountOverviewPanel;
+    private final DefaultTreeModel accountTreeModel;
+    private final JPanel accountOverviewPanel;
 
     private String selectedSchemaAccount;
 
@@ -154,11 +154,11 @@ public class AccountsOverview extends JPanel implements Configurable {
             super(title);
         }
 
-        public String getSchemaId() {
+        String getSchemaId() {
             return schemaId;
         }
 
-        public void setSchemaId(String schemaId) {
+        void setSchemaId(String schemaId) {
             this.schemaId = schemaId;
         }
     }

@@ -16,12 +16,12 @@ import java.util.List;
  */
 @Deprecated
 public class ProceduresDialog extends Dialog {
-    private Procedures procedures;
-    private TransactionManagementPanel transactionManagementPanel;
+    private final Procedures procedures;
+    private final TransactionManagementPanel transactionManagementPanel;
 
     public ProceduresDialog(Configuration parent) {
         super((Frame) parent, "Procedures");
-        procedures = Service.DEPACCOUNT.getProcedures();
+        procedures = Service.DEP_ACCOUNT.getProcedures();
         transactionManagementPanel = new TransactionManagementPanel(parent);
         buildDialog();
         this.pack();

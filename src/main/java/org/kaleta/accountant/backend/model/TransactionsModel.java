@@ -11,9 +11,9 @@ import java.util.List;
 @XmlRootElement(name = "transactions")
 public class TransactionsModel {
 
-    protected List<Transaction> transaction;
+    private List<Transaction> transaction;
     @XmlAttribute(name = "year", required = true)
-    protected String year;
+    private String year;
 
     public List<Transaction> getTransaction() {
         if (transaction == null) {
@@ -35,17 +35,17 @@ public class TransactionsModel {
     public static class Transaction {
 
         @XmlAttribute(name = "id", required = true)
-        protected String id;
+        String id;
         @XmlAttribute(name = "date", required = true)
-        protected String date;
+        String date;
         @XmlAttribute(name = "description", required = true)
-        protected String description;
+        String description;
         @XmlAttribute(name = "amount", required = true)
-        protected String amount;
+        String amount;
         @XmlAttribute(name = "debit", required = true)
-        protected String debit;
+        String debit;
         @XmlAttribute(name = "credit", required = true)
-        protected String credit;
+        String credit;
 
         public String getId() {
             return id;

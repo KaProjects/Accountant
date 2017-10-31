@@ -13,9 +13,9 @@ import java.util.List;
 public class SchemaModel {
 
     @XmlElement(name = "class", required = true)
-    protected List<SchemaModel.Class> clazz;
+    private List<SchemaModel.Class> clazz;
     @XmlAttribute(name = "year", required = true)
-    protected String year;
+    private String year;
 
     public List<SchemaModel.Class> getClazz() {
         if (clazz == null) {
@@ -38,11 +38,11 @@ public class SchemaModel {
     })
     public static class Class {
 
-        protected List<SchemaModel.Class.Group> group;
+        List<SchemaModel.Class.Group> group;
         @XmlAttribute(name = "id", required = true)
-        protected String id ="";
+        String id ="";
         @XmlAttribute(name = "name", required = true)
-        protected String name = "";
+        String name = "";
 
         @Override
         public String toString() {
@@ -79,11 +79,11 @@ public class SchemaModel {
         })
         public static class Group implements Comparable<Group>{
 
-            protected List<SchemaModel.Class.Group.Account> account;
+            List<SchemaModel.Class.Group.Account> account;
             @XmlAttribute(name = "id", required = true)
-            protected String id = "";
+            String id = "";
             @XmlAttribute(name = "name", required = true)
-            protected String name = "";
+            String name = "";
 
             @Override
             public int compareTo(Group o) {
@@ -124,11 +124,11 @@ public class SchemaModel {
             public static class Account implements Comparable<Account> {
 
                 @XmlAttribute(name = "id", required = true)
-                protected String id = "";
+                String id = "";
                 @XmlAttribute(name = "name", required = true)
-                protected String name = "";
+                String name = "";
                 @XmlAttribute(name = "type", required = true)
-                protected String type = "";
+                String type = "";
 
                 @Override
                 public int compareTo(Account o) {

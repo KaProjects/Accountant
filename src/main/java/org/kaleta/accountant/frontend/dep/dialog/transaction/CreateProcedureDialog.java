@@ -13,7 +13,7 @@ import java.awt.*;
  */
 @Deprecated
 public class CreateProcedureDialog extends Dialog {
-    private TransactionManagementPanel transactionManagementPanel;
+    private final TransactionManagementPanel transactionManagementPanel;
     private JTextField textFieldName;
 
     public CreateProcedureDialog(Configuration parent) {

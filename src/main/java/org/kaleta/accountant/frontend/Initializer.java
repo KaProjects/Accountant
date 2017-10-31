@@ -42,9 +42,9 @@ public class Initializer {
                 Service.CONFIG.checkResources();
                 initLogger();
                 Service.CONFIG.checkData();
-                if (Service.CONFIG.getActiveYear().equals("-1")){
-                    // TODO 1.0 : 12/25/16 init 1st year wizard
-                }
+                //if (Service.CONFIG.getActiveYear().equals("-1")){
+                // TODO 1.0 : 12/25/16 init 1st year wizard
+                //}
 
 
                 new AppFrame().setVisible(true);

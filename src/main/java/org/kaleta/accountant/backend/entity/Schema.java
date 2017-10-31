@@ -75,7 +75,7 @@ import java.util.List;
 public class Schema {
 
     @XmlElement(name = "class", required = true)
-    protected List<Schema.Class> clazz;
+    private List<Schema.Class> clazz;
 
     /**
      * Gets the value of the clazz property.
@@ -156,11 +156,11 @@ public class Schema {
     })
     public static class Class {
 
-        protected List<Schema.Class.Group> group;
+        List<Schema.Class.Group> group;
         @XmlAttribute(name = "id", required = true)
-        protected String id ="";
+        String id ="";
         @XmlAttribute(name = "name", required = true)
-        protected String name = "";
+        String name = "";
 
         /**
          * Gets the value of the group property.
@@ -277,11 +277,11 @@ public class Schema {
         })
         public static class Group {
 
-            protected List<Schema.Class.Group.Account> account;
+            List<Schema.Class.Group.Account> account;
             @XmlAttribute(name = "id", required = true)
-            protected String id = "";
+            String id = "";
             @XmlAttribute(name = "name", required = true)
-            protected String name = "";
+            String name = "";
 
             /**
              * Gets the value of the account property.
@@ -385,11 +385,11 @@ public class Schema {
             public static class Account {
 
                 @XmlAttribute(name = "id", required = true)
-                protected String id = "";
+                String id = "";
                 @XmlAttribute(name = "name", required = true)
-                protected String name = "";
+                String name = "";
                 @XmlAttribute(name = "type", required = true)
-                protected String type = "";
+                String type = "";
 
                 /**
                  * Gets the value of the id property.

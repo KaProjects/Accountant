@@ -14,7 +14,7 @@ import java.awt.event.MouseEvent;
 @Deprecated
 class ClassPanel extends JPanel {
     private final Schema.Class clazz;
-    private JDialog parent;
+    private final JDialog parent;
 
     public ClassPanel(Schema.Class clazz, JDialog parent) {
         this.clazz = clazz;

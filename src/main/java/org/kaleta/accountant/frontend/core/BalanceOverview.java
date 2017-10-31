@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class BalanceOverview extends JPanel implements Configurable {
     private Configuration configuration;
-    private BalanceTableModel tableModel;
+    private final BalanceTableModel tableModel;
 
     public BalanceOverview() {
         tableModel = new BalanceTableModel();
@@ -116,19 +116,19 @@ public class BalanceOverview extends JPanel implements Configurable {
     }
 
     private class BalanceTableModel extends AbstractTableModel {
-        private List<BalanceRow> assets;
-        private List<BalanceRow> liabilities;
-        private BalanceRow assetsBalanceRow;
-        private BalanceRow liabilitiesBalanceRow;
+        private final List<BalanceRow> assets;
+        private final List<BalanceRow> liabilities;
+        private final BalanceRow assetsBalanceRow;
+        private final BalanceRow liabilitiesBalanceRow;
 
-        public BalanceTableModel(){
+        BalanceTableModel(){
             assets = new ArrayList<>();
             liabilities = new ArrayList<>();
             assetsBalanceRow = new BalanceRow("Assets", "T", "X", BalanceRow.SUM);
             liabilitiesBalanceRow = new BalanceRow("Liabilities", "T", "X", BalanceRow.SUM);
         }
 
-        public void updateModel(){
+        void updateModel(){
             String year = getConfiguration().getSelectedYear();
             Map<String, List<AccountsModel.Account>> accountMap =  Service.ACCOUNT.getAccountsViaSchemaMap(year);
 
@@ -281,7 +281,7 @@ public class BalanceOverview extends JPanel implements Configurable {
             return "";
         }
 
-        public String getCellType(int row, int column){
+        String getCellType(int row, int column){
             if (row == getRowCount() - 1){
                 return BalanceRow.SUM;
             }

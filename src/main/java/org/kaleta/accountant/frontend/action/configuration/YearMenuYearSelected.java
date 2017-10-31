@@ -6,7 +6,7 @@ import org.kaleta.accountant.service.Service;
 import java.awt.*;
 
 public class YearMenuYearSelected extends ConfigurationAction {
-    private YearMenu menu;
+    private final YearMenu menu;
 
     public YearMenuYearSelected(YearMenu menu) {
         super(menu);

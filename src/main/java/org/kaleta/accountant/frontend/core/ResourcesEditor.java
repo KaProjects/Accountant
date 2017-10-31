@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
 public class ResourcesEditor extends JPanel implements Configurable {
     private Configuration configuration;
 
-    private AccountsEditor accountsEditor;
+    private final AccountsEditor accountsEditor;
 
     public ResourcesEditor(Configuration configuration) {
         setConfiguration(configuration);

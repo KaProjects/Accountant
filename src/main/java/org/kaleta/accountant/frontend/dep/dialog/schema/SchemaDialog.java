@@ -34,9 +34,7 @@ public class SchemaDialog extends Dialog {
         panelClasses.add(new ClassPanel(schema.getClazz().get(7), this));
 
         JButton buttonCancel = new JButton("Cancel");
-        buttonCancel.addActionListener(a -> {
-            this.dispose();
-        });
+        buttonCancel.addActionListener(a -> this.dispose());
         JButton buttonOk = new JButton("Save");
         buttonOk.addActionListener(a -> {
             result = true;

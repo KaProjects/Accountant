@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class OpenExcludeDialog extends ActionListener {
-    private AccountsModel.Account account;
+    private final AccountsModel.Account account;
 
     public OpenExcludeDialog(Configurable configurable, AccountsModel.Account account) {
         super(configurable);

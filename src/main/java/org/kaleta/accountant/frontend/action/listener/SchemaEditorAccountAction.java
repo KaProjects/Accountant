@@ -13,10 +13,10 @@ public class SchemaEditorAccountAction extends ActionListener {
     public static final int EDIT = 1;
     public static final int DELETE = 2;
 
-    private int action;
-    private String classId;
-    private String groupId;
-    private String accountId;
+    private final int action;
+    private final String classId;
+    private final String groupId;
+    private final String accountId;
 
     public SchemaEditorAccountAction(Configurable configurable, int action, int classId, int groupId, int accountId) {
         super(configurable);

@@ -21,7 +21,7 @@ import java.util.List;
 public class Config {
 
     @XmlElement(required = true)
-    protected Config.Years years = new Years();
+    private Config.Years years = new Years();
 
     /**
      * Gets the value of the years property.
@@ -54,13 +54,13 @@ public class Config {
     })
     public static class Years {
 
-        protected List<Config.Years.Year> year;
+        List<Config.Years.Year> year;
         @XmlAttribute(name = "active", required = true)
-        protected String active = "";
+        String active = "";
 
         public List<Config.Years.Year> getYear() {
             if (year == null) {
-                year = new ArrayList<Config.Years.Year>();
+                year = new ArrayList<>();
             }
             return this.year;
         }
@@ -92,10 +92,10 @@ public class Config {
 
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "")
-        public static class Year {
+        static class Year {
 
             @XmlAttribute(name = "name", required = true)
-            protected String name;
+            String name;
 
             /**
              * Gets the value of the name property.

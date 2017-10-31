@@ -57,13 +57,9 @@ public class AccountService {
         try {
             final String[] name = new String[]{""};
             Schema schema = new SchemaManager().retrieve();
-            schema.getClazz().stream().filter(clazz -> clazz.getId().equals(schemaId.substring(0, 1))).forEach(clazz -> {
-                clazz.getGroup().stream().filter(group -> group.getId().equals(schemaId.substring(1, 2))).forEach(group -> {
-                    group.getAccount().stream().filter(acc -> acc.getId().equals(schemaId.substring(2, 3))).forEach(acc -> {
-                        name[0] = acc.getName();
-                    });
-                });
-            });
+            schema.getClazz().stream().filter(clazz -> clazz.getId().equals(schemaId.substring(0, 1))).forEach(clazz -> clazz.getGroup().stream().filter(group -> group.getId().equals(schemaId.substring(1, 2))).forEach(group -> {
+                group.getAccount().stream().filter(acc -> acc.getId().equals(schemaId.substring(2, 3))).forEach(acc -> name[0] = acc.getName());
+            }));
             if (name[0].equals("")) {
                 throw new IllegalArgumentException("Account with schema id '" + schemaId + "' not found;");
             } else {
@@ -79,13 +75,9 @@ public class AccountService {
         try {
             final String[] name = new String[]{""};
             Schema schema = new SchemaManager().retrieve();
-            schema.getClazz().stream().filter(clazz -> clazz.getId().equals(schemaId.substring(0, 1))).forEach(clazz -> {
-                clazz.getGroup().stream().filter(group -> group.getId().equals(schemaId.substring(1, 2))).forEach(group -> {
-                    group.getAccount().stream().filter(acc -> acc.getId().equals(schemaId.substring(2, 3))).forEach(acc -> {
-                        name[0] = acc.getType();
-                    });
-                });
-            });
+            schema.getClazz().stream().filter(clazz -> clazz.getId().equals(schemaId.substring(0, 1))).forEach(clazz -> clazz.getGroup().stream().filter(group -> group.getId().equals(schemaId.substring(1, 2))).forEach(group -> {
+                group.getAccount().stream().filter(acc -> acc.getId().equals(schemaId.substring(2, 3))).forEach(acc -> name[0] = acc.getType());
+            }));
             if (name[0].equals("")) {
                 throw new IllegalArgumentException("Account with schema id '" + schemaId + "' not found!");
             } else {

@@ -35,7 +35,7 @@ class AccountDialog extends Dialog {
         tfName.setText(account.getName());
 
         JLabel labelType = new JLabel("Account Type:");
-        JComboBox<String> cbType = new JComboBox<String>(new String[]{"Asset", "Liability", "Expense", "Revenue", "Off Balance"});
+        JComboBox<String> cbType = new JComboBox<>(new String[]{"Asset", "Liability", "Expense", "Revenue", "Off Balance"});
         switch (account.getType()) {
             case Constants.AccountType.ASSET:cbType.setSelectedIndex(0);break;
             case Constants.AccountType.LIABILITY:cbType.setSelectedIndex(1);break;

@@ -42,17 +42,17 @@ import javax.xml.bind.annotation.XmlType;
 public class Transaction {
 
     @XmlAttribute(name = "id", required = true)
-    protected String id = "";
+    private String id = "";
     @XmlAttribute(name = "date", required = true)
-    protected String date = "";
+    private String date = "";
     @XmlAttribute(name = "description", required = true)
-    protected String description = "";
+    private String description = "";
     @XmlAttribute(name = "amount", required = true)
-    protected String amount = "";
+    private String amount = "";
     @XmlAttribute(name = "debit", required = true)
-    protected String debit = "";
+    private String debit = "";
     @XmlAttribute(name = "credit", required = true)
-    protected String credit = "";
+    private String credit = "";
 
     /**
      * Gets the value of the id property.

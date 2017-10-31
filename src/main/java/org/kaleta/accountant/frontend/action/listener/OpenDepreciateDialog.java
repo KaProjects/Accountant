@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OpenDepreciateDialog extends ActionListener {
-    private List<AccountsModel.Account> accounts;
+    private final List<AccountsModel.Account> accounts;
 
     public OpenDepreciateDialog(Configurable configurable, AccountsModel.Account account) {
         super(configurable);

@@ -16,19 +16,19 @@ import java.util.List;
 import java.util.Map;
 
 public class AddResourcesDialog extends Dialog {
-    private Map<String, List<AccountsModel.Account>> resourceAccountMap;
-    private SchemaModel.Class resourceClass;
-    private Map<String, List<AccountsModel.Account>> creditAccountMap;
-    private List<SchemaModel.Class> creditClasses;
-    private Map<String, List<AccountsModel.Account>> debitAccountMap;
-    private List<SchemaModel.Class> debitClasses ;
+    private final Map<String, List<AccountsModel.Account>> resourceAccountMap;
+    private final SchemaModel.Class resourceClass;
+    private final Map<String, List<AccountsModel.Account>> creditAccountMap;
+    private final List<SchemaModel.Class> creditClasses;
+    private final Map<String, List<AccountsModel.Account>> debitAccountMap;
+    private final List<SchemaModel.Class> debitClasses ;
 
     private JTextField tfDate;
     private JComboBox<SchemaModel.Class> cbCreditClass;
     private JComboBox<SchemaModel.Class.Group> cbCreditGroup;
     private JComboBox<SchemaModel.Class.Group.Account> cbCreditAccount;
     private JComboBox<AccountsModel.Account> cbCreditSemantic;
-    private List<ResourcePanel> resourcePanelList;
+    private final List<ResourcePanel> resourcePanelList;
     private JPanel resourcesPanel;
 
     public AddResourcesDialog(Configuration configuration, Map<String, List<AccountsModel.Account>> resourceAccountMap, SchemaModel.Class resourceClass,
@@ -89,19 +89,22 @@ public class AddResourcesDialog extends Dialog {
 
         cbCreditClass.addActionListener(a -> {
             cbCreditGroup.removeAllItems();
-            ((SchemaModel.Class)cbCreditClass.getSelectedItem()).getGroup().forEach(group -> cbCreditGroup.addItem(group));
+            if (cbCreditClass.getSelectedItem() != null) {
+                ((SchemaModel.Class)cbCreditClass.getSelectedItem()).getGroup().forEach(group -> cbCreditGroup.addItem(group));
+            }
             cbCreditGroup.setSelectedIndex(-1);
         });
         cbCreditGroup.addActionListener(a -> {
             cbCreditAccount.removeAllItems();
-            if (cbCreditGroup.getSelectedIndex() >= 0){
+            if (cbCreditGroup.getSelectedItem() != null && cbCreditGroup.getSelectedIndex() >= 0){
                 ((SchemaModel.Class.Group)cbCreditGroup.getSelectedItem()).getAccount().forEach(account -> cbCreditAccount.addItem(account));
             }
             cbCreditAccount.setSelectedIndex(-1);
         });
         cbCreditAccount.addActionListener(a -> {
             cbCreditSemantic.removeAllItems();
-            if (cbCreditAccount.getSelectedIndex() >= 0) {
+            if (cbCreditClass.getSelectedItem() != null && cbCreditGroup.getSelectedItem() != null && cbCreditAccount.getSelectedItem() != null
+                    && cbCreditAccount.getSelectedIndex() >= 0) {
                 String schemaId = ((SchemaModel.Class)cbCreditClass.getSelectedItem()).getId()
                         + ((SchemaModel.Class.Group)cbCreditGroup.getSelectedItem()).getId()
                         + ((SchemaModel.Class.Group.Account)cbCreditAccount.getSelectedItem()).getId();
@@ -167,6 +170,7 @@ public class AddResourcesDialog extends Dialog {
     }
 
     public String getCreditAcc(){
+        assert cbCreditSemantic.getSelectedItem() != null;
         return ((AccountsModel.Account)cbCreditSemantic.getSelectedItem()).getFullId();
     }
 
@@ -182,20 +186,20 @@ public class AddResourcesDialog extends Dialog {
         return resourceData;
     }
 
-    public class ResourcePanel extends JPanel {
-        private JComboBox<SchemaModel.Class.Group> cbGroup;
-        private JComboBox<SchemaModel.Class.Group.Account> cbAccount;
-        private JComboBox<AccountsModel.Account> cbSemantic;
-        private JTextField tfAmount;
-        private JCheckBox checkBoxConsumed;
-        private SelectAccountTextField textFieldDebit;
-        private JTextField textFieldDebitInfo;
+    class ResourcePanel extends JPanel {
+        private final JComboBox<SchemaModel.Class.Group> cbGroup;
+        private final JComboBox<SchemaModel.Class.Group.Account> cbAccount;
+        private final JComboBox<AccountsModel.Account> cbSemantic;
+        private final JTextField tfAmount;
+        private final JCheckBox checkBoxConsumed;
+        private final SelectAccountTextField textFieldDebit;
+        private final JTextField textFieldDebitInfo;
 
         private ResourcePanel(boolean deletable){
             this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
             cbGroup = new JComboBox<>();
-            resourceClass.getGroup().forEach(group -> cbGroup.addItem(group));
+            resourceClass.getGroup().forEach(cbGroup::addItem);
             cbGroup.setSelectedIndex(-1);
 
             cbAccount = new JComboBox<>();
@@ -203,18 +207,18 @@ public class AddResourcesDialog extends Dialog {
 
             cbGroup.addActionListener(a -> {
                 cbAccount.removeAllItems();
-                if (cbGroup.getSelectedIndex() >= 0) {
-                    ((SchemaModel.Class.Group)cbGroup.getSelectedItem()).getAccount().forEach(account -> cbAccount.addItem(account));
+                if (cbGroup.getSelectedItem() != null && cbGroup.getSelectedIndex() >= 0) {
+                    ((SchemaModel.Class.Group)cbGroup.getSelectedItem()).getAccount().forEach(cbAccount::addItem);
                 }
                 cbAccount.setSelectedIndex(-1);
             });
             cbAccount.addActionListener(a -> {
                 cbSemantic.removeAllItems();
-                if (cbAccount.getSelectedIndex() >= 0) {
+                if (cbGroup.getSelectedItem() != null && cbAccount.getSelectedItem() != null && cbAccount.getSelectedIndex() >= 0) {
                     String schemaId = "1" + ((SchemaModel.Class.Group)cbGroup.getSelectedItem()).getId()
                             + ((SchemaModel.Class.Group.Account)cbAccount.getSelectedItem()).getId();
                     if (resourceAccountMap.get(schemaId) != null){
-                        resourceAccountMap.get(schemaId).forEach(account -> cbSemantic.addItem(account));
+                        resourceAccountMap.get(schemaId).forEach(cbSemantic::addItem);
                     }
                 }
                 cbSemantic.setSelectedIndex(-1);
@@ -270,46 +274,47 @@ public class AddResourcesDialog extends Dialog {
                     .addGap(2));
         }
 
-        public boolean hasValidValues(){
+        boolean hasValidValues(){
             return (cbGroup.getSelectedIndex() != -1 && cbAccount.getSelectedIndex() != -1 && cbSemantic.getSelectedIndex() != -1 && tfAmount.getText() != null && !tfAmount.getText().trim().isEmpty())
                     && (checkBoxConsumed.isSelected() || !textFieldDebit.getSelectedAccount().trim().isEmpty());
         }
 
-        public String getAmount(){
+        String getAmount(){
             return tfAmount.getText();
         }
 
-        public String getResourceId(){
+        String getResourceId(){
+            assert cbSemantic.getSelectedItem() != null;
             return ((AccountsModel.Account)cbSemantic.getSelectedItem()).getFullId();
         }
 
-        public boolean isConsumed(){
+        boolean isConsumed(){
             return checkBoxConsumed.isSelected();
         }
 
-        public String getDebitId(){
+        String getDebitId(){
             return textFieldDebit.getSelectedAccount();
         }
 
-        public String getDebitInfo(){
+        String getDebitInfo(){
             return textFieldDebitInfo.getText();
         }
     }
 
     public class ResourceData {
-        private String resourceId;
-        private String amount;
-        private boolean isConsumed;
+        private final String resourceId;
+        private final String amount;
+        private final boolean isConsumed;
         private String debitId;
         private String debitInfo;
 
-        public ResourceData(String resourceId, String amount) {
+        ResourceData(String resourceId, String amount) {
             this.resourceId = resourceId;
             this.amount = amount;
             isConsumed = true;
         }
 
-        public ResourceData(String resourceId, String amount, String debitId, String debitInfo) {
+        ResourceData(String resourceId, String amount, String debitId, String debitInfo) {
             this.resourceId = resourceId;
             this.amount = amount;
             this.debitId = debitId;

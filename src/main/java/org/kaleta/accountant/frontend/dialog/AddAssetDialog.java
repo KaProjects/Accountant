@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AddAssetDialog extends Dialog {
-    private List<SchemaModel.Class.Group> groups;
-    private List<SchemaModel.Class.Group.Account> accounts;
+    private final List<SchemaModel.Class.Group> groups;
+    private final List<SchemaModel.Class.Group.Account> accounts;
 
     private JTextField textFieldName;
     private JTextField textFieldDate;
@@ -23,8 +23,8 @@ public class AddAssetDialog extends Dialog {
     private JTextField textFieldMonthlyDep;
     private JComboBox<SchemaModel.Class.Group> comboBoxGroup;
     private JComboBox<SchemaModel.Class.Group.Account> comboBoxAcc;
-    private Map<String, List<AccountsModel.Account>> creditAccountMap;
-    private List<SchemaModel.Class> classList;
+    private final Map<String, List<AccountsModel.Account>> creditAccountMap;
+    private final List<SchemaModel.Class> classList;
 
     private SelectAccountTextField textFieldCreditAcc;
 
@@ -83,8 +83,10 @@ public class AddAssetDialog extends Dialog {
         comboBoxGroup.addActionListener(a -> {
             comboBoxAcc.removeAllItems();
             accounts.clear();
-            accounts.addAll(((SchemaModel.Class.Group)comboBoxGroup.getSelectedItem()).getAccount());
-            accounts.forEach(account -> comboBoxAcc.addItem(account));
+            if (comboBoxGroup.getSelectedItem() != null) {
+                accounts.addAll(((SchemaModel.Class.Group)comboBoxGroup.getSelectedItem()).getAccount());
+                accounts.forEach(account -> comboBoxAcc.addItem(account));
+            }
             comboBoxAcc.setSelectedIndex(-1);
             AddAssetDialog.this.pack();
         });

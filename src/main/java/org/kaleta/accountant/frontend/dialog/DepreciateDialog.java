@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.List;
 
 public class DepreciateDialog extends Dialog {
-    private List<Config> configs;
+    private final List<Config> configs;
 
     public DepreciateDialog(Configuration configuration, List<Config> configs) {
         super(configuration, "Depreciating Asset(s) Dialog");
@@ -163,23 +163,15 @@ public class DepreciateDialog extends Dialog {
             return account;
         }
 
-        public void setAccount(AccountsModel.Account account) {
-            this.account = account;
-        }
-
         public AccountsModel.Account getDepAccount() {
             return depAccount;
-        }
-
-        public void setDepAccount(AccountsModel.Account depAccount) {
-            this.depAccount = depAccount;
         }
 
         public String getDateHint() {
             return dateHint;
         }
 
-        public void setDateHint(String dateHint) {
+        void setDateHint(String dateHint) {
             this.dateHint = dateHint;
         }
 
@@ -187,7 +179,7 @@ public class DepreciateDialog extends Dialog {
             return valueHint;
         }
 
-        public void setValueHint(String valueHint) {
+        void setValueHint(String valueHint) {
             this.valueHint = valueHint;
         }
 
@@ -195,16 +187,12 @@ public class DepreciateDialog extends Dialog {
             return enabled;
         }
 
-        public void setEnabled(Boolean enabled) {
+        void setEnabled(Boolean enabled) {
             this.enabled = enabled;
         }
 
-        public Integer getMaxDepValue() {
+        Integer getMaxDepValue() {
             return maxDepValue;
-        }
-
-        public void setMaxDepValue(Integer maxDepValue) {
-            this.maxDepValue = maxDepValue;
         }
     }
 }

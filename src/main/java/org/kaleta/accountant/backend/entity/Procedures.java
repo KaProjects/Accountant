@@ -51,7 +51,7 @@ import java.util.List;
 @Deprecated
 public class Procedures {
 
-    protected List<Procedure> procedure;
+    private List<Procedure> procedure;
 
     /**
      * Gets the value of the procedure property.
@@ -109,11 +109,11 @@ public class Procedures {
     })
     public static class Procedure {
 
-        protected List<Transaction> transaction;
+        List<Transaction> transaction;
         @XmlAttribute(name = "name", required = true)
-        protected String name;
+        String name;
         @XmlAttribute(name = "id", required = true)
-        protected String id;
+        String id;
 
         public List<Transaction> getTransaction() {
             if (transaction == null) {

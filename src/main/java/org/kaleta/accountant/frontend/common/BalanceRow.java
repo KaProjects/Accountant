@@ -27,10 +27,6 @@ public class BalanceRow {
         this.type = type;
     }
 
-    public BalanceRow(){
-
-    }
-
     public String getTurnover() {
         return turnover;
     }
@@ -41,10 +37,6 @@ public class BalanceRow {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getValue() {
@@ -59,15 +51,8 @@ public class BalanceRow {
         return schemaId;
     }
 
-    public void setSchemaId(String schemaId) {
-        this.schemaId = schemaId;
-    }
-
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
 }

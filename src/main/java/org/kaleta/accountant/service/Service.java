@@ -30,5 +30,5 @@ public class Service {
     /**
      * Instance of account's service class
      */
-    public static final AccountService DEPACCOUNT = new AccountService();
+    public static final AccountService DEP_ACCOUNT = new AccountService();
 }

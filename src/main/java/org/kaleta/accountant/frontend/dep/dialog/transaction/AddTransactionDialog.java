@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Deprecated
 public class AddTransactionDialog extends Dialog {
-    private TransactionManagementPanel transactionManagementPanel;
+    private final TransactionManagementPanel transactionManagementPanel;
 
     public AddTransactionDialog(Configuration parent) {
         super((Frame) parent, "Adding Transaction(s)");

@@ -12,9 +12,9 @@ public class SchemaEditorGroupAction extends ActionListener {
     public static final int EDIT = 1;
     public static final int DELETE = 2;
 
-    private int action;
-    private String classId;
-    private String groupId;
+    private final int action;
+    private final String classId;
+    private final String groupId;
 
     public SchemaEditorGroupAction(Configurable configurable, int action, int classId, int groupId) {
         super(configurable);

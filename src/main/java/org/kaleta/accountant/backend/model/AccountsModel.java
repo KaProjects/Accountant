@@ -11,9 +11,9 @@ import java.util.List;
 @XmlRootElement(name = "accounts")
 public class AccountsModel {
 
-    protected List<Account> account;
+    private List<Account> account;
     @XmlAttribute(name = "year", required = true)
-    protected String year;
+    private String year;
 
     public List<Account> getAccount() {
         if (account == null) {
@@ -35,13 +35,13 @@ public class AccountsModel {
     public static class Account {
 
         @XmlAttribute(name = "schemaId", required = true)
-        protected String schemaId;
+        String schemaId;
         @XmlAttribute(name = "semanticId", required = true)
-        protected String semanticId;
+        String semanticId;
         @XmlAttribute(name = "name", required = true)
-        protected String name;
+        String name;
         @XmlAttribute(name = "metadata", required = true)
-        protected String metadata = "";
+        String metadata = "";
 
         @Override
         public String toString() {

@@ -29,7 +29,7 @@ public class ErrorHandler {
 
     private static class ErrorDialog extends JDialog {
 
-        public ErrorDialog(String stackTrace) {
+        ErrorDialog(String stackTrace) {
             this.setTitle("Application Failure!");
             this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             this.setModal(true);

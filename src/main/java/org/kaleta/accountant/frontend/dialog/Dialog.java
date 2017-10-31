@@ -10,7 +10,7 @@ public abstract class Dialog extends JDialog implements Configurable{
     private Configuration configuration;
     protected boolean result;
 
-    public Dialog(Configuration configuration, String title){
+    Dialog(Configuration configuration, String title){
         super((Frame) configuration);
         setConfiguration(configuration);
         result = false;
@@ -19,7 +19,7 @@ public abstract class Dialog extends JDialog implements Configurable{
         this.setModal(true);
     }
 
-    public Dialog(Frame frame, String title){
+    protected Dialog(Frame frame, String title){
         super(frame);
         result = false;
         this.setTitle(title);

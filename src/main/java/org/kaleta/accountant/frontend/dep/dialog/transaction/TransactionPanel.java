@@ -17,11 +17,11 @@ import javax.swing.event.DocumentListener;
 public class TransactionPanel extends JPanel implements Configurable, DocumentListener {
     private Configuration configuration;
 
-    private JTextField tfDate;
-    private JComboBox<String> cbDescription;
-    private JTextField tfAmount;
-    private JTextField tfDebit;
-    private JTextField tfCredit;
+    private final JTextField tfDate;
+    private final JComboBox<String> cbDescription;
+    private final JTextField tfAmount;
+    private final JTextField tfDebit;
+    private final JTextField tfCredit;
 
     private boolean isActive;
     private final Object lock = new Object();

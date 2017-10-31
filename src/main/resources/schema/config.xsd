@@ -3,7 +3,7 @@
     <xs:element name="config">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="years" minOccurs="1" maxOccurs="1">
+                <xs:element name="years">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="year" minOccurs="0" maxOccurs="unbounded">

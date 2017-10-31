@@ -17,8 +17,8 @@ import java.util.Map;
 public class SchemaEditor extends JTabbedPane implements Configurable {
     private Configuration configuration;
     // [classId, firstEditableGroupId, lastEditableGroupId] = couple of first/last groups can be forbidden to edit
-    private int[][] classesDef = new int[][]{{0,0,8},{1,0,9},{2,0,9},{3,2,9},{4,1,9},{5,2,9},{6,0,9}};
-    private Map<Integer, JPanel> editorClassPanels;
+    private final int[][] classesDef = new int[][]{{0,0,8},{1,0,9},{2,0,9},{3,2,9},{4,1,9},{5,2,9},{6,0,9}};
+    private final Map<Integer, JPanel> editorClassPanels;
 
     public SchemaEditor(Configuration configuration){
         setConfiguration(configuration);

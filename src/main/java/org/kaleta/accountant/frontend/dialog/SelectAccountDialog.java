@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 public class SelectAccountDialog extends Dialog {
-    private Map<String, List<AccountsModel.Account>> accountMap;
-    private List<SchemaModel.Class> classList;
+    private final Map<String, List<AccountsModel.Account>> accountMap;
+    private final List<SchemaModel.Class> classList;
 
     private String selectedAccountId;
     private String selectedAccountName;
@@ -31,16 +31,6 @@ public class SelectAccountDialog extends Dialog {
         buildDialog();
         updateTree("");
         this.setSize(300, 100*classList.size() + 200);
-    }
-
-    public SelectAccountDialog(Configuration configuration, Map<String, java.util.List<AccountsModel.Account>> accountMap, SchemaModel.Class clazz) {
-        super(configuration, "Selecting Account");
-        this.accountMap = accountMap;
-        this.classList = new ArrayList<>();
-        classList.add(clazz);
-        selectedAccountId = "";
-        buildDialog();
-        this.setSize(300, 300);
     }
 
     @Override
@@ -185,19 +175,19 @@ public class SelectAccountDialog extends Dialog {
             super(title);
         }
 
-        public String getSchemaFullId() {
+        String getSchemaFullId() {
             return schemaFullId;
         }
 
-        public void setSchemaFullId(String schemaId) {
+        void setSchemaFullId(String schemaId) {
             this.schemaFullId = schemaId;
         }
 
-        public String getFullName() {
+        String getFullName() {
             return fullName;
         }
 
-        public void setFullName(String fullName) {
+        void setFullName(String fullName) {
             this.fullName = fullName;
         }
     }
@@ -209,11 +199,11 @@ public class SelectAccountDialog extends Dialog {
             super(title);
         }
 
-        public String getSchemaId() {
+        String getSchemaId() {
             return schemaId;
         }
 
-        public void setSchemaId(String schemaId) {
+        void setSchemaId(String schemaId) {
             this.schemaId = schemaId;
         }
     }

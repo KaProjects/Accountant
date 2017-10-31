@@ -51,7 +51,7 @@ import java.util.List;
 @Deprecated
 public class Semantic {
 
-    protected List<Account> account;
+    private List<Account> account;
 
     /**
      * Gets the value of the account property.
@@ -108,13 +108,13 @@ public class Semantic {
     public static class Account {
 
         @XmlAttribute(name = "schemaId", required = true)
-        protected String schemaId;
+        String schemaId;
         @XmlAttribute(name = "id", required = true)
-        protected String id;
+        String id;
         @XmlAttribute(name = "name", required = true)
-        protected String name;
+        String name;
         @XmlAttribute(name = "description", required = true)
-        protected String description = "";
+        String description = "";
 
         /**
          * Gets the value of the schemaId property.

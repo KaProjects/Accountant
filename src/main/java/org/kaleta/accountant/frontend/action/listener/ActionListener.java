@@ -9,10 +9,10 @@ import java.awt.event.ActionEvent;
 /**
  * Basic class for every action.
  */
-public abstract class ActionListener implements java.awt.event.ActionListener {
-    private Configurable configurable;
+abstract class ActionListener implements java.awt.event.ActionListener {
+    private final Configurable configurable;
 
-    public ActionListener(Configurable configurable){
+    ActionListener(Configurable configurable){
         this.configurable = configurable;
     }
 
@@ -28,7 +28,7 @@ public abstract class ActionListener implements java.awt.event.ActionListener {
 
     protected abstract void actionPerformed();
 
-    protected Configuration getConfiguration() {
+    Configuration getConfiguration() {
         return configurable.getConfiguration();
     }
 }

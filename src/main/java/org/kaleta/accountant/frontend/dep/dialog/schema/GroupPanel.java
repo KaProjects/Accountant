@@ -15,7 +15,7 @@ import java.awt.event.MouseEvent;
 class GroupPanel extends JPanel {
     private final Schema.Class.Group group;
     private int width = 0;
-    private JDialog parent;
+    private final JDialog parent;
 
     public GroupPanel(Schema.Class.Group group, JDialog parent) {
         this.group = group;

@@ -6,7 +6,7 @@ import org.kaleta.accountant.service.Service;
 import javax.swing.*;
 
 public class YearPaneYearSelected extends ConfigurationAction {
-    private YearPane pane;
+    private final YearPane pane;
 
     public YearPaneYearSelected(YearPane pane) {
         super(pane);

@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
  * Basic class for every menu action.
  */
 abstract public class MenuAction extends AbstractAction {
-    private Configuration config;
+    private final Configuration config;
 
     public MenuAction(Configuration config, String name, Icon icon) {
         super(name, icon);

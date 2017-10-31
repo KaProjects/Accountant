@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
 public class RevenuesEditor extends JPanel implements Configurable {
     private Configuration configuration;
 
-    private AccountsEditor accountsEditor;
+    private final AccountsEditor accountsEditor;
 
     public RevenuesEditor(Configuration configuration) {
         setConfiguration(configuration);

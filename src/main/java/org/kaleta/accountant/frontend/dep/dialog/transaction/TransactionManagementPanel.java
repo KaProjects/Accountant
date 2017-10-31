@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
  */
 @Deprecated
 public class TransactionManagementPanel extends JPanel {
-    private List<TransactionPanel> transactionPanelList;
-    private Configuration config;
+    private final List<TransactionPanel> transactionPanelList;
+    private final Configuration config;
     private JButton okButton;
 
     public TransactionManagementPanel(Configuration config){

@@ -19,7 +19,7 @@ import java.util.List;
 public class AccountsEditor extends JPanel implements Configurable {
     private Configuration configuration;
 
-    private List<ContentPanel> contentPanelList;
+    private final List<ContentPanel> contentPanelList;
 
     public AccountsEditor(Configuration configuration) {
         setConfiguration(configuration);
@@ -108,9 +108,9 @@ public class AccountsEditor extends JPanel implements Configurable {
     }
 
     private class ContentPanel extends JPanel {
-        private String schemaId;
+        private final String schemaId;
 
-        private JPanel panelAccounts;
+        private final JPanel panelAccounts;
 
         private ContentPanel(String schemaId){
             this.schemaId = schemaId;
@@ -154,9 +154,7 @@ public class AccountsEditor extends JPanel implements Configurable {
                 buttonGeneralAdd.setVisible(true);
             });
 
-            buttonGeneralAdd.addActionListener(e -> {
-                textFieldName.setText(Constants.Account.GENERAL_ACCOUNT_NAME);
-            });
+            buttonGeneralAdd.addActionListener(e -> textFieldName.setText(Constants.Account.GENERAL_ACCOUNT_NAME));
 
             buttonConfirmAdd.addActionListener(new AccountsEditorAccountAction(AccountsEditor.this, schemaId, textFieldName));
             buttonConfirmAdd.addActionListener(e -> {
@@ -183,7 +181,7 @@ public class AccountsEditor extends JPanel implements Configurable {
             layout.setHorizontalGroup(layout.createParallelGroup().addComponent(panelAccounts).addComponent(panelAddAcc));
             layout.setVerticalGroup(layout.createSequentialGroup().addComponent(panelAccounts).addComponent(panelAddAcc));
         }
-        public void update(){
+        void update(){
             panelAccounts.removeAll();
             for (AccountsModel.Account semAcc : Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(), schemaId)){
                 // TODO post 1.0 : design&impl (edit, close?/del?,...)

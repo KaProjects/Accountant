@@ -17,7 +17,7 @@ import java.util.List;
 
 public class TransactionsOverview extends JPanel implements Configurable {
     private Configuration configuration;
-    private TransactionTableModel tableModel;
+    private final TransactionTableModel tableModel;
 
     public TransactionsOverview(){
         tableModel = new TransactionTableModel();
@@ -75,11 +75,11 @@ public class TransactionsOverview extends JPanel implements Configurable {
 
         // TODO post 1.0 : transaction filter
 
-        public TransactionTableModel(){
+        TransactionTableModel(){
             transactionList = new ArrayList<>();
         }
 
-        public void setTransactionList(List<TransactionsModel.Transaction> transactionList) {
+        void setTransactionList(List<TransactionsModel.Transaction> transactionList) {
             this.transactionList = transactionList;
         }
 

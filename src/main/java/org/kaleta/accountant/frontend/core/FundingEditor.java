@@ -16,7 +16,7 @@ import java.util.List;
 public class FundingEditor extends JPanel implements Configurable {
     private Configuration configuration;
 
-    private AccountsEditor accountsEditor;
+    private final AccountsEditor accountsEditor;
 
     public FundingEditor(Configuration configuration) {
         setConfiguration(configuration);

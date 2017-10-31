@@ -28,7 +28,7 @@ public class NumberFilter extends DocumentFilter {
             return true;
         } else {
             try {
-                Integer.parseInt(text);
+                int a = Integer.parseInt(text);
                 return true;
             } catch (NumberFormatException e) {
                 return false;

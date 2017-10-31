@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class YearMenuYearAdded extends ConfigurationAction {
-    private YearMenu menu;
+    private final YearMenu menu;
 
     public YearMenuYearAdded(YearMenu menu) {
         super(menu);

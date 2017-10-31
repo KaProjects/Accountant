@@ -7,7 +7,7 @@ import java.awt.event.FocusListener;
 /**
  * TODO post 1.0 : impl. & use
  */
-public class HintTextField extends JTextField implements FocusListener {
+class HintTextField extends JTextField implements FocusListener {
     private boolean showingHint;
     @Override
     public void focusGained(FocusEvent e) {

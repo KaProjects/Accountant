@@ -12,7 +12,7 @@ import java.util.List;
 public class ConfigModel {
 
     @XmlElement(required = true)
-    protected ConfigModel.Years years = new Years();
+    private ConfigModel.Years years = new Years();
 
     public ConfigModel.Years getYears() {
         return years;
@@ -29,9 +29,9 @@ public class ConfigModel {
     })
     public static class Years {
 
-        protected List<ConfigModel.Years.Year> year;
+        List<ConfigModel.Years.Year> year;
         @XmlAttribute(name = "active", required = true)
-        protected String active = "";
+        String active = "";
 
         public List<ConfigModel.Years.Year> getYearList() {
             if (year == null) {
@@ -54,7 +54,7 @@ public class ConfigModel {
         public static class Year {
 
             @XmlAttribute(name = "name", required = true)
-            protected String name;
+            String name;
 
             public String getName() {
                 return name;

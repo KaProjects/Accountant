@@ -18,12 +18,12 @@ import java.util.Map;
 public class ExcludeDialog extends Dialog {
     private Map<String, List<AccountsModel.Account>> expenseAccountMap;
     private SchemaModel.Class expenseClass;
-    private Map<String, List<AccountsModel.Account>> debitAccountMap;
-    private List<SchemaModel.Class> debitClasses;
-    private Map<String, List<AccountsModel.Account>> revenueAccountMap;
-    private SchemaModel.Class revenueClass;
+    private final Map<String, List<AccountsModel.Account>> debitAccountMap;
+    private final List<SchemaModel.Class> debitClasses;
+    private final Map<String, List<AccountsModel.Account>> revenueAccountMap;
+    private final SchemaModel.Class revenueClass;
 
-    private boolean hasExpense;
+    private final boolean hasExpense;
     private SelectAccountTextField textFieldExpense;
     private boolean hasRevenue;
     private SelectAccountTextField textFieldDebit;

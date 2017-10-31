@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class ProfitOverview extends JPanel implements Configurable {
     private Configuration configuration;
-    private ProfitTableModel tableModel;
+    private final ProfitTableModel tableModel;
 
     public ProfitOverview() {
         tableModel = new ProfitTableModel();
@@ -110,10 +110,10 @@ public class ProfitOverview extends JPanel implements Configurable {
     }
 
     private class ProfitTableModel extends AbstractTableModel {
-        private java.util.List<BalanceRow> expenses;
-        private List<BalanceRow> revenues;
+        private final java.util.List<BalanceRow> expenses;
+        private final List<BalanceRow> revenues;
 
-        public ProfitTableModel(){
+        ProfitTableModel(){
             expenses = new ArrayList<>();
             revenues = new ArrayList<>();
         }
@@ -159,7 +159,7 @@ public class ProfitOverview extends JPanel implements Configurable {
             }
         }
 
-        public void updateModel(){
+        void updateModel(){
             String year = getConfiguration().getSelectedYear();
             Map<String, List<AccountsModel.Account>> accountMap =  Service.ACCOUNT.getAccountsViaSchemaMap(year);
 
@@ -216,7 +216,7 @@ public class ProfitOverview extends JPanel implements Configurable {
             }
         }
 
-        public String getCellType(int row, int column){
+        String getCellType(int row, int column){
             switch (column){
                 case 0:
                 case 1:

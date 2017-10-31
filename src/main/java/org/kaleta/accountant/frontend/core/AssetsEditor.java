@@ -23,8 +23,8 @@ import java.util.List;
 
 public class AssetsEditor extends JPanel implements Configurable {
     private Configuration configuration;
-    private JPanel panelItems;
-    private JButton buttonDepreciateAll;
+    private final JPanel panelItems;
+    private final JButton buttonDepreciateAll;
 
     private String schemaFilter;
     private int activeFilter;
@@ -187,19 +187,19 @@ public class AssetsEditor extends JPanel implements Configurable {
     }
 
     private class AssetPanel extends JPanel {
-        private JLabel labelInitValue;
-        private JLabel labelCurrentValue;
-        private JSeparator separator;
-        private JPanel depPanel;
-        private JLabel labelDepInfo;
-        private JButton buttonExclude;
-        private JButton buttonDep;
+        private final JLabel labelInitValue;
+        private final JLabel labelCurrentValue;
+        private final JSeparator separator;
+        private final JPanel depPanel;
+        private final JLabel labelDepInfo;
+        private final JButton buttonExclude;
+        private final JButton buttonDep;
 
         private boolean isActive;
-        private AccountsModel.Account account;
+        private final AccountsModel.Account account;
 
 
-        public AssetPanel(AccountsModel.Account assetAccount) {
+        AssetPanel(AccountsModel.Account assetAccount) {
             this.account = assetAccount;
             this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
