@@ -4,6 +4,7 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.common.NumberFilter;
+import org.kaleta.accountant.frontend.component.SelectAccountTextField;
 
 import javax.swing.*;
 import javax.swing.text.PlainDocument;
@@ -18,6 +19,8 @@ public class AddResourcesDialog extends Dialog {
     private SchemaModel.Class resourceClass;
     private Map<String, List<AccountsModel.Account>> creditAccountMap;
     private List<SchemaModel.Class> creditClasses;
+    private Map<String, List<AccountsModel.Account>> debitAccountMap;
+    private List<SchemaModel.Class> debitClasses ;
 
     private JTextField tfDate;
     private JComboBox<SchemaModel.Class> cbCreditClass;
@@ -28,15 +31,18 @@ public class AddResourcesDialog extends Dialog {
     private JPanel resourcesPanel;
 
     public AddResourcesDialog(Frame parent, Map<String, List<AccountsModel.Account>> resourceAccountMap, SchemaModel.Class resourceClass,
-            Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> creditClasses) {
+                              Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> creditClasses,
+                              Map<String, List<AccountsModel.Account>> debitAccountMap, List<SchemaModel.Class> debitClasses) {
         super(parent, "Adding Resources");
         this.resourceAccountMap = resourceAccountMap;
         this.resourceClass = resourceClass;
         this.creditAccountMap = creditAccountMap;
         this.creditClasses = creditClasses;
+        this.debitAccountMap = debitAccountMap;
+        this.debitClasses = debitClasses;
         resourcePanelList = new ArrayList<>();
         buildDialog();
-        this.setMinimumSize(new Dimension(500,600));
+        this.setMinimumSize(new Dimension(500, 600));
         pack();
     }
 
@@ -165,7 +171,11 @@ public class AddResourcesDialog extends Dialog {
     public List<ResourceData> getResourceData(){
         List<ResourceData> resourceData = new ArrayList<>();
         for (ResourcePanel resourcePanel : resourcePanelList){
-            resourceData.add(new ResourceData(resourcePanel.getResourceId(), resourcePanel.getAmount()));
+            if (resourcePanel.isConsumed()){
+                resourceData.add(new ResourceData(resourcePanel.getResourceId(), resourcePanel.getAmount()));
+            } else {
+                resourceData.add(new ResourceData(resourcePanel.getResourceId(), resourcePanel.getAmount(), resourcePanel.getDebitId(), resourcePanel.getDebitInfo()));
+            }
         }
         return resourceData;
     }
@@ -175,8 +185,13 @@ public class AddResourcesDialog extends Dialog {
         private JComboBox<SchemaModel.Class.Group.Account> cbAccount;
         private JComboBox<AccountsModel.Account> cbSemantic;
         private JTextField tfAmount;
+        private JCheckBox checkBoxConsumed;
+        private SelectAccountTextField textFieldDebit;
+        private JTextField textFieldDebitInfo;
 
         private ResourcePanel(boolean deletable){
+            this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
             cbGroup = new JComboBox<>();
             resourceClass.getGroup().forEach(group -> cbGroup.addItem(group));
             cbGroup.setSelectedIndex(-1);
@@ -196,7 +211,9 @@ public class AddResourcesDialog extends Dialog {
                 if (cbAccount.getSelectedIndex() >= 0) {
                     String schemaId = "1" + ((SchemaModel.Class.Group)cbGroup.getSelectedItem()).getId()
                             + ((SchemaModel.Class.Group.Account)cbAccount.getSelectedItem()).getId();
-                    resourceAccountMap.get(schemaId).forEach(account -> cbSemantic.addItem(account));
+                    if (resourceAccountMap.get(schemaId) != null){
+                        resourceAccountMap.get(schemaId).forEach(account -> cbSemantic.addItem(account));
+                    }
                 }
                 cbSemantic.setSelectedIndex(-1);
             });
@@ -218,20 +235,42 @@ public class AddResourcesDialog extends Dialog {
             tfAmount.setToolTipText("Amount");
             ((PlainDocument) tfAmount.getDocument()).setDocumentFilter(new NumberFilter());
 
+            JLabel labelDebit = new JLabel("In favor of: ");
+            labelDebit.setVisible(false);
+            textFieldDebit = new SelectAccountTextField((Frame) AddResourcesDialog.this.getParent(), debitAccountMap, debitClasses);
+            textFieldDebit.setVisible(false);
+
+            textFieldDebitInfo = new JTextField();
+            textFieldDebitInfo.setVisible(false);
+            JLabel labelDebitInfo = new JLabel("Info: ");
+            labelDebitInfo.setVisible(false);
+
+            checkBoxConsumed = new JCheckBox();
+            checkBoxConsumed.setToolTipText("Whether resource is consumed or...");
+            checkBoxConsumed.setSelected(true);
+            checkBoxConsumed.addActionListener(e -> {
+                labelDebit.setVisible(!checkBoxConsumed.isSelected());
+                textFieldDebit.setVisible(!checkBoxConsumed.isSelected());
+                textFieldDebitInfo.setVisible(!checkBoxConsumed.isSelected());
+                labelDebitInfo.setVisible(!checkBoxConsumed.isSelected());
+            });
+
             GroupLayout layout = new GroupLayout(this);
             this.setLayout(layout);
-            layout.setHorizontalGroup(layout.createSequentialGroup().addComponent(buttonDelete,10,10,10)
-                    .addComponent(cbGroup).addComponent(cbAccount).addComponent(cbSemantic).addComponent(tfAmount));
-            layout.setVerticalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup()
-                    .addComponent(buttonDelete,25,25,25)
-                    .addComponent(cbGroup,25,25,25).addComponent(cbAccount,25,25,25).addComponent(cbSemantic,25,25,25)
-                    .addComponent(tfAmount,25,25,25))
+            layout.setHorizontalGroup(layout.createParallelGroup().addGroup(layout.createSequentialGroup()
+                    .addComponent(buttonDelete,10,10,10).addComponent(cbGroup).addComponent(cbAccount).addComponent(cbSemantic).addComponent(tfAmount,100,100,1000).addComponent(checkBoxConsumed))
+                    .addGroup(layout.createSequentialGroup()
+                            .addGap(5).addComponent(labelDebit).addComponent(textFieldDebit).addGap(5).addComponent(labelDebitInfo).addComponent(textFieldDebitInfo)));
+            layout.setVerticalGroup(layout.createSequentialGroup().addGap(2).addGroup(layout.createParallelGroup()
+                    .addComponent(buttonDelete,25,25,25).addComponent(cbGroup,25,25,25).addComponent(cbAccount,25,25,25).addComponent(cbSemantic,25,25,25).addComponent(tfAmount,25,25,25).addComponent(checkBoxConsumed,25,25,25))
+                    .addGroup(layout.createParallelGroup()
+                            .addComponent(labelDebit,25,25,25).addComponent(textFieldDebit,25,25,25).addComponent(labelDebitInfo,25,25,25).addComponent(textFieldDebitInfo,25,25,25))
                     .addGap(2));
         }
 
         public boolean hasValidValues(){
-            return cbGroup.getSelectedIndex() != -1 && cbAccount.getSelectedIndex() != -1 && cbSemantic.getSelectedIndex() != -1
-                    && tfAmount.getText() != null && !tfAmount.getText().trim().isEmpty();
+            return (cbGroup.getSelectedIndex() != -1 && cbAccount.getSelectedIndex() != -1 && cbSemantic.getSelectedIndex() != -1 && tfAmount.getText() != null && !tfAmount.getText().trim().isEmpty())
+                    && (checkBoxConsumed.isSelected() || !textFieldDebit.getSelectedAccount().trim().isEmpty());
         }
 
         public String getAmount(){
@@ -241,15 +280,39 @@ public class AddResourcesDialog extends Dialog {
         public String getResourceId(){
             return ((AccountsModel.Account)cbSemantic.getSelectedItem()).getFullId();
         }
+
+        public boolean isConsumed(){
+            return checkBoxConsumed.isSelected();
+        }
+
+        public String getDebitId(){
+            return textFieldDebit.getSelectedAccount();
+        }
+
+        public String getDebitInfo(){
+            return textFieldDebitInfo.getText();
+        }
     }
 
     public class ResourceData {
-        String resourceId;
-        String amount;
+        private String resourceId;
+        private String amount;
+        private boolean isConsumed;
+        private String debitId;
+        private String debitInfo;
 
         public ResourceData(String resourceId, String amount) {
             this.resourceId = resourceId;
             this.amount = amount;
+            isConsumed = true;
+        }
+
+        public ResourceData(String resourceId, String amount, String debitId, String debitInfo) {
+            this.resourceId = resourceId;
+            this.amount = amount;
+            this.debitId = debitId;
+            this.debitInfo = debitInfo;
+            isConsumed = false;
         }
 
         public String getResourceId() {
@@ -258,6 +321,18 @@ public class AddResourcesDialog extends Dialog {
 
         public String getAmount() {
             return amount;
+        }
+
+        public boolean isConsumed() {
+            return isConsumed;
+        }
+
+        public String getDebitId() {
+            return debitId;
+        }
+
+        public String getDebitInfo() {
+            return debitInfo;
         }
     }
 }

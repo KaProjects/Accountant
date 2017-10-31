@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.component;
+package org.kaleta.accountant.frontend.core;
 
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;

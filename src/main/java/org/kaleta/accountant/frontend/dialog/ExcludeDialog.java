@@ -4,6 +4,7 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.common.NumberFilter;
+import org.kaleta.accountant.frontend.component.SelectAccountTextField;
 
 import javax.swing.*;
 import javax.swing.text.PlainDocument;
@@ -23,10 +24,10 @@ public class ExcludeDialog extends Dialog {
     private SchemaModel.Class revenueClass;
 
     private boolean hasExpense;
-    private String expenseAccount;
+    private SelectAccountTextField textFieldExpense;
     private boolean hasRevenue;
-    private String debitAccount;
-    private String revenueAccount;
+    private SelectAccountTextField textFieldDebit;
+    private SelectAccountTextField textFieldRevenue;
 
     private JTextField textFieldDate;
     private JTextField textFieldRevenueValue;
@@ -65,9 +66,8 @@ public class ExcludeDialog extends Dialog {
 
         JButton buttonOk = new JButton("Confirm");
         buttonOk.addActionListener(a -> {
-            if ((!hasExpense || !expenseAccount.trim().isEmpty())
-                    && (hasRevenue && !debitAccount.trim().isEmpty()
-                        && !revenueAccount.trim().isEmpty() && !textFieldRevenueValue.getText().trim().isEmpty() || !hasRevenue)
+            if ((!hasExpense || !textFieldExpense.getSelectedAccount().trim().isEmpty())
+                    && (!hasRevenue || (!textFieldDebit.getSelectedAccount().trim().isEmpty() && !textFieldRevenue.getSelectedAccount().trim().isEmpty() && !textFieldRevenueValue.getText().trim().isEmpty()))
                     && (!textFieldDate.getText().trim().isEmpty() && textFieldDate.getText().length() == 4)){
                 if (JOptionPane.showConfirmDialog(this.getParent(), "Are you sure you want to exclude this asset?",
                         "Excluding Asset", JOptionPane.YES_NO_OPTION) == 0){
@@ -92,28 +92,12 @@ public class ExcludeDialog extends Dialog {
         if (hasExpense) {
             JLabel labelExpense = new JLabel("Residual Expense:");
             labelExpense.setToolTipText("Asset is not fully depreciated, therefore its residual value must be delegated to a expense account.");
-            JTextField textFieldExpense = new JTextField();
-            textFieldExpense.setEditable(false);
-            expenseAccount = "";
-            JButton buttonSelectExpenseAcc = new JButton("Select");
-            buttonSelectExpenseAcc.addActionListener(e -> {
-                SelectAccountDialog selectExpenseAccountDialog = new SelectAccountDialog((Frame) ExcludeDialog.this.getParent(), expenseAccountMap, expenseClass);
-                selectExpenseAccountDialog.setVisible(true);
-                if (selectExpenseAccountDialog.getResult()) {
-                    expenseAccount = selectExpenseAccountDialog.getSelectedAccountId();
-                    textFieldExpense.setText(selectExpenseAccountDialog.getSelectedAccountName());
-                }
-            });
+            textFieldExpense = new SelectAccountTextField((Frame) ExcludeDialog.this.getParent(), expenseAccountMap, expenseClass);
+
             GroupLayout layoutExpense = new GroupLayout(panelExpense);
             panelExpense.setLayout(layoutExpense);
-            layoutExpense.setHorizontalGroup(layoutExpense.createParallelGroup()
-                    .addGroup(layoutExpense.createSequentialGroup()
-                            .addComponent(labelExpense).addGap(10, 10, Short.MAX_VALUE).addComponent(buttonSelectExpenseAcc))
-                    .addComponent(textFieldExpense));
-            layoutExpense.setVerticalGroup(layoutExpense.createSequentialGroup()
-                    .addGroup(layoutExpense.createParallelGroup()
-                            .addComponent(labelExpense,25,25,25).addComponent(buttonSelectExpenseAcc,25,25,25))
-                    .addComponent(textFieldExpense,25,25,25).addGap(5));
+            layoutExpense.setHorizontalGroup(layoutExpense.createParallelGroup().addComponent(labelExpense).addComponent(textFieldExpense));
+            layoutExpense.setVerticalGroup(layoutExpense.createSequentialGroup().addComponent(labelExpense,25,25,25).addComponent(textFieldExpense,25,25,25).addGap(5));
         } else {
             panelExpense.setVisible(false);
         }
@@ -122,45 +106,18 @@ public class ExcludeDialog extends Dialog {
 
         JPanel panelDebit = new JPanel();
         JLabel labelDebit = new JLabel("Debit:");
-        JTextField textFieldDebit = new JTextField();
-        textFieldDebit.setEditable(false);
-        debitAccount = "";
-        JButton buttonSelectDebitAcc = new JButton("Select");
-        buttonSelectDebitAcc.addActionListener(e -> {
-            SelectAccountDialog selectDebitAccountDialog = new SelectAccountDialog((Frame) ExcludeDialog.this.getParent(), debitAccountMap, debitClasses);
-            selectDebitAccountDialog.setVisible(true);
-            if (selectDebitAccountDialog.getResult()) {
-                debitAccount = selectDebitAccountDialog.getSelectedAccountId();
-                textFieldDebit.setText(selectDebitAccountDialog.getSelectedAccountName());
-            }
-        });
+        textFieldDebit = new SelectAccountTextField((Frame) ExcludeDialog.this.getParent(), debitAccountMap, debitClasses);
+
         GroupLayout layoutDebit = new GroupLayout(panelDebit);
         panelDebit.setLayout(layoutDebit);
-        layoutDebit.setHorizontalGroup(layoutDebit.createParallelGroup()
-                .addGroup(layoutDebit.createSequentialGroup()
-                        .addComponent(labelDebit).addGap(10, 10, Short.MAX_VALUE).addComponent(buttonSelectDebitAcc))
-                .addComponent(textFieldDebit));
-        layoutDebit.setVerticalGroup(layoutDebit.createSequentialGroup()
-                .addGroup(layoutDebit.createParallelGroup()
-                        .addComponent(labelDebit,25,25,25).addComponent(buttonSelectDebitAcc,25,25,25))
-                .addComponent(textFieldDebit,25,25,25).addGap(5));
+        layoutDebit.setHorizontalGroup(layoutDebit.createParallelGroup().addComponent(labelDebit).addComponent(textFieldDebit));
+        layoutDebit.setVerticalGroup(layoutDebit.createSequentialGroup().addComponent(labelDebit,25,25,25).addComponent(textFieldDebit,25,25,25).addGap(5));
         panelDebit.setVisible(hasRevenue);
-
 
         JPanel panelRevenue = new JPanel();
         JLabel labelRevenue = new JLabel("Revenue:");
-        JTextField textFieldRevenue = new JTextField();
-        textFieldRevenue.setEditable(false);
-        revenueAccount = "";
-        JButton buttonSelectRevenueAcc = new JButton("Select");
-        buttonSelectRevenueAcc.addActionListener(e -> {
-            SelectAccountDialog selectRevenueAccountDialog = new SelectAccountDialog((Frame) ExcludeDialog.this.getParent(), revenueAccountMap, revenueClass);
-            selectRevenueAccountDialog.setVisible(true);
-            if (selectRevenueAccountDialog.getResult()) {
-                revenueAccount = selectRevenueAccountDialog.getSelectedAccountId();
-                textFieldRevenue.setText(selectRevenueAccountDialog.getSelectedAccountName());
-            }
-        });
+        textFieldRevenue  = new SelectAccountTextField((Frame) ExcludeDialog.this.getParent(), revenueAccountMap, revenueClass);
+
         JLabel labelRevenueValue = new JLabel("Value: ");
         textFieldRevenueValue = new JTextField();
         ((PlainDocument) textFieldRevenueValue.getDocument()).setDocumentFilter(new NumberFilter());
@@ -168,16 +125,15 @@ public class ExcludeDialog extends Dialog {
         GroupLayout layoutRevenue = new GroupLayout(panelRevenue);
         panelRevenue.setLayout(layoutRevenue);
         layoutRevenue.setHorizontalGroup(layoutRevenue.createParallelGroup()
-                .addGroup(layoutRevenue.createSequentialGroup()
-                        .addComponent(labelRevenue).addGap(10, 10, Short.MAX_VALUE).addComponent(buttonSelectRevenueAcc))
+                .addComponent(labelRevenue)
                 .addComponent(textFieldRevenue)
-                .addGroup(layoutRevenue.createSequentialGroup()
-                        .addComponent(labelRevenueValue).addComponent(textFieldRevenueValue)));
+                .addComponent(labelRevenueValue)
+                .addComponent(textFieldRevenueValue));
         layoutRevenue.setVerticalGroup(layoutRevenue.createSequentialGroup()
-                .addGroup(layoutRevenue.createParallelGroup()
-                        .addComponent(labelRevenue,25,25,25).addComponent(buttonSelectRevenueAcc,25,25,25))
+                .addComponent(labelRevenue,25,25,25)
                 .addComponent(textFieldRevenue,25,25,25).addGap(2)
-                .addGroup(layoutRevenue.createParallelGroup().addComponent(labelRevenueValue,25,25,25).addComponent(textFieldRevenueValue,25,25,25)).addGap(5));
+                .addComponent(labelRevenueValue,25,25,25)
+                .addComponent(textFieldRevenueValue,25,25,25).addGap(5));
         panelRevenue.setVisible(hasRevenue);
 
         JLabel labelAddRevenue = new JLabel("Add Revenue", IconLoader.getIcon(IconLoader.ADD), SwingConstants.CENTER);
@@ -215,7 +171,7 @@ public class ExcludeDialog extends Dialog {
     }
 
     public String getExpenseAccount() {
-        return expenseAccount;
+        return textFieldExpense.getSelectedAccount();
     }
 
     public boolean hasRevenue() {
@@ -223,11 +179,11 @@ public class ExcludeDialog extends Dialog {
     }
 
     public String getDebitAccount() {
-        return debitAccount;
+        return textFieldDebit.getSelectedAccount();
     }
 
     public String getRevenueAccount() {
-        return revenueAccount;
+        return textFieldRevenue.getSelectedAccount();
     }
 
     public String getRevenueValue(){

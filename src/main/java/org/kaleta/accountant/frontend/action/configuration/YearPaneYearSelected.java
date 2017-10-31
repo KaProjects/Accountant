@@ -1,6 +1,6 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
-import org.kaleta.accountant.frontend.component.*;
+import org.kaleta.accountant.frontend.core.*;
 import org.kaleta.accountant.frontend.year.component.ResourcesEditor;
 import org.kaleta.accountant.service.Service;
 

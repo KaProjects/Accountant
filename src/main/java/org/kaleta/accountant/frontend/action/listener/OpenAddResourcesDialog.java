@@ -14,9 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Stanislav Kaleta on 04.08.2017.
- */
 public class OpenAddResourcesDialog extends ActionListener {
 
     public OpenAddResourcesDialog(Configurable configurable) {
@@ -29,12 +26,18 @@ public class OpenAddResourcesDialog extends ActionListener {
         Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(year);
         Map<String, List<AccountsModel.Account>> resourceAccountMap = new HashMap<>();
         Map<String, List<AccountsModel.Account>> creditAccountMap = new HashMap<>();
+        Map<String, List<AccountsModel.Account>> debitAccountMap = new HashMap<>();
         for (String schemaId : allAccountMap.keySet()){
             if (schemaId.startsWith("1")){
                 resourceAccountMap.put(schemaId, allAccountMap.get(schemaId));
             }
             if (schemaId.startsWith("2") || schemaId.startsWith("3") || schemaId.startsWith("4") || schemaId.startsWith("6")) {
                 creditAccountMap.put(schemaId, allAccountMap.get(schemaId));
+            }
+            if (schemaId.startsWith("2") || schemaId.startsWith("3")
+                    || (schemaId.startsWith("5") && !schemaId.startsWith("5"+Constants.Schema.DEPRECIATION_GROUP_ID)
+                        && !schemaId.startsWith("5"+Constants.Schema.CONSUMPTION_GROUP_ID))) {
+                debitAccountMap.put(schemaId, allAccountMap.get(schemaId));
             }
         }
         SchemaModel.Class resourceClass = Service.SCHEMA.getSchemaClassMap(year).get(1);
@@ -43,11 +46,13 @@ public class OpenAddResourcesDialog extends ActionListener {
         creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(3));
         creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(4));
         creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(6));
+        List<SchemaModel.Class> debitClasses = new ArrayList<>();
+        debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(2));
+        debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(3));
+        debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(5));
 
-
-
-        AddResourcesDialog dialog = new AddResourcesDialog((Frame) getConfiguration(), resourceAccountMap,
-                resourceClass, creditAccountMap, creditClasses);
+        AddResourcesDialog dialog = new AddResourcesDialog((Frame) getConfiguration(),
+                resourceAccountMap, resourceClass, creditAccountMap, creditClasses, debitAccountMap, debitClasses);
         dialog.setVisible(true);
         if (dialog.getResult()) {
             String date = dialog.getDate();
@@ -57,12 +62,16 @@ public class OpenAddResourcesDialog extends ActionListener {
                         resourceData.getResourceId(), creditId, Constants.Transaction.RESOURCE_ACQUIRED);
 
                 String[] resId = resourceData.getResourceId().split("\\.");
-                Service.TRANSACTIONS.addTransaction(year, date, resourceData.getAmount(),
-                        Service.ACCOUNT.getConsumptionAccountId(resId[0], resId[1]),
-                        resourceData.getResourceId(), Constants.Transaction.RESOURCE_CONSUMED);
-
-                getConfiguration().update(Configuration.TRANSACTION_UPDATED);
+                if (resourceData.isConsumed()) {
+                    Service.TRANSACTIONS.addTransaction(year, date, resourceData.getAmount(),
+                            Service.ACCOUNT.getConsumptionAccountId(resId[0], resId[1]),
+                            resourceData.getResourceId(), Constants.Transaction.RESOURCE_CONSUMED);
+                } else {
+                    Service.TRANSACTIONS.addTransaction(year, date, resourceData.getAmount(),
+                            resourceData.getDebitId(), resourceData.getResourceId(), resourceData.getDebitInfo());
+                }
             }
+            getConfiguration().update(Configuration.TRANSACTION_UPDATED);
         }
 
     }

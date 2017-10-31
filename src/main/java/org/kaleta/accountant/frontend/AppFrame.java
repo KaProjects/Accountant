@@ -3,7 +3,7 @@ package org.kaleta.accountant.frontend;
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
 import org.kaleta.accountant.frontend.component.YearMenu;
-import org.kaleta.accountant.frontend.component.YearPane;
+import org.kaleta.accountant.frontend.core.YearPane;
 import org.kaleta.accountant.frontend.year.model.YearModel;
 import org.kaleta.accountant.service.Service;
 
