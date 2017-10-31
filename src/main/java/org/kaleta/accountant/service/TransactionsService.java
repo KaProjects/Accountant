@@ -19,7 +19,7 @@ public class TransactionsService {
     }
 
     /**
-     * todo
+     * Adds transaction for specified values.
      */
     public void addTransaction(String year, String date, String amount, String debit, String credit, String description){
         try {
@@ -36,7 +36,7 @@ public class TransactionsService {
             model.getTransaction().add(transaction);
 
             manager.update(model);
-            // TODO: 10/26/17 LOG
+            //  TODO 1.0 : LOG
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

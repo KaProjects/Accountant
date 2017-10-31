@@ -29,7 +29,6 @@ public class DepreciateDialog extends Dialog {
         for (Config config : configs) {
             if (!config.isEnabled()) continue;
 
-
             JCheckBox checkBoxEnabled = new JCheckBox("", config.isEnabled());
             checkBoxEnabled.addItemListener(e -> config.setEnabled(checkBoxEnabled.isSelected()));
             checkBoxEnabled.setToolTipText("Exclude/Include from Depreciation Process");

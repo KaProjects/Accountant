@@ -42,7 +42,7 @@ public class TransactionsOverview extends JPanel implements Configurable {
         ((DefaultTableCellRenderer)columnModel.getColumn(2).getCellRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         columnModel.getColumn(3).setMinWidth(300);
         columnModel.getColumn(4).setMinWidth(300);
-        // TODO: 8/8/16 play more with column renderers
+        // TODO post 1.0 : play more with column renderers
 
         this.getActionMap().put(Configuration.TRANSACTION_UPDATED, new ConfigurationAction(this) {
             @Override
@@ -72,6 +72,8 @@ public class TransactionsOverview extends JPanel implements Configurable {
 
     private class TransactionTableModel extends AbstractTableModel {
         private List<TransactionsModel.Transaction> transactionList;
+
+        // TODO post 1.0 : transaction filter
 
         public TransactionTableModel(){
             transactionList = new ArrayList<>();

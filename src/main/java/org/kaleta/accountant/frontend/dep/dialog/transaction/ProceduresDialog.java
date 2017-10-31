@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * Created by Stanislav Kaleta on 30.05.2016.
  */
+@Deprecated
 public class ProceduresDialog extends Dialog {
     private Procedures procedures;
     private TransactionManagementPanel transactionManagementPanel;

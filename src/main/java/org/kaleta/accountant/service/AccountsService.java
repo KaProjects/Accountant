@@ -24,7 +24,7 @@ public class AccountsService {
     }
 
     /**
-     * todo
+     * Returns list of accounts for specified schema id prefix.
      */
     public List<AccountsModel.Account> getAccountsBySchemaId(String year, String schemaIdPrefix){
         try {
@@ -43,7 +43,7 @@ public class AccountsService {
     }
 
     /**
-     * todo
+     * Returns accounts mapped according to schema id.
      */
     public Map<String, List<AccountsModel.Account>> getAccountsViaSchemaMap(String year){
         try {
@@ -65,7 +65,7 @@ public class AccountsService {
     }
 
     /**
-     * todo
+     * Returns value of turnover for specified account.
      */
     public String getAccountTurnover(String year, AccountsModel.Account account) {
         String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
@@ -91,7 +91,7 @@ public class AccountsService {
     }
 
     /**
-     * todo
+     * Returns value of balance for specified account.
      */
     public String getAccountBalance(String year, AccountsModel.Account account) {
         String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
@@ -125,7 +125,7 @@ public class AccountsService {
     }
 
     /**
-     * Composes full id of accumulated depreciation account of specified asset's account.
+     * Composes full id of accumulated depreciation account of specified asset account.
      */
     public String getAccumulatedDepAccountId(String schemaId, String semanticId) {
         if (!schemaId.startsWith("0") || schemaId.startsWith("09")){
@@ -136,7 +136,7 @@ public class AccountsService {
     }
 
     /**
-     * Composes full id of depreciation account of specified asset's account.
+     * Composes full id of depreciation account of specified asset account.
      */
     public String getDepreciationAccountId(String schemaId, String semanticId) {
         if (!schemaId.startsWith("0") || schemaId.startsWith("09")){
@@ -147,7 +147,7 @@ public class AccountsService {
     }
 
     /**
-     * Composes full id of consumption account of specified resource's account.
+     * Composes full id of consumption account of specified resource account.
      */
     public String getConsumptionAccountId(String schemaId, String semanticId) {
         if (!schemaId.startsWith("1")){
@@ -158,7 +158,7 @@ public class AccountsService {
     }
 
     /**
-     * todo
+     * Returns accumulated depreciation account for specified asset account.
      */
     public AccountsModel.Account getAccumulatedDepAccount(String year, AccountsModel.Account account){
         String accDepId = getAccumulatedDepAccountId(account.getSchemaId(), account.getSemanticId());
@@ -176,7 +176,7 @@ public class AccountsService {
     }
 
     /**
-     * todo
+     * Returns depreciation account for specified asset account.
      */
     public AccountsModel.Account getDepreciationAccount(String year, AccountsModel.Account account){
         String depId = getDepreciationAccountId(account.getSchemaId(), account.getSemanticId());
@@ -194,7 +194,7 @@ public class AccountsService {
     }
 
     /**
-     * todo
+     * Returns date of last depreciation for specified account.
      */
     public String getLastDepreciationDate(String year, AccountsModel.Account account){
         try {
@@ -241,7 +241,7 @@ public class AccountsService {
             accountsModel.getAccount().add(account);
 
             accountsManager.update(accountsModel);
-            // TODO: 10/26/17 LOG
+            // TODO 1.0 LOG
             return account;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
@@ -266,7 +266,4 @@ public class AccountsService {
             throw new ServiceFailureException(e);
         }
     }
-
-
-
 }

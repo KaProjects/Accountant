@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * Created by Stanislav Kaleta on 24.05.2016.
  */
+@Deprecated
 public class AddTransactionDialog extends Dialog {
     private TransactionManagementPanel transactionManagementPanel;
 

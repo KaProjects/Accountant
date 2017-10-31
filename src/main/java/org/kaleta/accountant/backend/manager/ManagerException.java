@@ -1,8 +1,5 @@
 package org.kaleta.accountant.backend.manager;
 
-/**
- * Created by Stanislav Kaleta on 16.04.2016.
- */
 public class ManagerException extends Exception {
 
     public ManagerException(String message, Throwable cause) {

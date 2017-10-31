@@ -1,7 +1,7 @@
 package org.kaleta.accountant.frontend;
 
 import org.kaleta.accountant.common.ErrorHandler;
-import org.kaleta.accountant.frontend.common.LogFormatter;
+import org.kaleta.accountant.common.LogFormatter;
 import org.kaleta.accountant.service.Service;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class Initializer {
                 initLogger();
                 Service.CONFIG.checkData();
                 if (Service.CONFIG.getActiveYear().equals("-1")){
-                    // TODO: 12/25/16 init 1st year wizard
+                    // TODO 1.0 : 12/25/16 init 1st year wizard
                 }
 
 

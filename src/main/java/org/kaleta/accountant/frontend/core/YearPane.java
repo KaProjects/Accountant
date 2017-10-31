@@ -11,7 +11,6 @@ public class YearPane extends JTabbedPane implements Configurable{
     private Configuration configuration;
 
     public YearPane(){
-
         this.getActionMap().put(Configuration.INIT_CONFIG, new InitConfigurableAction(this));
         this.getActionMap().put(Configuration.YEAR_SELECTED, new YearPaneYearSelected(this));
     }

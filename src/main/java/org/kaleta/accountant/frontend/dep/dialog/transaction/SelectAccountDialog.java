@@ -20,6 +20,7 @@ import java.util.Map;
 /**
  * Created by Stanislav Kaleta on 05.09.2016.
  */
+@Deprecated
 public class SelectAccountDialog extends Dialog {
     private JTree tree;
 
@@ -94,22 +95,22 @@ public class SelectAccountDialog extends Dialog {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getModel().getRoot();
         List<TreeNode> path = new ArrayList<>();
         path.add(node);
-        // todo class starts with 0, rest starts with 1 - formalize that !
+        //  class starts with 0, rest starts with 1 - formalize that !
         if (schemaId.length() > 0) {
             node = (DefaultMutableTreeNode) node.getChildAt(Integer.parseInt(schemaId.substring(0,1)));
             path.add(node);
         }
         if (schemaId.length() > 1) {
-            node = (DefaultMutableTreeNode) node.getChildAt(Integer.parseInt(schemaId.substring(1,2)) - 1); // todo from 1
+            node = (DefaultMutableTreeNode) node.getChildAt(Integer.parseInt(schemaId.substring(1,2)) - 1); //  from 1
             path.add(node);
         }
         if (schemaId.length() == 3) {
-            node = (DefaultMutableTreeNode) node.getChildAt(Integer.parseInt(schemaId.substring(2,3)) - 1); // todo from 1
+            node = (DefaultMutableTreeNode) node.getChildAt(Integer.parseInt(schemaId.substring(2,3)) - 1); //  from 1
             path.add(node);
             path.add(node.getChildAt(0));
         }
         if (schemaId.length() == 5){
-            node = (DefaultMutableTreeNode) node.getChildAt(Integer.parseInt(schemaId.substring(2,3)) - 1); // todo from 1
+            node = (DefaultMutableTreeNode) node.getChildAt(Integer.parseInt(schemaId.substring(2,3)) - 1); //  from 1
             path.add(node);
             path.add(node.getChildAt(Integer.parseInt(schemaId.substring(4,5))));
         }
@@ -134,12 +135,12 @@ public class SelectAccountDialog extends Dialog {
         if (tree.getSelectionPath().getPathCount() > 2){
             DefaultMutableTreeNode parent = (DefaultMutableTreeNode) tree.getSelectionPath().getPath()[1];
             int index = parent.getIndex((TreeNode) tree.getSelectionPath().getPath()[2]);
-            accountId += String.valueOf(index + 1); // todo from 1
+            accountId += String.valueOf(index + 1);  // from 1
         }
         if (tree.getSelectionPath().getPathCount() > 3){
             DefaultMutableTreeNode parent = (DefaultMutableTreeNode) tree.getSelectionPath().getPath()[2];
             int index = parent.getIndex((TreeNode) tree.getSelectionPath().getPath()[3]);
-            accountId += String.valueOf(index + 1); // todo from 1
+            accountId += String.valueOf(index + 1); // from 1
         }
         if (tree.getSelectionPath().getPathCount() > 4){
             DefaultMutableTreeNode parent = (DefaultMutableTreeNode) tree.getSelectionPath().getPath()[3];

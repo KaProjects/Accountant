@@ -1,6 +1,6 @@
 package org.kaleta.accountant.frontend;
 
-import org.kaleta.accountant.frontend.action.menu.*;
+import org.kaleta.accountant.frontend.action.menu.PerformExit;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
 import org.kaleta.accountant.frontend.component.YearMenu;
 import org.kaleta.accountant.frontend.core.YearPane;
@@ -9,7 +9,6 @@ import org.kaleta.accountant.service.Service;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 public class AppFrame extends JFrame implements Configuration{
@@ -40,19 +39,9 @@ public class AppFrame extends JFrame implements Configuration{
         JMenu newMenu = new JMenu("Add");
         fileMenu.add(newMenu);
         fileMenu.add(new JSeparator());
-        // TODO: 3.10.2017 add menus
+        // TODO 1.0 : add more menus for action: add asset, resource, transaction...
         fileMenu.add(new JSeparator());
         fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
-
-        // TODO: 3.10.2017 to del
-        JMenu depMenu = new JMenu("dep");
-        menuBar.add(depMenu);
-        depMenu.add(new MenuItemWrapper(new OpenSchemaDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK)));
-        depMenu.add(new MenuItemWrapper(new OpenSemanticDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.SHIFT_MASK)));
-        depMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.SHIFT_MASK)));
-        depMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.SHIFT_MASK)));
-        depMenu.add(new MenuItemWrapper(new OpenProceduresDialog(this)));
-        depMenu.add(new MenuItemWrapper(new OpenAccountPreview(this)));
 
         menuBar.add(new JPanel());
         menuBar.add(new YearMenu());

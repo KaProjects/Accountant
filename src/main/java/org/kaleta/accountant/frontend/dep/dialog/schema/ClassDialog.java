@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Created by Stanislav Kaleta on 20.04.2016.
  */
+@Deprecated
 class ClassDialog extends Dialog {
     private final Schema.Class clazz;
     private final List<Schema.Class.Group> groups;

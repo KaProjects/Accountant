@@ -2,8 +2,10 @@ package org.kaleta.accountant.frontend.core;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.common.BalanceRow;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -76,25 +78,22 @@ public class BalanceOverview extends JPanel implements Configurable {
             }
         });
 
-        //this.addMouseListener(new BalanceTableClicked(this, Boolean.TRUE));
-        // TODO: 31.10.2017 analyze this
-
         this.getActionMap().put(Configuration.SCHEMA_UPDATED, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: 31.10.2017
+                tableModel.updateModel();
             }
         });
         this.getActionMap().put(Configuration.ACCOUNT_UPDATED, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: 31.10.2017
+                tableModel.updateModel();
             }
         });
         this.getActionMap().put(Configuration.TRANSACTION_UPDATED, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: 31.10.2017
+                tableModel.updateModel();
             }
         });
 
@@ -103,9 +102,6 @@ public class BalanceOverview extends JPanel implements Configurable {
     }
 
     public void update(){
-
-
-
         tableModel.updateModel();
     }
 
@@ -117,78 +113,6 @@ public class BalanceOverview extends JPanel implements Configurable {
     @Override
     public Configuration getConfiguration() {
         return configuration;
-    }
-
-    private class BalanceRow {
-        public static final String SUM = "SUM";
-        public static final String CLASS = "CLASS";
-        public static final String GROUP = "GROUP";
-        public static final String ACCOUNT = "ACC";
-
-        private String name;
-        private String turnover;
-        private String value;
-        private String schemaId;
-        private String type;
-
-        public BalanceRow(String name, String turnover, String value, String type){
-            this.name = name;
-            this.turnover = turnover;
-            this.value = value;
-            this.type = type;
-        }
-
-        public BalanceRow(String name, String turnover, String value, String schemaId, String type){
-            this.name = name;
-            this.turnover = turnover;
-            this.value = value;
-            this.schemaId = schemaId;
-            this.type = type;
-        }
-
-        public BalanceRow(){
-
-        }
-
-        public String getTurnover() {
-            return turnover;
-        }
-
-        public void setTurnover(String turnover) {
-            this.turnover = turnover;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getSchemaId() {
-            return schemaId;
-        }
-
-        public void setSchemaId(String schemaId) {
-            this.schemaId = schemaId;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
     }
 
     private class BalanceTableModel extends AbstractTableModel {
@@ -205,35 +129,31 @@ public class BalanceOverview extends JPanel implements Configurable {
         }
 
         public void updateModel(){
-            assets.clear();
-            liabilities.clear();
-            Map<String, List<AccountsModel.Account>> accountMap =  Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
-            List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
+            String year = getConfiguration().getSelectedYear();
+            Map<String, List<AccountsModel.Account>> accountMap =  Service.ACCOUNT.getAccountsViaSchemaMap(year);
 
+            assets.clear();
             int assetsBalance = 0;
             int assetsTurnover = 0;
-            for (SchemaModel.Class clazz : classList){
+            for (SchemaModel.Class clazz : Service.SCHEMA.getSchemaClassListByAccountType(year, Constants.AccountType.ASSET)){
                 List<BalanceRow> groups = new ArrayList<>();
                 int classBalance = 0;
                 int classTurnover = 0;
-                for (Schema.Class.Group group : clazz.getGroup()) {
+                for (SchemaModel.Class.Group group : clazz.getGroup()) {
                     List<BalanceRow> accounts = new ArrayList<>();
                     int groupBalance = 0;
                     int groupTurnover = 0;
-                    for (Schema.Class.Group.Account account : group.getAccount()) {
+                    for (SchemaModel.Class.Group.Account schemaAccount : group.getAccount()) {
                         int accBalance = 0;
                         int accTurnover = 0;
-                        String schemaId = clazz.getId() + group.getId() + account.getId();
-                        for (Transaction transaction : journal.getTransaction()) {
-                            if (transaction.getDebit().startsWith(schemaId)) {
-                                accBalance += Integer.parseInt(transaction.getAmount());
-                                accTurnover += Integer.parseInt(transaction.getAmount());
-                            }
-                            if (transaction.getCredit().startsWith(schemaId)) {
-                                accBalance -= Integer.parseInt(transaction.getAmount());
+                        String schemaId = clazz.getId() + group.getId() + schemaAccount.getId();
+                        if (accountMap.get(schemaId) != null) {
+                            for (AccountsModel.Account account : accountMap.get(schemaId)){
+                                accTurnover += Integer.parseInt(Service.ACCOUNT.getAccountTurnover(year, account));
+                                accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
                             }
                         }
-                        accounts.add(new BalanceRow(account.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                        accounts.add(new BalanceRow(schemaAccount.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
                         groupBalance += accBalance;
                         groupTurnover += accTurnover;
                     }
@@ -249,6 +169,47 @@ public class BalanceOverview extends JPanel implements Configurable {
             }
             assetsBalanceRow.setValue(String.valueOf(assetsBalance));
             assetsBalanceRow.setTurnover(String.valueOf(assetsTurnover));
+
+            liabilities.clear();
+            int liabilitiesBalance = 0;
+            int liabilitiesTurnover = 0;
+            for (SchemaModel.Class clazz : Service.SCHEMA.getSchemaClassListByAccountType(year, Constants.AccountType.LIABILITY)){
+                List<BalanceRow> groups = new ArrayList<>();
+                int classBalance = 0;
+                int classTurnover = 0;
+                for (SchemaModel.Class.Group group : clazz.getGroup()) {
+                    List<BalanceRow> accounts = new ArrayList<>();
+                    int groupBalance = 0;
+                    int groupTurnover = 0;
+                    for (SchemaModel.Class.Group.Account schemaAccount : group.getAccount()) {
+                        int accBalance = 0;
+                        int accTurnover = 0;
+                        String schemaId = clazz.getId() + group.getId() + schemaAccount.getId();
+                        if (accountMap.get(schemaId) != null) {
+                            for (AccountsModel.Account account : accountMap.get(schemaId)){
+                                accTurnover += Integer.parseInt(Service.ACCOUNT.getAccountTurnover(year, account));
+                                accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
+                            }
+                        }
+                        accounts.add(new BalanceRow(schemaAccount.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                        groupBalance += accBalance;
+                        groupTurnover += accTurnover;
+                    }
+                    groups.add(new BalanceRow(group.getName(), String.valueOf(groupTurnover), String.valueOf(groupBalance), BalanceRow.GROUP));
+                    groups.addAll(accounts);
+                    classBalance += groupBalance;
+                    classTurnover += groupTurnover;
+                }
+                liabilitiesBalance += classBalance;
+                liabilitiesTurnover += classTurnover;
+                liabilities.add(new BalanceRow(clazz.getName(), String.valueOf(classTurnover), String.valueOf(classBalance), BalanceRow.CLASS));
+                liabilities.addAll(groups);
+            }
+            int profit = assetsBalance - liabilitiesBalance;
+            liabilities.add(new BalanceRow("Profit", "", String.valueOf(profit), BalanceRow.SUM));
+            liabilitiesBalance += profit;
+            liabilitiesBalanceRow.setValue(String.valueOf(liabilitiesBalance));
+            liabilitiesBalanceRow.setTurnover(String.valueOf(liabilitiesTurnover));
         }
 
         @Override

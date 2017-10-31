@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Stanislav Kaleta on 05.09.2016.
  */
+@Deprecated
 public class TransactionManagementPanel extends JPanel {
     private List<TransactionPanel> transactionPanelList;
     private Configuration config;

@@ -1,7 +1,6 @@
 package org.kaleta.accountant.backend.manager;
 
 /**
- * Created by Stanislav Kaleta on 16.04.2016.
  *  Provides basic CRUD operations for any entity.
  */
 public interface Manager<Type> {

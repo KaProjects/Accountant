@@ -4,7 +4,6 @@ import org.kaleta.accountant.backend.entity.Transaction;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.action.mouse.AccountTextFieldClicked;
 import org.kaleta.accountant.frontend.common.SwingWorkerHandler;
 
 import javax.swing.*;
@@ -14,6 +13,7 @@ import javax.swing.event.DocumentListener;
 /**
  * Created by Stanislav Kaleta on 24.05.2016.
  */
+@Deprecated
 public class TransactionPanel extends JPanel implements Configurable, DocumentListener {
     private Configuration configuration;
 
@@ -34,10 +34,10 @@ public class TransactionPanel extends JPanel implements Configurable, DocumentLi
         cbDescription.setEditable(true);
         tfAmount = new JTextField();
         tfDebit = new JTextField();
-        tfDebit.addMouseListener(new AccountTextFieldClicked(this, true));
+        //tfDebit.addMouseListener(new AccountTextFieldClicked(this, true));
         tfDebit.getDocument().addDocumentListener(this);
         tfCredit = new JTextField();
-        tfCredit.addMouseListener(new AccountTextFieldClicked(this, false));
+        //tfCredit.addMouseListener(new AccountTextFieldClicked(this, false));
         tfCredit.getDocument().addDocumentListener(this);
 
         GroupLayout layout = new GroupLayout(this);
@@ -138,11 +138,11 @@ public class TransactionPanel extends JPanel implements Configurable, DocumentLi
 
     private void updateDescriptions() {
         synchronized(lock) {
-            //todo Set<String> descList = Service.JOURNAL.listTransactionDescriptions(tfDebit.getText(), tfCredit.getText(), getConfiguration().getActiveYear());
+            // Set<String> descList = Service.JOURNAL.listTransactionDescriptions(tfDebit.getText(), tfCredit.getText(), getConfiguration().getActiveYear());
             String cbValue = ((JTextField)cbDescription.getEditor().getEditorComponent()).getText();
             DefaultComboBoxModel model = (DefaultComboBoxModel) cbDescription.getModel();
             model.removeAllElements();
-            //todo descList.forEach(model::addElement);
+            // descList.forEach(model::addElement);
             ((JTextField)cbDescription.getEditor().getEditorComponent()).setText(cbValue);
         }
     }

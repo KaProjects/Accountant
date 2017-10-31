@@ -7,7 +7,7 @@ import org.kaleta.accountant.frontend.common.SwingWorkerHandler;
 import java.awt.event.ActionEvent;
 
 /**
- * Created by Stanislav Kaleta on 10.01.2017.
+ * Basic class for every action.
  */
 public abstract class ActionListener implements java.awt.event.ActionListener {
     private Configurable configurable;

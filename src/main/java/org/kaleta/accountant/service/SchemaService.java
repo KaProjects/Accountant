@@ -7,6 +7,7 @@ import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Initializer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -26,6 +27,41 @@ public class SchemaService {
     public List<SchemaModel.Class> getSchemaClassList(String year) {
         try {
             return new SchemaManager(year).retrieve().getClazz();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns list of schema classes for specified account type.
+     */
+    public List<SchemaModel.Class> getSchemaClassListByAccountType(String year, String accountType) {
+        try {
+            List<SchemaModel.Class> allClasses = new SchemaManager(year).retrieve().getClazz();
+            List<SchemaModel.Class> filteredClasses = new ArrayList<>();
+            for (SchemaModel.Class clazz : allClasses) {
+                List<SchemaModel.Class.Group> groupList = new ArrayList<>();
+                for (SchemaModel.Class.Group group : clazz.getGroup()) {
+                    List<SchemaModel.Class.Group.Account> accountList = new ArrayList<>();
+                    for (SchemaModel.Class.Group.Account account : group.getAccount()) {
+                        if (account.getType().equals(accountType)){
+                            accountList.add(account);
+                        }
+                    }
+                    if (!accountList.isEmpty()){
+                        group.getAccount().clear();
+                        group.getAccount().addAll(accountList);
+                        groupList.add(group);
+                    }
+                }
+                if (!groupList.isEmpty()){
+                    clazz.getGroup().clear();
+                    clazz.getGroup().addAll(groupList);
+                    filteredClasses.add(clazz);
+                }
+            }
+            return filteredClasses;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -121,9 +157,7 @@ public class SchemaService {
      * Returns true if schema group can be deleted, false otherwise.
      */
     public boolean isGroupDeletable(String year, String classId, String groupId) {
-        // TODO: 10.10.2017 TODO impl. this when conditions decided
-        // TODO: 10.10.2017 e.g. associated opened accounts
-        // TODO: 15.10.2017 dont forget to check associated groups/accounts
+        // TODO 1.0 : impl. this when conditions decided, e.g. associated opened accounts (dont forget to check associated groups/accounts)
         return true;
     }
 
@@ -131,9 +165,7 @@ public class SchemaService {
      * Returns true if schema account can be deleted, false otherwise.
      */
     public boolean isAccountDeletable(String year, String classId, String groupId, String accountId) {
-        // TODO: 10.10.2017 TODO impl. this when conditions decided
-        // TODO: 10.10.2017 e.g. associated opened accounts
-        // TODO: 15.10.2017 dont forget to check associated groups/accounts
+        // TODO 1.0 : impl. this when conditions decided, e.g. associated opened accounts (dont forget to check associated groups/accounts)
         return true;
     }
 
@@ -338,10 +370,4 @@ public class SchemaService {
             throw new ServiceFailureException(e);
         }
     }
-
-
-
-
-
-
 }

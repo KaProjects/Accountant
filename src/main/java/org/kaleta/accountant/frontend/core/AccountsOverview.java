@@ -16,7 +16,6 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.util.List;
 
-
 public class AccountsOverview extends JPanel implements Configurable {
     private Configuration configuration;
 
@@ -117,7 +116,6 @@ public class AccountsOverview extends JPanel implements Configurable {
     private void updateAccountOverview() {
         accountOverviewPanel.removeAll();
         if (selectedSchemaAccount.equals("-1")) {
-            //accountOverviewPanel.add(new JLabel("Select a Schema Account to see its overview."));
             this.revalidate();
             this.repaint();
             return;
@@ -132,7 +130,7 @@ public class AccountsOverview extends JPanel implements Configurable {
                         +Service.ACCOUNT.getAccountTurnover(getConfiguration().getSelectedYear(), account) + "  balance="
                         +Service.ACCOUNT.getAccountBalance(getConfiguration().getSelectedYear(), account);
                 accountOverviewPanel.add(new JLabel(text));
-                // TODO: 5.3.2017 design&impl
+                // TODO post 1.0 : design&impl
             }
         }
         this.revalidate();

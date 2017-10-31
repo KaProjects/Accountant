@@ -186,8 +186,7 @@ public class AccountsEditor extends JPanel implements Configurable {
         public void update(){
             panelAccounts.removeAll();
             for (AccountsModel.Account semAcc : Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(), schemaId)){
-                // TODO: 10/26/17 design&impl
-                // TODO: 10/26/17 edit, close?/del?,...
+                // TODO post 1.0 : design&impl (edit, close?/del?,...)
                 JLabel label = new JLabel(" " + semAcc.getSemanticId() + " " + semAcc.getName());
                 label.setFont(new Font(label.getFont().getName(), Font.BOLD, 15));
                 panelAccounts.add(label);

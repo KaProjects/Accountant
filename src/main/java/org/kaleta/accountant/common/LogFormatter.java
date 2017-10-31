@@ -1,4 +1,4 @@
-package org.kaleta.accountant.frontend.common;
+package org.kaleta.accountant.common;
 
 import java.util.Date;
 import java.util.logging.Handler;
@@ -35,6 +35,7 @@ public class LogFormatter extends SimpleFormatter {
 
     @Override
     public String getTail(Handler h) {
-        return "######### Application ended #########\n";
+        Date date = new Date(System.currentTimeMillis());
+        return "ending time: "+date.toString() + "\n######### Application ended #########\n";
     }
 }

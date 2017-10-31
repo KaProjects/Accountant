@@ -69,7 +69,7 @@ public class ConfigService {
             }
         }
 
-        // TODO: 3.10.2017 check years data -> do something if corrupted
+        // TODO post 1.0 check years data -> do something if corrupted
     }
 
     /**
@@ -95,7 +95,7 @@ public class ConfigService {
             new SchemaManager(newYearName).create();
             new TransactionsManager(newYearName).create();
             new AccountsManager(newYearName).create();
-            // TODO: 3.10.2017 add if needed: procedures?,...
+            // TODO 1.0 : add if needed: procedures?,...
 
             ConfigManager configManager = new ConfigManager();
             ConfigModel configModel = configManager.retrieve();
@@ -136,5 +136,4 @@ public class ConfigService {
             throw new ServiceFailureException(e);
         }
     }
-
 }

@@ -9,6 +9,7 @@ import java.awt.*;
 /**
  * Created by Stanislav Kaleta on 19.04.2016.
  */
+@Deprecated
 public class SchemaDialog extends Dialog {
     private final Schema schema;
 

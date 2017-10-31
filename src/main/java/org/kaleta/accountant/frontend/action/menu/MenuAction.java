@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Created by Stanislav Kaleta on 19.04.2016.
- *
  * Basic class for every menu action.
  */
 abstract public class MenuAction extends AbstractAction {

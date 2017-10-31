@@ -1,9 +1,5 @@
-package org.kaleta.accountant.frontend.dep;
+package org.kaleta.accountant.frontend.common;
 
-/**
- * Created by Stanislav Kaleta on 10.08.2016.
- */
-@Deprecated
 public class BalanceRow {
     public static final String SUM = "SUM";
     public static final String CLASS = "CLASS";

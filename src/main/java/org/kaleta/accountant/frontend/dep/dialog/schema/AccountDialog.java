@@ -12,6 +12,7 @@ import java.awt.*;
 /**
  * Created by Stanislav Kaleta on 20.04.2016.
  */
+@Deprecated
 class AccountDialog extends Dialog {
     private final Schema.Class.Group.Account account;
 

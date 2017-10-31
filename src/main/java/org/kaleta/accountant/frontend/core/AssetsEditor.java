@@ -28,13 +28,11 @@ public class AssetsEditor extends JPanel implements Configurable {
 
     private String schemaFilter;
     private int activeFilter;
-    private List<AssetPanel> assetPanels;
 
     public AssetsEditor(Configuration configuration) {
         setConfiguration(configuration);
         schemaFilter = "0";
         activeFilter = 0;
-        assetPanels = new ArrayList<>();
 
         buttonDepreciateAll = new JButton("Depreciate All");
 

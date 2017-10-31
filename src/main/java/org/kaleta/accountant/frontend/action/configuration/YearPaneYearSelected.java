@@ -59,17 +59,18 @@ public class YearPaneYearSelected extends ConfigurationAction {
             RevenuesEditor revenuesEditor = new RevenuesEditor(getConfiguration());
             accountsPane.add("Revenues", revenuesEditor);
 
+            JTabbedPane transactionsPane = new JTabbedPane();
+            pane.addTab("Transactions", transactionsPane);
+            transactionsPane.addTab("Overview", new JScrollPane(transactionsOverview));
+
             JTabbedPane accountingPane = new JTabbedPane();
             pane.addTab("Accounting", accountingPane);
-            accountingPane.addTab("Journal", new JScrollPane(transactionsOverview));
             accountingPane.addTab("Balance", new JScrollPane(balanceOverview));
             accountingPane.addTab("Profit", new JScrollPane(profitOverview));
-
-
         } else {
             pane.addTab("Schema", new JScrollPane(schemaOverview));
             pane.addTab("Accounts", new JScrollPane(accountsOverview));
-            pane.addTab("Journal", new JScrollPane(transactionsOverview));
+            pane.addTab("Transactions", new JScrollPane(transactionsOverview));
             pane.addTab("Balance", new JScrollPane(balanceOverview));
             pane.addTab("Profit", new JScrollPane(profitOverview));
         }
