@@ -62,13 +62,14 @@ public class Constants {
         public static final String PROFIT_GROUP_ID = "0";
         public static final String PROFIT_STATEMENT_ACCOUNT_NAME = "Vykaz zisku a strat";
         public static final String PROFIT_STATEMENT_ACCOUNT_ID = "0";
-
     }
 
     public static class Account {
         public static final String INIT_ACC_ID = "700.0";
         public static final String CLOSING_ACC_ID = "701.0";
         public static final String PROFIT_ACC_ID = "710.0";
+
+        public static final String GENERAL_ACCOUNT_NAME = "general";
     }
 
     public static class Color {

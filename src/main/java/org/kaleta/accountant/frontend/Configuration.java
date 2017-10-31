@@ -1,8 +1,6 @@
 package org.kaleta.accountant.frontend;
 
 
-import org.kaleta.accountant.frontend.year.model.YearModel;
-
 /**
  *  Provides major app. wide configuration operations.
  */
@@ -34,7 +32,4 @@ public interface Configuration {
      * Returns selected year.
      */
     String getSelectedYear();
-
-    @Deprecated
-    YearModel getModel();
 }

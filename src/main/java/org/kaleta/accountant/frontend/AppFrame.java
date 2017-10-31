@@ -4,7 +4,6 @@ import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
 import org.kaleta.accountant.frontend.component.YearMenu;
 import org.kaleta.accountant.frontend.core.YearPane;
-import org.kaleta.accountant.frontend.year.model.YearModel;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -15,14 +14,8 @@ import java.awt.event.KeyEvent;
 
 public class AppFrame extends JFrame implements Configuration{
     private String selectedYear;
-    private YearModel model; // TODO: 3.10.2017 to del
 
     public AppFrame(){
-//        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//        Dimension frameSize = this.getSize();
-//        int centerPosX = (screenSize.width - frameSize.width) / 2;
-//        int centerPosY = (screenSize.height - frameSize.height) / 2;
-//        this.setLocation(centerPosX, centerPosY);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setTitle(Initializer.NAME +" - "+ Initializer.VERSION);
 
@@ -31,6 +24,10 @@ public class AppFrame extends JFrame implements Configuration{
         applySettings();
         this.pack();
         this.setSize(1100,1000);
+
+        int centerPosX = (Toolkit.getDefaultToolkit().getScreenSize().width - this.getSize().width) / 2;
+        int centerPosY = (Toolkit.getDefaultToolkit().getScreenSize().height - this.getSize().height) / 2;
+        this.setLocation(centerPosX, centerPosY);
     }
 
     private void initMenuBar() {
@@ -63,36 +60,13 @@ public class AppFrame extends JFrame implements Configuration{
 
     private void initComponents( ){
         this.getContentPane().setLayout(new GridLayout(1,1));
-
-//        JTabbedPane tabbedPane = new JTabbedPane();
-//
-//        JScrollPane journalPane = new JScrollPane(new JournalTable());
-//        tabbedPane.addTab("Journal", journalPane);
-//
-//        JScrollPane balancePane = new JScrollPane(new BalanceTable());
-//        tabbedPane.addTab("Balance", balancePane);
-//
-//        JScrollPane profitPane = new JScrollPane(new ProfitTable());
-//        tabbedPane.addTab("Profit", profitPane);
-//        this.add(tabbedPane);
-        // TODO: 3.10.2017 to del - old layout
-
         this.add(new YearPane());
     }
 
     private void applySettings(){
         update(Configuration.INIT_CONFIG);
-
-
-        // TODO: 3.10.2017 to del
-        model = Service.YEAR.getYearModel(Integer.parseInt(Service.CONFIG.getActiveYear()));
-
-
         update(Configuration.YEAR_ADDED); // to init Year Menu
         selectYear(Service.CONFIG.getActiveYear());
-
-
-
     }
 
     private void updateComponent(JComponent component,int command) {
@@ -127,10 +101,5 @@ public class AppFrame extends JFrame implements Configuration{
     @Override
     public String getSelectedYear() {
         return selectedYear;
-    }
-
-    @Override
-    public YearModel getModel() {
-        return model;
     }
 }

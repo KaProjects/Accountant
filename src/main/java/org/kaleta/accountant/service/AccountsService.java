@@ -249,6 +249,23 @@ public class AccountsService {
         }
     }
 
+    /**
+     * Returns name of semantic account according to specified attributes.
+     */
+    public String getAccountName(String year, String fullId){
+        try {
+            AccountsModel accountsModel = new AccountsManager(year).retrieve();
+            for (AccountsModel.Account account : accountsModel.getAccount()){
+                if (account.getFullId().equals(fullId)){
+                    return account.getName();
+                }
+            }
+            throw new IllegalArgumentException("No account found for '"+ fullId + "'");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
 
 
 

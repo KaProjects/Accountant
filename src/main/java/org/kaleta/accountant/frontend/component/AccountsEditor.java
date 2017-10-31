@@ -1,7 +1,8 @@
-package org.kaleta.accountant.frontend.year.component;
+package org.kaleta.accountant.frontend.component;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.AccountsEditorAccountAction;
@@ -118,6 +119,8 @@ public class AccountsEditor extends JPanel implements Configurable {
             JButton buttonAdd = new JButton("Add");
             JTextField textFieldName = new JTextField();
             textFieldName.setVisible(false);
+            JButton buttonGeneralAdd = new JButton("General");
+            buttonGeneralAdd.setVisible(false);
             JButton buttonConfirmAdd = new JButton("Confirm");
             buttonConfirmAdd.setVisible(false);
             JButton buttonCancelAdd = new JButton("Cancel");
@@ -130,12 +133,14 @@ public class AccountsEditor extends JPanel implements Configurable {
             layoutAddPanel.setHorizontalGroup(layoutAddPanel.createSequentialGroup()
                     .addComponent(buttonAdd)
                     .addComponent(textFieldName,100,100,100).addGap(5)
+                    .addComponent(buttonGeneralAdd).addGap(5)
                     .addComponent(buttonConfirmAdd).addGap(5)
                     .addComponent(buttonCancelAdd)
                     .addComponent(panelGap));
             layoutAddPanel.setVerticalGroup(layoutAddPanel.createParallelGroup()
                     .addComponent(buttonAdd,25,25,25)
                     .addComponent(textFieldName,25,25,25)
+                    .addComponent(buttonGeneralAdd,25,25,25)
                     .addComponent(buttonConfirmAdd,25,25,25)
                     .addComponent(buttonCancelAdd,25,25,25)
                     .addComponent(panelGap,25,25,25));
@@ -146,6 +151,11 @@ public class AccountsEditor extends JPanel implements Configurable {
                 textFieldName.setVisible(true);
                 buttonConfirmAdd.setVisible(true);
                 buttonCancelAdd.setVisible(true);
+                buttonGeneralAdd.setVisible(true);
+            });
+
+            buttonGeneralAdd.addActionListener(e -> {
+                textFieldName.setText(Constants.Account.GENERAL_ACCOUNT_NAME);
             });
 
             buttonConfirmAdd.addActionListener(new AccountsEditorAccountAction(AccountsEditor.this, schemaId, textFieldName));
@@ -154,6 +164,7 @@ public class AccountsEditor extends JPanel implements Configurable {
                 textFieldName.setVisible(false);
                 buttonConfirmAdd.setVisible(false);
                 buttonCancelAdd.setVisible(false);
+                buttonGeneralAdd.setVisible(false);
             });
 
             buttonCancelAdd.addActionListener(e -> {
@@ -161,6 +172,7 @@ public class AccountsEditor extends JPanel implements Configurable {
                 textFieldName.setVisible(false);
                 buttonConfirmAdd.setVisible(false);
                 buttonCancelAdd.setVisible(false);
+                buttonGeneralAdd.setVisible(false);
             });
 
             panelAccounts = new JPanel();

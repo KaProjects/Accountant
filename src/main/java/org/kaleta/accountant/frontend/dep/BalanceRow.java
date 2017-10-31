@@ -3,6 +3,7 @@ package org.kaleta.accountant.frontend.dep;
 /**
  * Created by Stanislav Kaleta on 10.08.2016.
  */
+@Deprecated
 public class BalanceRow {
     public static final String SUM = "SUM";
     public static final String CLASS = "CLASS";

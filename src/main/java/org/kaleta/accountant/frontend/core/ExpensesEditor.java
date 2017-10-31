@@ -4,7 +4,7 @@ import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.year.component.AccountsEditor;
+import org.kaleta.accountant.frontend.component.AccountsEditor;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;

@@ -30,19 +30,19 @@ public class AccountsManager implements Manager<AccountsModel> {
         accountsModel.setYear(year);
 
         AccountsModel.Account initAcc = new AccountsModel.Account();
-        initAcc.setName(Constants.Schema.INIT_BALANCE_ACCOUNT_NAME);
+        initAcc.setName(Constants.Account.GENERAL_ACCOUNT_NAME);
         initAcc.setSchemaId(Constants.Account.INIT_ACC_ID.split("\\.")[0]);
         initAcc.setSemanticId(Constants.Account.INIT_ACC_ID.split("\\.")[1]);
         accountsModel.getAccount().add(initAcc);
 
         AccountsModel.Account closingAcc = new AccountsModel.Account();
-        closingAcc.setName(Constants.Schema.CLOSING_BALANCE_ACCOUNT_NAME);
+        closingAcc.setName(Constants.Account.GENERAL_ACCOUNT_NAME);
         closingAcc.setSchemaId(Constants.Account.CLOSING_ACC_ID.split("\\.")[0]);
         closingAcc.setSemanticId(Constants.Account.CLOSING_ACC_ID.split("\\.")[1]);
         accountsModel.getAccount().add(closingAcc);
 
         AccountsModel.Account profitAcc = new AccountsModel.Account();
-        profitAcc.setName(Constants.Schema.PROFIT_STATEMENT_ACCOUNT_NAME);
+        profitAcc.setName(Constants.Account.GENERAL_ACCOUNT_NAME);
         profitAcc.setSchemaId(Constants.Account.PROFIT_ACC_ID.split("\\.")[0]);
         profitAcc.setSemanticId(Constants.Account.PROFIT_ACC_ID.split("\\.")[1]);
         accountsModel.getAccount().add(profitAcc);

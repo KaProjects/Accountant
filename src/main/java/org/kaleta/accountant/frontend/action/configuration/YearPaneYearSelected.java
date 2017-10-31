@@ -1,7 +1,6 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
 import org.kaleta.accountant.frontend.core.*;
-import org.kaleta.accountant.frontend.year.component.ResourcesEditor;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -26,6 +25,12 @@ public class YearPaneYearSelected extends ConfigurationAction {
         TransactionsOverview transactionsOverview = new TransactionsOverview();
         transactionsOverview.setConfiguration(getConfiguration());
         transactionsOverview.update();
+        BalanceOverview balanceOverview = new BalanceOverview();
+        balanceOverview.setConfiguration(getConfiguration());
+        balanceOverview.update();
+        ProfitOverview profitOverview = new ProfitOverview();
+        profitOverview.setConfiguration(getConfiguration());
+        profitOverview.update();
 
         if (pane.getConfiguration().getSelectedYear().equals(Service.CONFIG.getActiveYear())){
             JTabbedPane schemaPane = new JTabbedPane();
@@ -54,16 +59,19 @@ public class YearPaneYearSelected extends ConfigurationAction {
             RevenuesEditor revenuesEditor = new RevenuesEditor(getConfiguration());
             accountsPane.add("Revenues", revenuesEditor);
 
-            JTabbedPane transactionsPane = new JTabbedPane();
-            pane.addTab("Transactions", transactionsPane);
-            transactionsPane.addTab("Overview", new JScrollPane(transactionsOverview));
-
+            JTabbedPane accountingPane = new JTabbedPane();
+            pane.addTab("Accounting", accountingPane);
+            accountingPane.addTab("Journal", new JScrollPane(transactionsOverview));
+            accountingPane.addTab("Balance", new JScrollPane(balanceOverview));
+            accountingPane.addTab("Profit", new JScrollPane(profitOverview));
 
 
         } else {
             pane.addTab("Schema", new JScrollPane(schemaOverview));
             pane.addTab("Accounts", new JScrollPane(accountsOverview));
-            pane.addTab("Transactions", new JScrollPane(transactionsOverview));
+            pane.addTab("Journal", new JScrollPane(transactionsOverview));
+            pane.addTab("Balance", new JScrollPane(balanceOverview));
+            pane.addTab("Profit", new JScrollPane(profitOverview));
         }
         pane.revalidate();
         pane.repaint();

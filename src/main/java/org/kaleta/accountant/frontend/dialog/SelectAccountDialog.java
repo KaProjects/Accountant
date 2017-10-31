@@ -150,7 +150,11 @@ public class SelectAccountDialog extends Dialog {
                         for (AccountsModel.Account account : accountList) {
                             AccountTreeNode accountNode = new AccountTreeNode(account.getName());
                             accountNode.setSchemaFullId(account.getFullId());
-                            accountNode.setFullName(acc.getName() + " - " + account.getName());
+                            if (account.getName().equals(Constants.Account.GENERAL_ACCOUNT_NAME)){
+                                accountNode.setFullName(acc.getName());
+                            } else {
+                                accountNode.setFullName(acc.getName() + " - " + account.getName());
+                            }
                             schemaAccountNode.add(accountNode);
                         }
                     }
