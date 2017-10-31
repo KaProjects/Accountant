@@ -8,7 +8,6 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.DepreciateDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +57,7 @@ public class OpenDepreciateDialog extends ActionListener {
 
             configs.add(new DepreciateDialog.Config(account, accDepAccount, dateHint, monthlyDepHint, (assetValue-accDepSum), enabled));
         }
-        DepreciateDialog dialog = new DepreciateDialog((Frame) getConfiguration(), configs);
+        DepreciateDialog dialog = new DepreciateDialog(getConfiguration(), configs);
         dialog.setVisible(true);
         if (dialog.getResult()){
             for (DepreciateDialog.Config config : dialog.getConfigs()){

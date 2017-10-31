@@ -2,6 +2,7 @@ package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.common.NumberFilter;
 import org.kaleta.accountant.frontend.component.SelectAccountTextField;
@@ -30,10 +31,10 @@ public class AddResourcesDialog extends Dialog {
     private List<ResourcePanel> resourcePanelList;
     private JPanel resourcesPanel;
 
-    public AddResourcesDialog(Frame parent, Map<String, List<AccountsModel.Account>> resourceAccountMap, SchemaModel.Class resourceClass,
+    public AddResourcesDialog(Configuration configuration, Map<String, List<AccountsModel.Account>> resourceAccountMap, SchemaModel.Class resourceClass,
                               Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> creditClasses,
                               Map<String, List<AccountsModel.Account>> debitAccountMap, List<SchemaModel.Class> debitClasses) {
-        super(parent, "Adding Resources");
+        super(configuration, "Adding Resources");
         this.resourceAccountMap = resourceAccountMap;
         this.resourceClass = resourceClass;
         this.creditAccountMap = creditAccountMap;
@@ -68,6 +69,7 @@ public class AddResourcesDialog extends Dialog {
 
         JLabel labelDate = new JLabel("Date: ");
         tfDate = new JTextField();
+        tfDate.setHorizontalAlignment(SwingConstants.RIGHT);
         JButton buttonToday = new JButton("Today");
         buttonToday.addActionListener(a -> {
             Calendar calendar = Calendar.getInstance();
@@ -237,7 +239,7 @@ public class AddResourcesDialog extends Dialog {
 
             JLabel labelDebit = new JLabel("In favor of: ");
             labelDebit.setVisible(false);
-            textFieldDebit = new SelectAccountTextField((Frame) AddResourcesDialog.this.getParent(), debitAccountMap, debitClasses);
+            textFieldDebit = new SelectAccountTextField(getConfiguration(), debitAccountMap, debitClasses);
             textFieldDebit.setVisible(false);
 
             textFieldDebitInfo = new JTextField();

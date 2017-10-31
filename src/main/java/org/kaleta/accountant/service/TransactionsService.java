@@ -67,6 +67,9 @@ public class TransactionsService {
                         transactionList.add(transaction);
                     }
                 }
+                if (debit == null && credit == null){
+                    transactionList.add(transaction);
+                }
             }
             return transactionList;
         } catch (ManagerException e){

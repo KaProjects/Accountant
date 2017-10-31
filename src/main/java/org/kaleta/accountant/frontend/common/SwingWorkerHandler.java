@@ -7,8 +7,6 @@ import org.kaleta.accountant.service.ServiceFailureException;
 import javax.swing.*;
 
 /**
- * Created by Stanislav Kaleta on 16.04.2016.
- *
  * Handles executing in Swing Worker thread. Every GUI action should extend this class.
  */
 public abstract class SwingWorkerHandler {

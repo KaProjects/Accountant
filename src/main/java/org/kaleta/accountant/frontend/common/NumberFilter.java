@@ -6,9 +6,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
-/**
- * Created by Stanislav Kaleta on 20.04.2016.
- */
 public class NumberFilter extends DocumentFilter {
     @Override
     public void insertString(FilterBypass fb, int offset, String string,

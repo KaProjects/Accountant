@@ -3,11 +3,11 @@ package org.kaleta.accountant.frontend.dialog;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
+import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.action.listener.AccountsEditorAccountAction;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,17 +20,21 @@ public class SelectAccountDialog extends Dialog {
     private String selectedAccountId;
     private String selectedAccountName;
 
-    public SelectAccountDialog(Frame parent, Map<String, java.util.List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
-        super(parent, "Selecting Account");
+    private DefaultTreeModel accountTreeModel;
+    private JTree accountTree;
+
+    public SelectAccountDialog(Configuration configuration, Map<String, java.util.List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
+        super(configuration, "Selecting Account");
         this.accountMap = accountMap;
         this.classList = classList;
         selectedAccountId = "";
         buildDialog();
+        updateTree("");
         this.setSize(300, 100*classList.size() + 200);
     }
 
-    public SelectAccountDialog(Frame parent, Map<String, java.util.List<AccountsModel.Account>> accountMap, SchemaModel.Class clazz) {
-        super(parent, "Selecting Account");
+    public SelectAccountDialog(Configuration configuration, Map<String, java.util.List<AccountsModel.Account>> accountMap, SchemaModel.Class clazz) {
+        super(configuration, "Selecting Account");
         this.accountMap = accountMap;
         this.classList = new ArrayList<>();
         classList.add(clazz);
@@ -54,38 +58,15 @@ public class SelectAccountDialog extends Dialog {
             dispose();
         });
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-        for (SchemaModel.Class clazz : classList) {
-            boolean classHasAccount = false;
-            DefaultMutableTreeNode classNode = new DefaultMutableTreeNode(clazz.getName());
-            for (SchemaModel.Class.Group group : clazz.getGroup()) {
-                boolean groupHasAccount = false;
-                DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(group.getName());
-                for (SchemaModel.Class.Group.Account acc : group.getAccount()) {
-                    DefaultMutableTreeNode accNode = new DefaultMutableTreeNode(acc.getName());
-                    List<AccountsModel.Account> accountList = accountMap.get(clazz.getId() + group.getId() + acc.getId());
-                    if (accountList != null) {
-                        classHasAccount = true;
-                        groupHasAccount = true;
-                        for (AccountsModel.Account account : accountList) {
-                            AccountTreeNode accountNode = new AccountTreeNode(account.getName());
-                            accountNode.setSchemaId(account.getFullId());
-                            accountNode.setFullName(acc.getName() + " - " + account.getName());
-                            accNode.add(accountNode);
-                        }
-                        groupNode.add(accNode);
-                    }
-                }
-                if (groupHasAccount) classNode.add(groupNode);
-            }
-            if (classHasAccount) root.add(classNode);
-        }
+        JButton buttonAddAccount = new JButton("Add Account");
+        buttonAddAccount.setEnabled(false);
 
-        JTree tree = new JTree(root);
-        tree.setRootVisible(false);
-        tree.setToggleClickCount(1);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.setCellRenderer(new DefaultTreeCellRenderer() {
+        accountTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
+        accountTree = new JTree(accountTreeModel);
+        accountTree.setRootVisible(false);
+        accountTree.setToggleClickCount(1);
+        accountTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        accountTree.setCellRenderer(new DefaultTreeCellRenderer() {
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 Component c = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
@@ -108,17 +89,32 @@ public class SelectAccountDialog extends Dialog {
                 return c;
             }
         });
-        tree.addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        accountTree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) accountTree.getLastSelectedPathComponent();
             if (node instanceof SelectAccountDialog.AccountTreeNode) {
-                selectedAccountId = ((SelectAccountDialog.AccountTreeNode) node).getSchemaId();
+                selectedAccountId = ((SelectAccountDialog.AccountTreeNode) node).getSchemaFullId();
                 selectedAccountName = ((SelectAccountDialog.AccountTreeNode) node).getFullName();
             } else {
                 selectedAccountId = "";
                 selectedAccountName = "";
             }
+            buttonAddAccount.setEnabled(node instanceof SelectAccountDialog.SchemaAccountTreeNode);
         });
-        JScrollPane accountTreeScrollPane = new JScrollPane(tree);
+        JScrollPane accountTreeScrollPane = new JScrollPane(accountTree);
+
+        buttonAddAccount.addActionListener(e -> {
+            String name = JOptionPane.showInputDialog(getParent(), "Set Account Name");
+            if (name != null && !name.trim().isEmpty()) {
+                String schemaId = ((SchemaAccountTreeNode) accountTree.getLastSelectedPathComponent()).getSchemaId();
+                List<AccountsModel.Account> accountList = accountMap.get(schemaId);
+                if (accountList == null) accountList = new ArrayList<>();
+                AccountsEditorAccountAction action = new AccountsEditorAccountAction(this, schemaId, null);
+                AccountsModel.Account createdAccount = action.subactionPerformed(name);
+                accountList.add(createdAccount);
+                accountMap.put(schemaId, accountList);
+                updateTree(schemaId);
+            }
+        });
 
         GroupLayout layout = new GroupLayout(this.getContentPane());
         this.getContentPane().setLayout(layout);
@@ -126,15 +122,47 @@ public class SelectAccountDialog extends Dialog {
                 .addGroup(layout.createParallelGroup()
                 .addComponent(accountTreeScrollPane)
                 .addGroup(layout.createSequentialGroup()
-                        .addGap(5, 5, Short.MAX_VALUE).addComponent(buttonCancel).addGap(5).addComponent(buttonOk)))
+                        .addComponent(buttonAddAccount).addGap(5, 5, Short.MAX_VALUE).addComponent(buttonCancel).addGap(5).addComponent(buttonOk)))
                 .addGap(5));
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGap(5)
                 .addComponent(accountTreeScrollPane)
                 .addGap(5)
                 .addGroup(layout.createParallelGroup()
-                        .addComponent(buttonCancel).addComponent(buttonOk))
+                        .addComponent(buttonAddAccount).addComponent(buttonCancel).addComponent(buttonOk))
                 .addGap(5));
+    }
+
+    private void updateTree(String updatedSchemaId){
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) accountTreeModel.getRoot();
+        root.removeAllChildren();
+        DefaultMutableTreeNode updatedSchemaAccountNode = null;
+        for (SchemaModel.Class clazz : classList) {
+            DefaultMutableTreeNode classNode = new DefaultMutableTreeNode(clazz.getName());
+            for (SchemaModel.Class.Group group : clazz.getGroup()) {
+                DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode(group.getName());
+                for (SchemaModel.Class.Group.Account acc : group.getAccount()) {
+                    SchemaAccountTreeNode schemaAccountNode = new SchemaAccountTreeNode(acc.getName());
+                    String schemaId = clazz.getId() + group.getId() + acc.getId();
+                    schemaAccountNode.setSchemaId(schemaId);
+                    List<AccountsModel.Account> accountList = accountMap.get(schemaId);
+                    if (accountList != null) {
+                        for (AccountsModel.Account account : accountList) {
+                            AccountTreeNode accountNode = new AccountTreeNode(account.getName());
+                            accountNode.setSchemaFullId(account.getFullId());
+                            accountNode.setFullName(acc.getName() + " - " + account.getName());
+                            schemaAccountNode.add(accountNode);
+                        }
+                    }
+                    groupNode.add(schemaAccountNode);
+                    if (schemaId.equals(updatedSchemaId)) updatedSchemaAccountNode = schemaAccountNode;
+                }
+                classNode.add(groupNode);
+            }
+            root.add(classNode);
+        }
+        accountTreeModel.setRoot(root);
+        if (updatedSchemaAccountNode != null) accountTree.expandPath(new TreePath(updatedSchemaAccountNode.getPath()));
     }
 
     public String getSelectedAccountId() {
@@ -146,10 +174,34 @@ public class SelectAccountDialog extends Dialog {
     }
 
     private class AccountTreeNode extends DefaultMutableTreeNode {
-        private String schemaId;
+        private String schemaFullId;
         private String fullName;
 
         AccountTreeNode(String title) {
+            super(title);
+        }
+
+        public String getSchemaFullId() {
+            return schemaFullId;
+        }
+
+        public void setSchemaFullId(String schemaId) {
+            this.schemaFullId = schemaId;
+        }
+
+        public String getFullName() {
+            return fullName;
+        }
+
+        public void setFullName(String fullName) {
+            this.fullName = fullName;
+        }
+    }
+
+    private class SchemaAccountTreeNode extends DefaultMutableTreeNode {
+        private String schemaId;
+
+        SchemaAccountTreeNode(String title) {
             super(title);
         }
 
@@ -159,14 +211,6 @@ public class SelectAccountDialog extends Dialog {
 
         public void setSchemaId(String schemaId) {
             this.schemaId = schemaId;
-        }
-
-        public String getFullName() {
-            return fullName;
-        }
-
-        public void setFullName(String fullName) {
-            this.fullName = fullName;
         }
     }
 }

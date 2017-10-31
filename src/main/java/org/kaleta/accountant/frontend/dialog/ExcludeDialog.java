@@ -2,13 +2,13 @@ package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.common.NumberFilter;
 import org.kaleta.accountant.frontend.component.SelectAccountTextField;
 
 import javax.swing.*;
 import javax.swing.text.PlainDocument;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Calendar;
@@ -32,10 +32,10 @@ public class ExcludeDialog extends Dialog {
     private JTextField textFieldDate;
     private JTextField textFieldRevenueValue;
 
-    public ExcludeDialog(Frame parent, Map<String, List<AccountsModel.Account>> expenseAccountMap, SchemaModel.Class expenseClass,
+    public ExcludeDialog(Configuration configuration, Map<String, List<AccountsModel.Account>> expenseAccountMap, SchemaModel.Class expenseClass,
                          Map<String, List<AccountsModel.Account>> debitAccountMap, List<SchemaModel.Class> debitClasses,
                          Map<String, List<AccountsModel.Account>> revenueAccountMap, SchemaModel.Class revenueClass) {
-        super(parent, "Excluding Asset");
+        super(configuration, "Excluding Asset");
         this.expenseAccountMap = expenseAccountMap;
         this.expenseClass = expenseClass;
         this.debitAccountMap = debitAccountMap;
@@ -47,9 +47,9 @@ public class ExcludeDialog extends Dialog {
         pack();
     }
 
-    public ExcludeDialog(Frame parent, Map<String, List<AccountsModel.Account>> debitAccountMap, List<SchemaModel.Class> debitClasses,
+    public ExcludeDialog(Configuration configuration, Map<String, List<AccountsModel.Account>> debitAccountMap, List<SchemaModel.Class> debitClasses,
                          Map<String, List<AccountsModel.Account>> revenueAccountMap, SchemaModel.Class revenueClass) {
-        super(parent, "Excluding Asset");
+        super(configuration, "Excluding Asset");
         this.debitAccountMap = debitAccountMap;
         this.debitClasses = debitClasses;
         this.revenueAccountMap = revenueAccountMap;
@@ -81,6 +81,7 @@ public class ExcludeDialog extends Dialog {
 
         JLabel labelDate = new JLabel("Date: ");
         textFieldDate = new JTextField();
+        textFieldDate.setHorizontalAlignment(SwingConstants.RIGHT);
         ((PlainDocument) textFieldDate.getDocument()).setDocumentFilter(new NumberFilter());
         JButton buttonToday = new JButton("Today");
         buttonToday.addActionListener(a -> {
@@ -92,7 +93,7 @@ public class ExcludeDialog extends Dialog {
         if (hasExpense) {
             JLabel labelExpense = new JLabel("Residual Expense:");
             labelExpense.setToolTipText("Asset is not fully depreciated, therefore its residual value must be delegated to a expense account.");
-            textFieldExpense = new SelectAccountTextField((Frame) ExcludeDialog.this.getParent(), expenseAccountMap, expenseClass);
+            textFieldExpense = new SelectAccountTextField(getConfiguration(), expenseAccountMap, expenseClass);
 
             GroupLayout layoutExpense = new GroupLayout(panelExpense);
             panelExpense.setLayout(layoutExpense);
@@ -106,7 +107,7 @@ public class ExcludeDialog extends Dialog {
 
         JPanel panelDebit = new JPanel();
         JLabel labelDebit = new JLabel("Debit:");
-        textFieldDebit = new SelectAccountTextField((Frame) ExcludeDialog.this.getParent(), debitAccountMap, debitClasses);
+        textFieldDebit = new SelectAccountTextField(getConfiguration(), debitAccountMap, debitClasses);
 
         GroupLayout layoutDebit = new GroupLayout(panelDebit);
         panelDebit.setLayout(layoutDebit);
@@ -116,10 +117,11 @@ public class ExcludeDialog extends Dialog {
 
         JPanel panelRevenue = new JPanel();
         JLabel labelRevenue = new JLabel("Revenue:");
-        textFieldRevenue  = new SelectAccountTextField((Frame) ExcludeDialog.this.getParent(), revenueAccountMap, revenueClass);
+        textFieldRevenue  = new SelectAccountTextField(getConfiguration(), revenueAccountMap, revenueClass);
 
         JLabel labelRevenueValue = new JLabel("Value: ");
         textFieldRevenueValue = new JTextField();
+        textFieldRevenueValue.setHorizontalAlignment(SwingConstants.RIGHT);
         ((PlainDocument) textFieldRevenueValue.getDocument()).setDocumentFilter(new NumberFilter());
 
         GroupLayout layoutRevenue = new GroupLayout(panelRevenue);

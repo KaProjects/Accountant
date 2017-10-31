@@ -1,6 +1,7 @@
 package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.NumberFilter;
 
 import javax.swing.*;
@@ -13,8 +14,8 @@ import java.util.List;
 public class DepreciateDialog extends Dialog {
     private List<Config> configs;
 
-    public DepreciateDialog(Frame parent, List<Config> configs) {
-        super(parent, "Depreciating Asset(s) Dialog");
+    public DepreciateDialog(Configuration configuration, List<Config> configs) {
+        super(configuration, "Depreciating Asset(s) Dialog");
         this.configs = configs;
         buildDialog();
         pack();
@@ -38,6 +39,7 @@ public class DepreciateDialog extends Dialog {
             JLabel labelValue = new JLabel("Value: ");
             JTextField textFieldValue = new JTextField((config.getValueHint().contains("x")) ? "" : config.getValueHint());
             ((PlainDocument) textFieldValue.getDocument()).setDocumentFilter(new NumberFilter());
+            textFieldValue.setHorizontalAlignment(SwingConstants.RIGHT);
             textFieldValue.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent documentEvent) {
@@ -59,6 +61,7 @@ public class DepreciateDialog extends Dialog {
             JLabel labelDate = new JLabel("Date:");
             JTextField textFieldDate = new JTextField((config.getDateHint().contains("x")) ? "" : config.getDateHint());
             ((PlainDocument) textFieldDate.getDocument()).setDocumentFilter(new NumberFilter());
+            textFieldDate.setHorizontalAlignment(SwingConstants.RIGHT);
             textFieldDate.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent documentEvent) {

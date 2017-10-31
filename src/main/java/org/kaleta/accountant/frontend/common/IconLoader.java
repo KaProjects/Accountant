@@ -8,9 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
-/**
- * Created by Stanislav Kaleta on 16.04.2016.
- */
 public class IconLoader {
     public static final String NO_ICON = "/icon/no_icon.png";
     public static final String ERROR_ICON = "/icon/error_icon.png";

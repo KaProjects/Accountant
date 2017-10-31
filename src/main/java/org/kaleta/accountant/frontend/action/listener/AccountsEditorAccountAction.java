@@ -27,10 +27,15 @@ public class AccountsEditorAccountAction extends ActionListener{
 
     @Override
     protected void actionPerformed() {
+        subactionPerformed(tfName.getText());
+
+    }
+
+    public AccountsModel.Account subactionPerformed(String name){
         String semanticId = String.valueOf(Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),schemaId).size());
 
         AccountsModel.Account createdAccount =
-            Service.ACCOUNT.createAccount(getConfiguration().getSelectedYear(), tfName.getText(), schemaId, semanticId, "");
+                Service.ACCOUNT.createAccount(getConfiguration().getSelectedYear(), name, schemaId, semanticId, "");
 
         Calendar calendar = Calendar.getInstance();
         String date = String.format("%1$02d%2$02d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1);
@@ -39,11 +44,12 @@ public class AccountsEditorAccountAction extends ActionListener{
 
         if (schemaId.startsWith("1")){
             String consumptionAccId = Service.ACCOUNT.getConsumptionAccountId(schemaId, semanticId);
-            Service.ACCOUNT.createAccount(getConfiguration().getSelectedYear(), Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + tfName.getText(),
+            Service.ACCOUNT.createAccount(getConfiguration().getSelectedYear(), Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + name,
                     consumptionAccId.split("\\.")[0], consumptionAccId.split("\\.")[1], "");
         }
 
         getConfiguration().update(Configuration.ACCOUNT_UPDATED);
         getConfiguration().update(Configuration.TRANSACTION_UPDATED);
+        return createdAccount;
     }
 }

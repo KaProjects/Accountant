@@ -8,7 +8,6 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.AddResourcesDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,7 @@ public class OpenAddResourcesDialog extends ActionListener {
         debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(3));
         debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(5));
 
-        AddResourcesDialog dialog = new AddResourcesDialog((Frame) getConfiguration(),
+        AddResourcesDialog dialog = new AddResourcesDialog(getConfiguration(),
                 resourceAccountMap, resourceClass, creditAccountMap, creditClasses, debitAccountMap, debitClasses);
         dialog.setVisible(true);
         if (dialog.getResult()) {

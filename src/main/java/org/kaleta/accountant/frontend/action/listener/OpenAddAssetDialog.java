@@ -8,9 +8,7 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.AddAssetDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public class OpenAddAssetDialog extends ActionListener {
 
@@ -35,7 +33,7 @@ public class OpenAddAssetDialog extends ActionListener {
         creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(3));
         creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(4));
         creditClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(6));
-        AddAssetDialog dialog = new AddAssetDialog((Frame) getConfiguration(),
+        AddAssetDialog dialog = new AddAssetDialog(getConfiguration(),
                 new ArrayList<>(groupMap.values()), creditAccountMap,
                 creditClasses);
         dialog.setVisible(true);

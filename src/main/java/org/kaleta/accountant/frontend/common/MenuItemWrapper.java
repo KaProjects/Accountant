@@ -2,9 +2,6 @@ package org.kaleta.accountant.frontend.common;
 
 import javax.swing.*;
 
-/**
- * Created by Stanislav Kaleta on 16.04.2016.
- */
 public class MenuItemWrapper extends JMenuItem {
 
     public MenuItemWrapper(Action action, KeyStroke keyStroke, String tipText) {

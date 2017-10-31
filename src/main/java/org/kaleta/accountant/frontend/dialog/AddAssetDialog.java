@@ -2,11 +2,12 @@ package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.NumberFilter;
+import org.kaleta.accountant.frontend.component.SelectAccountTextField;
 
 import javax.swing.*;
 import javax.swing.text.PlainDocument;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -25,10 +26,10 @@ public class AddAssetDialog extends Dialog {
     private Map<String, List<AccountsModel.Account>> creditAccountMap;
     private List<SchemaModel.Class> classList;
 
-    private String creditAcc;
+    private SelectAccountTextField textFieldCreditAcc;
 
-    public AddAssetDialog(Frame parent, List<SchemaModel.Class.Group> groups, Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> classList) {
-        super(parent, "Adding Asset");
+    public AddAssetDialog(Configuration configuration, List<SchemaModel.Class.Group> groups, Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> classList) {
+        super(configuration, "Adding Asset");
         this.groups = groups;
         this.creditAccountMap = creditAccountMap;
         this.classList = classList;
@@ -49,7 +50,7 @@ public class AddAssetDialog extends Dialog {
                     || textFieldDate.getText() == null || textFieldDate.getText().trim().isEmpty()
                     || textFieldAmount.getText() == null || textFieldAmount.getText().trim().isEmpty()
                     || textFieldMonthlyDep.getText() == null || textFieldMonthlyDep.getText().trim().isEmpty()
-                    || creditAcc.trim().isEmpty()){
+                    || textFieldCreditAcc.getSelectedAccount().trim().isEmpty()){
                 JOptionPane.showMessageDialog(AddAssetDialog.this, "Mandatory attribute is not set!", "Value Missing", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -61,6 +62,7 @@ public class AddAssetDialog extends Dialog {
         textFieldName = new JTextField();
         JLabel labelDate = new JLabel("Date of Purchase:");
         textFieldDate = new JTextField();
+        textFieldDate.setHorizontalAlignment(SwingConstants.RIGHT);
         JButton buttonToday = new JButton("Today");
         buttonToday.addActionListener(a -> {
             Calendar calendar = Calendar.getInstance();
@@ -68,9 +70,11 @@ public class AddAssetDialog extends Dialog {
         });
         JLabel labelAmount = new JLabel("Amount:");
         textFieldAmount = new JTextField();
+        textFieldAmount.setHorizontalAlignment(SwingConstants.RIGHT);
         ((PlainDocument) textFieldAmount.getDocument()).setDocumentFilter(new NumberFilter());
         JLabel labelMonthlyDep = new JLabel("Preferred Monthly Deprecation:");
         textFieldMonthlyDep = new JTextField();
+        textFieldMonthlyDep.setHorizontalAlignment(SwingConstants.RIGHT);
         ((PlainDocument) textFieldMonthlyDep.getDocument()).setDocumentFilter(new NumberFilter());
         JLabel labelGroup = new JLabel("Group:");
         comboBoxGroup = new JComboBox<>();
@@ -82,23 +86,13 @@ public class AddAssetDialog extends Dialog {
             accounts.addAll(((SchemaModel.Class.Group)comboBoxGroup.getSelectedItem()).getAccount());
             accounts.forEach(account -> comboBoxAcc.addItem(account));
             comboBoxAcc.setSelectedIndex(-1);
+            AddAssetDialog.this.pack();
         });
-        JLabel labelAcc = new JLabel("Type:");
+        JLabel labelAcc = new JLabel("Account:");
         comboBoxAcc = new JComboBox<>();
 
         JLabel labelCreditAcc = new JLabel("Purchased by:");
-        JTextField textFieldCreditAcc = new JTextField();
-        textFieldCreditAcc.setEditable(false);
-        creditAcc = "";
-        JButton buttonSelectCreditAcc = new JButton("Select");
-        buttonSelectCreditAcc.addActionListener(e -> {
-            SelectAccountDialog selectCreditAccountDialog = new SelectAccountDialog((Frame) AddAssetDialog.this.getParent(), creditAccountMap, classList);
-            selectCreditAccountDialog.setVisible(true);
-            if (selectCreditAccountDialog.getResult()){
-                creditAcc = selectCreditAccountDialog.getSelectedAccountId();
-                textFieldCreditAcc.setText(selectCreditAccountDialog.getSelectedAccountName());
-            }
-        });
+        textFieldCreditAcc = new SelectAccountTextField(getConfiguration(), creditAccountMap, classList);
 
         JSeparator separator1 = new JSeparator(SwingConstants.HORIZONTAL);
         JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
@@ -113,10 +107,12 @@ public class AddAssetDialog extends Dialog {
                         .addGroup(layout.createSequentialGroup().addComponent(labelAcc,60,60,60).addComponent(comboBoxAcc))
                         .addGroup(layout.createSequentialGroup().addComponent(labelAmount,60,60,60).addComponent(textFieldAmount))
                         .addComponent(separator1)
-                        .addGroup(layout.createSequentialGroup().addComponent(labelCreditAcc).addGap(0,0,Short.MAX_VALUE).addComponent(buttonSelectCreditAcc))
-                        .addGroup(layout.createSequentialGroup().addComponent(textFieldCreditAcc,150,150,Short.MAX_VALUE))
-                        .addGroup(layout.createSequentialGroup().addComponent(labelDate).addGap(5).addComponent(textFieldDate,80,80,Short.MAX_VALUE).addComponent(buttonToday))
-                        .addGroup(layout.createSequentialGroup().addComponent(labelMonthlyDep).addGap(5).addComponent(textFieldMonthlyDep))
+                        .addComponent(labelCreditAcc)
+                        .addComponent(textFieldCreditAcc)
+                        .addGroup(layout.createSequentialGroup().addComponent(labelDate).addGap(5,5,Short.MAX_VALUE).addComponent(buttonToday))
+                        .addComponent(textFieldDate)
+                        .addComponent(labelMonthlyDep)
+                        .addComponent(textFieldMonthlyDep)
                         .addComponent(separator2)
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(5, 5, Short.MAX_VALUE)
@@ -133,12 +129,14 @@ public class AddAssetDialog extends Dialog {
                 .addGroup(layout.createParallelGroup().addComponent(labelAmount,25,25,25).addComponent(textFieldAmount,25,25,25))
                 .addGap(5)
                 .addComponent(separator1,5,5,5)
-                .addGroup(layout.createParallelGroup().addComponent(labelCreditAcc,25,25,25).addComponent(buttonSelectCreditAcc,25,25,25))
-                .addGroup(layout.createParallelGroup().addComponent(textFieldCreditAcc,25,25,25))
+                .addComponent(labelCreditAcc,25,25,25)
+                .addComponent(textFieldCreditAcc,25,25,25)
                 .addGap(5)
-                .addGroup(layout.createParallelGroup().addComponent(labelDate,25,25,25).addComponent(textFieldDate,25,25,25).addComponent(buttonToday,25,25,25))
+                .addGroup(layout.createParallelGroup().addComponent(labelDate,25,25,25).addComponent(buttonToday,25,25,25))
+                .addComponent(textFieldDate,25,25,25)
                 .addGap(5)
-                .addGroup(layout.createParallelGroup().addComponent(labelMonthlyDep,25,25,25).addComponent(textFieldMonthlyDep,25,25,25))
+                .addComponent(labelMonthlyDep,25,25,25)
+                .addComponent(textFieldMonthlyDep,25,25,25)
                 .addGap(5)
                 .addComponent(separator2,5,5,5)
                 .addGroup(layout.createParallelGroup().addComponent(buttonCancel,25,25,25).addComponent(buttonOk,25,25,25))
@@ -166,6 +164,6 @@ public class AddAssetDialog extends Dialog {
     }
 
     public String getCreditAccount(){
-        return creditAcc;
+        return textFieldCreditAcc.getSelectedAccount();
     }
 }

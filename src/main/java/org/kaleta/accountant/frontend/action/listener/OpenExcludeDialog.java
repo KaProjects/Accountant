@@ -8,7 +8,6 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.dialog.ExcludeDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,8 +54,8 @@ public class OpenExcludeDialog extends ActionListener {
                 - Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, accDepAccount));
 
         ExcludeDialog dialog = (residualExpense == 0)
-        ? new ExcludeDialog((Frame) getConfiguration(),debitAccountMap,debitClasses,revenueAccountMap,revenueClass)
-        : new ExcludeDialog((Frame) getConfiguration(), expenseAccountMap, expenseClass,debitAccountMap,debitClasses,revenueAccountMap,revenueClass);
+        ? new ExcludeDialog(getConfiguration(),debitAccountMap,debitClasses,revenueAccountMap,revenueClass)
+        : new ExcludeDialog(getConfiguration(), expenseAccountMap, expenseClass,debitAccountMap,debitClasses,revenueAccountMap,revenueClass);
         dialog.setVisible(true);
         if (dialog.getResult()) {
             if (residualExpense != 0){

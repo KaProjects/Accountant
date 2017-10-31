@@ -7,8 +7,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
 /**
- * Created by Stanislav Kaleta on 16.04.2016.
- *
  * Basic log formatter.
  */
 public class LogFormatter extends SimpleFormatter {
