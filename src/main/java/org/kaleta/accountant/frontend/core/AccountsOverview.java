@@ -92,6 +92,7 @@ public class AccountsOverview extends JPanel implements Configurable {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) accountTreeModel.getRoot();
         root.removeAllChildren();
         for (SchemaModel.Class clazz : Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear())) {
+            if (clazz.getId().equals("7")) continue;
             DefaultMutableTreeNode classNode = new DefaultMutableTreeNode(clazz.getName());
             root.add(classNode);
             for (SchemaModel.Class.Group group : clazz.getGroup()) {

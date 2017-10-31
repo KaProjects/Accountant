@@ -23,6 +23,9 @@ public class YearPaneYearSelected extends ConfigurationAction {
         AccountsOverview accountsOverview = new AccountsOverview();
         accountsOverview.setConfiguration(getConfiguration());
         accountsOverview.update();
+        TransactionsOverview transactionsOverview = new TransactionsOverview();
+        transactionsOverview.setConfiguration(getConfiguration());
+        transactionsOverview.update();
 
         if (pane.getConfiguration().getSelectedYear().equals(Service.CONFIG.getActiveYear())){
             JTabbedPane schemaPane = new JTabbedPane();
@@ -40,9 +43,27 @@ public class YearPaneYearSelected extends ConfigurationAction {
             accountsPane.add("Assets", assetsEditor);
             ResourcesEditor resourcesEditor = new ResourcesEditor(getConfiguration());
             accountsPane.add("Resources", resourcesEditor);
+            FinanceEditor financeEditor = new FinanceEditor(getConfiguration());
+            accountsPane.add("Finance", financeEditor);
+            RelationsEditor relationsEditor = new RelationsEditor(getConfiguration());
+            accountsPane.add("Relations", relationsEditor);
+            FundingEditor fundingEditor = new FundingEditor(getConfiguration());
+            accountsPane.add("Funding", fundingEditor);
+            ExpensesEditor expensesEditor = new ExpensesEditor(getConfiguration());
+            accountsPane.add("Expenses", expensesEditor);
+            RevenuesEditor revenuesEditor = new RevenuesEditor(getConfiguration());
+            accountsPane.add("Revenues", revenuesEditor);
+
+            JTabbedPane transactionsPane = new JTabbedPane();
+            pane.addTab("Transactions", transactionsPane);
+            transactionsPane.addTab("Overview", new JScrollPane(transactionsOverview));
+
+
+
         } else {
             pane.addTab("Schema", new JScrollPane(schemaOverview));
             pane.addTab("Accounts", new JScrollPane(accountsOverview));
+            pane.addTab("Transactions", new JScrollPane(transactionsOverview));
         }
         pane.revalidate();
         pane.repaint();
