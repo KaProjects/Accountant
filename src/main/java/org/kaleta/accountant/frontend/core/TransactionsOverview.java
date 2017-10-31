@@ -21,8 +21,8 @@ public class TransactionsOverview extends JPanel implements Configurable {
 
     public TransactionsOverview(){
         tableModel = new TransactionTableModel();
-        JTable table = new JTable(tableModel);
-        table.setModel(new TransactionTableModel());
+        JTable table = new JTable();
+        table.setModel(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowSelectionAllowed(true);
         table.setColumnSelectionAllowed(false);

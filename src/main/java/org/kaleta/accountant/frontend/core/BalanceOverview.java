@@ -1,7 +1,10 @@
 package org.kaleta.accountant.frontend.core;
 
+import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -11,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class BalanceOverview extends JPanel implements Configurable {
     private Configuration configuration;
@@ -100,6 +104,9 @@ public class BalanceOverview extends JPanel implements Configurable {
 
     public void update(){
 
+
+
+        tableModel.updateModel();
     }
 
     @Override
@@ -197,6 +204,52 @@ public class BalanceOverview extends JPanel implements Configurable {
             liabilitiesBalanceRow = new BalanceRow("Liabilities", "T", "X", BalanceRow.SUM);
         }
 
+        public void updateModel(){
+            assets.clear();
+            liabilities.clear();
+            Map<String, List<AccountsModel.Account>> accountMap =  Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
+            List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
+
+            int assetsBalance = 0;
+            int assetsTurnover = 0;
+            for (SchemaModel.Class clazz : classList){
+                List<BalanceRow> groups = new ArrayList<>();
+                int classBalance = 0;
+                int classTurnover = 0;
+                for (Schema.Class.Group group : clazz.getGroup()) {
+                    List<BalanceRow> accounts = new ArrayList<>();
+                    int groupBalance = 0;
+                    int groupTurnover = 0;
+                    for (Schema.Class.Group.Account account : group.getAccount()) {
+                        int accBalance = 0;
+                        int accTurnover = 0;
+                        String schemaId = clazz.getId() + group.getId() + account.getId();
+                        for (Transaction transaction : journal.getTransaction()) {
+                            if (transaction.getDebit().startsWith(schemaId)) {
+                                accBalance += Integer.parseInt(transaction.getAmount());
+                                accTurnover += Integer.parseInt(transaction.getAmount());
+                            }
+                            if (transaction.getCredit().startsWith(schemaId)) {
+                                accBalance -= Integer.parseInt(transaction.getAmount());
+                            }
+                        }
+                        accounts.add(new BalanceRow(account.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                        groupBalance += accBalance;
+                        groupTurnover += accTurnover;
+                    }
+                    groups.add(new BalanceRow(group.getName(), String.valueOf(groupTurnover), String.valueOf(groupBalance), BalanceRow.GROUP));
+                    groups.addAll(accounts);
+                    classBalance += groupBalance;
+                    classTurnover += groupTurnover;
+                }
+                assetsBalance += classBalance;
+                assetsTurnover += classTurnover;
+                assets.add(new BalanceRow(clazz.getName(), String.valueOf(classTurnover), String.valueOf(classBalance), BalanceRow.CLASS));
+                assets.addAll(groups);
+            }
+            assetsBalanceRow.setValue(String.valueOf(assetsBalance));
+            assetsBalanceRow.setTurnover(String.valueOf(assetsTurnover));
+        }
 
         @Override
         public int getRowCount() {
