@@ -1,6 +1,6 @@
 package org.kaleta.accountant.frontend.common;
 
-public class BalanceRow {
+public class BalanceRowModel {
     public static final String SUM = "SUM";
     public static final String CLASS = "CLASS";
     public static final String GROUP = "GROUP";
@@ -12,14 +12,14 @@ public class BalanceRow {
     private String schemaId;
     private String type;
 
-    public BalanceRow(String name, String turnover, String value, String type){
+    public BalanceRowModel(String name, String turnover, String value, String type){
         this.name = name;
         this.turnover = turnover;
         this.value = value;
         this.type = type;
     }
 
-    public BalanceRow(String name, String turnover, String value, String schemaId, String type){
+    public BalanceRowModel(String name, String turnover, String value, String schemaId, String type){
         this.name = name;
         this.turnover = turnover;
         this.value = value;

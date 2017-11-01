@@ -5,7 +5,7 @@ import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.common.BalanceRow;
+import org.kaleta.accountant.frontend.common.BalanceRowModel;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -50,15 +50,15 @@ public class ProfitOverview extends JPanel implements Configurable {
                 if (type.equals("")){
                     c.setBackground(null);
                 }
-                if (type.equals(BalanceRow.SUM) || type.equals(BalanceRow.CLASS)){
+                if (type.equals(BalanceRowModel.SUM) || type.equals(BalanceRowModel.CLASS)){
                     c.setFont(new Font(c.getFont().getName(), Font.BOLD, 25));
                     c.setBackground(Color.LIGHT_GRAY.darker());
                 }
-                if (type.equals(BalanceRow.GROUP)){
+                if (type.equals(BalanceRowModel.GROUP)){
                     c.setFont(new Font(c.getFont().getName(), Font.PLAIN, 20));
                     c.setBackground(Color.LIGHT_GRAY);
                 }
-                if (type.equals(BalanceRow.ACCOUNT)){
+                if (type.equals(BalanceRowModel.ACCOUNT)){
                     c.setFont(new Font(c.getFont().getName(), Font.PLAIN, 15));
                     c.setBackground(Color.WHITE);
                 }
@@ -110,8 +110,8 @@ public class ProfitOverview extends JPanel implements Configurable {
     }
 
     private class ProfitTableModel extends AbstractTableModel {
-        private final java.util.List<BalanceRow> expenses;
-        private final List<BalanceRow> revenues;
+        private final java.util.List<BalanceRowModel> expenses;
+        private final List<BalanceRowModel> revenues;
 
         ProfitTableModel(){
             expenses = new ArrayList<>();
@@ -165,10 +165,10 @@ public class ProfitOverview extends JPanel implements Configurable {
 
             expenses.clear();
             for (SchemaModel.Class clazz : Service.SCHEMA.getSchemaClassListByAccountType(year, Constants.AccountType.EXPENSE)){
-                List<BalanceRow> groups = new ArrayList<>();
+                List<BalanceRowModel> groups = new ArrayList<>();
                 int classBalance = 0;
                 for (SchemaModel.Class.Group group : clazz.getGroup()) {
-                    List<BalanceRow> accounts = new ArrayList<>();
+                    List<BalanceRowModel> accounts = new ArrayList<>();
                     int groupBalance = 0;
                     for (SchemaModel.Class.Group.Account schemaAccount : group.getAccount()) {
                         int accBalance = 0;
@@ -178,23 +178,23 @@ public class ProfitOverview extends JPanel implements Configurable {
                                 accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
                             }
                         }
-                        accounts.add(new BalanceRow(schemaAccount.getName(), "T", String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                        accounts.add(new BalanceRowModel(schemaAccount.getName(), "T", String.valueOf(accBalance), schemaId, BalanceRowModel.ACCOUNT));
                         groupBalance += accBalance;
                     }
-                    groups.add(new BalanceRow(group.getName(), "T", String.valueOf(groupBalance), BalanceRow.GROUP));
+                    groups.add(new BalanceRowModel(group.getName(), "T", String.valueOf(groupBalance), BalanceRowModel.GROUP));
                     groups.addAll(accounts);
                     classBalance += groupBalance;
                 }
-                expenses.add(new BalanceRow(clazz.getName(), "T", String.valueOf(classBalance), BalanceRow.CLASS));
+                expenses.add(new BalanceRowModel(clazz.getName(), "T", String.valueOf(classBalance), BalanceRowModel.CLASS));
                 expenses.addAll(groups);
             }
 
             revenues.clear();
             for (SchemaModel.Class clazz : Service.SCHEMA.getSchemaClassListByAccountType(year, Constants.AccountType.REVENUE)){
-                List<BalanceRow> groups = new ArrayList<>();
+                List<BalanceRowModel> groups = new ArrayList<>();
                 int classBalance = 0;
                 for (SchemaModel.Class.Group group : clazz.getGroup()) {
-                    List<BalanceRow> accounts = new ArrayList<>();
+                    List<BalanceRowModel> accounts = new ArrayList<>();
                     int groupBalance = 0;
                     for (SchemaModel.Class.Group.Account schemaAccount : group.getAccount()) {
                         int accBalance = 0;
@@ -204,14 +204,14 @@ public class ProfitOverview extends JPanel implements Configurable {
                                 accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
                             }
                         }
-                        accounts.add(new BalanceRow(schemaAccount.getName() ,"T", String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                        accounts.add(new BalanceRowModel(schemaAccount.getName() ,"T", String.valueOf(accBalance), schemaId, BalanceRowModel.ACCOUNT));
                         groupBalance += accBalance;
                     }
-                    groups.add(new BalanceRow(group.getName(), "T", String.valueOf(groupBalance), BalanceRow.GROUP));
+                    groups.add(new BalanceRowModel(group.getName(), "T", String.valueOf(groupBalance), BalanceRowModel.GROUP));
                     groups.addAll(accounts);
                     classBalance += groupBalance;
                 }
-                revenues.add(new BalanceRow(clazz.getName(), "T", String.valueOf(classBalance), BalanceRow.CLASS));
+                revenues.add(new BalanceRowModel(clazz.getName(), "T", String.valueOf(classBalance), BalanceRowModel.CLASS));
                 revenues.addAll(groups);
             }
         }

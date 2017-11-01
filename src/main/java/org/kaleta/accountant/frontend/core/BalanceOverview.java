@@ -5,7 +5,7 @@ import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.common.BalanceRow;
+import org.kaleta.accountant.frontend.common.BalanceRowModel;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -55,15 +55,15 @@ public class BalanceOverview extends JPanel implements Configurable {
                 if (type.equals("")){
                     c.setBackground(null);
                 }
-                if (type.equals(BalanceRow.SUM) || type.equals(BalanceRow.CLASS)){
+                if (type.equals(BalanceRowModel.SUM) || type.equals(BalanceRowModel.CLASS)){
                     c.setFont(new Font(c.getFont().getName(), Font.BOLD, 25));
                     c.setBackground(Color.LIGHT_GRAY.darker());
                 }
-                if (type.equals(BalanceRow.GROUP)){
+                if (type.equals(BalanceRowModel.GROUP)){
                     c.setFont(new Font(c.getFont().getName(), Font.PLAIN, 20));
                     c.setBackground(Color.LIGHT_GRAY);
                 }
-                if (type.equals(BalanceRow.ACCOUNT)){
+                if (type.equals(BalanceRowModel.ACCOUNT)){
                     c.setFont(new Font(c.getFont().getName(), Font.PLAIN, 15));
                     c.setBackground(Color.WHITE);
                 }
@@ -116,16 +116,16 @@ public class BalanceOverview extends JPanel implements Configurable {
     }
 
     private class BalanceTableModel extends AbstractTableModel {
-        private final List<BalanceRow> assets;
-        private final List<BalanceRow> liabilities;
-        private final BalanceRow assetsBalanceRow;
-        private final BalanceRow liabilitiesBalanceRow;
+        private final List<BalanceRowModel> assets;
+        private final List<BalanceRowModel> liabilities;
+        private final BalanceRowModel assetsBalanceRow;
+        private final BalanceRowModel liabilitiesBalanceRow;
 
         BalanceTableModel(){
             assets = new ArrayList<>();
             liabilities = new ArrayList<>();
-            assetsBalanceRow = new BalanceRow("Assets", "T", "X", BalanceRow.SUM);
-            liabilitiesBalanceRow = new BalanceRow("Liabilities", "T", "X", BalanceRow.SUM);
+            assetsBalanceRow = new BalanceRowModel("Assets", "T", "X", BalanceRowModel.SUM);
+            liabilitiesBalanceRow = new BalanceRowModel("Liabilities", "T", "X", BalanceRowModel.SUM);
         }
 
         void updateModel(){
@@ -136,11 +136,11 @@ public class BalanceOverview extends JPanel implements Configurable {
             int assetsBalance = 0;
             int assetsTurnover = 0;
             for (SchemaModel.Class clazz : Service.SCHEMA.getSchemaClassListByAccountType(year, Constants.AccountType.ASSET)){
-                List<BalanceRow> groups = new ArrayList<>();
+                List<BalanceRowModel> groups = new ArrayList<>();
                 int classBalance = 0;
                 int classTurnover = 0;
                 for (SchemaModel.Class.Group group : clazz.getGroup()) {
-                    List<BalanceRow> accounts = new ArrayList<>();
+                    List<BalanceRowModel> accounts = new ArrayList<>();
                     int groupBalance = 0;
                     int groupTurnover = 0;
                     for (SchemaModel.Class.Group.Account schemaAccount : group.getAccount()) {
@@ -153,18 +153,18 @@ public class BalanceOverview extends JPanel implements Configurable {
                                 accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
                             }
                         }
-                        accounts.add(new BalanceRow(schemaAccount.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                        accounts.add(new BalanceRowModel(schemaAccount.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRowModel.ACCOUNT));
                         groupBalance += accBalance;
                         groupTurnover += accTurnover;
                     }
-                    groups.add(new BalanceRow(group.getName(), String.valueOf(groupTurnover), String.valueOf(groupBalance), BalanceRow.GROUP));
+                    groups.add(new BalanceRowModel(group.getName(), String.valueOf(groupTurnover), String.valueOf(groupBalance), BalanceRowModel.GROUP));
                     groups.addAll(accounts);
                     classBalance += groupBalance;
                     classTurnover += groupTurnover;
                 }
                 assetsBalance += classBalance;
                 assetsTurnover += classTurnover;
-                assets.add(new BalanceRow(clazz.getName(), String.valueOf(classTurnover), String.valueOf(classBalance), BalanceRow.CLASS));
+                assets.add(new BalanceRowModel(clazz.getName(), String.valueOf(classTurnover), String.valueOf(classBalance), BalanceRowModel.CLASS));
                 assets.addAll(groups);
             }
             assetsBalanceRow.setValue(String.valueOf(assetsBalance));
@@ -174,11 +174,11 @@ public class BalanceOverview extends JPanel implements Configurable {
             int liabilitiesBalance = 0;
             int liabilitiesTurnover = 0;
             for (SchemaModel.Class clazz : Service.SCHEMA.getSchemaClassListByAccountType(year, Constants.AccountType.LIABILITY)){
-                List<BalanceRow> groups = new ArrayList<>();
+                List<BalanceRowModel> groups = new ArrayList<>();
                 int classBalance = 0;
                 int classTurnover = 0;
                 for (SchemaModel.Class.Group group : clazz.getGroup()) {
-                    List<BalanceRow> accounts = new ArrayList<>();
+                    List<BalanceRowModel> accounts = new ArrayList<>();
                     int groupBalance = 0;
                     int groupTurnover = 0;
                     for (SchemaModel.Class.Group.Account schemaAccount : group.getAccount()) {
@@ -191,22 +191,22 @@ public class BalanceOverview extends JPanel implements Configurable {
                                 accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
                             }
                         }
-                        accounts.add(new BalanceRow(schemaAccount.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRow.ACCOUNT));
+                        accounts.add(new BalanceRowModel(schemaAccount.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRowModel.ACCOUNT));
                         groupBalance += accBalance;
                         groupTurnover += accTurnover;
                     }
-                    groups.add(new BalanceRow(group.getName(), String.valueOf(groupTurnover), String.valueOf(groupBalance), BalanceRow.GROUP));
+                    groups.add(new BalanceRowModel(group.getName(), String.valueOf(groupTurnover), String.valueOf(groupBalance), BalanceRowModel.GROUP));
                     groups.addAll(accounts);
                     classBalance += groupBalance;
                     classTurnover += groupTurnover;
                 }
                 liabilitiesBalance += classBalance;
                 liabilitiesTurnover += classTurnover;
-                liabilities.add(new BalanceRow(clazz.getName(), String.valueOf(classTurnover), String.valueOf(classBalance), BalanceRow.CLASS));
+                liabilities.add(new BalanceRowModel(clazz.getName(), String.valueOf(classTurnover), String.valueOf(classBalance), BalanceRowModel.CLASS));
                 liabilities.addAll(groups);
             }
             int profit = assetsBalance - liabilitiesBalance;
-            liabilities.add(new BalanceRow("Profit", "", String.valueOf(profit), BalanceRow.SUM));
+            liabilities.add(new BalanceRowModel("Profit", "", String.valueOf(profit), BalanceRowModel.SUM));
             liabilitiesBalance += profit;
             liabilitiesBalanceRow.setValue(String.valueOf(liabilitiesBalance));
             liabilitiesBalanceRow.setTurnover(String.valueOf(liabilitiesTurnover));
@@ -283,7 +283,7 @@ public class BalanceOverview extends JPanel implements Configurable {
 
         String getCellType(int row, int column){
             if (row == getRowCount() - 1){
-                return BalanceRow.SUM;
+                return BalanceRowModel.SUM;
             }
             switch (column){
                 case 0:
