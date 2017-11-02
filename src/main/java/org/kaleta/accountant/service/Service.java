@@ -26,6 +26,11 @@ public class Service {
      */
     public static final TransactionsService TRANSACTIONS = new TransactionsService();
 
+    /**
+     * Instance of procedure's service class
+     */
+    public static final ProceduresService PROCEDURES = new ProceduresService();
+
 
     /**
      * Instance of account's service class

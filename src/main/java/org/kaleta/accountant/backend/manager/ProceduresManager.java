@@ -1,8 +1,6 @@
-package org.kaleta.accountant.backend.manager.jaxb;
+package org.kaleta.accountant.backend.manager;
 
-import org.kaleta.accountant.backend.entity.Procedures;
-import org.kaleta.accountant.backend.manager.Manager;
-import org.kaleta.accountant.backend.manager.ManagerException;
+import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -14,57 +12,60 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 
-/**
- * Created by Stanislav Kaleta on 24.05.2016.
- */
-@Deprecated
-public class ProceduresManager implements Manager<Procedures> {
+public class ProceduresManager implements Manager<ProceduresModel>{
     private final String schemaUri;
-    private final String proceduresFileUri;
+    private final String schemaFileUri;
+    private final String year;
 
-    public ProceduresManager() {
+    public ProceduresManager(String year) {
+        this.year = year;
         schemaUri = "/schema/procedures.xsd";
-        proceduresFileUri = Initializer.DATA_SOURCE + "procedures.xml";
+        schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "procedures.xml";
     }
+
     @Override
     public void create() throws ManagerException {
-        update(new Procedures());
+        ProceduresModel newModel = new ProceduresModel();
+        newModel.setYear(year);
+        update(newModel);
+        Initializer.LOG.info("File \"" + schemaFileUri + "\" created!");
     }
 
     @Override
-    public Procedures retrieve() throws ManagerException {
+    public ProceduresModel retrieve() throws ManagerException {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             javax.xml.validation.Schema xmlSchema = schemaFactory.newSchema(this.getClass().getResource(schemaUri));
 
-            JAXBContext context = JAXBContext.newInstance(Procedures.class);
+            JAXBContext context = JAXBContext.newInstance(ProceduresModel.class);
 
             Unmarshaller unmarshaller = context.createUnmarshaller();
             unmarshaller.setSchema(xmlSchema);
 
-            return (Procedures) unmarshaller.unmarshal(new File(proceduresFileUri));
+            File file = new File(schemaFileUri);
+            return (ProceduresModel) unmarshaller.unmarshal(file);
         } catch (Exception e) {
             throw new ManagerException("Error while retrieving procedures data: ",e);
         }
     }
 
     @Override
-    public void update(Procedures procedures) throws ManagerException {
+    public void update(ProceduresModel proceduresModel) throws ManagerException {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             javax.xml.validation.Schema xmlSchema = schemaFactory.newSchema(this.getClass().getResource(schemaUri));
 
-            JAXBContext context = JAXBContext.newInstance(Procedures.class);
+            JAXBContext context = JAXBContext.newInstance(ProceduresModel.class);
 
             Marshaller marshaller = context.createMarshaller();
             marshaller.setSchema(xmlSchema);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-            File file = new File(proceduresFileUri);
-            marshaller.marshal(procedures, new DefaultHandler());
-            marshaller.marshal(procedures, file);
+            File file = new File(schemaFileUri);
+            marshaller.marshal(proceduresModel,new DefaultHandler());
+            marshaller.marshal(proceduresModel, file);
         } catch (Exception e) {
-            throw new ManagerException("Error while updating semantic data: ",e);
+            throw new ManagerException("Error while updating procedures data: ",e);
         }
     }
 

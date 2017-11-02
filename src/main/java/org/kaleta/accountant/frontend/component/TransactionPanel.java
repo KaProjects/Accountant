@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO debug descriptions, tfAmount only numbers
+ * TODO tfAmount only numbers
  */
 public class TransactionPanel extends JPanel implements DocumentListener {
     private final Object lock = new Object();

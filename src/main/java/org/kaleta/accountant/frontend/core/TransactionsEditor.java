@@ -1,44 +1,62 @@
 package org.kaleta.accountant.frontend.core;
 
-import org.kaleta.accountant.backend.model.AccountsModel;
-import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.common.AccountPairModel;
-import org.kaleta.accountant.frontend.component.TransactionPanel;
+import org.kaleta.accountant.frontend.action.listener.OpenCreateProcedureDialog;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TransactionsEditor extends JPanel implements Configurable {
     private Configuration configuration;
 
+    private List<ProcedurePanel> procedurePanelList;
+    private JPanel panelProcedures;
+
     public TransactionsEditor(){
+        procedurePanelList = new ArrayList<>();
+
         JButton buttonAddTr = new JButton();
         buttonAddTr.addActionListener(actionEvent -> {
 
         });
 
-        JButton createProcedure = new JButton();
-        buttonAddTr.addActionListener(actionEvent -> {
+        JButton createProcedure = new JButton("Create Procedure");
+        createProcedure.addActionListener(new OpenCreateProcedureDialog(this));
 
-        });
+
+        panelProcedures = new JPanel();
+        panelProcedures.setLayout(new BoxLayout(panelProcedures, BoxLayout.Y_AXIS));
+
+
+
+
 
         // TODO: 10/31/17 procedures list (design & impl backend, service, frontend)
 
 
-
-
+        this.getActionMap().put(Configuration.PROCEDURE_UPDATED, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                TransactionsEditor.this.update();
+            }
+        });
     }
 
     public void update(){
-        Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
-        List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
-        Map<AccountPairModel, List<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
-
-        this.add(new TransactionPanel(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList));
+        procedurePanelList.clear();
+        panelProcedures.removeAll();
+        for (ProceduresModel.Procedure procedure : Service.PROCEDURES.getProcedureList(getConfiguration().getSelectedYear())) {
+            ProcedurePanel procedurePanel = new ProcedurePanel(procedure);
+            panelProcedures.add(procedurePanel);
+            procedurePanelList.add(procedurePanel);
+        }
+        panelProcedures.repaint();
+        panelProcedures.revalidate();
     }
 
 
@@ -55,8 +73,11 @@ public class TransactionsEditor extends JPanel implements Configurable {
         return configuration;
     }
 
-    private class ProcedurePanel {
+    private class ProcedurePanel extends JPanel{
 
+        ProcedurePanel(ProceduresModel.Procedure procedure){
+            this.add(new JLabel(procedure.getName()));
+        }
 
     }
 }
