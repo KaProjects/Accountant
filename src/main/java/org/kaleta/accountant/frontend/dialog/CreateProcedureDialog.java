@@ -5,11 +5,16 @@ import org.kaleta.accountant.frontend.Configuration;
 public class CreateProcedureDialog extends Dialog {
 
     public CreateProcedureDialog(Configuration configuration) {
-        super(configuration, "Creating Procedure");
+        super(configuration, "Creating Procedure", "Create");
+
+
+
+        buildDialogContent();
+        pack();
     }
 
-    @Override
-    protected void buildDialog() {
+
+    private void buildDialogContent() {
         //new TransactionPanel(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList);
     }
 }

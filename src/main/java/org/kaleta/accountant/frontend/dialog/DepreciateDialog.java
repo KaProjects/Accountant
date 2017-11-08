@@ -15,14 +15,14 @@ public class DepreciateDialog extends Dialog {
     private final List<Config> configs;
 
     public DepreciateDialog(Configuration configuration, List<Config> configs) {
-        super(configuration, "Depreciating Asset(s) Dialog");
+        super(configuration, "Depreciating Asset(s) Dialog", "Confirm");
         this.configs = configs;
-        buildDialog();
+        buildDialogContent();
         pack();
     }
 
     @Override
-    protected void buildDialog() {
+    protected void buildDialogContent() {
         JPanel panelItems = new JPanel();
         panelItems.setLayout(new BoxLayout(panelItems, BoxLayout.Y_AXIS));
         JScrollPane pane = new JScrollPane(panelItems);

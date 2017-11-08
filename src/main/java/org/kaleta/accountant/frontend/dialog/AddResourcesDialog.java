@@ -34,7 +34,7 @@ public class AddResourcesDialog extends Dialog {
     public AddResourcesDialog(Configuration configuration, Map<String, List<AccountsModel.Account>> resourceAccountMap, SchemaModel.Class resourceClass,
                               Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> creditClasses,
                               Map<String, List<AccountsModel.Account>> debitAccountMap, List<SchemaModel.Class> debitClasses) {
-        super(configuration, "Adding Resources");
+        super(configuration, "Adding Resources", "Add");
         this.resourceAccountMap = resourceAccountMap;
         this.resourceClass = resourceClass;
         this.creditAccountMap = creditAccountMap;
@@ -42,13 +42,13 @@ public class AddResourcesDialog extends Dialog {
         this.debitAccountMap = debitAccountMap;
         this.debitClasses = debitClasses;
         resourcePanelList = new ArrayList<>();
-        buildDialog();
+        buildDialogContent();
         this.setMinimumSize(new Dimension(500, 600));
         pack();
     }
 
     @Override
-    protected void buildDialog() {
+    protected void buildDialogContent() {
         JButton buttonCancel = new JButton("Cancel");
         buttonCancel.addActionListener(a -> dispose());
         JButton buttonOk = new JButton("Add");
@@ -243,7 +243,7 @@ public class AddResourcesDialog extends Dialog {
 
             JLabel labelDebit = new JLabel("In favor of: ");
             labelDebit.setVisible(false);
-            textFieldDebit = new SelectAccountTextField(getConfiguration(), debitAccountMap, debitClasses);
+            textFieldDebit = new SelectAccountTextField(getConfiguration(), debitAccountMap, debitClasses, AddResourcesDialog.this);
             textFieldDebit.setVisible(false);
 
             textFieldDebitInfo = new JTextField();

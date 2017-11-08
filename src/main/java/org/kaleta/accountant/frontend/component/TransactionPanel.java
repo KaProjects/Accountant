@@ -34,9 +34,9 @@ public class TransactionPanel extends JPanel implements DocumentListener {
         cbDescription.setEditable(true);
 
         tfAmount = new JTextField();
-        tfDebit = new SelectAccountTextField(configuration, accountMap, classList);
+        tfDebit = new SelectAccountTextField(configuration, accountMap, classList, this);
         tfDebit.getDocument().addDocumentListener(this);
-        tfCredit = new SelectAccountTextField(configuration, accountMap, classList);
+        tfCredit = new SelectAccountTextField(configuration, accountMap, classList, this);
         tfCredit.getDocument().addDocumentListener(this);
 
         GroupLayout layout = new GroupLayout(this);

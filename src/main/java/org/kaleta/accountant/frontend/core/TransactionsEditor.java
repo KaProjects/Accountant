@@ -37,6 +37,7 @@ public class TransactionsEditor extends JPanel implements Configurable {
 
 
         // TODO: 10/31/17 procedures list (design & impl backend, service, frontend)
+        this.add(createProcedure);
 
 
         this.getActionMap().put(Configuration.PROCEDURE_UPDATED, new AbstractAction() {

@@ -24,17 +24,17 @@ public class SelectAccountDialog extends Dialog {
     private JTree accountTree;
 
     public SelectAccountDialog(Configuration configuration, Map<String, java.util.List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
-        super(configuration, "Selecting Account");
+        super(configuration, "Selecting Account", "Select");
         this.accountMap = accountMap;
         this.classList = classList;
         selectedAccountId = "";
-        buildDialog();
+        buildDialogContent();
         updateTree("");
         this.setSize(300, 100*classList.size() + 200);
     }
 
     @Override
-    protected void buildDialog() {
+    protected void buildDialogContent() {
         JButton buttonCancel = new JButton("Cancel");
         buttonCancel.addActionListener(a -> dispose());
 
