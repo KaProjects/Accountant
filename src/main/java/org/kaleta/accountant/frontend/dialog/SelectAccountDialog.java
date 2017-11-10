@@ -30,7 +30,7 @@ public class SelectAccountDialog extends Dialog {
         selectedAccountId = "";
         buildDialogContent();
         updateTree("");
-        this.setSize(300, 100*classList.size() + 200);
+        this.setSize(300, 500);
     }
 
     private void buildDialogContent() {

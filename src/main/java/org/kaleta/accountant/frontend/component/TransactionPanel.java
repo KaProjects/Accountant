@@ -102,6 +102,28 @@ public class TransactionPanel extends JPanel implements DocumentListener {
         return ((JTextField)cbDescription.getEditor().getEditorComponent()).getText();
     }
 
+    public void setDate(String date){
+        tfDate.focusGained(null);
+        tfDate.setText(date);
+    }
+
+    public void setAmount(String amount){
+        tfAmount.focusGained(null);
+        tfAmount.setText(amount);
+    }
+
+    public void setDebit(String debit){
+        tfDebit.setSelectedAccount(debit);
+    }
+
+    public void setCredit(String credit){
+        tfCredit.setSelectedAccount(credit);
+    }
+
+    public void setDescription(String description){
+        ((JTextField)cbDescription.getEditor().getEditorComponent()).setText(description);
+    }
+
     @Override
     public void changedUpdate(DocumentEvent e) {
         new SwingWorkerHandler() {

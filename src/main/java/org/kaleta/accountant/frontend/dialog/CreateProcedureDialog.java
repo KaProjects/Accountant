@@ -15,50 +15,38 @@ import java.util.List;
 import java.util.Map;
 
 public class CreateProcedureDialog extends Dialog {
+    private Map<AccountPairModel, List<String>> accountPairDescriptionMap;
+    private Map<String, List<AccountsModel.Account>> accountMap;
+    private List<SchemaModel.Class> classList;
 
+    private JPanel panelTransactions;
     private HintValidatedTextField tfName;
     private List<TransactionPanel> transactionPanelList;
 
     public CreateProcedureDialog(Configuration configuration, Map<AccountPairModel, List<String>> accountPairDescriptionMap,
                                  Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
         super(configuration, "Creating Procedure", "Create");
-        buildDialogContent(accountPairDescriptionMap, accountMap, classList);
+        this.accountPairDescriptionMap = accountPairDescriptionMap;
+        this.accountMap = accountMap;
+        this.classList = classList;
+        transactionPanelList = new ArrayList<>();
+        buildDialogContent();
+        addTransactionPanel();
         pack();
         this.setSize(new Dimension(this.getWidth(), this.getHeight() + 100));
     }
 
-    private void buildDialogContent(Map<AccountPairModel, List<String>> accountPairDescriptionMap, Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
-        transactionPanelList = new ArrayList<>();
-
+    private void buildDialogContent() {
         JLabel labelName = new JLabel("Procedure Name:");
         tfName = new HintValidatedTextField("", "Procedure Name", "set procedure name", false, this);
 
-        JPanel trPanel = new JPanel();
-        trPanel.setLayout(new BoxLayout(trPanel, BoxLayout.Y_AXIS));
-        JScrollPane trPane = new JScrollPane(trPanel);
-
-        TransactionPanel firstTrPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, accountMap, classList, this, false);
-        trPanel.add(firstTrPanel);
-        transactionPanelList.add(firstTrPanel);
+        panelTransactions = new JPanel();
+        panelTransactions.setLayout(new BoxLayout(panelTransactions, BoxLayout.Y_AXIS));
+        JScrollPane trPane = new JScrollPane(panelTransactions);
 
         JButton buttonAddTr = new JButton("Add Transaction");
         buttonAddTr.addActionListener(e -> {
-            TransactionPanel panel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, accountMap, classList, this, false);
-            panel.addDeleteAction(e1 -> {
-                panel.disableValidators();
-                CreateProcedureDialog.this.validateDialog();
-                transactionPanelList.remove(panel);
-                trPanel.removeAll();
-                for (TransactionPanel transactionPanel : transactionPanelList){
-                    trPanel.add(transactionPanel);
-                }
-                trPanel.repaint();
-                trPanel.revalidate();
-            });
-            transactionPanelList.add(panel);
-            trPanel.add(panel);
-            trPanel.repaint();
-            trPanel.revalidate();
+            addTransactionPanel();
         });
 
         setContent(layout -> {
@@ -70,14 +58,37 @@ public class CreateProcedureDialog extends Dialog {
                     .addComponent(trPane));
             layout.setVerticalGroup(layout.createSequentialGroup()
                     .addGroup(layout.createParallelGroup()
-                            .addComponent(labelName,25,25,25)
-                            .addComponent(tfName,25,25,25))
+                            .addComponent(labelName, 25, 25, 25)
+                            .addComponent(tfName, 25, 25, 25))
                     .addGap(5)
                     .addComponent(trPane));
         });
         setButtons(jPanel -> {
             jPanel.add(buttonAddTr);
         });
+    }
+
+    private void addTransactionPanel(){
+        TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, accountMap, classList, this, false);
+        transactionPanel.addDeleteAction(e1 -> {
+            transactionPanel.disableValidators();
+            CreateProcedureDialog.this.validateDialog();
+            transactionPanelList.remove(transactionPanel);
+            panelTransactions.removeAll();
+            if (transactionPanelList.isEmpty()){
+                CreateProcedureDialog.this.setDialogValid("No Transaction");
+            } else {
+                for (TransactionPanel trPanel : transactionPanelList) {
+                    panelTransactions.add(trPanel);
+                }
+            }
+            panelTransactions.repaint();
+            panelTransactions.revalidate();
+        });
+        panelTransactions.add(transactionPanel);
+        transactionPanelList.add(transactionPanel);
+        panelTransactions.repaint();
+        panelTransactions.revalidate();
     }
 
     public String getProcedureName(){

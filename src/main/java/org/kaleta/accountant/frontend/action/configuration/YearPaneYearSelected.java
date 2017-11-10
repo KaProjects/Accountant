@@ -65,7 +65,7 @@ public class YearPaneYearSelected extends ConfigurationAction {
             JTabbedPane transactionsPane = new JTabbedPane();
             pane.addTab("Transactions", transactionsPane);
             transactionsPane.addTab("Overview", new JScrollPane(transactionsOverview));
-            transactionsPane.addTab("Editor", new JScrollPane(transactionsEditor));
+            transactionsPane.addTab("Editor", transactionsEditor);
 
             JTabbedPane accountingPane = new JTabbedPane();
             pane.addTab("Accounting", accountingPane);

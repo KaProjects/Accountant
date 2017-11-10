@@ -30,10 +30,4 @@ public class Service {
      * Instance of procedure's service class
      */
     public static final ProceduresService PROCEDURES = new ProceduresService();
-
-
-    /**
-     * Instance of account's service class
-     */
-    public static final AccountService DEP_ACCOUNT = new AccountService();
 }

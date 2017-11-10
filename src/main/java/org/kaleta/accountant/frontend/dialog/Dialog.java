@@ -30,11 +30,6 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
         initComponents(title, confirmationLabel);
     }
 
-    Dialog(Frame frame, String title, String confirmationLabel){
-        super(frame);
-        initComponents(title, confirmationLabel);
-    }
-
     private void initComponents(String title, String confirmationLabel){
         validableList = new ArrayList<>();
         result = false;

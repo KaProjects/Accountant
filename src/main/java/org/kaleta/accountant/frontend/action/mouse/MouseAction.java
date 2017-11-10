@@ -18,7 +18,7 @@ abstract public class MouseAction extends MouseAdapter {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e)  {
+    public void mouseReleased(MouseEvent e)  {
         new SwingWorkerHandler() {
             @Override
             protected void runInBackground() {
