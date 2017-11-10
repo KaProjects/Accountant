@@ -78,10 +78,6 @@ public class ProceduresModel {
         @XmlType(name = "")
         public static class Transaction {
 
-            @XmlAttribute(name = "id", required = true)
-            protected String id;
-            @XmlAttribute(name = "date", required = true)
-            protected String date;
             @XmlAttribute(name = "description", required = true)
             protected String description;
             @XmlAttribute(name = "amount", required = true)
@@ -90,22 +86,6 @@ public class ProceduresModel {
             protected String debit;
             @XmlAttribute(name = "credit", required = true)
             protected String credit;
-
-            public String getId() {
-                return id;
-            }
-
-            public void setId(String value) {
-                this.id = value;
-            }
-
-            public String getDate() {
-                return date;
-            }
-
-            public void setDate(String value) {
-                this.date = value;
-            }
 
             public String getDescription() {
                 return description;

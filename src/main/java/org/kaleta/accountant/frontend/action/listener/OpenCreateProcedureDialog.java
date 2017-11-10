@@ -23,15 +23,10 @@ public class OpenCreateProcedureDialog extends ActionListener {
         List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
         Map<AccountPairModel, List<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
 
-
-
-        CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration());
+        CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList);
         dialog.setVisible(true);
         if (dialog.getResult()){
-
-
-
-
+            Service.PROCEDURES.createProcedure(getConfiguration().getSelectedYear(), dialog.getProcedureName(), dialog.getTransactions());
             getConfiguration().update(Configuration.PROCEDURE_UPDATED);
         }
     }

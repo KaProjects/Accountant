@@ -28,4 +28,25 @@ public class ProceduresService {
             throw new ServiceFailureException(e);
         }
     }
+
+    /**
+     * Creates procedure according to specified values
+     */
+    public void createProcedure(String year, String name, List<ProceduresModel.Procedure.Transaction> transactions){
+        try {
+            ProceduresManager manager = new ProceduresManager(year);
+            ProceduresModel model = manager.retrieve();
+
+            ProceduresModel.Procedure procedure = new ProceduresModel.Procedure();
+            procedure.setName(name);
+            procedure.setId(String.valueOf(model.getProcedure().size()));
+            procedure.getTransaction().addAll(transactions);
+            model.getProcedure().add(procedure);
+
+            manager.update(model);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
 }

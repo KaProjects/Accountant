@@ -54,6 +54,8 @@ public class SelectAccountTextField extends JTextField implements Validable{
                     selectedAccount = selectExpenseAccountDialog.getSelectedAccountId();
                     SelectAccountTextField.this.setText(selectExpenseAccountDialog.getSelectedAccountName());
                     SelectAccountTextField.this.setForeground(new JTextField().getForeground());
+                    SelectAccountTextField.this.getParent().revalidate();
+                    SelectAccountTextField.this.getParent().repaint();
                 }
             }
         });
