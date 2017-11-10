@@ -4,6 +4,7 @@ import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.common.LogFormatter;
 import org.kaleta.accountant.service.Service;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
@@ -40,15 +41,18 @@ public class Initializer {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 Service.CONFIG.checkResources();
-                initLogger();
                 Service.CONFIG.checkData();
-                //if (Service.CONFIG.getActiveYear().equals("-1")){
-                // TODO 1.0 : 12/25/16 init 1st year wizard
-                //}
-
+                initLogger();
+                if (Service.CONFIG.getActiveYear().equals("-1")){
+                    String name = JOptionPane.showInputDialog(null, "Set First Year Name");
+                    if (name != null && !name.trim().isEmpty()) {
+                        Service.CONFIG.initYearData(name);
+                        Service.CONFIG.setActiveYear(name);
+                    }
+                }
 
                 new AppFrame().setVisible(true);
-
+                
             } catch (Throwable e) {
                 ErrorHandler.getThrowableDialog(e).setVisible(true);
                 System.exit(1);

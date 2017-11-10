@@ -49,7 +49,7 @@ public class ConfigService {
             try {
                 boolean result = logFile.createNewFile();
                 if (result) {
-                    System.out.println("# Log file \"%DATA%/" + logFile.getName() + "\" created!");
+                    System.out.println("# Log file '%DATA_DIR%/" + logFile.getName() + "' created!");
                 } else {
                     System.err.println("ERROR: Log file creation failed!");
                     throw new ServiceFailureException("Log file creation failed!");
@@ -65,18 +65,36 @@ public class ConfigService {
     /**
      * Checks that data are valid, throws ServiceFailureException if not.
      */
-    public void checkData() {
+    public void checkData() throws ManagerException {
         File configFile = new File(Initializer.DATA_SOURCE + "config.xml");
         if (!configFile.exists()) {
-            try {
-                new ConfigManager().create();
-            } catch (ManagerException e) {
-                Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-                throw new ServiceFailureException(e);
+            new ConfigManager().create();
+            System.out.println("# File '%DATA_DIR%/config.xml' created!");
+        }
+        for (ConfigModel.Years.Year yearModel : getModel().getYears().getYearList()){
+            String year = yearModel.getName();
+            File yearDir = new File(Initializer.DATA_SOURCE + year);
+            if (!yearDir.exists()) {
+                throw new ServiceFailureException("Directory '%DATA_DIR%/" + year +"' is missing!");
+            }
+            File schemaFile = new File(Initializer.DATA_SOURCE + year + File.separator + "schema.xml");
+            if (!schemaFile.exists()) {
+                throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "schema.xml' is missing!");
+            }
+            File trFile = new File(Initializer.DATA_SOURCE + year + File.separator + "transactions.xml");
+            if (!trFile.exists()) {
+                throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "transactions.xml' is missing!");
+            }
+            File accFile = new File(Initializer.DATA_SOURCE + year + File.separator + "accounts.xml");
+            if (!accFile.exists()) {
+                throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "accounts.xml' is missing!");
+            }
+            File prFile = new File(Initializer.DATA_SOURCE + year + File.separator + "procedures.xml");
+            if (!prFile.exists()) {
+                throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "procedures.xml' is missing!");
             }
         }
-
-        // TODO post 1.0 check years data -> do something if corrupted
+        System.out.println("# Data checked. Everything OK.");
     }
 
     /**
@@ -113,6 +131,25 @@ public class ConfigService {
 
             manager.update(model);
             Initializer.LOG.info("Year '" + newYearName + "' added to config");
+            this.configModel = model;
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     *
+     */
+    public void setActiveYear(String year){
+        try {
+            ConfigManager manager = new ConfigManager();
+            ConfigModel model = manager.retrieve();
+
+            model.getYears().setActive(year);
+
+            manager.update(model);
+            Initializer.LOG.info("Year '" + year + "' set to active");
             this.configModel = model;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
