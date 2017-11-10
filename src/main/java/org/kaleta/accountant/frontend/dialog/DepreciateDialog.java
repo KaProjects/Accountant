@@ -2,12 +2,12 @@ package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.common.NumberFilter;
+import org.kaleta.accountant.frontend.component.DatePickerTextField;
+import org.kaleta.accountant.frontend.component.HintValidatedTextField;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.util.List;
 
@@ -21,24 +21,18 @@ public class DepreciateDialog extends Dialog {
         pack();
     }
 
-    @Override
-    protected void buildDialogContent() {
+    private void buildDialogContent() {
         JPanel panelItems = new JPanel();
         panelItems.setLayout(new BoxLayout(panelItems, BoxLayout.Y_AXIS));
         JScrollPane pane = new JScrollPane(panelItems);
         for (Config config : configs) {
             if (!config.isEnabled()) continue;
 
-            JCheckBox checkBoxEnabled = new JCheckBox("", config.isEnabled());
-            checkBoxEnabled.addItemListener(e -> config.setEnabled(checkBoxEnabled.isSelected()));
-            checkBoxEnabled.setToolTipText("Exclude/Include from Depreciation Process");
-
             JLabel labelName = new JLabel(config.getAccount().getName());
 
             JLabel labelValue = new JLabel("Value: ");
-            JTextField textFieldValue = new JTextField((config.getValueHint().contains("x")) ? "" : config.getValueHint());
-            ((PlainDocument) textFieldValue.getDocument()).setDocumentFilter(new NumberFilter());
-            textFieldValue.setHorizontalAlignment(SwingConstants.RIGHT);
+            String valueHint = ((config.getValueHint().contains("x")) ? "" : config.getValueHint());
+            HintValidatedTextField textFieldValue = new HintValidatedTextField(valueHint,"Depreciation Value", "set value", true, this);
             textFieldValue.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent documentEvent) {
@@ -55,12 +49,11 @@ public class DepreciateDialog extends Dialog {
                     config.setValueHint(textFieldValue.getText());
                 }
             });
-            textFieldValue.setMinimumSize(new Dimension(50,25));
+            textFieldValue.setMinimumSize(new Dimension(70,25));
 
             JLabel labelDate = new JLabel("Date:");
-            JTextField textFieldDate = new JTextField((config.getDateHint().contains("x")) ? "" : config.getDateHint());
-            ((PlainDocument) textFieldDate.getDocument()).setDocumentFilter(new NumberFilter());
-            textFieldDate.setHorizontalAlignment(SwingConstants.RIGHT);
+            String dateHint = (config.getDateHint().contains("x")) ? "" : config.getDateHint();
+            DatePickerTextField textFieldDate = new DatePickerTextField(dateHint, this);
             textFieldDate.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent documentEvent) {
@@ -77,7 +70,16 @@ public class DepreciateDialog extends Dialog {
                     config.setDateHint(textFieldDate.getText());
                 }
             });
-            textFieldDate.setMinimumSize(new Dimension(50,25));
+            textFieldDate.setMinimumSize(new Dimension(75,25));
+
+            JCheckBox checkBoxEnabled = new JCheckBox("", config.isEnabled());
+            checkBoxEnabled.addItemListener(e -> {
+                config.setEnabled(checkBoxEnabled.isSelected());
+                textFieldValue.setValidatorEnabled(checkBoxEnabled.isSelected());
+                textFieldDate.setValidatorEnabled(checkBoxEnabled.isSelected());
+                DepreciateDialog.this.validateDialog();
+            });
+            checkBoxEnabled.setToolTipText("Exclude/Include from Depreciation Process");
 
             JPanel panelItem = new JPanel();
             panelItem.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -97,45 +99,12 @@ public class DepreciateDialog extends Dialog {
             panelItems.add(panelItem);
         }
 
-        JButton buttonCancel = new JButton("Cancel");
-        buttonCancel.addActionListener(a -> dispose());
-
-        JButton buttonOk = new JButton("Confirm");
-        buttonOk.addActionListener(a -> {
-            if (validator()){
-                result = true;
-                dispose();
-            }
+        setContent(layout -> {
+            layout.setHorizontalGroup(layout.createParallelGroup().addComponent(pane));
+            layout.setVerticalGroup(layout.createSequentialGroup().addComponent(pane));
         });
 
-        GroupLayout layout = new GroupLayout(this.getContentPane());
-        this.getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(layout.createSequentialGroup().addGap(10)
-                .addGroup(layout.createParallelGroup()
-                        .addComponent(pane)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(5, 5, Short.MAX_VALUE)
-                                .addComponent(buttonCancel).addGap(5).addComponent(buttonOk).addGap(1))).addGap(10));
-        layout.setVerticalGroup(layout.createSequentialGroup().addGap(10)
-                .addComponent(pane).addGap(5)
-                .addGroup(layout.createParallelGroup().addComponent(buttonCancel).addComponent(buttonOk)).addGap(10));
-    }
-
-    private boolean validator(){
-        for (Config config : configs){
-            if (config.isEnabled()){
-                if (config.getDateHint().isEmpty() || config.getDateHint().trim().isEmpty() || config.getDateHint().length() != 4 || config.getDateHint().contains("x")){
-                    JOptionPane.showMessageDialog(this, "Inserted Date for '" + config.getAccount().getName() + "' is invalid!", "Not Valid", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                if (config.getValueHint().isEmpty() || config.getDateHint().trim().isEmpty() || config.getDateHint().equals("0") || config.getValueHint().contains("x")
-                        || (config.getMaxDepValue() < Integer.parseInt(config.getValueHint()))){
-                    JOptionPane.showMessageDialog(this, "Inserted Value for '" + config.getAccount().getName() + "' is invalid!", "Not Valid", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-            }
-        }
-        return true;
+        validateDialog();
     }
 
     public List<Config> getConfigs() {

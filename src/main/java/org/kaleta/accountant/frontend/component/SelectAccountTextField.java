@@ -16,21 +16,31 @@ import java.util.List;
 import java.util.Map;
 
 public class SelectAccountTextField extends JTextField implements Validable{
+    private String label;
     private String selectedAccount;
 
-    public SelectAccountTextField(Configuration config, Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classes, DocumentListener documentListener){
+    private boolean validatorEnabled;
+
+    public SelectAccountTextField(Configuration config, Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classes,
+                                  String label, DocumentListener documentListener){
+        this.label = label;
         init(config, accountMap, classes, documentListener);
     }
 
-    public SelectAccountTextField(Configuration config, Map<String, List<AccountsModel.Account>> accountMap, SchemaModel.Class clazz, DocumentListener documentListener){
+    public SelectAccountTextField(Configuration config, Map<String, List<AccountsModel.Account>> accountMap, SchemaModel.Class clazz,
+                                  String label, DocumentListener documentListener){
+        this.label = label;
         List<SchemaModel.Class> classes = new ArrayList<>();
         classes.add(clazz);
         init(config, accountMap, classes, documentListener);
     }
 
     private void init(Configuration config, Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classes, DocumentListener documentListener){
-        this.getDocument().addDocumentListener(documentListener);
-        this.getDocument().putProperty("owner", this);
+        if (documentListener != null) {
+            this.getDocument().addDocumentListener(documentListener);
+            this.getDocument().putProperty("owner", this);
+        }
+        validatorEnabled = true;
         selectedAccount = "";
         this.setText(" - - Click to Select - - ");
         this.setForeground(Color.GRAY);
@@ -49,12 +59,17 @@ public class SelectAccountTextField extends JTextField implements Validable{
         });
     }
 
+    public void setValidatorEnabled(boolean enabled){
+        this.validatorEnabled = enabled;
+    }
+
     public String getSelectedAccount(){
         return selectedAccount;
     }
 
     @Override
     public String validator() {
-        return selectedAccount.isEmpty() ? "No Account Selected" : null;
+        if (!validatorEnabled) return null;
+        return selectedAccount.isEmpty() ? "No account selected at '" + label + "'" : null;
     }
 }

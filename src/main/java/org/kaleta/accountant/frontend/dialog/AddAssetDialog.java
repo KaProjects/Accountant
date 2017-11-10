@@ -4,8 +4,9 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.DatePickerTextField;
+import org.kaleta.accountant.frontend.component.HintValidatedTextField;
 import org.kaleta.accountant.frontend.component.SelectAccountTextField;
-import org.kaleta.accountant.frontend.component.ValidableTextField;
+import org.kaleta.accountant.frontend.component.ValidatedComboBox;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -39,26 +40,24 @@ public class AddAssetDialog extends Dialog {
     }
 
     private void buildDialogContent() {
-
-        // TODO: 11/8/17 validate combobox != -1
-
         JLabel labelName = new JLabel("Name:");
-        textFieldName = new ValidableTextField("Name", "set name", false, this);
+        textFieldName = new HintValidatedTextField("","Name", "set name", false, this);
         JLabel labelDate = new JLabel("Date of Purchase:");
-        textFieldDate = new DatePickerTextField(this);
+        textFieldDate = new DatePickerTextField("",this);
         JButton buttonToday = new JButton("Today");
         buttonToday.addActionListener(a -> {
-            Calendar calendar = Calendar.getInstance();
             textFieldDate.focusGained(null);
+            Calendar calendar = Calendar.getInstance();
             textFieldDate.setText(String.format("%1$02d%2$02d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1));
         });
         JLabel labelAmount = new JLabel("Amount:");
-        textFieldAmount = new ValidableTextField("Amount", "set amount", true, this);
+        textFieldAmount = new HintValidatedTextField("","Amount", "set amount", true, this);
 
         JLabel labelMonthlyDep = new JLabel("Preferred Monthly Deprecation:");
-        textFieldMonthlyDep = new ValidableTextField("Preferred Monthly Depreciation", "set preferred monthly depreciation", true, this);
+        textFieldMonthlyDep = new HintValidatedTextField("","Preferred Monthly Depreciation", "set preferred monthly depreciation", true, this);
+
         JLabel labelGroup = new JLabel("Group:");
-        comboBoxGroup = new JComboBox<>();
+        comboBoxGroup = new ValidatedComboBox<>("Group", this);
         groups.forEach(group -> comboBoxGroup.addItem(group));
         comboBoxGroup.setSelectedIndex(-1);
         comboBoxGroup.addActionListener(a -> {
@@ -72,14 +71,14 @@ public class AddAssetDialog extends Dialog {
             AddAssetDialog.this.pack();
         });
         JLabel labelAcc = new JLabel("Account:");
-        comboBoxAcc = new JComboBox<>();
+        comboBoxAcc = new ValidatedComboBox<>("Account", this);
 
         JLabel labelCreditAcc = new JLabel("Purchased by:");
-        textFieldCreditAcc = new SelectAccountTextField(getConfiguration(), creditAccountMap, classList, this);
+        textFieldCreditAcc = new SelectAccountTextField(getConfiguration(), creditAccountMap, classList, "Purchased by", this);
 
         JSeparator separator1 = new JSeparator(SwingConstants.HORIZONTAL);
 
-        setContentLayout(layout -> {
+        setContent(layout -> {
             layout.setHorizontalGroup(layout.createParallelGroup()
                     .addGroup(layout.createSequentialGroup().addComponent(labelName, 60, 60, 60).addComponent(textFieldName))
                     .addGroup(layout.createSequentialGroup().addComponent(labelGroup, 60, 60, 60).addComponent(comboBoxGroup))

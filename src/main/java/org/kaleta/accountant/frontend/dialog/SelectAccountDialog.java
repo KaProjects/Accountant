@@ -33,21 +33,7 @@ public class SelectAccountDialog extends Dialog {
         this.setSize(300, 100*classList.size() + 200);
     }
 
-    @Override
-    protected void buildDialogContent() {
-        JButton buttonCancel = new JButton("Cancel");
-        buttonCancel.addActionListener(a -> dispose());
-
-        JButton buttonOk = new JButton("Add");
-        buttonOk.addActionListener(a -> {
-            if (selectedAccountId.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(SelectAccountDialog.this, "No account selected!", "Value Missing", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            result = true;
-            dispose();
-        });
-
+    private void buildDialogContent() {
         JButton buttonAddAccount = new JButton("Add Account");
         buttonAddAccount.setEnabled(false);
 
@@ -84,9 +70,11 @@ public class SelectAccountDialog extends Dialog {
             if (node instanceof SelectAccountDialog.AccountTreeNode) {
                 selectedAccountId = ((SelectAccountDialog.AccountTreeNode) node).getSchemaFullId();
                 selectedAccountName = ((SelectAccountDialog.AccountTreeNode) node).getFullName();
+                SelectAccountDialog.this.setDialogValid(null);
             } else {
                 selectedAccountId = "";
                 selectedAccountName = "";
+                SelectAccountDialog.this.setDialogValid("No account selected");
             }
             buttonAddAccount.setEnabled(node instanceof SelectAccountDialog.SchemaAccountTreeNode);
         });
@@ -106,21 +94,14 @@ public class SelectAccountDialog extends Dialog {
             }
         });
 
-        GroupLayout layout = new GroupLayout(this.getContentPane());
-        this.getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(layout.createSequentialGroup().addGap(5)
-                .addGroup(layout.createParallelGroup()
-                .addComponent(accountTreeScrollPane)
-                .addGroup(layout.createSequentialGroup()
-                        .addComponent(buttonAddAccount).addGap(5, 5, Short.MAX_VALUE).addComponent(buttonCancel).addGap(5).addComponent(buttonOk)))
-                .addGap(5));
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                .addGap(5)
-                .addComponent(accountTreeScrollPane)
-                .addGap(5)
-                .addGroup(layout.createParallelGroup()
-                        .addComponent(buttonAddAccount).addComponent(buttonCancel).addComponent(buttonOk))
-                .addGap(5));
+        SelectAccountDialog.this.setDialogValid("No account selected");
+
+        setContent(layout -> {
+            layout.setHorizontalGroup(layout.createParallelGroup().addComponent(accountTreeScrollPane));
+            layout.setVerticalGroup(layout.createSequentialGroup().addComponent(accountTreeScrollPane));
+        });
+
+        setButtons(jPanel -> jPanel.add(buttonAddAccount));
     }
 
     private void updateTree(String updatedSchemaId){

@@ -20,6 +20,7 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
 
     private JPanel contentPanel;
     private JButton buttonOk;
+    private JPanel panelButtons;
 
     private List<Validable> validableList;
 
@@ -55,6 +56,11 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
         });
 
         contentPanel = new JPanel();
+        GroupLayout contentLayout = new GroupLayout(this.contentPanel);
+        this.contentPanel.setLayout(contentLayout);
+
+        panelButtons = new JPanel();
+        panelButtons.setLayout(new BoxLayout(panelButtons, BoxLayout.Y_AXIS));
 
         GroupLayout layout = new GroupLayout(this.getContentPane());
         this.getContentPane().setLayout(layout);
@@ -63,6 +69,7 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
                 .addGroup(layout.createParallelGroup()
                         .addComponent(contentPanel)
                         .addGroup(layout.createSequentialGroup()
+                                .addComponent(panelButtons)
                                 .addGap(5, 5, Short.MAX_VALUE)
                                 .addComponent(buttonCancel)
                                 .addGap(5)
@@ -73,16 +80,20 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
                 .addComponent(contentPanel)
                 .addGap(5)
                 .addGroup(layout.createParallelGroup()
+                        .addComponent(panelButtons)
                         .addComponent(buttonCancel)
                         .addComponent(buttonOk))
                 .addGap(10));
 
-        GroupLayout contentLayout = new GroupLayout(this.contentPanel);
-        this.contentPanel.setLayout(contentLayout);
+
     }
 
-    protected void setContentLayout(Consumer<GroupLayout> layout) {
+    protected void setContent(Consumer<GroupLayout> layout) {
         layout.accept((GroupLayout) contentPanel.getLayout());
+    }
+
+    protected void setButtons(Consumer<JPanel> panelButtons) {
+        panelButtons.accept(this.panelButtons);
     }
 
     private void validateSource(Object source){
@@ -90,8 +101,10 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
             Validable validable = (Validable) source;
             if (!validableList.contains(validable)) validableList.add(validable);
         }
+        validateDialog();
+    }
 
-
+    protected void validateDialog(){
         for (Validable validable : validableList) {
             String errorMsg = validable.validator();
             if (errorMsg != null){
@@ -100,11 +113,13 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
                 return;
             }
         }
-
-
-
         buttonOk.setToolTipText("");
         buttonOk.setEnabled(true);
+    }
+
+    protected void setDialogValid(String invalidMessage) {
+        buttonOk.setEnabled(invalidMessage == null);
+        buttonOk.setToolTipText(invalidMessage);
     }
 
     public boolean getResult(){
@@ -116,9 +131,6 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
         this.setLocation(getParent().getLocationOnScreen().x + getParent().getSize().width/2 - getSize().width/2,
                 getParent().getLocationOnScreen().y + getParent().getSize().height/2 - getSize().height/2);
         buttonOk.grabFocus();
-        buttonOk.requestFocus();
-        buttonOk.transferFocus();
-
         super.setVisible(b);
     }
 

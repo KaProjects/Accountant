@@ -29,14 +29,14 @@ public class TransactionPanel extends JPanel implements DocumentListener {
                             Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
         this.accountPairDescriptionMap = accountPairDescriptionMap;
 
-        tfDate = new JTextField();
+        tfDate = new DatePickerTextField("",null);
         cbDescription = new JComboBox<>();
         cbDescription.setEditable(true);
 
-        tfAmount = new JTextField();
-        tfDebit = new SelectAccountTextField(configuration, accountMap, classList, this);
+        tfAmount = new HintValidatedTextField("","Transaction Amount", "set amount", true, null);
+        tfDebit = new SelectAccountTextField(configuration, accountMap, classList, "Debit",this);
         tfDebit.getDocument().addDocumentListener(this);
-        tfCredit = new SelectAccountTextField(configuration, accountMap, classList, this);
+        tfCredit = new SelectAccountTextField(configuration, accountMap, classList,"Credit", this);
         tfCredit.getDocument().addDocumentListener(this);
 
         GroupLayout layout = new GroupLayout(this);

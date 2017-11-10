@@ -8,10 +8,10 @@ import javax.swing.event.DocumentListener;
 /**
  * TODO post 1.0 : impl. & use + date validator
  */
-public class DatePickerTextField extends ValidableTextField implements Validable {
+public class DatePickerTextField extends HintValidatedTextField implements Validable {
 
-    public DatePickerTextField(DocumentListener documentListener) {
-        super("Date Picker", "set date", true, documentListener);
+    public DatePickerTextField(String date, DocumentListener documentListener) {
+        super(date,"Date Picker", "set date", true, documentListener);
         this.setHorizontalAlignment(SwingConstants.RIGHT);
     }
 
@@ -22,6 +22,7 @@ public class DatePickerTextField extends ValidableTextField implements Validable
 
     @Override
     public String validator() {
+        if (!validatorEnabled) return null;
         return doValidate() ? null : "Date NOT set";
     }
 }

@@ -10,21 +10,25 @@ import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-public class ValidableTextField extends JTextField implements FocusListener, Validable {
-    protected boolean showingHint;
+public class HintValidatedTextField extends JTextField implements FocusListener, Validable {
+    private boolean showingHint;
     private NumberFilter numberFilter;
 
     private String hint;
     private String label;
     private boolean isOnlyNumberInput;
 
-    public ValidableTextField(String label, String hint, boolean isOnlyNumberInput, DocumentListener documentListener) {
+    protected boolean validatorEnabled;
+
+    public HintValidatedTextField(String text, String label, String hint, boolean isOnlyNumberInput, DocumentListener documentListener) {
+        super(text);
         this.label = label;
         this.hint = hint;
+        validatorEnabled = true;
         this.isOnlyNumberInput = isOnlyNumberInput;
-        showingHint = hint != null;
-        super.addFocusListener(this);
-
+        showingHint = text.trim().isEmpty() && hint != null;
+        this.addFocusListener(this);
+        this.setToolTipText(label);
 
         if (isOnlyNumberInput) {
             numberFilter = new NumberFilter();
@@ -39,8 +43,13 @@ public class ValidableTextField extends JTextField implements FocusListener, Val
         focusLost(null);
     }
 
+    public void setValidatorEnabled(boolean enabled){
+        this.validatorEnabled = enabled;
+    }
+
     @Override
     public String validator(){
+        if (!validatorEnabled) return null;
         return doValidate() ? null : "Value missing at '" + label + "'";
     }
 
