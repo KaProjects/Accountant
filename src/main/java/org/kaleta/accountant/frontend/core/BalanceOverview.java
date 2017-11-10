@@ -149,8 +149,8 @@ public class BalanceOverview extends JPanel implements Configurable {
                         String schemaId = clazz.getId() + group.getId() + schemaAccount.getId();
                         if (accountMap.get(schemaId) != null) {
                             for (AccountsModel.Account account : accountMap.get(schemaId)){
-                                accTurnover += Integer.parseInt(Service.ACCOUNT.getAccountTurnover(year, account));
-                                accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
+                                accTurnover += Integer.parseInt(Service.TRANSACTIONS.getAccountTurnover(year, account));
+                                accBalance += Integer.parseInt(Service.TRANSACTIONS.getAccountBalance(year, account));
                             }
                         }
                         accounts.add(new BalanceRowModel(schemaAccount.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRowModel.ACCOUNT));
@@ -187,8 +187,8 @@ public class BalanceOverview extends JPanel implements Configurable {
                         String schemaId = clazz.getId() + group.getId() + schemaAccount.getId();
                         if (accountMap.get(schemaId) != null) {
                             for (AccountsModel.Account account : accountMap.get(schemaId)){
-                                accTurnover += Integer.parseInt(Service.ACCOUNT.getAccountTurnover(year, account));
-                                accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
+                                accTurnover += Integer.parseInt(Service.TRANSACTIONS.getAccountTurnover(year, account));
+                                accBalance += Integer.parseInt(Service.TRANSACTIONS.getAccountBalance(year, account));
                             }
                         }
                         accounts.add(new BalanceRowModel(schemaAccount.getName(), String.valueOf(accTurnover), String.valueOf(accBalance), schemaId, BalanceRowModel.ACCOUNT));

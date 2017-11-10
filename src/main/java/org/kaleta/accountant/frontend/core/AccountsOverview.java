@@ -127,8 +127,8 @@ public class AccountsOverview extends JPanel implements Configurable {
         } else {
             for (AccountsModel.Account account : accountList) {
                 String text = account.getSchemaId() + "." + account.getSemanticId() + " '" + account.getName() + "'  turnover="
-                        +Service.ACCOUNT.getAccountTurnover(getConfiguration().getSelectedYear(), account) + "  balance="
-                        +Service.ACCOUNT.getAccountBalance(getConfiguration().getSelectedYear(), account);
+                        +Service.TRANSACTIONS.getAccountTurnover(getConfiguration().getSelectedYear(), account) + "  balance="
+                        +Service.TRANSACTIONS.getAccountBalance(getConfiguration().getSelectedYear(), account);
                 accountOverviewPanel.add(new JLabel(text));
                 // TODO post 1.0 : design&impl
             }

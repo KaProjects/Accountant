@@ -15,6 +15,15 @@ public class AccountsModel {
     @XmlAttribute(name = "year", required = true)
     private String year;
 
+    public AccountsModel() { }
+
+    public AccountsModel(AccountsModel accountsModel) {
+        this.setYear(accountsModel.getYear());
+        for (AccountsModel.Account acc : accountsModel.getAccount()){
+            this.getAccount().add(new AccountsModel.Account(acc));
+        }
+    }
+
     public List<Account> getAccount() {
         if (account == null) {
             account = new ArrayList<>();
@@ -43,13 +52,18 @@ public class AccountsModel {
         @XmlAttribute(name = "metadata", required = true)
         String metadata = "";
 
+        public Account() { }
+
+        public Account(Account acc) {
+            this.setName(acc.getName());
+            this.setSchemaId(acc.getSchemaId());
+            this.setSemanticId(acc.getSemanticId());
+            this.setMetadata(acc.getMetadata());
+        }
+
         @Override
         public String toString() {
             return this.getName();
-        }
-
-        public String getSchemaId() {
-            return schemaId;
         }
 
         public String getFullId(){
@@ -66,6 +80,10 @@ public class AccountsModel {
 
         public String getSchemaAccountId(){
             return schemaId.substring(2,3);
+        }
+
+        public String getSchemaId() {
+            return schemaId;
         }
 
         public void setSchemaId(String value) {

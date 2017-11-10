@@ -17,8 +17,17 @@ import java.util.TreeMap;
  */
 public class SchemaService {
 
+    private SchemaModel schemaModel;
+
     SchemaService(){
         // package-private
+    }
+
+    private SchemaModel getModel(String year) throws ManagerException {
+        if (schemaModel == null) {
+            schemaModel = new SchemaManager(year).retrieve();
+        }
+        return new SchemaModel(schemaModel);
     }
 
     /**
@@ -26,7 +35,7 @@ public class SchemaService {
      */
     public List<SchemaModel.Class> getSchemaClassList(String year) {
         try {
-            return new SchemaManager(year).retrieve().getClazz();
+            return getModel(year).getClazz();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -38,7 +47,7 @@ public class SchemaService {
      */
     public List<SchemaModel.Class> getSchemaClassListByAccountType(String year, String accountType) {
         try {
-            List<SchemaModel.Class> allClasses = new SchemaManager(year).retrieve().getClazz();
+            List<SchemaModel.Class> allClasses = getModel(year).getClazz();
             List<SchemaModel.Class> filteredClasses = new ArrayList<>();
             for (SchemaModel.Class clazz : allClasses) {
                 List<SchemaModel.Class.Group> groupList = new ArrayList<>();
@@ -74,7 +83,7 @@ public class SchemaService {
     public Map<Integer, SchemaModel.Class> getSchemaClassMap(String year) {
         try {
             Map<Integer, SchemaModel.Class> classMap = new TreeMap<>();
-            for ( SchemaModel.Class clazz : new SchemaManager(year).retrieve().getClazz()){
+            for ( SchemaModel.Class clazz : getModel(year).getClazz()){
                 classMap.put(Integer.parseInt(clazz.getId()), clazz);
             }
             return classMap;
@@ -106,25 +115,25 @@ public class SchemaService {
         return accountMap;
     }
 
-    private SchemaModel.Class getClassById(SchemaModel  schemaModel, String classId){
-        for (SchemaModel.Class clazz : schemaModel.getClazz()){
+    private SchemaModel.Class getClassById(SchemaModel model, String classId) throws ManagerException {
+        for (SchemaModel.Class clazz : model.getClazz()){
             if (clazz.getId().equals(classId)) return clazz;
         }
-        throw new IllegalArgumentException("Illegal class id!");
+        throw new IllegalArgumentException("Not found: class id=" + classId + " in year=" + model.getYear());
     }
 
     private SchemaModel.Class.Group getGroupById(SchemaModel.Class clazz, String groupId){
         for (SchemaModel.Class.Group group : clazz.getGroup()){
             if (group.getId().equals(groupId)) return group;
         }
-        throw new IllegalArgumentException("Illegal group id!");
+        throw new IllegalArgumentException("Not found: group id=" + groupId + " in class id=" + clazz.getId());
     }
 
     private SchemaModel.Class.Group.Account getAccountById(SchemaModel.Class.Group group, String accId){
         for (SchemaModel.Class.Group.Account acc : group.getAccount()){
             if (acc.getId().equals(accId)) return acc;
         }
-        throw new IllegalArgumentException("Illegal account id!");
+        throw new IllegalArgumentException("Not found: account id=" + accId + " in group id=" + group.getId());
     }
 
     /**
@@ -132,8 +141,7 @@ public class SchemaService {
      */
     public String getGroupName(String year, String classId, String groupId) {
         try {
-            SchemaModel schemaModel = new SchemaManager(year).retrieve();
-            return getGroupById(getClassById(schemaModel, classId), groupId).getName();
+            return getGroupById(getClassById(getModel(year), classId), groupId).getName();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -145,8 +153,7 @@ public class SchemaService {
      */
     public String getAccountName(String year, String classId, String groupId, String accountId) {
         try {
-            SchemaModel schemaModel = new SchemaManager(year).retrieve();
-            return getAccountById(getGroupById(getClassById(schemaModel, classId), groupId), accountId).getName();
+            return getAccountById(getGroupById(getClassById(getModel(year), classId), groupId), accountId).getName();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -174,13 +181,13 @@ public class SchemaService {
      */
     public void createGroup(String year, String classId, String groupId, String name) {
         try {
-            SchemaManager schemaManager = new SchemaManager(year);
-            SchemaModel schemaModel = schemaManager.retrieve();
+            SchemaManager manager = new SchemaManager(year);
+            SchemaModel model = manager.retrieve();
 
             SchemaModel.Class.Group newGroup = new SchemaModel.Class.Group();
             newGroup.setName(name);
             newGroup.setId(groupId);
-            getClassById(schemaModel, classId).getGroup().add(newGroup);
+            getClassById(model, classId).getGroup().add(newGroup);
 
             switch (classId) {
                 case "0": {
@@ -188,13 +195,13 @@ public class SchemaService {
                     accDepAccount.setId(groupId);
                     accDepAccount.setName(Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + name);
                     accDepAccount.setType(Constants.AccountType.LIABILITY);
-                    getGroupById(getClassById(schemaModel, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID).getAccount().add(accDepAccount);
+                    getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID).getAccount().add(accDepAccount);
 
                     SchemaModel.Class.Group.Account depAccount = new SchemaModel.Class.Group.Account();
                     depAccount.setId(groupId);
                     depAccount.setName(Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + name);
                     depAccount.setType(Constants.AccountType.EXPENSE);
-                    getGroupById(getClassById(schemaModel, "5"), Constants.Schema.DEPRECIATION_GROUP_ID).getAccount().add(depAccount);
+                    getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID).getAccount().add(depAccount);
                     break;
                 }
                 case "1": {
@@ -202,7 +209,7 @@ public class SchemaService {
                     consumptionAccount.setId(groupId);
                     consumptionAccount.setName(Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + name);
                     consumptionAccount.setType(Constants.AccountType.EXPENSE);
-                    getGroupById(getClassById(schemaModel, "5"), Constants.Schema.CONSUMPTION_GROUP_ID).getAccount().add(consumptionAccount);
+                    getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID).getAccount().add(consumptionAccount);
                     break;
                 }
                 case "2":
@@ -213,7 +220,9 @@ public class SchemaService {
                 default: throw new IllegalArgumentException("Illegal class id!");
             }
 
-            schemaManager.update(schemaModel);
+            manager.update(model);
+            Initializer.LOG.info("Schema Group id=" + classId + groupId + " name='" + name + "' created");
+            this.schemaModel = model;
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -225,22 +234,22 @@ public class SchemaService {
      */
     public void renameGroup(String year, String classId, String groupId, String newName){
         try {
-            SchemaManager schemaManager = new SchemaManager(year);
-            SchemaModel schemaModel = schemaManager.retrieve();
+            SchemaManager manager = new SchemaManager(year);
+            SchemaModel model = manager.retrieve();
 
-            getGroupById(getClassById(schemaModel, classId), groupId).setName(newName);
+            getGroupById(getClassById(model, classId), groupId).setName(newName);
 
             switch (classId) {
                 case "0": {
-                    getAccountById(getGroupById(getClassById(schemaModel, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID), groupId)
+                    getAccountById(getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID), groupId)
                             .setName(Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + newName);
 
-                    getAccountById(getGroupById(getClassById(schemaModel, "5"), Constants.Schema.DEPRECIATION_GROUP_ID), groupId)
+                    getAccountById(getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID), groupId)
                             .setName(Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + newName);
                     break;
                 }
                 case "1": {
-                    getAccountById(getGroupById(getClassById(schemaModel, "5"), Constants.Schema.CONSUMPTION_GROUP_ID), groupId)
+                    getAccountById(getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID), groupId)
                             .setName(Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + newName);
                     break;
                 }
@@ -252,7 +261,9 @@ public class SchemaService {
                 default: throw new IllegalArgumentException("Illegal class id!");
             }
 
-            schemaManager.update(schemaModel);
+            manager.update(model);
+            Initializer.LOG.info("Schema Group id=" + classId + groupId + " renamed to '" + newName + "'");
+            this.schemaModel = model;
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -264,23 +275,23 @@ public class SchemaService {
      */
     public void deleteGroup(String year, String classId, String groupId){
         try {
-            SchemaManager schemaManager = new SchemaManager(year);
-            SchemaModel schemaModel = schemaManager.retrieve();
+            SchemaManager manager = new SchemaManager(year);
+            SchemaModel model = manager.retrieve();
 
-            SchemaModel.Class clazz = getClassById(schemaModel, classId);
+            SchemaModel.Class clazz = getClassById(model, classId);
             clazz.getGroup().remove(getGroupById(clazz, groupId));
 
             switch (classId) {
                 case "0": {
-                    SchemaModel.Class.Group groupAccDep = getGroupById(getClassById(schemaModel, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID);
+                    SchemaModel.Class.Group groupAccDep = getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID);
                     groupAccDep.getAccount().remove(getAccountById(groupAccDep, groupId));
 
-                    SchemaModel.Class.Group groupDep = getGroupById(getClassById(schemaModel, "5"), Constants.Schema.DEPRECIATION_GROUP_ID);
+                    SchemaModel.Class.Group groupDep = getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID);
                     groupDep.getAccount().remove(getAccountById(groupDep, groupId));
                     break;
                 }
                 case "1": {
-                    SchemaModel.Class.Group groupCons = getGroupById(getClassById(schemaModel, "5"), Constants.Schema.CONSUMPTION_GROUP_ID);
+                    SchemaModel.Class.Group groupCons = getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID);
                     groupCons.getAccount().remove(getAccountById(groupCons, groupId));
                     break;
                 }
@@ -292,7 +303,9 @@ public class SchemaService {
                 default: throw new IllegalArgumentException("Illegal class id!");
             }
 
-            schemaManager.update(schemaModel);
+            manager.update(model);
+            Initializer.LOG.info("Schema Group id=" + classId + groupId + " deleted");
+            this.schemaModel = model;
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -304,16 +317,18 @@ public class SchemaService {
      */
     public void createAccount(String year, String classId, String groupId, String accountId, String name, String type) {
         try {
-            SchemaManager schemaManager = new SchemaManager(year);
-            SchemaModel schemaModel = schemaManager.retrieve();
+            SchemaManager manager = new SchemaManager(year);
+            SchemaModel model = manager.retrieve();
 
             SchemaModel.Class.Group.Account newAcc = new SchemaModel.Class.Group.Account();
             newAcc.setName(name);
             newAcc.setId(accountId);
             newAcc.setType(type);
-            getGroupById(getClassById(schemaModel, classId), groupId).getAccount().add(newAcc);
+            getGroupById(getClassById(model, classId), groupId).getAccount().add(newAcc);
 
-            schemaManager.update(schemaModel);
+            manager.update(model);
+            Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " name='" + name + "' created");
+            this.schemaModel = model;
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -325,12 +340,14 @@ public class SchemaService {
      */
     public void renameAccount(String year, String classId, String groupId, String accountId, String newName){
         try {
-            SchemaManager schemaManager = new SchemaManager(year);
-            SchemaModel schemaModel = schemaManager.retrieve();
+            SchemaManager manager = new SchemaManager(year);
+            SchemaModel model = manager.retrieve();
 
-            getAccountById(getGroupById(getClassById(schemaModel, classId), groupId), accountId).setName(newName);
+            getAccountById(getGroupById(getClassById(model, classId), groupId), accountId).setName(newName);
 
-            schemaManager.update(schemaModel);
+            manager.update(model);
+            Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " renamed to '" + newName + "'");
+            this.schemaModel = model;
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -342,13 +359,15 @@ public class SchemaService {
      */
     public void deleteAccount(String year, String classId, String groupId, String accountId){
         try {
-            SchemaManager schemaManager = new SchemaManager(year);
-            SchemaModel schemaModel = schemaManager.retrieve();
+            SchemaManager manager = new SchemaManager(year);
+            SchemaModel model = manager.retrieve();
 
-            SchemaModel.Class.Group group = getGroupById(getClassById(schemaModel, classId), groupId);
+            SchemaModel.Class.Group group = getGroupById(getClassById(model, classId), groupId);
             group.getAccount().remove(getAccountById(group, accountId));
 
-            schemaManager.update(schemaModel);
+            manager.update(model);
+            Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " deleted");
+            this.schemaModel = model;
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -360,8 +379,7 @@ public class SchemaService {
      */
     public String getSchemaAccountType(String year, String schemaId) {
         try {
-            SchemaModel schemaModel = new SchemaManager(year).retrieve();
-            return getAccountById(getGroupById(getClassById(schemaModel,
+            return getAccountById(getGroupById(getClassById(getModel(year),
                     schemaId.substring(0, 1)),
                     schemaId.substring(1, 2)),
                     schemaId.substring(2, 3)).getType();

@@ -14,6 +14,12 @@ public class ConfigModel {
     @XmlElement(required = true)
     private ConfigModel.Years years = new Years();
 
+    public ConfigModel(){}
+
+    public ConfigModel(ConfigModel configModel){
+        this.setYears(new ConfigModel.Years(configModel.getYears()));
+    }
+
     public ConfigModel.Years getYears() {
         return years;
     }
@@ -32,6 +38,15 @@ public class ConfigModel {
         List<ConfigModel.Years.Year> year;
         @XmlAttribute(name = "active", required = true)
         String active = "";
+
+        public Years(){}
+
+        public Years(Years years){
+            this.setActive(years.getActive());
+            for (ConfigModel.Years.Year year : years.getYearList()){
+                this.getYearList().add(new ConfigModel.Years.Year(year));
+            }
+        }
 
         public List<ConfigModel.Years.Year> getYearList() {
             if (year == null) {
@@ -55,6 +70,12 @@ public class ConfigModel {
 
             @XmlAttribute(name = "name", required = true)
             String name;
+
+            public Year(){}
+
+            public Year(Year year){
+                this.setName(year.getName());
+            }
 
             public String getName() {
                 return name;

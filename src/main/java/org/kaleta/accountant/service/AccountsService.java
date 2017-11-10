@@ -2,9 +2,7 @@ package org.kaleta.accountant.service;
 
 import org.kaleta.accountant.backend.manager.AccountsManager;
 import org.kaleta.accountant.backend.manager.ManagerException;
-import org.kaleta.accountant.backend.manager.TransactionsManager;
 import org.kaleta.accountant.backend.model.AccountsModel;
-import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Initializer;
@@ -19,8 +17,17 @@ import java.util.Map;
  */
 public class AccountsService {
 
+    private AccountsModel accountsModel;
+
     AccountsService(){
         // package-private
+    }
+
+    private AccountsModel getModel(String year) throws ManagerException {
+        if (accountsModel == null) {
+            accountsModel = new AccountsManager(year).retrieve();
+        }
+        return new AccountsModel(accountsModel);
     }
 
     /**
@@ -28,9 +35,8 @@ public class AccountsService {
      */
     public List<AccountsModel.Account> getAccountsBySchemaId(String year, String schemaIdPrefix){
         try {
-            AccountsModel accountsModel = new AccountsManager(year).retrieve();
             List<AccountsModel.Account> eligibleAccounts = new ArrayList<>();
-            for (AccountsModel.Account account : accountsModel.getAccount()) {
+            for (AccountsModel.Account account : getModel(year).getAccount()) {
                 if (account.getSchemaId().startsWith(schemaIdPrefix)) {
                     eligibleAccounts.add(account);
                 }
@@ -48,7 +54,7 @@ public class AccountsService {
     public Map<String, List<AccountsModel.Account>> getAccountsViaSchemaMap(String year){
         try {
             Map<String, List<AccountsModel.Account>> accountMap = new HashMap<>();
-            for (AccountsModel.Account account : new AccountsManager(year).retrieve().getAccount()){
+            for (AccountsModel.Account account : getModel(year).getAccount()){
                 String schemaId = account.getSchemaId();
                 if (accountMap.keySet().contains(schemaId)){
                     accountMap.get(schemaId).add(account);
@@ -58,66 +64,6 @@ public class AccountsService {
                 }
             }
             return accountMap;
-        } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-            throw new ServiceFailureException(e);
-        }
-    }
-
-    /**
-     * Returns value of turnover for specified account.
-     */
-    public String getAccountTurnover(String year, AccountsModel.Account account) {
-        String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
-        if (accountType.equals(Constants.AccountType.OFF_BALANCE)){
-            throw new IllegalArgumentException("Off-Balance accounts has no balance");
-        }
-        try {
-            String accountId = account.getSchemaId() + "." + account.getSemanticId();
-            Integer turnover = 0;
-            for (TransactionsModel.Transaction tr : new TransactionsManager(year).retrieve().getTransaction()){
-                if (tr.getDebit().equals(accountId) && (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE))){
-                    turnover += Integer.parseInt(tr.getAmount());
-                }
-                if (tr.getCredit().equals(accountId) && (accountType.equals(Constants.AccountType.LIABILITY) || accountType.equals(Constants.AccountType.REVENUE))){
-                    turnover += Integer.parseInt(tr.getAmount());
-                }
-            }
-            return String.valueOf(turnover);
-        } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-            throw new ServiceFailureException(e);
-        }
-    }
-
-    /**
-     * Returns value of balance for specified account.
-     */
-    public String getAccountBalance(String year, AccountsModel.Account account) {
-        String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
-        if (accountType.equals(Constants.AccountType.OFF_BALANCE)){
-            throw new IllegalArgumentException("Off-Balance accounts has no balance");
-        }
-        try {
-            String accountId = account.getSchemaId() + "." + account.getSemanticId();
-            Integer balance = 0;
-            for (TransactionsModel.Transaction tr : new TransactionsManager(year).retrieve().getTransaction()){
-                if (tr.getCredit().equals(accountId)){
-                    if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
-                        balance -= Integer.parseInt(tr.getAmount());
-                    } else {
-                        balance += Integer.parseInt(tr.getAmount());
-                    }
-                }
-                if (tr.getDebit().equals(accountId)){
-                    if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
-                        balance += Integer.parseInt(tr.getAmount());
-                    } else {
-                        balance -= Integer.parseInt(tr.getAmount());
-                    }
-                }
-            }
-            return String.valueOf(balance);
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -163,7 +109,7 @@ public class AccountsService {
     public AccountsModel.Account getAccumulatedDepAccount(String year, AccountsModel.Account account){
         String accDepId = getAccumulatedDepAccountId(account.getSchemaId(), account.getSemanticId());
         try {
-            for (AccountsModel.Account acc : new AccountsManager(year).retrieve().getAccount()) {
+            for (AccountsModel.Account acc : getModel(year).getAccount()) {
                 if (acc.getFullId().equals(accDepId)) {
                     return acc;
                 }
@@ -181,7 +127,7 @@ public class AccountsService {
     public AccountsModel.Account getDepreciationAccount(String year, AccountsModel.Account account){
         String depId = getDepreciationAccountId(account.getSchemaId(), account.getSemanticId());
         try {
-            for (AccountsModel.Account acc : new AccountsManager(year).retrieve().getAccount()) {
+            for (AccountsModel.Account acc : getModel(year).getAccount()) {
                 if (acc.getFullId().equals(depId)) {
                     return acc;
                 }
@@ -194,54 +140,23 @@ public class AccountsService {
     }
 
     /**
-     * Returns date of last depreciation for specified account.
-     */
-    public String getLastDepreciationDate(String year, AccountsModel.Account account){
-        try {
-            String depAccId = getDepreciationAccountId(account.getSchemaId(), account.getSemanticId());
-            String accDepAccId = getAccumulatedDepAccountId(account.getSchemaId(), account.getSemanticId());
-
-            TransactionsModel model = new TransactionsManager(year).retrieve();
-            TransactionsModel.Transaction lastDepTransaction = null;
-            for (TransactionsModel.Transaction transaction : model.getTransaction()){
-                if (transaction.getDebit().equals(depAccId) && transaction.getCredit().equals(accDepAccId)){
-                    if (lastDepTransaction == null){
-                        lastDepTransaction = transaction;
-                    } else {
-                        int newTrId = Integer.parseInt(transaction.getId());
-                        int lastTrId = Integer.parseInt(lastDepTransaction.getId());
-                        lastDepTransaction = (newTrId > lastTrId) ? transaction : lastDepTransaction;
-                    }
-                }
-            }
-            if (lastDepTransaction != null){
-                return lastDepTransaction.getDate();
-            } else {
-                return null;
-            }
-        } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-            throw new ServiceFailureException(e);
-        }
-    }
-
-    /**
      * Creates semantic account according to specified attributes.
      */
     public AccountsModel.Account createAccount(String year, String name, String schemaId, String semanticId, String metadata){
         try {
-            AccountsManager accountsManager = new AccountsManager(year);
-            AccountsModel accountsModel = accountsManager.retrieve();
+            AccountsManager manager = new AccountsManager(year);
+            AccountsModel model = manager.retrieve();
 
             AccountsModel.Account account = new AccountsModel.Account();
             account.setName(name);
             account.setSchemaId(schemaId);
             account.setSemanticId(semanticId);
             account.setMetadata(metadata);
-            accountsModel.getAccount().add(account);
+            model.getAccount().add(account);
 
-            accountsManager.update(accountsModel);
-            // TODO 1.0 LOG
+            manager.update(model);
+            Initializer.LOG.info("Account schemaId=" + schemaId + " semanticId=" + semanticId + " name='" + name + "' created");
+            this.accountsModel = model;
             return account;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
@@ -254,8 +169,7 @@ public class AccountsService {
      */
     public String getAccountName(String year, String fullId){
         try {
-            AccountsModel accountsModel = new AccountsManager(year).retrieve();
-            for (AccountsModel.Account account : accountsModel.getAccount()){
+            for (AccountsModel.Account account : getModel(year).getAccount()){
                 if (account.getFullId().equals(fullId)){
                     return account.getName();
                 }

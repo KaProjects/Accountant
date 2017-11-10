@@ -15,6 +15,15 @@ public class TransactionsModel {
     @XmlAttribute(name = "year", required = true)
     private String year;
 
+    public TransactionsModel(){}
+
+    public TransactionsModel(TransactionsModel transactionsModel){
+        this.setYear(transactionsModel.getYear());
+        for (TransactionsModel.Transaction transaction : transactionsModel.getTransaction()){
+            this.getTransaction().add(new TransactionsModel.Transaction(transaction));
+        }
+    }
+
     public List<Transaction> getTransaction() {
         if (transaction == null) {
             transaction = new ArrayList<>();
@@ -46,6 +55,17 @@ public class TransactionsModel {
         String debit;
         @XmlAttribute(name = "credit", required = true)
         String credit;
+
+        public Transaction(){}
+
+        public Transaction(Transaction transaction){
+            this.setDescription(transaction.getDescription());
+            this.setId(transaction.getId());
+            this.setDate(transaction.getDate());
+            this.setAmount(transaction.getAmount());
+            this.setDebit(transaction.getDebit());
+            this.setCredit(transaction.getCredit());
+        }
 
         public String getId() {
             return id;
@@ -94,7 +114,5 @@ public class TransactionsModel {
         public void setCredit(String value) {
             this.credit = value;
         }
-
     }
-
 }

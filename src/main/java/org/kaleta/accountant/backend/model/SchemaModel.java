@@ -17,6 +17,15 @@ public class SchemaModel {
     @XmlAttribute(name = "year", required = true)
     private String year;
 
+    public SchemaModel(){}
+
+    public SchemaModel(SchemaModel schemaModel){
+        this.setYear(schemaModel.getYear());
+        for (SchemaModel.Class clazz : schemaModel.getClazz()){
+            this.getClazz().add(new SchemaModel.Class(clazz));
+        }
+    }
+
     public List<SchemaModel.Class> getClazz() {
         if (clazz == null) {
             clazz = new ArrayList<>();
@@ -43,6 +52,16 @@ public class SchemaModel {
         String id ="";
         @XmlAttribute(name = "name", required = true)
         String name = "";
+
+        public Class(){}
+
+        public Class(Class clazz){
+            this.setId(clazz.getId());
+            this.setName(clazz.getName());
+            for (SchemaModel.Class.Group group : clazz.getGroup()){
+                this.getGroup().add(new SchemaModel.Class.Group(group));
+            }
+        }
 
         @Override
         public String toString() {
@@ -84,6 +103,16 @@ public class SchemaModel {
             String id = "";
             @XmlAttribute(name = "name", required = true)
             String name = "";
+
+            public Group(){}
+
+            public Group(Group group){
+                this.setId(group.getId());
+                this.setName(group.getName());
+                for (SchemaModel.Class.Group.Account acc : group.getAccount()){
+                    this.getAccount().add(new SchemaModel.Class.Group.Account(acc));
+                }
+            }
 
             @Override
             public int compareTo(Group o) {
@@ -129,6 +158,14 @@ public class SchemaModel {
                 String name = "";
                 @XmlAttribute(name = "type", required = true)
                 String type = "";
+
+                public Account(){}
+
+                public Account(Account acc){
+                    this.setId(acc.getId());
+                    this.setName(acc.getName());
+                    this.setType(acc.getType());
+                }
 
                 @Override
                 public int compareTo(Account o) {

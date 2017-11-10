@@ -275,15 +275,15 @@ public class AssetsEditor extends JPanel implements Configurable {
 
         private void update() {
             String year = getConfiguration().getSelectedYear();
-            String assetValue = Service.ACCOUNT.getAccountBalance(year, account);
+            String assetValue = Service.TRANSACTIONS.getAccountBalance(year, account);
             isActive = Integer.parseInt(assetValue) != 0;
             if (isActive) {
-                String accDepValue = Service.ACCOUNT.getAccountBalance(year, Service.ACCOUNT.getAccumulatedDepAccount(year, account));
+                String accDepValue = Service.TRANSACTIONS.getAccountBalance(year, Service.ACCOUNT.getAccumulatedDepAccount(year, account));
                 String currentValue = String.valueOf(Integer.parseInt(assetValue) - Integer.parseInt(accDepValue));
                 labelCurrentValue.setText(currentValue);
                 labelInitValue.setText(assetValue);
                 try {
-                    String lastDepDate = Service.ACCOUNT.getLastDepreciationDate(year, account);
+                    String lastDepDate = Service.TRANSACTIONS.getLastDepreciationDate(year, account);
                     if (lastDepDate != null) {
                         buttonDep.setEnabled(!(lastDepDate.substring(2, 4).equals("12") || currentValue.equals("0")));
                         lastDepDate = new SimpleDateFormat("dd.MM.").format(new SimpleDateFormat("ddMM").parse(lastDepDate));

@@ -23,6 +23,15 @@ public class ProceduresModel {
     @XmlAttribute(name = "year", required = true)
     protected String year;
 
+    public ProceduresModel(){}
+
+    public ProceduresModel(ProceduresModel proceduresModel){
+        this.setYear(proceduresModel.getYear());
+        for (ProceduresModel.Procedure procedure : proceduresModel.getProcedure()){
+            this.getProcedure().add(new ProceduresModel.Procedure(procedure));
+        }
+    }
+
     public List<Procedure> getProcedure() {
         if (procedure == null) {
             procedure = new ArrayList<>();
@@ -50,6 +59,16 @@ public class ProceduresModel {
         protected String id;
         @XmlAttribute(name = "name", required = true)
         protected String name;
+
+        public Procedure(){}
+
+        public Procedure(Procedure procedure){
+            this.setId(procedure.getId());
+            this.setName(procedure.getName());
+            for (ProceduresModel.Procedure.Transaction transaction : procedure.getTransaction()){
+                this.getTransaction().add(new ProceduresModel.Procedure.Transaction(transaction));
+            }
+        }
 
         public List<Transaction> getTransaction() {
             if (transaction == null) {
@@ -86,6 +105,15 @@ public class ProceduresModel {
             protected String debit;
             @XmlAttribute(name = "credit", required = true)
             protected String credit;
+
+            public Transaction(){}
+
+            public Transaction(Transaction transaction){
+                this.setAmount(transaction.getAmount());
+                this.setDescription(transaction.getDescription());
+                this.setCredit(transaction.getCredit());
+                this.setDebit(transaction.getDebit());
+            }
 
             public String getDescription() {
                 return description;

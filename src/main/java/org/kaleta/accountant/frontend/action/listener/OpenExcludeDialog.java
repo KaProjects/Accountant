@@ -49,9 +49,9 @@ public class OpenExcludeDialog extends ActionListener {
 
         AccountsModel.Account accDepAccount = Service.ACCOUNT.getAccumulatedDepAccount(year,account);
 
-        String assetValue = Service.ACCOUNT.getAccountBalance(year, account);
+        String assetValue = Service.TRANSACTIONS.getAccountBalance(year, account);
         Integer residualExpense = Integer.parseInt(assetValue)
-                - Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, accDepAccount));
+                - Integer.parseInt(Service.TRANSACTIONS.getAccountBalance(year, accDepAccount));
 
         ExcludeDialog dialog = (residualExpense == 0)
         ? new ExcludeDialog(getConfiguration(),debitAccountMap,debitClasses,revenueAccountMap,revenueClass)

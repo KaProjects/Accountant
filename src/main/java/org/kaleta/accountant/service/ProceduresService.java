@@ -13,8 +13,17 @@ import java.util.List;
  */
 public class ProceduresService {
 
+    private ProceduresModel proceduresModel;
+
     ProceduresService(){
         // package-private
+    }
+
+    private ProceduresModel getModel(String year) throws ManagerException {
+        if (proceduresModel == null) {
+            proceduresModel = new ProceduresManager(year).retrieve();
+        }
+        return new ProceduresModel(proceduresModel);
     }
 
     /**
@@ -22,7 +31,7 @@ public class ProceduresService {
      */
     public List<ProceduresModel.Procedure> getProcedureList(String year) {
         try {
-            return new ProceduresManager(year).retrieve().getProcedure();
+            return getModel(year).getProcedure();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -44,6 +53,8 @@ public class ProceduresService {
             model.getProcedure().add(procedure);
 
             manager.update(model);
+            Initializer.LOG.info("Procedure id=" + procedure.getId() + " name='" + procedure.getName() + "' created");
+            this.proceduresModel = model;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

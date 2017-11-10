@@ -175,7 +175,7 @@ public class ProfitOverview extends JPanel implements Configurable {
                         String schemaId = clazz.getId() + group.getId() + schemaAccount.getId();
                         if (accountMap.get(schemaId) != null) {
                             for (AccountsModel.Account account : accountMap.get(schemaId)){
-                                accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
+                                accBalance += Integer.parseInt(Service.TRANSACTIONS.getAccountBalance(year, account));
                             }
                         }
                         accounts.add(new BalanceRowModel(schemaAccount.getName(), "T", String.valueOf(accBalance), schemaId, BalanceRowModel.ACCOUNT));
@@ -201,7 +201,7 @@ public class ProfitOverview extends JPanel implements Configurable {
                         String schemaId = clazz.getId() + group.getId() + schemaAccount.getId();
                         if (accountMap.get(schemaId) != null) {
                             for (AccountsModel.Account account : accountMap.get(schemaId)){
-                                accBalance += Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
+                                accBalance += Integer.parseInt(Service.TRANSACTIONS.getAccountBalance(year, account));
                             }
                         }
                         accounts.add(new BalanceRowModel(schemaAccount.getName() ,"T", String.valueOf(accBalance), schemaId, BalanceRowModel.ACCOUNT));

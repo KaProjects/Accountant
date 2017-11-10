@@ -33,12 +33,12 @@ public class OpenDepreciateDialog extends ActionListener {
             AccountsModel.Account accDepAccount = Service.ACCOUNT.getAccumulatedDepAccount(year, account);
 
             String monthlyDepHint = accDepAccount.getMetadata().split(",")[0];
-            int assetValue = Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, account));
-            int accDepSum = Integer.parseInt(Service.ACCOUNT.getAccountBalance(year, accDepAccount));
+            int assetValue = Integer.parseInt(Service.TRANSACTIONS.getAccountBalance(year, account));
+            int accDepSum = Integer.parseInt(Service.TRANSACTIONS.getAccountBalance(year, accDepAccount));
             monthlyDepHint = ((assetValue-accDepSum) < Integer.parseInt(monthlyDepHint)) ? String.valueOf(assetValue-accDepSum) : monthlyDepHint;
             if (monthlyDepHint.equals("0")) monthlyDepHint = "x";
 
-            String lastDepDate = Service.ACCOUNT.getLastDepreciationDate(year,account);
+            String lastDepDate = Service.TRANSACTIONS.getLastDepreciationDate(year,account);
             if (lastDepDate == null){
                 for (TransactionsModel.Transaction tr : Service.TRANSACTIONS.getTransactions(year, account.getFullId(), null)){
                     if (tr.getDescription().contains(Constants.Transaction.PURCHASE_DESCRIPTION)){
