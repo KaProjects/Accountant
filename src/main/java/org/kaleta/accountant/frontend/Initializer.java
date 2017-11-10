@@ -52,7 +52,7 @@ public class Initializer {
                 }
 
                 new AppFrame().setVisible(true);
-                
+
             } catch (Throwable e) {
                 ErrorHandler.getThrowableDialog(e).setVisible(true);
                 System.exit(1);

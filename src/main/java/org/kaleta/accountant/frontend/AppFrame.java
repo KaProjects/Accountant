@@ -39,7 +39,12 @@ public class AppFrame extends JFrame implements Configuration{
         JMenu newMenu = new JMenu("Add");
         fileMenu.add(newMenu);
         fileMenu.add(new JSeparator());
-        // TODO 1.0 : add more menus for action: add asset, resource, transaction...
+
+        //newMenu.add(new MenuItemWrapper()); TODO: 11/10/17 add asset
+        //newMenu.add(new MenuItemWrapper()); TODO: 11/10/17 add resource(s)
+        //newMenu.add(new MenuItemWrapper()); TODO: 11/10/17 add transaction
+        //newMenu.add(new MenuItemWrapper()); TODO: 11/10/17 create procedure
+        
         fileMenu.add(new JSeparator());
         fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
 
