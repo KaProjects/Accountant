@@ -103,14 +103,14 @@ public class ConfigService {
     public void initYearData(String newYearName){
         File yearDir = new File(Initializer.DATA_SOURCE + newYearName + File.separator);
         if (yearDir.exists()) {
-            String msg = "Directory " + newYearName + " already exists";
+            String msg = "Directory '" + newYearName + "' already exists";
             Initializer.LOG.severe(msg);
             throw new ServiceFailureException(msg);
         } else {
             if (yearDir.mkdir()) {
-                Initializer.LOG.info("Directory \"" + yearDir.getPath() + "\" created!");
+                Initializer.LOG.info("Directory '" + yearDir.getPath() + "' created!");
             } else {
-                String msg = "Directory for year " + newYearName + " failed to create";
+                String msg = "Directory for year '" + newYearName + "' failed to create";
                 Initializer.LOG.severe(msg);
                 throw new ServiceFailureException(msg);
             }

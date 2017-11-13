@@ -155,7 +155,7 @@ public class AccountsService {
             model.getAccount().add(account);
 
             manager.update(model);
-            Initializer.LOG.info("Account schemaId=" + schemaId + " semanticId=" + semanticId + " name='" + name + "' created");
+            Initializer.LOG.info("Account created: id=" + schemaId + "." + semanticId + " name='" + name + "'");
             this.accountsModel = model;
             return account;
         } catch (ManagerException e){

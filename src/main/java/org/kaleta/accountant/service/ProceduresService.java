@@ -53,7 +53,7 @@ public class ProceduresService {
             model.getProcedure().add(procedure);
 
             manager.update(model);
-            Initializer.LOG.info("Procedure id=" + procedure.getId() + " name='" + procedure.getName() + "' created");
+            Initializer.LOG.info("Procedure created: id=" + procedure.getId() + " name='" + procedure.getName() + "'");
             this.proceduresModel = model;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));

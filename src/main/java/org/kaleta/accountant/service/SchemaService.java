@@ -221,7 +221,7 @@ public class SchemaService {
             }
 
             manager.update(model);
-            Initializer.LOG.info("Schema Group id=" + classId + groupId + " name='" + name + "' created");
+            Initializer.LOG.info("Schema Group created: id=" + classId + groupId + " name='" + name + "'");
             this.schemaModel = model;
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
@@ -327,7 +327,7 @@ public class SchemaService {
             getGroupById(getClassById(model, classId), groupId).getAccount().add(newAcc);
 
             manager.update(model);
-            Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " name='" + name + "' created");
+            Initializer.LOG.info("Schema Account created: id=" + classId + groupId + accountId + " name='" + name + "'");
             this.schemaModel = model;
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));

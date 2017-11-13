@@ -50,8 +50,9 @@ public class TransactionsService {
             model.getTransaction().add(transaction);
 
             manager.update(model);
-            Initializer.LOG.info("Transaction id=" + transaction.getId() + " amount=" + transaction.getAmount()
-                    + " debit=" +  transaction.getDebit() + " credit=" + transaction.getCredit()  + " created");
+            Initializer.LOG.info("Transaction created: id=" + transaction.getId() + " amount=" + transaction.getAmount()
+                    + " debit=" +  transaction.getDebit() + " credit=" + transaction.getCredit() + " description='"
+                    + transaction.getDescription() + "'");
             this.transactionsModel = model;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));

@@ -1,6 +1,6 @@
 package org.kaleta.accountant.frontend;
 
-import org.kaleta.accountant.frontend.action.menu.PerformExit;
+import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
 import org.kaleta.accountant.frontend.component.YearMenu;
 import org.kaleta.accountant.frontend.core.YearPane;
@@ -11,7 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-public class AppFrame extends JFrame implements Configuration{
+public class AppFrame extends JFrame implements Configuration {
     private String selectedYear;
 
     public AppFrame(){
@@ -35,19 +35,21 @@ public class AppFrame extends JFrame implements Configuration{
 
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
-        menuBar.add(fileMenu);
-        JMenu newMenu = new JMenu("Add");
-        fileMenu.add(newMenu);
-        fileMenu.add(new JSeparator());
-
-        //newMenu.add(new MenuItemWrapper()); TODO: 11/10/17 add asset
-        //newMenu.add(new MenuItemWrapper()); TODO: 11/10/17 add resource(s)
-        //newMenu.add(new MenuItemWrapper()); TODO: 11/10/17 add transaction
-        //newMenu.add(new MenuItemWrapper()); TODO: 11/10/17 create procedure
-        
-        fileMenu.add(new JSeparator());
         fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
 
+        JMenu addMenu = new JMenu("Add");
+        addMenu.setMnemonic(KeyEvent.VK_A);
+        addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, 0)));
+        addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, 0)));
+        addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, 0)));
+
+        JMenu createMenu = new JMenu("Create");
+        createMenu.setMnemonic(KeyEvent.VK_C);
+        createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)));
+
+        menuBar.add(fileMenu);
+        menuBar.add(addMenu);
+        menuBar.add(createMenu);
         menuBar.add(new JPanel());
         menuBar.add(new YearMenu());
     }

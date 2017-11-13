@@ -10,6 +10,8 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,18 +27,23 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
     private List<Validable> validableList;
 
     Dialog(Configuration configuration, String title, String confirmationLabel){
-        super((Frame) configuration);
-        setConfiguration(configuration);
-        initComponents(title, confirmationLabel);
-    }
-
-    private void initComponents(String title, String confirmationLabel){
+        super((Frame) configuration, title, true);
         validableList = new ArrayList<>();
         result = false;
-        this.setTitle(title);
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        this.setModal(true);
+        String actionKey = "com.spodding.tackline.dispatch:WINDOW_CLOSING";
+        this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), actionKey);
+        this.getRootPane().getActionMap().put(actionKey, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Dialog.this.dispatchEvent(new WindowEvent(Dialog.this, WindowEvent.WINDOW_CLOSING));
+            }
+        });
+        setConfiguration(configuration);
+        initComponents(confirmationLabel);
+    }
 
+    private void initComponents(String confirmationLabel){
         JButton buttonCancel = new JButton("Cancel");
         buttonCancel.addActionListener(a -> {
             result = false;
@@ -79,16 +86,6 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
                         .addComponent(buttonCancel)
                         .addComponent(buttonOk))
                 .addGap(10));
-
-
-    }
-
-    protected void setContent(Consumer<GroupLayout> layout) {
-        layout.accept((GroupLayout) contentPanel.getLayout());
-    }
-
-    protected void setButtons(Consumer<JPanel> panelButtons) {
-        panelButtons.accept(this.panelButtons);
     }
 
     private void validateSource(Object source){
@@ -97,6 +94,14 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
             if (!validableList.contains(validable)) validableList.add(validable);
         }
         validateDialog();
+    }
+
+    protected void setContent(Consumer<GroupLayout> layout) {
+        layout.accept((GroupLayout) contentPanel.getLayout());
+    }
+
+    protected void setButtons(Consumer<JPanel> panelButtons) {
+        panelButtons.accept(this.panelButtons);
     }
 
     protected void validateDialog(){
