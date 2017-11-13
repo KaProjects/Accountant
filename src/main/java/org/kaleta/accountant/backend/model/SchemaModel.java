@@ -55,7 +55,7 @@ public class SchemaModel {
 
         public Class(){}
 
-        public Class(Class clazz){
+        Class(Class clazz){
             this.setId(clazz.getId());
             this.setName(clazz.getName());
             for (SchemaModel.Class.Group group : clazz.getGroup()){
@@ -106,7 +106,7 @@ public class SchemaModel {
 
             public Group(){}
 
-            public Group(Group group){
+            Group(Group group){
                 this.setId(group.getId());
                 this.setName(group.getName());
                 for (SchemaModel.Class.Group.Account acc : group.getAccount()){
@@ -161,7 +161,7 @@ public class SchemaModel {
 
                 public Account(){}
 
-                public Account(Account acc){
+                Account(Account acc){
                     this.setId(acc.getId());
                     this.setName(acc.getName());
                     this.setType(acc.getType());

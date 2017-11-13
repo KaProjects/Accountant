@@ -14,11 +14,11 @@ public class HintValidatedTextField extends JTextField implements FocusListener,
     private boolean showingHint;
     private NumberFilter numberFilter;
 
-    private String hint;
-    private String label;
-    private boolean isOnlyNumberInput;
+    private final String hint;
+    private final String label;
+    private final boolean isOnlyNumberInput;
 
-    protected boolean validatorEnabled;
+    boolean validatorEnabled;
 
     public HintValidatedTextField(String text, String label, String hint, boolean isOnlyNumberInput, DocumentListener documentListener) {
         super(text);
@@ -53,7 +53,7 @@ public class HintValidatedTextField extends JTextField implements FocusListener,
         return doValidate() ? null : "Value missing at '" + label + "'";
     }
 
-    protected boolean doValidate() {
+    boolean doValidate() {
         return this.getText() != null && !this.getText().trim().isEmpty();
     }
 

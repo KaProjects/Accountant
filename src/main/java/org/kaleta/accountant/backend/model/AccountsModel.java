@@ -31,7 +31,7 @@ public class AccountsModel {
         return this.account;
     }
 
-    public String getYear() {
+    private String getYear() {
         return year;
     }
 
@@ -54,7 +54,7 @@ public class AccountsModel {
 
         public Account() { }
 
-        public Account(Account acc) {
+        Account(Account acc) {
             this.setName(acc.getName());
             this.setSchemaId(acc.getSchemaId());
             this.setSemanticId(acc.getSemanticId());

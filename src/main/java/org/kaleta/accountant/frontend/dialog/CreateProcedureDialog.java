@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 public class CreateProcedureDialog extends Dialog {
-    private Map<AccountPairModel, List<String>> accountPairDescriptionMap;
-    private Map<String, List<AccountsModel.Account>> accountMap;
-    private List<SchemaModel.Class> classList;
+    private final Map<AccountPairModel, List<String>> accountPairDescriptionMap;
+    private final Map<String, List<AccountsModel.Account>> accountMap;
+    private final List<SchemaModel.Class> classList;
 
     private JPanel panelTransactions;
     private HintValidatedTextField tfName;
-    private List<TransactionPanel> transactionPanelList;
+    private final List<TransactionPanel> transactionPanelList;
 
     public CreateProcedureDialog(Configuration configuration, Map<AccountPairModel, List<String>> accountPairDescriptionMap,
                                  Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
@@ -45,9 +45,7 @@ public class CreateProcedureDialog extends Dialog {
         JScrollPane trPane = new JScrollPane(panelTransactions);
 
         JButton buttonAddTr = new JButton("Add Transaction");
-        buttonAddTr.addActionListener(e -> {
-            addTransactionPanel();
-        });
+        buttonAddTr.addActionListener(e -> addTransactionPanel());
 
         setContent(layout -> {
             layout.setHorizontalGroup(layout.createParallelGroup()
@@ -63,9 +61,7 @@ public class CreateProcedureDialog extends Dialog {
                     .addGap(5)
                     .addComponent(trPane));
         });
-        setButtons(jPanel -> {
-            jPanel.add(buttonAddTr);
-        });
+        setButtons(jPanel -> jPanel.add(buttonAddTr));
     }
 
     private void addTransactionPanel(){

@@ -17,14 +17,14 @@ import java.util.Map;
 
 public class TransactionPanel extends JPanel implements DocumentListener {
     private final Object lock = new Object();
-    private Map<AccountPairModel, List<String>> accountPairDescriptionMap;
+    private final Map<AccountPairModel, List<String>> accountPairDescriptionMap;
 
-    private JButton buttonDelete;
-    private DatePickerTextField tfDate;
-    private JComboBox<String> cbDescription;
-    private HintValidatedTextField tfAmount;
-    private SelectAccountTextField tfDebit;
-    private SelectAccountTextField tfCredit;
+    private final JButton buttonDelete;
+    private final DatePickerTextField tfDate;
+    private final JComboBox<String> cbDescription;
+    private final HintValidatedTextField tfAmount;
+    private final SelectAccountTextField tfDebit;
+    private final SelectAccountTextField tfCredit;
 
     public TransactionPanel(Configuration configuration, Map<AccountPairModel, List<String>> accountPairDescriptionMap,
                             Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,

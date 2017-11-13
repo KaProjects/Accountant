@@ -3,7 +3,6 @@ package org.kaleta.accountant.backend.manager;
 import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -28,7 +27,7 @@ public class ProceduresManager implements Manager<ProceduresModel>{
         ProceduresModel newModel = new ProceduresModel();
         newModel.setYear(year);
         update(newModel);
-        Initializer.LOG.info("File \"" + schemaFileUri + "\" created!");
+        Initializer.LOG.info("File created: '" + schemaFileUri + "'");
     }
 
     @Override
@@ -67,10 +66,5 @@ public class ProceduresManager implements Manager<ProceduresModel>{
         } catch (Exception e) {
             throw new ManagerException("Error while updating procedures data: ",e);
         }
-    }
-
-    @Override
-    public void delete() throws ManagerException {
-        throw new ManagerException(new NotImplementedException());
     }
 }

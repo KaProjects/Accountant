@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Map;
 
 public class AddTransactionDialog extends Dialog {
-    private Map<AccountPairModel, List<String>> accountPairDescriptionMap;
-    private Map<String, List<AccountsModel.Account>> accountMap;
-    private List<SchemaModel.Class> classList;
+    private final Map<AccountPairModel, List<String>> accountPairDescriptionMap;
+    private final Map<String, List<AccountsModel.Account>> accountMap;
+    private final List<SchemaModel.Class> classList;
 
-    private List<TransactionPanel> transactionPanelList;
+    private final List<TransactionPanel> transactionPanelList;
     private JPanel panelTransactions;
 
     public AddTransactionDialog(Configuration configuration, Map<AccountPairModel, List<String>> accountPairDescriptionMap,
@@ -57,9 +57,7 @@ public class AddTransactionDialog extends Dialog {
         JScrollPane trPane = new JScrollPane(panelTransactions);
 
         JButton buttonAddTr = new JButton("Add Transaction");
-        buttonAddTr.addActionListener(e -> {
-            addTransactionPanel();
-        });
+        buttonAddTr.addActionListener(e -> addTransactionPanel());
 
         JButton buttonSetDate = new JButton("Set Date");
         JButton buttonConfirmSetDate = new JButton("Confirm");
@@ -125,9 +123,7 @@ public class AddTransactionDialog extends Dialog {
                     .addGap(5)
                     .addComponent(trPane));
         });
-        setButtons(jPanel -> {
-            jPanel.add(buttonAddTr);
-        });
+        setButtons(jPanel -> jPanel.add(buttonAddTr));
     }
 
     private void addTransactionPanel(){

@@ -18,13 +18,13 @@ import java.util.function.Consumer;
 
 public abstract class Dialog extends JDialog implements Configurable, DocumentListener, ActionListener {
     private Configuration configuration;
-    protected boolean result;
+    boolean result;
 
     private JPanel contentPanel;
     private JButton buttonOk;
     private JPanel panelButtons;
 
-    private List<Validable> validableList;
+    private final List<Validable> validableList;
 
     Dialog(Configuration configuration, String title, String confirmationLabel){
         super((Frame) configuration, title, true);
@@ -96,15 +96,15 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
         validateDialog();
     }
 
-    protected void setContent(Consumer<GroupLayout> layout) {
+    void setContent(Consumer<GroupLayout> layout) {
         layout.accept((GroupLayout) contentPanel.getLayout());
     }
 
-    protected void setButtons(Consumer<JPanel> panelButtons) {
+    void setButtons(Consumer<JPanel> panelButtons) {
         panelButtons.accept(this.panelButtons);
     }
 
-    protected void validateDialog(){
+    void validateDialog(){
         for (Validable validable : validableList) {
             String errorMsg = validable.validator();
             if (errorMsg != null){
@@ -117,7 +117,7 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
         buttonOk.setEnabled(true);
     }
 
-    protected void setDialogValid(String invalidMessage) {
+    void setDialogValid(String invalidMessage) {
         buttonOk.setEnabled(invalidMessage == null);
         buttonOk.setToolTipText(invalidMessage);
     }

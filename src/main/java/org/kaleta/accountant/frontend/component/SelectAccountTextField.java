@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 public class SelectAccountTextField extends JTextField implements Validable{
-    private Configuration configuration;
+    private final Configuration configuration;
 
-    private String label;
+    private final String label;
     private String selectedAccount;
 
     private boolean validatorEnabled;

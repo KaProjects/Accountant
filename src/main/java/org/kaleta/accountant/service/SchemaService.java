@@ -1,5 +1,6 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.backend.manager.Manager;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.SchemaManager;
 import org.kaleta.accountant.backend.model.SchemaModel;
@@ -115,7 +116,7 @@ public class SchemaService {
         return accountMap;
     }
 
-    private SchemaModel.Class getClassById(SchemaModel model, String classId) throws ManagerException {
+    private SchemaModel.Class getClassById(SchemaModel model, String classId) {
         for (SchemaModel.Class clazz : model.getClazz()){
             if (clazz.getId().equals(classId)) return clazz;
         }
@@ -181,7 +182,7 @@ public class SchemaService {
      */
     public void createGroup(String year, String classId, String groupId, String name) {
         try {
-            SchemaManager manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager(year);
             SchemaModel model = manager.retrieve();
 
             SchemaModel.Class.Group newGroup = new SchemaModel.Class.Group();
@@ -234,7 +235,7 @@ public class SchemaService {
      */
     public void renameGroup(String year, String classId, String groupId, String newName){
         try {
-            SchemaManager manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager(year);
             SchemaModel model = manager.retrieve();
 
             getGroupById(getClassById(model, classId), groupId).setName(newName);
@@ -275,7 +276,7 @@ public class SchemaService {
      */
     public void deleteGroup(String year, String classId, String groupId){
         try {
-            SchemaManager manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager(year);
             SchemaModel model = manager.retrieve();
 
             SchemaModel.Class clazz = getClassById(model, classId);
@@ -317,7 +318,7 @@ public class SchemaService {
      */
     public void createAccount(String year, String classId, String groupId, String accountId, String name, String type) {
         try {
-            SchemaManager manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager(year);
             SchemaModel model = manager.retrieve();
 
             SchemaModel.Class.Group.Account newAcc = new SchemaModel.Class.Group.Account();
@@ -340,7 +341,7 @@ public class SchemaService {
      */
     public void renameAccount(String year, String classId, String groupId, String accountId, String newName){
         try {
-            SchemaManager manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager(year);
             SchemaModel model = manager.retrieve();
 
             getAccountById(getGroupById(getClassById(model, classId), groupId), accountId).setName(newName);
@@ -359,7 +360,7 @@ public class SchemaService {
      */
     public void deleteAccount(String year, String classId, String groupId, String accountId){
         try {
-            SchemaManager manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager(year);
             SchemaModel model = manager.retrieve();
 
             SchemaModel.Class.Group group = getGroupById(getClassById(model, classId), groupId);

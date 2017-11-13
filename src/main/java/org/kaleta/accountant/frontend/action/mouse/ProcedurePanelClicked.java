@@ -10,12 +10,11 @@ import org.kaleta.accountant.frontend.component.TransactionPanel;
 import org.kaleta.accountant.frontend.dialog.AddTransactionDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Map;
 
 public class ProcedurePanelClicked extends MouseAction {
-    private ProceduresModel.Procedure procedure;
+    private final ProceduresModel.Procedure procedure;
 
     public ProcedurePanelClicked(Configurable configurable, ProceduresModel.Procedure procedure) {
         super(configurable);
@@ -23,7 +22,7 @@ public class ProcedurePanelClicked extends MouseAction {
     }
 
     @Override
-    protected void actionPerformed(MouseEvent e) {
+    protected void actionPerformed() {
         Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
         List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
         Map<AccountPairModel, List<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());

@@ -96,7 +96,7 @@ public class ExcludeDialog extends Dialog {
             layoutExpense.setHorizontalGroup(layoutExpense.createParallelGroup().addComponent(labelExpense).addComponent(textFieldExpense));
             layoutExpense.setVerticalGroup(layoutExpense.createSequentialGroup().addComponent(labelExpense,25,25,25).addComponent(textFieldExpense,25,25,25).addGap(5));
         } else {
-            textFieldExpense.setValidatorEnabled(false);
+            //textFieldExpense.setValidatorEnabled(false); - not needed - not initialized
             panelExpense.setVisible(false);
         }
 

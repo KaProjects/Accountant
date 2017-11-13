@@ -19,9 +19,9 @@ import java.util.List;
 @XmlRootElement(name = "procedures")
 public class ProceduresModel {
 
-    protected List<Procedure> procedure;
+    private List<Procedure> procedure;
     @XmlAttribute(name = "year", required = true)
-    protected String year;
+    private String year;
 
     public ProceduresModel(){}
 
@@ -39,7 +39,7 @@ public class ProceduresModel {
         return this.procedure;
     }
 
-    public String getYear() {
+    private String getYear() {
         return year;
     }
 
@@ -54,15 +54,15 @@ public class ProceduresModel {
     public static class Procedure {
 
         @XmlElement(required = true)
-        protected List<Transaction> transaction;
+        List<Transaction> transaction;
         @XmlAttribute(name = "id", required = true)
-        protected String id;
+        String id;
         @XmlAttribute(name = "name", required = true)
-        protected String name;
+        String name;
 
         public Procedure(){}
 
-        public Procedure(Procedure procedure){
+        Procedure(Procedure procedure){
             this.setId(procedure.getId());
             this.setName(procedure.getName());
             for (ProceduresModel.Procedure.Transaction transaction : procedure.getTransaction()){
@@ -98,17 +98,17 @@ public class ProceduresModel {
         public static class Transaction {
 
             @XmlAttribute(name = "description", required = true)
-            protected String description;
+            String description;
             @XmlAttribute(name = "amount", required = true)
-            protected String amount;
+            String amount;
             @XmlAttribute(name = "debit", required = true)
-            protected String debit;
+            String debit;
             @XmlAttribute(name = "credit", required = true)
-            protected String credit;
+            String credit;
 
             public Transaction(){}
 
-            public Transaction(Transaction transaction){
+            Transaction(Transaction transaction){
                 this.setAmount(transaction.getAmount());
                 this.setDescription(transaction.getDescription());
                 this.setCredit(transaction.getCredit());

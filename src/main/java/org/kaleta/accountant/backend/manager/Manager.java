@@ -21,10 +21,4 @@ public interface Manager<Type> {
      * @throws ManagerException if CRUD operation fails.
      */
     void update(Type object) throws ManagerException;
-
-    /**
-     * Deletes object from data source.
-     * @throws ManagerException if CRUD operation fails.
-     */
-    void delete() throws ManagerException;
 }

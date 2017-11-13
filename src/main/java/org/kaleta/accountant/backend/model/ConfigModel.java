@@ -41,7 +41,7 @@ public class ConfigModel {
 
         public Years(){}
 
-        public Years(Years years){
+        Years(Years years){
             this.setActive(years.getActive());
             for (ConfigModel.Years.Year year : years.getYearList()){
                 this.getYearList().add(new ConfigModel.Years.Year(year));
@@ -73,7 +73,7 @@ public class ConfigModel {
 
             public Year(){}
 
-            public Year(Year year){
+            Year(Year year){
                 this.setName(year.getName());
             }
 

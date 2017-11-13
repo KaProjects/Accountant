@@ -4,7 +4,6 @@ import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -154,7 +153,7 @@ public class SchemaManager implements Manager<SchemaModel> {
         newSchemaModel.getClazz().add(c7);
 
         update(newSchemaModel);
-        Initializer.LOG.info("File \"" + schemaFileUri + "\" created!");
+        Initializer.LOG.info("File created: '" + schemaFileUri + "'");
     }
 
     @Override
@@ -193,10 +192,5 @@ public class SchemaManager implements Manager<SchemaModel> {
         } catch (Exception e) {
             throw new ManagerException("Error while updating schema data: ",e);
         }
-    }
-
-    @Override
-    public void delete() throws ManagerException {
-        throw new ManagerException(new NotImplementedException());
     }
 }

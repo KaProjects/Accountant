@@ -20,7 +20,7 @@ import java.awt.event.MouseEvent;
 public class TransactionsEditor extends JPanel implements Configurable {
     private Configuration configuration;
 
-    private JPanel panelProcedures;
+    private final JPanel panelProcedures;
 
     public TransactionsEditor() {
         JButton buttonAddTr = new JButton("Add Transaction(s)");

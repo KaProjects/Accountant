@@ -112,19 +112,17 @@ public class DepreciateDialog extends Dialog {
     }
 
     public static class Config{
-        private AccountsModel.Account account;
-        private AccountsModel.Account depAccount;
+        private final AccountsModel.Account account;
+        private final AccountsModel.Account depAccount;
         private String dateHint;
         private String valueHint;
-        private Integer maxDepValue;
         private Boolean enabled;
 
-        public Config(AccountsModel.Account account, AccountsModel.Account depAccount, String dateHint, String valueHint, Integer maxDepValue, Boolean enabled) {
+        public Config(AccountsModel.Account account, AccountsModel.Account depAccount, String dateHint, String valueHint, Boolean enabled) {
             this.account = account;
             this.depAccount = depAccount;
             this.dateHint = dateHint;
             this.valueHint = valueHint;
-            this.maxDepValue = maxDepValue;
             this.enabled = enabled;
         }
 
@@ -158,10 +156,6 @@ public class DepreciateDialog extends Dialog {
 
         void setEnabled(Boolean enabled) {
             this.enabled = enabled;
-        }
-
-        Integer getMaxDepValue() {
-            return maxDepValue;
         }
     }
 }
