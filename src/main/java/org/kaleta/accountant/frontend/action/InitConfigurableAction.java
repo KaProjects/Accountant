@@ -7,12 +7,10 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Created by Stanislav Kaleta on 03.08.2016.
- *
- * Action which inits configuration in every component which needs it.
+ * Action which initializes configuration in every component which needs it.
  */
 public class InitConfigurableAction extends AbstractAction {
-    private Configurable configurable;
+    private final Configurable configurable;
 
     public InitConfigurableAction(Configurable configurable){
         this.configurable = configurable;

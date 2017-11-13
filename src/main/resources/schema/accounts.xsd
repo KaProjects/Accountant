@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="accounts">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="account" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="schemaId" use="required" type="xs:string"/>
+                        <xs:attribute name="semanticId" use="required" type="xs:string"/>
+                        <xs:attribute name="name" use="required" type="xs:string"/>
+                        <xs:attribute name="metadata" use="required" type="xs:string"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="year" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

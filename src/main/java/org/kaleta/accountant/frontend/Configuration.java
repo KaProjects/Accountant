@@ -1,8 +1,7 @@
 package org.kaleta.accountant.frontend;
 
+
 /**
- * Created by Stanislav Kaleta on 19.04.2016.
- *
  *  Provides major app. wide configuration operations.
  */
 public interface Configuration {
@@ -10,7 +9,12 @@ public interface Configuration {
      * list of commands
      */
     int INIT_CONFIG = 0;
-    int TRANSACTION_ACTION = 1;
+    int YEAR_ADDED = 1;
+    int YEAR_SELECTED = 2;
+    int SCHEMA_UPDATED = 3;
+    int ACCOUNT_UPDATED = 4;
+    int TRANSACTION_UPDATED = 5;
+    int PROCEDURE_UPDATED = 6;
 
     /**
      * Recursively updates component's tree of app.
@@ -21,7 +25,12 @@ public interface Configuration {
     void update(int command);
 
     /**
-     * Returns actual year according configuration.
+     * Selects specified year.
      */
-    int getActiveYear();
+    void selectYear(String yearId);
+
+    /**
+     * Returns selected year.
+     */
+    String getSelectedYear();
 }

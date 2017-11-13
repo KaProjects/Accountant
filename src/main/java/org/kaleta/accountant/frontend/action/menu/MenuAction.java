@@ -7,12 +7,10 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Created by Stanislav Kaleta on 19.04.2016.
- *
  * Basic class for every menu action.
  */
 abstract public class MenuAction extends AbstractAction {
-    private Configuration config;
+    private final Configuration config;
 
     public MenuAction(Configuration config, String name, Icon icon) {
         super(name, icon);

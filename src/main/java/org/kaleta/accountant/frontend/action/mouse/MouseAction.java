@@ -8,29 +8,28 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Created by Stanislav Kaleta on 20.08.2016.
  * Basic class for every action reacting to mouse action.
  */
-abstract public class MouseAction extends MouseAdapter {
-    private Configurable configurable;
+abstract class MouseAction extends MouseAdapter {
+    private final Configurable configurable;
 
-    public MouseAction(Configurable configurable){
+    MouseAction(Configurable configurable){
         this.configurable = configurable;
     }
 
     @Override
-    public void mouseClicked(MouseEvent e)  {
+    public void mouseReleased(MouseEvent e)  {
         new SwingWorkerHandler() {
             @Override
             protected void runInBackground() {
-                actionPerformed(e);
+                actionPerformed();
             }
         }.execute();
     }
 
-    protected abstract void actionPerformed(MouseEvent e);
+    protected abstract void actionPerformed();
 
-    protected Configuration getConfiguration() {
+    Configuration getConfiguration() {
         return configurable.getConfiguration();
     }
 }

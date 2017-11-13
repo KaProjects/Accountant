@@ -1,8 +1,6 @@
 package org.kaleta.accountant.service;
 
 /**
- * Created by Stanislav Kaleta on 16.04.2016.
- *
  * Puts together logically divided service classes which provide access to data source.
  * Every front-end action should access to back-end via this class.
  */
@@ -14,12 +12,22 @@ public class Service {
     public static final ConfigService CONFIG = new ConfigService();
 
     /**
-     * Instance of account's service class
+     * Instance of schema's service class.
      */
-    public static final AccountService ACCOUNT = new AccountService();
+    public static final SchemaService SCHEMA = new SchemaService();
 
     /**
-     * Instance of journal's service class
+     * Instance of account's service class
      */
-    public static final JournalService JOURNAL = new JournalService();
+    public static final AccountsService ACCOUNT = new AccountsService();
+
+    /**
+     * Instance of transaction's service class
+     */
+    public static final TransactionsService TRANSACTIONS = new TransactionsService();
+
+    /**
+     * Instance of procedure's service class
+     */
+    public static final ProceduresService PROCEDURES = new ProceduresService();
 }
