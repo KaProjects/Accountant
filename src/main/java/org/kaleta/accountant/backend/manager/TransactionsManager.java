@@ -3,7 +3,6 @@ package org.kaleta.accountant.backend.manager;
 import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -28,7 +27,7 @@ public class TransactionsManager implements Manager<TransactionsModel> {
         TransactionsModel transactionsModel = new TransactionsModel();
         transactionsModel.setYear(year);
         update(transactionsModel);
-        Initializer.LOG.info("File \"" + schemaFileUri + "\" created!");
+        Initializer.LOG.info("File created: '" + schemaFileUri + "'");
     }
 
     @Override
@@ -67,10 +66,5 @@ public class TransactionsManager implements Manager<TransactionsModel> {
         } catch (Exception e) {
             throw new ManagerException("Error while updating transactions data: ",e);
         }
-    }
-
-    @Override
-    public void delete() throws ManagerException {
-        throw new ManagerException(new NotImplementedException());
     }
 }

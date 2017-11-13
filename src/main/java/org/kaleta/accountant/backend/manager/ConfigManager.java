@@ -3,7 +3,6 @@ package org.kaleta.accountant.backend.manager;
 import org.kaleta.accountant.backend.model.ConfigModel;
 import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -20,6 +19,7 @@ public class ConfigManager implements Manager<ConfigModel> {
         schemaUri = "/schema/config.xsd";
         configFileUri = Initializer.DATA_SOURCE + "config.xml";
     }
+
     @Override
     public void create() throws ManagerException {
         ConfigModel configModel = new ConfigModel();
@@ -27,7 +27,7 @@ public class ConfigManager implements Manager<ConfigModel> {
         years.setActive("-1");
         configModel.setYears(years);
         update(configModel);
-        Initializer.LOG.info("File \"" + configFileUri + "\" created!");
+        Initializer.LOG.info("File created: '" + configFileUri + "'");
     }
 
     @Override
@@ -65,10 +65,5 @@ public class ConfigManager implements Manager<ConfigModel> {
         } catch (Exception e) {
             throw new ManagerException("Error while updating config data: ",e);
         }
-    }
-
-    @Override
-    public void delete() throws ManagerException {
-        throw new ManagerException(new NotImplementedException());
     }
 }

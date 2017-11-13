@@ -16,7 +16,7 @@ public class DatePickerTextField extends HintValidatedTextField implements Valid
     }
 
     @Override
-    protected boolean doValidate()  {
+    boolean doValidate()  {
         return this.getText() != null && !this.getText().trim().isEmpty() && this.getText().length() == 4;
     }
 

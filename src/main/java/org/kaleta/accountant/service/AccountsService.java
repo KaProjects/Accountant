@@ -1,6 +1,7 @@
 package org.kaleta.accountant.service;
 
 import org.kaleta.accountant.backend.manager.AccountsManager;
+import org.kaleta.accountant.backend.manager.Manager;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.common.Constants;
@@ -144,7 +145,7 @@ public class AccountsService {
      */
     public AccountsModel.Account createAccount(String year, String name, String schemaId, String semanticId, String metadata){
         try {
-            AccountsManager manager = new AccountsManager(year);
+            Manager<AccountsModel> manager = new AccountsManager(year);
             AccountsModel model = manager.retrieve();
 
             AccountsModel.Account account = new AccountsModel.Account();

@@ -108,7 +108,7 @@ public class ConfigService {
             throw new ServiceFailureException(msg);
         } else {
             if (yearDir.mkdir()) {
-                Initializer.LOG.info("Directory '" + yearDir.getPath() + "' created!");
+                Initializer.LOG.info("Directory created: '" + yearDir.getPath() + "'");
             } else {
                 String msg = "Directory for year '" + newYearName + "' failed to create";
                 Initializer.LOG.severe(msg);
@@ -122,7 +122,7 @@ public class ConfigService {
             new AccountsManager(newYearName).create();
             new ProceduresManager(newYearName).create();
 
-            ConfigManager manager = new ConfigManager();
+            Manager<ConfigModel> manager = new ConfigManager();
             ConfigModel model = manager.retrieve();
 
             ConfigModel.Years.Year configYear = new ConfigModel.Years.Year();
@@ -143,7 +143,7 @@ public class ConfigService {
      */
     public void setActiveYear(String year){
         try {
-            ConfigManager manager = new ConfigManager();
+            Manager<ConfigModel> manager = new ConfigManager();
             ConfigModel model = manager.retrieve();
 
             model.getYears().setActive(year);

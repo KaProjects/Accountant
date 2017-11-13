@@ -6,11 +6,11 @@ public class BalanceRowModel {
     public static final String GROUP = "GROUP";
     public static final String ACCOUNT = "ACC";
 
-    private String name;
+    private final String name;
     private String turnover;
     private String value;
     private String schemaId;
-    private String type;
+    private final String type;
 
     public BalanceRowModel(String name, String turnover, String value, String type){
         this.name = name;

@@ -1,1 +1,1 @@
-# Personal Accountant - planning
+# Personal Accountant

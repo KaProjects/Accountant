@@ -1,5 +1,6 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.backend.manager.Manager;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.ProceduresManager;
 import org.kaleta.accountant.backend.model.ProceduresModel;
@@ -43,7 +44,7 @@ public class ProceduresService {
      */
     public void createProcedure(String year, String name, List<ProceduresModel.Procedure.Transaction> transactions){
         try {
-            ProceduresManager manager = new ProceduresManager(year);
+            Manager<ProceduresModel> manager = new ProceduresManager(year);
             ProceduresModel model = manager.retrieve();
 
             ProceduresModel.Procedure procedure = new ProceduresModel.Procedure();

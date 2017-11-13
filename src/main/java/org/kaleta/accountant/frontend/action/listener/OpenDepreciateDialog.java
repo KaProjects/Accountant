@@ -55,7 +55,7 @@ public class OpenDepreciateDialog extends ActionListener {
 
             boolean enabled = (!dateHint.equals("x") && !monthlyDepHint.equals("x"));
 
-            configs.add(new DepreciateDialog.Config(account, accDepAccount, dateHint, monthlyDepHint, (assetValue-accDepSum), enabled));
+            configs.add(new DepreciateDialog.Config(account, accDepAccount, dateHint, monthlyDepHint, enabled));
         }
         DepreciateDialog dialog = new DepreciateDialog(getConfiguration(), configs);
         dialog.setVisible(true);

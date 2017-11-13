@@ -1,5 +1,6 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.backend.manager.Manager;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.TransactionsManager;
 import org.kaleta.accountant.backend.model.AccountsModel;
@@ -37,7 +38,7 @@ public class TransactionsService {
      */
     public void addTransaction(String year, String date, String amount, String debit, String credit, String description){
         try {
-            TransactionsManager manager = new TransactionsManager(year);
+            Manager<TransactionsModel> manager = new TransactionsManager(year);
             TransactionsModel model = manager.retrieve();
 
             TransactionsModel.Transaction transaction = new TransactionsModel.Transaction();
@@ -50,7 +51,7 @@ public class TransactionsService {
             model.getTransaction().add(transaction);
 
             manager.update(model);
-            Initializer.LOG.info("Transaction created: id=" + transaction.getId() + " amount=" + transaction.getAmount()
+            Initializer.LOG.info("Transaction added: id=" + transaction.getId() + " amount=" + transaction.getAmount()
                     + " debit=" +  transaction.getDebit() + " credit=" + transaction.getCredit() + " description='"
                     + transaction.getDescription() + "'");
             this.transactionsModel = model;

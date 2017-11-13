@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class ValidatedComboBox<E>  extends JComboBox<E> implements Validable {
-    private String label;
+    private final String label;
 
     private boolean validatorEnabled;
 

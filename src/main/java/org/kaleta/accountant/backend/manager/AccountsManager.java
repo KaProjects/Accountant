@@ -4,7 +4,6 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -48,7 +47,7 @@ public class AccountsManager implements Manager<AccountsModel> {
         accountsModel.getAccount().add(profitAcc);
 
         update(accountsModel);
-        Initializer.LOG.info("File \"" + schemaFileUri + "\" created!");
+        Initializer.LOG.info("File created: '" + schemaFileUri + "'");
     }
 
     @Override
@@ -87,10 +86,5 @@ public class AccountsManager implements Manager<AccountsModel> {
         } catch (Exception e) {
             throw new ManagerException("Error while updating accounts data: ",e);
         }
-    }
-
-    @Override
-    public void delete() throws ManagerException {
-        throw new ManagerException(new NotImplementedException());
     }
 }

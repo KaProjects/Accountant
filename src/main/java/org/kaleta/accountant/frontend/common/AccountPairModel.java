@@ -1,20 +1,12 @@
 package org.kaleta.accountant.frontend.common;
 
 public class AccountPairModel {
-    private String debit;
-    private String credit;
+    private final String debit;
+    private final String credit;
 
     public AccountPairModel(String debit, String credit) {
         this.debit = debit;
         this.credit = credit;
-    }
-
-    public String getDebit() {
-        return debit;
-    }
-
-    public String getCredit() {
-        return credit;
     }
 
     @Override
@@ -24,8 +16,7 @@ public class AccountPairModel {
 
         AccountPairModel that = (AccountPairModel) o;
 
-        if (!debit.equals(that.debit)) return false;
-        return credit.equals(that.credit);
+        return debit.equals(that.debit) && credit.equals(that.credit);
     }
 
     @Override
