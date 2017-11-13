@@ -1,7 +1,7 @@
 package org.kaleta.accountant.backend.manager;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.model.ProceduresModel;
-import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;

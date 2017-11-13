@@ -1,5 +1,6 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.manager.Manager;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.TransactionsManager;
@@ -7,7 +8,6 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
-import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
 
 import java.util.ArrayList;

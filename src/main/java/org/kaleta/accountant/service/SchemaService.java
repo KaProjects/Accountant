@@ -1,12 +1,12 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.manager.Manager;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.SchemaManager;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
-import org.kaleta.accountant.frontend.Initializer;
 
 import java.util.ArrayList;
 import java.util.List;

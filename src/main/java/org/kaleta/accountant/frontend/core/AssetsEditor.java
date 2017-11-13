@@ -1,5 +1,6 @@
 package org.kaleta.accountant.frontend.core;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.backend.model.TransactionsModel;
@@ -7,7 +8,6 @@ import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
-import org.kaleta.accountant.frontend.Initializer;
 import org.kaleta.accountant.frontend.action.listener.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenDepreciateDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenExcludeDialog;

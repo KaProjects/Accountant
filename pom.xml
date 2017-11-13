@@ -6,7 +6,7 @@
 
     <groupId>org.kaleta</groupId>
     <artifactId>accountant</artifactId>
-    <version>1.0</version>
+    <version>1.1-snapshot</version>
 
     <dependencies>
     </dependencies>
@@ -33,7 +33,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.kaleta.accountant.frontend.Initializer</mainClass>
+                            <mainClass>org.kaleta.accountant.Initializer</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -1,9 +1,9 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.manager.*;
 import org.kaleta.accountant.backend.model.ConfigModel;
 import org.kaleta.accountant.common.ErrorHandler;
-import org.kaleta.accountant.frontend.Initializer;
 
 import java.io.File;
 import java.io.IOException;

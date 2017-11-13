@@ -1,7 +1,8 @@
-package org.kaleta.accountant.frontend;
+package org.kaleta.accountant;
 
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.common.LogFormatter;
+import org.kaleta.accountant.frontend.AppFrame;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class Initializer {
     public static final String NAME = "Accountant";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.1-snapshot";
     public static final String DATA_SOURCE = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation()
             .getPath()).getParentFile().getPath() + File.separator + NAME + "-" + VERSION + "-DATA" + File.separator;
     public static final Logger LOG = Logger.getLogger("Logger");

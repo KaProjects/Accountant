@@ -1,5 +1,6 @@
 package org.kaleta.accountant.frontend;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
 import org.kaleta.accountant.frontend.component.YearMenu;
