@@ -1,5 +1,6 @@
 package org.kaleta.accountant;
 
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.common.LogFormatter;
 import org.kaleta.accountant.frontend.AppFrame;
@@ -19,13 +20,23 @@ import java.util.logging.Logger;
 public class Initializer {
     public static final String NAME = "Accountant";
     public static final String VERSION = "1.1-snapshot";
-    public static final String DATA_SOURCE = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation()
-            .getPath()).getParentFile().getPath() + File.separator + NAME + "-" + VERSION + "-DATA" + File.separator;
     public static final Logger LOG = Logger.getLogger("Logger");
+    public static int CONTEXT;
+
+    public static String getDataSource(){
+        String appParentPath = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation().getPath())
+                .getParentFile().getPath() + File.separator;
+        switch (CONTEXT){
+            case Constants.Context.PRODUCTION: return appParentPath + NAME + "-" + VERSION + "-DATA" + File.separator;
+            case Constants.Context.DEVEL: return appParentPath + "DEVEL-DATA" + File.separator;
+            case Constants.Context.TEST: return appParentPath + "TEST-DATA" + File.separator;
+            default: throw new IllegalArgumentException("illegal context");
+        }
+    }
 
     private static void initLogger(){
         try {
-            File logFile = new File(DATA_SOURCE + "log.log");
+            File logFile = new File(getDataSource() + "log.log");
             FileHandler fileHandler = new FileHandler(logFile.getCanonicalPath(), true);
             fileHandler.setFormatter(new LogFormatter());
             LOG.addHandler(fileHandler);
@@ -41,6 +52,7 @@ public class Initializer {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
             try {
+                CONTEXT = Constants.Context.DEVEL;
                 Service.CONFIG.checkResources();
                 Service.CONFIG.checkData();
                 initLogger();

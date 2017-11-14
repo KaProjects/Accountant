@@ -17,7 +17,7 @@ public class ConfigManager implements Manager<ConfigModel> {
 
     public ConfigManager() {
         schemaUri = "/schema/config.xsd";
-        configFileUri = Initializer.DATA_SOURCE + "config.xml";
+        configFileUri = Initializer.getDataSource() + "config.xml";
     }
 
     @Override

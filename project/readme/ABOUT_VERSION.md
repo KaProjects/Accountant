@@ -18,3 +18,8 @@ Released: 13.11.2017
     
 ## 1.1
 Released: in progress
+
+    before release: 
+        pom.xml: x.y-snapshot -> x.y
+        Initializer.VERSION: x.y-snapshot -> x.y
+        Initializer.CONTEXT = production

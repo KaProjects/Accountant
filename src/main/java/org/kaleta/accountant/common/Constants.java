@@ -2,6 +2,12 @@ package org.kaleta.accountant.common;
 
 public class Constants {
 
+    public static class Context {
+        public static final int PRODUCTION = 0;
+        public static final int DEVEL = 1;
+        public static final int TEST = 2;
+    }
+
     /**
      * Default values for schema.
      */

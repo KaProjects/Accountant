@@ -20,7 +20,7 @@ public class AccountsManager implements Manager<AccountsModel> {
     public AccountsManager(String year) {
         this.year = year;
         schemaUri = "/schema/accounts.xsd";
-        schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "accounts.xml";
+        schemaFileUri = Initializer.getDataSource() + year + File.separator + "accounts.xml";
     }
 
     @Override

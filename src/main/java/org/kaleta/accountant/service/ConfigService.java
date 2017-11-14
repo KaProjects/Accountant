@@ -15,17 +15,8 @@ import java.util.List;
  */
 public class ConfigService {
 
-    private ConfigModel configModel;
-
     ConfigService(){
         // package-private
-    }
-
-    private ConfigModel getModel() throws ManagerException {
-        if (configModel == null) {
-            configModel = new ConfigManager().retrieve();
-        }
-        return new ConfigModel(configModel);
     }
 
     /**
@@ -33,7 +24,7 @@ public class ConfigService {
      */
     public void checkResources() {
         /*checks whether DATA dir is present, creates it if not*/
-        File dataSourceFile = new File(Initializer.DATA_SOURCE);
+        File dataSourceFile = new File(Initializer.getDataSource());
         if (!dataSourceFile.exists()) {
             boolean result = dataSourceFile.mkdir();
             if (result) {
@@ -44,7 +35,7 @@ public class ConfigService {
             }
         }
         /*checks whether log file is present, creates it if not*/
-        File logFile = new File(Initializer.DATA_SOURCE + "log.log");
+        File logFile = new File(Initializer.getDataSource() + "log.log");
         if (!logFile.exists()) {
             try {
                 boolean result = logFile.createNewFile();
@@ -66,30 +57,30 @@ public class ConfigService {
      * Checks that data are valid, throws ServiceFailureException if not.
      */
     public void checkData() throws ManagerException {
-        File configFile = new File(Initializer.DATA_SOURCE + "config.xml");
+        File configFile = new File(Initializer.getDataSource() + "config.xml");
         if (!configFile.exists()) {
             new ConfigManager().create();
             System.out.println("# File '%DATA_DIR%/config.xml' created!");
         }
-        for (ConfigModel.Years.Year yearModel : getModel().getYears().getYearList()){
+        for (ConfigModel.Years.Year yearModel : new ConfigManager().retrieve().getYears().getYearList()){
             String year = yearModel.getName();
-            File yearDir = new File(Initializer.DATA_SOURCE + year);
+            File yearDir = new File(Initializer.getDataSource() + year);
             if (!yearDir.exists()) {
                 throw new ServiceFailureException("Directory '%DATA_DIR%/" + year +"' is missing!");
             }
-            File schemaFile = new File(Initializer.DATA_SOURCE + year + File.separator + "schema.xml");
+            File schemaFile = new File(Initializer.getDataSource() + year + File.separator + "schema.xml");
             if (!schemaFile.exists()) {
                 throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "schema.xml' is missing!");
             }
-            File trFile = new File(Initializer.DATA_SOURCE + year + File.separator + "transactions.xml");
+            File trFile = new File(Initializer.getDataSource() + year + File.separator + "transactions.xml");
             if (!trFile.exists()) {
                 throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "transactions.xml' is missing!");
             }
-            File accFile = new File(Initializer.DATA_SOURCE + year + File.separator + "accounts.xml");
+            File accFile = new File(Initializer.getDataSource() + year + File.separator + "accounts.xml");
             if (!accFile.exists()) {
                 throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "accounts.xml' is missing!");
             }
-            File prFile = new File(Initializer.DATA_SOURCE + year + File.separator + "procedures.xml");
+            File prFile = new File(Initializer.getDataSource() + year + File.separator + "procedures.xml");
             if (!prFile.exists()) {
                 throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "procedures.xml' is missing!");
             }
@@ -101,7 +92,7 @@ public class ConfigService {
      * Registers year in configuration and creates year's data directory and files.
      */
     public void initYearData(String newYearName){
-        File yearDir = new File(Initializer.DATA_SOURCE + newYearName + File.separator);
+        File yearDir = new File(Initializer.getDataSource() + newYearName + File.separator);
         if (yearDir.exists()) {
             String msg = "Directory '" + newYearName + "' already exists";
             Initializer.LOG.severe(msg);
@@ -131,7 +122,6 @@ public class ConfigService {
 
             manager.update(model);
             Initializer.LOG.info("Year '" + newYearName + "' added to config");
-            this.configModel = model;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -150,7 +140,6 @@ public class ConfigService {
 
             manager.update(model);
             Initializer.LOG.info("Year '" + year + "' set to active");
-            this.configModel = model;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -162,7 +151,7 @@ public class ConfigService {
      */
     public String getActiveYear(){
         try {
-            return getModel().getYears().getActive();
+            return new ConfigManager().retrieve().getYears().getActive();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -175,7 +164,7 @@ public class ConfigService {
     public List<String> getYears(){
         try {
             List<String> yearList = new ArrayList<>();
-            for (ConfigModel.Years.Year year : getModel().getYears().getYearList()) {
+            for (ConfigModel.Years.Year year : new ConfigManager().retrieve().getYears().getYearList()) {
                 yearList.add(year.getName());
             }
             return yearList;

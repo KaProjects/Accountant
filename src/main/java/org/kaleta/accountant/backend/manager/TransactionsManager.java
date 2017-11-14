@@ -19,7 +19,7 @@ public class TransactionsManager implements Manager<TransactionsModel> {
     public TransactionsManager(String year) {
         this.year = year;
         schemaUri = "/schema/transactions.xsd";
-        schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "transactions.xml";
+        schemaFileUri = Initializer.getDataSource() + year + File.separator + "transactions.xml";
     }
 
     @Override

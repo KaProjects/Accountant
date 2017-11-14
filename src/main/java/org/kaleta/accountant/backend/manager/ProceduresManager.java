@@ -19,7 +19,7 @@ public class ProceduresManager implements Manager<ProceduresModel>{
     public ProceduresManager(String year) {
         this.year = year;
         schemaUri = "/schema/procedures.xsd";
-        schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "procedures.xml";
+        schemaFileUri = Initializer.getDataSource() + year + File.separator + "procedures.xml";
     }
 
     @Override

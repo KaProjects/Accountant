@@ -22,7 +22,7 @@ public class SchemaManager implements Manager<SchemaModel> {
     public SchemaManager(String year) {
         this.year = year;
         schemaUri = "/schema/schema.xsd";
-        schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "schema.xml";
+        schemaFileUri = Initializer.getDataSource() + year + File.separator + "schema.xml";
     }
 
     @Override
