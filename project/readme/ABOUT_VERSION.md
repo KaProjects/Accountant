@@ -16,6 +16,10 @@ Released: 13.11.2017
     Reworked procedure, transaction managemet.
     Improved dialogs.
     
+Known bugs:
+
+    Accumulated depreciation accounts are opened wrongly - switched debit/credit 
+        
 ## 1.1
 Released: in progress
 

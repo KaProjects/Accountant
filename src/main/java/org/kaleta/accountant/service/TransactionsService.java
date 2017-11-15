@@ -118,22 +118,53 @@ public class TransactionsService {
     }
 
     /**
+     * Returns initial value for specified account.
+     */
+    public String getAccountInitValue(String year, AccountsModel.Account account) {
+        String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
+        if (accountType.equals(Constants.AccountType.OFF_BALANCE)
+                || accountType.equals(Constants.AccountType.EXPENSE)
+                || accountType.equals(Constants.AccountType.REVENUE)){
+            throw new IllegalArgumentException("Accounts of type '" + accountType + "' has no initial value!");
+        }
+        try {
+            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()){
+                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)){
+                    if (tr.getDebit().equals(account.getFullId()) && tr.getCredit().equals(Constants.Account.INIT_ACC_ID)){
+                        return tr.getAmount();
+                    }
+                } else {
+                    if (tr.getCredit().equals(account.getFullId()) && tr.getDebit().equals(Constants.Account.INIT_ACC_ID)){
+                        return tr.getAmount();
+                    }
+                }
+            }
+            throw new IllegalArgumentException("Account id=" + account.getFullId() + " not yet opened!");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
      * Returns value of turnover for specified account.
      */
     public String getAccountTurnover(String year, AccountsModel.Account account) {
         String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
         if (accountType.equals(Constants.AccountType.OFF_BALANCE)){
-            throw new IllegalArgumentException("Off-Balance accounts has no balance");
+            throw new IllegalArgumentException("Off-Balance accounts has no turnover!");
         }
         try {
-            String accountId = account.getSchemaId() + "." + account.getSemanticId();
             Integer turnover = 0;
             for (TransactionsModel.Transaction tr : getModel(year).getTransaction()){
-                if (tr.getDebit().equals(accountId) && (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE))){
-                    turnover += Integer.parseInt(tr.getAmount());
-                }
-                if (tr.getCredit().equals(accountId) && (accountType.equals(Constants.AccountType.LIABILITY) || accountType.equals(Constants.AccountType.REVENUE))){
-                    turnover += Integer.parseInt(tr.getAmount());
+                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)){
+                    if (tr.getDebit().equals(account.getFullId()) && !tr.getCredit().equals(Constants.Account.INIT_ACC_ID)){
+                        turnover += Integer.parseInt(tr.getAmount());
+                    }
+                } else {
+                    if (tr.getCredit().equals(account.getFullId()) && !tr.getDebit().equals(Constants.Account.INIT_ACC_ID)){
+                        turnover += Integer.parseInt(tr.getAmount());
+                    }
                 }
             }
             return String.valueOf(turnover);
@@ -149,24 +180,30 @@ public class TransactionsService {
     public String getAccountBalance(String year, AccountsModel.Account account) {
         String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
         if (accountType.equals(Constants.AccountType.OFF_BALANCE)){
-            throw new IllegalArgumentException("Off-Balance accounts has no balance");
+            throw new IllegalArgumentException("Off-Balance accounts has no balance!");
         }
         try {
-            String accountId = account.getSchemaId() + "." + account.getSemanticId();
             Integer balance = 0;
             for (TransactionsModel.Transaction tr : getModel(year).getTransaction()){
-                if (tr.getCredit().equals(accountId)){
-                    if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
-                        balance -= Integer.parseInt(tr.getAmount());
-                    } else {
+                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)){
+                    if (tr.getDebit().equals(account.getFullId())){
                         balance += Integer.parseInt(tr.getAmount());
                     }
-                }
-                if (tr.getDebit().equals(accountId)){
-                    if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
-                        balance += Integer.parseInt(tr.getAmount());
-                    } else {
+                    if (tr.getCredit().equals(account.getFullId())){
+                        if (tr.getDebit().equals(Constants.Account.CLOSING_ACC_ID) || tr.getDebit().equals(Constants.Account.PROFIT_ACC_ID)){
+                            return tr.getAmount();
+                        }
                         balance -= Integer.parseInt(tr.getAmount());
+                    }
+                } else {
+                    if (tr.getDebit().equals(account.getFullId())){
+                        if (tr.getCredit().equals(Constants.Account.CLOSING_ACC_ID) || tr.getCredit().equals(Constants.Account.PROFIT_ACC_ID)){
+                            return tr.getAmount();
+                        }
+                        balance -= Integer.parseInt(tr.getAmount());
+                    }
+                    if (tr.getCredit().equals(account.getFullId())){
+                        balance += Integer.parseInt(tr.getAmount());
                     }
                 }
             }

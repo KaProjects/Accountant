@@ -101,7 +101,7 @@ public class TransactionsOverview extends JPanel implements Configurable {
                 case 2: return "Amount";
                 case 3: return "Debit";
                 case 4: return "Credit";
-                default: throw new IllegalArgumentException("columnIndex");
+                default: throw new IllegalArgumentException("invalid column index");
             }
         }
 

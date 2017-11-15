@@ -143,7 +143,7 @@ public class ConfigService {
     }
 
     /**
-     *
+     * Sets specified year as active.
      */
     public void setActiveYear(String year){
         try {

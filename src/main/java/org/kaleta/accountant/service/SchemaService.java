@@ -194,6 +194,8 @@ public class SchemaService {
             newGroup.setId(groupId);
             getClassById(model, classId).getGroup().add(newGroup);
 
+            List<String> logMsgList = new ArrayList<>();
+            logMsgList.add("Schema Group created: id=" + classId + groupId + " name='" + name + "'");
             switch (classId) {
                 case "0": {
                     SchemaModel.Class.Group.Account accDepAccount = new SchemaModel.Class.Group.Account();
@@ -201,12 +203,14 @@ public class SchemaService {
                     accDepAccount.setName(Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + name);
                     accDepAccount.setType(Constants.AccountType.LIABILITY);
                     getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID).getAccount().add(accDepAccount);
+                    logMsgList.add("Schema Account created: id=" + "0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID + groupId + " name='" + Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + name + "'");
 
                     SchemaModel.Class.Group.Account depAccount = new SchemaModel.Class.Group.Account();
                     depAccount.setId(groupId);
                     depAccount.setName(Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + name);
                     depAccount.setType(Constants.AccountType.EXPENSE);
                     getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID).getAccount().add(depAccount);
+                    logMsgList.add("Schema Account created: id=" + "5" + Constants.Schema.DEPRECIATION_GROUP_ID + groupId + " name='" + Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + name + "'");
                     break;
                 }
                 case "1": {
@@ -215,6 +219,7 @@ public class SchemaService {
                     consumptionAccount.setName(Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + name);
                     consumptionAccount.setType(Constants.AccountType.EXPENSE);
                     getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID).getAccount().add(consumptionAccount);
+                    logMsgList.add("Schema Account created: id=" + "5" + Constants.Schema.CONSUMPTION_GROUP_ID + groupId + " name='" + Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + name + "'");
                     break;
                 }
                 case "2":
@@ -226,7 +231,9 @@ public class SchemaService {
             }
 
             manager.update(model);
-            Initializer.LOG.info("Schema Group created: id=" + classId + groupId + " name='" + name + "'");
+            for (String logMsg : logMsgList){
+                Initializer.LOG.info(logMsg);
+            }
             invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
@@ -244,18 +251,24 @@ public class SchemaService {
 
             getGroupById(getClassById(model, classId), groupId).setName(newName);
 
+            List<String> logMsgList = new ArrayList<>();
+            logMsgList.add("Schema Group id=" + classId + groupId + " renamed to '" + newName + "'");
             switch (classId) {
                 case "0": {
                     getAccountById(getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID), groupId)
                             .setName(Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + newName);
+                    logMsgList.add("Schema Account id=" + "0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID + groupId + " renamed to '" + Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + newName + "'");
 
                     getAccountById(getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID), groupId)
                             .setName(Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + newName);
+                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.DEPRECIATION_GROUP_ID + groupId + " renamed to '" + Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + newName + "'");
+
                     break;
                 }
                 case "1": {
                     getAccountById(getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID), groupId)
                             .setName(Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + newName);
+                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.CONSUMPTION_GROUP_ID + groupId + " renamed to '" + Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + newName + "'");
                     break;
                 }
                 case "2":
@@ -267,7 +280,9 @@ public class SchemaService {
             }
 
             manager.update(model);
-            Initializer.LOG.info("Schema Group id=" + classId + groupId + " renamed to '" + newName + "'");
+            for (String logMsg : logMsgList){
+                Initializer.LOG.info(logMsg);
+            }
             invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
@@ -286,18 +301,23 @@ public class SchemaService {
             SchemaModel.Class clazz = getClassById(model, classId);
             clazz.getGroup().remove(getGroupById(clazz, groupId));
 
+            List<String> logMsgList = new ArrayList<>();
+            logMsgList.add("Schema Group id=" + classId + groupId + " deleted");
             switch (classId) {
                 case "0": {
                     SchemaModel.Class.Group groupAccDep = getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID);
                     groupAccDep.getAccount().remove(getAccountById(groupAccDep, groupId));
+                    logMsgList.add("Schema Account id=" + "0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID + groupId + " deleted");
 
                     SchemaModel.Class.Group groupDep = getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID);
                     groupDep.getAccount().remove(getAccountById(groupDep, groupId));
+                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.DEPRECIATION_GROUP_ID + groupId + " deleted");
                     break;
                 }
                 case "1": {
                     SchemaModel.Class.Group groupCons = getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID);
                     groupCons.getAccount().remove(getAccountById(groupCons, groupId));
+                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.CONSUMPTION_GROUP_ID + groupId + " deleted");
                     break;
                 }
                 case "2":
@@ -309,7 +329,9 @@ public class SchemaService {
             }
 
             manager.update(model);
-            Initializer.LOG.info("Schema Group id=" + classId + groupId + " deleted");
+            for (String logMsg : logMsgList){
+                Initializer.LOG.info(logMsg);
+            }
             invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));

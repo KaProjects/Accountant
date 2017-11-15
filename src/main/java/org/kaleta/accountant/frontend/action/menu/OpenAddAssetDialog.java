@@ -49,7 +49,7 @@ public class OpenAddAssetDialog extends MenuAction {
             Service.ACCOUNT.createAccount(year, Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + dialog.getAccName(),
                     accDepId.split("\\.")[0], accDepId.split("\\.")[1], dialog.getDepMetaData());
 
-            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), "0", accDepId, Constants.Account.INIT_ACC_ID, Constants.Transaction.OPEN_DESCRIPTION);
+            Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), "0", Constants.Account.INIT_ACC_ID, accDepId, Constants.Transaction.OPEN_DESCRIPTION);
 
             String depId = Service.ACCOUNT.getDepreciationAccountId(dialog.getSchemaId(), semanticId);
             Service.ACCOUNT.createAccount(year, Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + dialog.getAccName(),
