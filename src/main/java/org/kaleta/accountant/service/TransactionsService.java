@@ -26,6 +26,10 @@ public class TransactionsService {
         // package-private
     }
 
+    public void invalidateModel(){
+        transactionsModel = null;
+    }
+
     private TransactionsModel getModel(String year) throws ManagerException {
         if (transactionsModel == null) {
             transactionsModel = new TransactionsManager(year).retrieve();
@@ -54,7 +58,7 @@ public class TransactionsService {
             Initializer.LOG.info("Transaction added: id=" + transaction.getId() + " amount=" + transaction.getAmount()
                     + " debit=" +  transaction.getDebit() + " credit=" + transaction.getCredit() + " description='"
                     + transaction.getDescription() + "'");
-            this.transactionsModel = model;
+            invalidateModel();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

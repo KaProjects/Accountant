@@ -27,6 +27,10 @@ public class ProceduresService {
         return new ProceduresModel(proceduresModel);
     }
 
+    public void invalidateModel(){
+        proceduresModel = null;
+    }
+
     /**
      * Returns list of schema classes.
      */
@@ -55,7 +59,7 @@ public class ProceduresService {
 
             manager.update(model);
             Initializer.LOG.info("Procedure created: id=" + procedure.getId() + " name='" + procedure.getName() + "'");
-            this.proceduresModel = model;
+            invalidateModel();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

@@ -31,6 +31,10 @@ public class SchemaService {
         return new SchemaModel(schemaModel);
     }
 
+    public void invalidateModel(){
+        schemaModel = null;
+    }
+
     /**
      * Returns list of schema classes.
      */
@@ -223,7 +227,7 @@ public class SchemaService {
 
             manager.update(model);
             Initializer.LOG.info("Schema Group created: id=" + classId + groupId + " name='" + name + "'");
-            this.schemaModel = model;
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -264,7 +268,7 @@ public class SchemaService {
 
             manager.update(model);
             Initializer.LOG.info("Schema Group id=" + classId + groupId + " renamed to '" + newName + "'");
-            this.schemaModel = model;
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -306,7 +310,7 @@ public class SchemaService {
 
             manager.update(model);
             Initializer.LOG.info("Schema Group id=" + classId + groupId + " deleted");
-            this.schemaModel = model;
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -329,7 +333,7 @@ public class SchemaService {
 
             manager.update(model);
             Initializer.LOG.info("Schema Account created: id=" + classId + groupId + accountId + " name='" + name + "'");
-            this.schemaModel = model;
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -348,7 +352,7 @@ public class SchemaService {
 
             manager.update(model);
             Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " renamed to '" + newName + "'");
-            this.schemaModel = model;
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -368,7 +372,7 @@ public class SchemaService {
 
             manager.update(model);
             Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " deleted");
-            this.schemaModel = model;
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

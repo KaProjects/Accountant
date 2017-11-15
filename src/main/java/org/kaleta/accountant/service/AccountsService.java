@@ -20,7 +20,7 @@ public class AccountsService {
 
     private AccountsModel accountsModel;
 
-    AccountsService(){
+    AccountsService() {
         // package-private
     }
 
@@ -29,6 +29,10 @@ public class AccountsService {
             accountsModel = new AccountsManager(year).retrieve();
         }
         return new AccountsModel(accountsModel);
+    }
+
+    public void invalidateModel(){
+        accountsModel = null;
     }
 
     /**
@@ -157,7 +161,7 @@ public class AccountsService {
 
             manager.update(model);
             Initializer.LOG.info("Account created: id=" + schemaId + "." + semanticId + " name='" + name + "'");
-            this.accountsModel = model;
+            invalidateModel();
             return account;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));

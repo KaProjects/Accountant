@@ -20,6 +20,11 @@ public class TestParent {
         Initializer.CONTEXT = Constants.Context.TEST;
         FileUtils.deleteDirectory(new File(Initializer.getDataSource()));
         try {
+            Service.CONFIG.invalidateModel();
+            Service.ACCOUNT.invalidateModel();
+            Service.PROCEDURES.invalidateModel();
+            Service.TRANSACTIONS.invalidateModel();
+            Service.SCHEMA.invalidateModel();
             Service.CONFIG.checkResources();
             Service.CONFIG.checkData();
             Service.CONFIG.initYearData(YEAR);

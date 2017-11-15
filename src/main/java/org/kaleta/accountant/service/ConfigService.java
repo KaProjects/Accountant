@@ -15,8 +15,21 @@ import java.util.List;
  */
 public class ConfigService {
 
+    private ConfigModel configModel;
+
     ConfigService(){
         // package-private
+    }
+
+    private ConfigModel getModel() throws ManagerException {
+        if (configModel == null) {
+            configModel = new ConfigManager().retrieve();
+        }
+        return new ConfigModel(configModel);
+    }
+
+    public void invalidateModel(){
+        configModel = null;
     }
 
     /**
@@ -62,7 +75,7 @@ public class ConfigService {
             new ConfigManager().create();
             System.out.println("# File '%DATA_DIR%/config.xml' created!");
         }
-        for (ConfigModel.Years.Year yearModel : new ConfigManager().retrieve().getYears().getYearList()){
+        for (ConfigModel.Years.Year yearModel : getModel().getYears().getYearList()){
             String year = yearModel.getName();
             File yearDir = new File(Initializer.getDataSource() + year);
             if (!yearDir.exists()) {
@@ -122,6 +135,7 @@ public class ConfigService {
 
             manager.update(model);
             Initializer.LOG.info("Year '" + newYearName + "' added to config");
+            invalidateModel();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -140,6 +154,7 @@ public class ConfigService {
 
             manager.update(model);
             Initializer.LOG.info("Year '" + year + "' set to active");
+            invalidateModel();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -151,7 +166,7 @@ public class ConfigService {
      */
     public String getActiveYear(){
         try {
-            return new ConfigManager().retrieve().getYears().getActive();
+            return getModel().getYears().getActive();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -164,7 +179,7 @@ public class ConfigService {
     public List<String> getYears(){
         try {
             List<String> yearList = new ArrayList<>();
-            for (ConfigModel.Years.Year year : new ConfigManager().retrieve().getYears().getYearList()) {
+            for (ConfigModel.Years.Year year : getModel().getYears().getYearList()) {
                 yearList.add(year.getName());
             }
             return yearList;
