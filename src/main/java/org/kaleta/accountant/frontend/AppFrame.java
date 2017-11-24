@@ -40,13 +40,13 @@ public class AppFrame extends JFrame implements Configuration {
 
         JMenu addMenu = new JMenu("Add");
         addMenu.setMnemonic(KeyEvent.VK_A);
-        addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, 0)));
-        addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, 0)));
-        addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, 0)));
+        addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.VK_ALT)));
+        addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.VK_ALT)));
+        addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.VK_ALT)));
 
         JMenu createMenu = new JMenu("Create");
         createMenu.setMnemonic(KeyEvent.VK_C);
-        createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)));
+        createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.VK_ALT)));
 
         menuBar.add(fileMenu);
         menuBar.add(addMenu);
