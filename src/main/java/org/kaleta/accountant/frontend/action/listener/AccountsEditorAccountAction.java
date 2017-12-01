@@ -35,14 +35,24 @@ public class AccountsEditorAccountAction extends ActionListener{
         String year = getConfiguration().getSelectedYear();
         String semanticId = String.valueOf(Service.ACCOUNT.getAccountsBySchemaId(year,schemaId).size());
 
-        AccountsModel.Account createdAccount =
-                Service.ACCOUNT.createAccount(year, name, schemaId, semanticId, "");
+        AccountsModel.Account createdAccount = Service.ACCOUNT.createAccount(year, name, schemaId, semanticId, "");
 
         Calendar calendar = Calendar.getInstance();
         String date = String.format("%1$02d%2$02d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1);
-        Service.TRANSACTIONS.addTransaction(year,date, "0",
-                createdAccount.getFullId(), Constants.Account.INIT_ACC_ID, Constants.Transaction.OPEN_DESCRIPTION);
 
+        String createdAccType = Service.SCHEMA.getSchemaAccountType(year, createdAccount.getSchemaId());
+        switch (createdAccType){
+            case Constants.AccountType.ASSET: {
+                Service.TRANSACTIONS.addTransaction(year, date, "0", createdAccount.getFullId(), Constants.Account.INIT_ACC_ID, Constants.Transaction.OPEN_DESCRIPTION);
+                break;
+            }
+            case Constants.AccountType.LIABILITY: {
+                Service.TRANSACTIONS.addTransaction(year, date, "0", Constants.Account.INIT_ACC_ID, createdAccount.getFullId(), Constants.Transaction.OPEN_DESCRIPTION);
+                break;
+            }
+            // accounts of other types aren't openable, thus no open transaction
+        }
+        
         if (schemaId.startsWith("1")){
             String consumptionAccId = Service.ACCOUNT.getConsumptionAccountId(schemaId, semanticId);
             String conAccName = (name.equals(Constants.Account.GENERAL_ACCOUNT_NAME))
