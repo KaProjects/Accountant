@@ -22,7 +22,8 @@ public class TransactionsEditor extends JPanel implements Configurable {
 
     private final JPanel panelProcedures;
 
-    public TransactionsEditor() {
+    public TransactionsEditor(Configuration configuration) {
+        this.configuration = configuration;
         JButton buttonAddTr = new JButton("Add Transaction(s)");
         buttonAddTr.addActionListener(new OpenAddTransactionDialog(this));
 
