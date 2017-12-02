@@ -52,7 +52,7 @@ public class AccountsEditorAccountAction extends ActionListener{
             }
             // accounts of other types aren't openable, thus no open transaction
         }
-        
+
         if (schemaId.startsWith("1")){
             String consumptionAccId = Service.ACCOUNT.getConsumptionAccountId(schemaId, semanticId);
             String conAccName = (name.equals(Constants.Account.GENERAL_ACCOUNT_NAME))

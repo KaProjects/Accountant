@@ -18,10 +18,11 @@ import java.util.List;
 public class TransactionsOverview extends JPanel implements Configurable {
     private Configuration configuration;
     private final TransactionTableModel tableModel;
+    private final JTable table;
 
     public TransactionsOverview(){
         tableModel = new TransactionTableModel();
-        JTable table = new JTable();
+        table = new JTable();
         table.setModel(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowSelectionAllowed(true);
@@ -58,6 +59,8 @@ public class TransactionsOverview extends JPanel implements Configurable {
 
     public void update(){
         tableModel.setTransactionList(Service.TRANSACTIONS.getTransactions(getConfiguration().getSelectedYear(),null,null));
+        table.repaint();
+        table.revalidate();
     }
 
     @Override
