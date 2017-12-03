@@ -13,6 +13,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class TransactionsOverview extends JPanel implements Configurable {
@@ -73,7 +74,7 @@ public class TransactionsOverview extends JPanel implements Configurable {
         return configuration;
     }
 
-    private class TransactionTableModel extends AbstractTableModel {
+    private class TransactionTableModel extends AbstractTableModel implements Comparator<TransactionsModel.Transaction> {
         private List<TransactionsModel.Transaction> transactionList;
 
         // TODO post 1.0 : transaction filter
@@ -82,8 +83,10 @@ public class TransactionsOverview extends JPanel implements Configurable {
             transactionList = new ArrayList<>();
         }
 
-        void setTransactionList(List<TransactionsModel.Transaction> transactionList) {
-            this.transactionList = transactionList;
+        void setTransactionList(List<TransactionsModel.Transaction> newTransactionList) {
+            transactionList.clear();
+            transactionList.addAll(newTransactionList);
+            transactionList.sort(this);
         }
 
         @Override
@@ -118,6 +121,16 @@ public class TransactionsOverview extends JPanel implements Configurable {
                 case 3: return getFullAccountName(transaction.getDebit());
                 case 4: return getFullAccountName(transaction.getCredit());
                 default: throw new IllegalArgumentException("columnIndex");
+            }
+        }
+
+        @Override
+        public int compare(TransactionsModel.Transaction tr1, TransactionsModel.Transaction tr2) {
+            int monthDiff = Integer.parseInt(tr1.getDate().substring(2,4)) - Integer.parseInt(tr2.getDate().substring(2,4));
+            if (monthDiff != 0) {
+                return monthDiff;
+            } else {
+                return Integer.parseInt(tr1.getDate().substring(0,2)) - Integer.parseInt(tr2.getDate().substring(0,2));
             }
         }
 

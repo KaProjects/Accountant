@@ -244,9 +244,9 @@ public class AssetsEditor extends JPanel implements Configurable {
             this.setLayout(layout);
             layout.setHorizontalGroup(layout.createSequentialGroup().addGap(5)
                     .addGroup(layout.createParallelGroup()
-                            .addComponent(labelAccountName, 300, 300, 300)
-                            .addComponent(labelGroup, 300, 300, 300)
-                            .addComponent(labelAccType, 300, 300, 300))
+                            .addComponent(labelAccountName, 500, 500, 500)
+                            .addComponent(labelGroup, 500, 500, 500)
+                            .addComponent(labelAccType, 500, 500, 500))
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                             .addComponent(labelInitValue, 150, 150, 150)
                             .addComponent(labelCurrentValue, 150, 150, 150))

@@ -56,7 +56,7 @@ public class AccountsEditorAccountAction extends ActionListener{
         if (schemaId.startsWith("1")){
             String consumptionAccId = Service.ACCOUNT.getConsumptionAccountId(schemaId, semanticId);
             String conAccName = (name.equals(Constants.Account.GENERAL_ACCOUNT_NAME))
-                    ? "General " + Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + Service.SCHEMA.getGroupName(year, "1", createdAccount.getGroupId())
+                    ? "General " + Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + Service.SCHEMA.getAccountName(year, "1", createdAccount.getGroupId(), createdAccount.getSchemaAccountId())
                     : Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + name;
             Service.ACCOUNT.createAccount(year, conAccName, consumptionAccId.split("\\.")[0], consumptionAccId.split("\\.")[1], "");
         }
