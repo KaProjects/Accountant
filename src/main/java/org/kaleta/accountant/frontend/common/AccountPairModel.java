@@ -9,6 +9,14 @@ public class AccountPairModel {
         this.credit = credit;
     }
 
+    public String getDebit() {
+        return debit;
+    }
+
+    public String getCredit() {
+        return credit;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

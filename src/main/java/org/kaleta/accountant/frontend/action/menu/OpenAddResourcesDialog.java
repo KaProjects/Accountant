@@ -4,6 +4,7 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.common.AccountPairModel;
 import org.kaleta.accountant.frontend.dialog.AddResourcesDialog;
 import org.kaleta.accountant.service.Service;
 
@@ -49,18 +50,35 @@ public class OpenAddResourcesDialog extends MenuAction {
         debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(3));
         debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(5));
 
-        AddResourcesDialog dialog = new AddResourcesDialog(getConfiguration(),
-                resourceAccountMap, resourceClass, creditAccountMap, creditClasses, debitAccountMap, debitClasses);
+        Map<String, List<String>> resourceDescriptionMap = new HashMap<>();
+        Map<AccountPairModel, List<String>> descMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
+        for (AccountPairModel accPair : descMap.keySet()){
+            if (accPair.getDebit().startsWith("1") &&
+                    (accPair.getCredit().startsWith("2") || accPair.getCredit().startsWith("3") || accPair.getCredit().startsWith("4") || accPair.getCredit().startsWith("6"))){
+                resourceDescriptionMap.computeIfAbsent(accPair.getDebit(), k -> new ArrayList<>());
+                for (String desc : descMap.get(accPair)){
+                    if (desc.equals(Constants.Transaction.RESOURCE_ACQUIRED)) {
+                        continue;
+                    } else {
+                        resourceDescriptionMap.get(accPair.getDebit()).add(desc.replace(Constants.Transaction.RESOURCE_ACQUIRED + " - ", ""));
+                    }
+                }
+            }
+        }
+
+        AddResourcesDialog dialog = new AddResourcesDialog(getConfiguration(), resourceAccountMap, resourceClass,
+                creditAccountMap, creditClasses, debitAccountMap, debitClasses, resourceDescriptionMap);
         dialog.setVisible(true);
         if (dialog.getResult()) {
             String date = dialog.getDate();
             String creditId = dialog.getCreditAcc();
             for (AddResourcesDialog.ResourceData resourceData : dialog.getResourceData()) {
+                String acqDesc = (resourceData.getAcqDescription().trim().isEmpty()) ? "" : " - " + resourceData.getAcqDescription();
                 Service.TRANSACTIONS.addTransaction(year, date, resourceData.getAmount(),
-                        resourceData.getResourceId(), creditId, Constants.Transaction.RESOURCE_ACQUIRED);
+                        resourceData.getResourceId(), creditId, Constants.Transaction.RESOURCE_ACQUIRED + acqDesc);
 
-                String[] resId = resourceData.getResourceId().split("\\.");
                 if (resourceData.isConsumed()) {
+                    String[] resId = resourceData.getResourceId().split("\\.");
                     Service.TRANSACTIONS.addTransaction(year, date, resourceData.getAmount(),
                             Service.ACCOUNT.getConsumptionAccountId(resId[0], resId[1]),
                             resourceData.getResourceId(), Constants.Transaction.RESOURCE_CONSUMED);

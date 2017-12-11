@@ -59,14 +59,14 @@ public class Constants {
 
         public static final String BALANCE_GROUP_NAME = "Rozvahove";
         public static final String BALANCE_GROUP_ID = "0";
-        public static final String INIT_BALANCE_ACCOUNT_NAME = "Pociatocny ucet rozvazny";
+        public static final String INIT_BALANCE_ACCOUNT_NAME = "Pociatocny Ucet Rozvazny";
         public static final String INIT_BALANCE_ACCOUNT_ID = "0";
-        public static final String CLOSING_BALANCE_ACCOUNT_NAME = "Konecny ucet rozvazny";
+        public static final String CLOSING_BALANCE_ACCOUNT_NAME = "Konecny Ucet Rozvazny";
         public static final String CLOSING_BALANCE_ACCOUNT_ID = "1";
 
         public static final String PROFIT_GROUP_NAME = "Vysledkove";
         public static final String PROFIT_GROUP_ID = "0";
-        public static final String PROFIT_STATEMENT_ACCOUNT_NAME = "Vykaz zisku a strat";
+        public static final String PROFIT_STATEMENT_ACCOUNT_NAME = "Vykaz Zisku a Strat";
         public static final String PROFIT_STATEMENT_ACCOUNT_ID = "0";
     }
 

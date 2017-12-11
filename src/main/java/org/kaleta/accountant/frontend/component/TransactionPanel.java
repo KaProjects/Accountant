@@ -166,7 +166,6 @@ public class TransactionPanel extends JPanel implements DocumentListener {
                     model.removeAllElements();
                     descList.forEach(model::addElement);
                     ((JTextField)cbDescription.getEditor().getEditorComponent()).setText(cbValue);
-
                 }
             }
         }
