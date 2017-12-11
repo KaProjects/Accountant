@@ -8,10 +8,7 @@ import org.kaleta.accountant.frontend.common.AccountPairModel;
 import org.kaleta.accountant.frontend.dialog.AddResourcesDialog;
 import org.kaleta.accountant.service.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OpenAddResourcesDialog extends MenuAction {
 
@@ -51,7 +48,7 @@ public class OpenAddResourcesDialog extends MenuAction {
         debitClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(5));
 
         Map<String, List<String>> resourceDescriptionMap = new HashMap<>();
-        Map<AccountPairModel, List<String>> descMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
+        Map<AccountPairModel, Set<String>> descMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
         for (AccountPairModel accPair : descMap.keySet()){
             if (accPair.getDebit().startsWith("1") &&
                     (accPair.getCredit().startsWith("2") || accPair.getCredit().startsWith("3") || accPair.getCredit().startsWith("4") || accPair.getCredit().startsWith("6"))){

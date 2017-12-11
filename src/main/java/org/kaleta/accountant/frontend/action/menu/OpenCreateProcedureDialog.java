@@ -9,6 +9,7 @@ import org.kaleta.accountant.service.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class OpenCreateProcedureDialog extends MenuAction {
 
@@ -20,7 +21,7 @@ public class OpenCreateProcedureDialog extends MenuAction {
     protected void actionPerformed() {
         Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
         List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
-        Map<AccountPairModel, List<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
+        Map<AccountPairModel, Set<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
 
         CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, null);
         dialog.setVisible(true);

@@ -17,7 +17,7 @@ import java.util.TreeMap;
  * Provides access to data source which is related to schema.
  */
 public class SchemaService {
-
+    private static final Object lock = new Object();
     private SchemaModel schemaModel;
 
     SchemaService(){
@@ -25,10 +25,12 @@ public class SchemaService {
     }
 
     private SchemaModel getModel(String year) throws ManagerException {
-        if (schemaModel == null) {
-            schemaModel = new SchemaManager(year).retrieve();
+        synchronized (lock) {
+            if (schemaModel == null) {
+                schemaModel = new SchemaManager(year).retrieve();
+            }
+            return new SchemaModel(schemaModel);
         }
-        return new SchemaModel(schemaModel);
     }
 
     public void invalidateModel(){

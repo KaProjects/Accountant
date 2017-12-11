@@ -10,10 +10,7 @@ import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provides access to data source which is related to transactions.
@@ -102,12 +99,12 @@ public class TransactionsService {
     /**
      * Returns list of descriptions mapped by account pair.
      */
-    public Map<AccountPairModel, List<String>> getAccountPairDescriptions(String year){
+    public Map<AccountPairModel, Set<String>> getAccountPairDescriptions(String year){
         try {
-            Map<AccountPairModel, List<String>> accountPairDescriptionMap = new HashMap<>();
+            Map<AccountPairModel, Set<String>> accountPairDescriptionMap = new HashMap<>();
             for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()){
                 AccountPairModel accountPair = new AccountPairModel(transaction.getDebit(), transaction.getCredit());
-                accountPairDescriptionMap.computeIfAbsent(accountPair, k -> new ArrayList<>());
+                accountPairDescriptionMap.computeIfAbsent(accountPair, k -> new HashSet<>());
                 accountPairDescriptionMap.get(accountPair).add(transaction.getDescription());
             }
             return accountPairDescriptionMap;

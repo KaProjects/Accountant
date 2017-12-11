@@ -13,9 +13,10 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class CreateProcedureDialog extends Dialog {
-    private final Map<AccountPairModel, List<String>> accountPairDescriptionMap;
+    private final Map<AccountPairModel, Set<String>> accountPairDescriptionMap;
     private final Map<String, List<AccountsModel.Account>> accountMap;
     private final List<SchemaModel.Class> classList;
 
@@ -23,12 +24,12 @@ public class CreateProcedureDialog extends Dialog {
     private HintValidatedTextField tfName;
     private final List<TransactionPanel> transactionPanelList;
 
-    public CreateProcedureDialog(Configuration configuration, Map<AccountPairModel, List<String>> accountPairDescriptionMap,
+    public CreateProcedureDialog(Configuration configuration, Map<AccountPairModel, Set<String>> accountPairDescriptionMap,
                                  Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
                                  ProceduresModel.Procedure procedure) {
         super(configuration,
                 (procedure == null) ? "Creating Procedure" : "Editing Procedure",
-                (procedure == null) ? "Create" : "Edit");
+                (procedure == null) ? "Create" : "Update");
         this.accountPairDescriptionMap = accountPairDescriptionMap;
         this.accountMap = accountMap;
         this.classList = classList;
