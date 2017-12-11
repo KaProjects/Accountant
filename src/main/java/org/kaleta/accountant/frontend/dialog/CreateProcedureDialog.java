@@ -24,14 +24,31 @@ public class CreateProcedureDialog extends Dialog {
     private final List<TransactionPanel> transactionPanelList;
 
     public CreateProcedureDialog(Configuration configuration, Map<AccountPairModel, List<String>> accountPairDescriptionMap,
-                                 Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
-        super(configuration, "Creating Procedure", "Create");
+                                 Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
+                                 ProceduresModel.Procedure procedure) {
+        super(configuration,
+                (procedure == null) ? "Creating Procedure" : "Editing Procedure",
+                (procedure == null) ? "Create" : "Edit");
         this.accountPairDescriptionMap = accountPairDescriptionMap;
         this.accountMap = accountMap;
         this.classList = classList;
         transactionPanelList = new ArrayList<>();
         buildDialogContent();
-        addTransactionPanel();
+        if (procedure == null) {
+            addTransactionPanel();
+        } else {
+            tfName.focusGained(null);
+            tfName.setText(procedure.getName());
+            for (ProceduresModel.Procedure.Transaction preparedTr : procedure.getTransaction()){
+                addTransactionPanel();
+                TransactionPanel panel = transactionPanelList.get(transactionPanelList.size() - 1);
+                panel.setDescription(preparedTr.getDescription());
+                panel.setAmount(preparedTr.getAmount());
+                panel.setDebit(preparedTr.getDebit());
+                panel.setCredit(preparedTr.getCredit());
+            }
+            validateDialog();
+        }
         pack();
         this.setSize(new Dimension(this.getWidth(), this.getHeight() + 100));
     }

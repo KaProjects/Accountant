@@ -44,7 +44,7 @@ public class ProceduresService {
     }
 
     /**
-     * Creates procedure according to specified values
+     * Creates procedure according to specified values.
      */
     public void createProcedure(String year, String name, List<ProceduresModel.Procedure.Transaction> transactions){
         try {
@@ -65,4 +65,30 @@ public class ProceduresService {
             throw new ServiceFailureException(e);
         }
     }
+
+    /**
+     * Updates procedure specified by 'id' according to new values.
+     */
+    public void updateProcedure(String year, String id, String newName, List<ProceduresModel.Procedure.Transaction> newTransactions){
+        try {
+            Manager<ProceduresModel> manager = new ProceduresManager(year);
+            ProceduresModel model = manager.retrieve();
+
+            for (ProceduresModel.Procedure procedure : model.getProcedure()){
+                if (procedure.getId().equals(id)){
+                    procedure.setName(newName);
+                    procedure.getTransaction().clear();
+                    procedure.getTransaction().addAll(newTransactions);
+                }
+            }
+
+            manager.update(model);
+            Initializer.LOG.info("Procedure updated: id=" + id + " name='" + newName + "'");
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
 }

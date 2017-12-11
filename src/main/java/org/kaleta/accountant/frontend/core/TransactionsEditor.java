@@ -6,7 +6,9 @@ import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.OpenAddTransactionDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenCreateProcedureDialog;
+import org.kaleta.accountant.frontend.action.listener.OpenEditProcedureDialog;
 import org.kaleta.accountant.frontend.action.mouse.ProcedurePanelClicked;
+import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.common.WrapLayout;
 import org.kaleta.accountant.service.Service;
 
@@ -81,6 +83,7 @@ public class TransactionsEditor extends JPanel implements Configurable {
     private class ProcedurePanel extends JPanel {
         ProcedurePanel(ProceduresModel.Procedure procedure){
             this.setBorder(BorderFactory.createLineBorder(Constants.Color.OVERVIEW_GROUP, 2, true));
+            this.setBackground(Color.LIGHT_GRAY);
 
             JLabel label = new JLabel(procedure.getName());
             label.setForeground(Constants.Color.OVERVIEW_ACCOUNT);
@@ -101,21 +104,28 @@ public class TransactionsEditor extends JPanel implements Configurable {
                     ((JPanel) e.getComponent().getAccessibleContext().getAccessibleParent()).dispatchEvent(e);
                 }
             });
+            JButton buttonEdit = new JButton(IconLoader.getIcon(IconLoader.EDIT, new Dimension(15,15)));
+            buttonEdit.setBackground(Color.LIGHT_GRAY);
+            buttonEdit.addActionListener(new OpenEditProcedureDialog(getConfiguration(), procedure));
 
             GroupLayout layout = new GroupLayout(this);
             this.setLayout(layout);
-            layout.setHorizontalGroup(layout.createSequentialGroup().addGap(10).addComponent(label).addGap(10));
-            layout.setVerticalGroup(layout.createSequentialGroup().addGap(10).addComponent(label).addGap(10));
+            layout.setHorizontalGroup(layout.createSequentialGroup().addGap(10).addComponent(label).addGap(10).addComponent(buttonEdit,15,15,15));
+            layout.setVerticalGroup(layout.createParallelGroup()
+                    .addGroup(layout.createSequentialGroup().addGap(10).addComponent(label).addGap(10))
+                    .addComponent(buttonEdit,15,15,15));
 
             this.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     ProcedurePanel.this.setBackground(ProcedurePanel.this.getBackground().darker());
+                    buttonEdit.setBackground(buttonEdit.getBackground().darker());
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e) {
                     ProcedurePanel.this.setBackground(ProcedurePanel.this.getBackground().brighter());
+                    buttonEdit.setBackground(buttonEdit.getBackground().brighter());
                 }
             });
             this.addMouseListener(new ProcedurePanelClicked(TransactionsEditor.this, procedure));
