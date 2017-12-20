@@ -25,22 +25,22 @@ public class Constants {
         public static final String ACCUMULATED_DEP_GROUP_ID = "9";
         public static final String ACCUMULATED_DEP_ACCOUNT_PREFIX = "A. D. of ";
 
-        public static final String RECEIVABLES_GROUP_NAME = "Receivables";
+        public static final String RECEIVABLES_GROUP_NAME = "Pohladavky";
         public static final String RECEIVABLES_GROUP_ID = "0";
-        public static final String RECEIVABLES_PERSONAL_ACCOUNT_NAME = "Receivables to Persons";
+        public static final String RECEIVABLES_PERSONAL_ACCOUNT_NAME = "Pohladavky k Osobam";
         public static final String RECEIVABLES_PERSONAL_ACCOUNT_ID = "0";
-        public static final String RECEIVABLES_INSTITUTION_ACCOUNT_NAME = "Receivables to Institutions";
+        public static final String RECEIVABLES_INSTITUTION_ACCOUNT_NAME = "Pohladavky k Instituciam";
         public static final String RECEIVABLES_INSTITUTION_ACCOUNT_ID = "1";
-        public static final String RECEIVABLES_COMPANY_ACCOUNT_NAME = "Receivables to Companies";
+        public static final String RECEIVABLES_COMPANY_ACCOUNT_NAME = "Pohladavky k Spolocnostiam";
         public static final String RECEIVABLES_COMPANY_ACCOUNT_ID = "2";
 
-        public static final String LIABILITIES_GROUP_NAME = "Liabilities";
+        public static final String LIABILITIES_GROUP_NAME = "Zavazky";
         public static final String LIABILITIES_GROUP_ID = "1";
-        public static final String LIABILITIES_PERSONAL_ACCOUNT_NAME = "Liabilities to Persons";
+        public static final String LIABILITIES_PERSONAL_ACCOUNT_NAME = "Zavazky k Osobam";
         public static final String LIABILITIES_PERSONAL_ACCOUNT_ID = "0";
-        public static final String LIABILITIES_INSTITUTION_ACCOUNT_NAME = "Liabilities to Institutions";
+        public static final String LIABILITIES_INSTITUTION_ACCOUNT_NAME = "Zavazky k Instituciam";
         public static final String LIABILITIES_INSTITUTION_ACCOUNT_ID = "1";
-        public static final String LIABILITIES_COMPANY_ACCOUNT_NAME = "Liabilities to Companies";
+        public static final String LIABILITIES_COMPANY_ACCOUNT_NAME = "Zavazky k Spolocnostiam";
         public static final String LIABILITIES_COMPANY_ACCOUNT_ID = "2";
 
         public static final String CAPITAL_GROUP_NAME = "Capital";
