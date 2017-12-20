@@ -36,6 +36,33 @@ public class AccountsService {
     }
 
     /**
+     * Returns all accounts.
+     */
+    public List<AccountsModel.Account> getAllAccounts(String year){
+        try {
+            return getModel(year).getAccount();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns model of semantic account specified by full id.
+     */
+    public AccountsModel.Account getAccount(String year, String fullId){
+        try {
+            for (AccountsModel.Account account : getModel(year).getAccount()) {
+                if (account.getFullId().equals(fullId)) return account;
+            }
+            throw new IllegalArgumentException("Account with id='" + fullId + "' not found!");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
      * Returns list of accounts for specified schema id prefix.
      */
     public List<AccountsModel.Account> getAccountsBySchemaId(String year, String schemaIdPrefix){
@@ -170,19 +197,9 @@ public class AccountsService {
     }
 
     /**
-     * Returns name of semantic account according to specified attributes.
+     * Returns name of semantic account specified by full id.
      */
     public String getAccountName(String year, String fullId){
-        try {
-            for (AccountsModel.Account account : getModel(year).getAccount()){
-                if (account.getFullId().equals(fullId)){
-                    return account.getName();
-                }
-            }
-            throw new IllegalArgumentException("No account found for '"+ fullId + "'");
-        } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-            throw new ServiceFailureException(e);
-        }
+        return this.getAccount(year, fullId).getName();
     }
 }

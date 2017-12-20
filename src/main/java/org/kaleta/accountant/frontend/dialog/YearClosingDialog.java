@@ -1,30 +1,28 @@
 package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.component.HintValidatedTextField;
 
 public class YearClosingDialog extends Dialog {
+    private HintValidatedTextField tfNewYearName;
+
+    // TODO: 12/20/17 manage proceed button
+    // TODO: 12/20/17 to decide how select acc. to add + open & import porcedures
 
     public YearClosingDialog(Configuration configuration) {
-        super(configuration, "Closing year", "Continue");
+        super(configuration, "Closing year", "Proceed");
+
+
+        buildDialogContent();
+        pack();
     }
 
-    private void closeAccounts(){
-        //E/R -> profit
-        // A/L -> balance
-        // profit -> balance
+    private void buildDialogContent() {
+
+        validateDialog();
     }
 
-    private void initYear(){
-        // init files
-        // import schema
-        // set as active
-    }
 
-    private void openAccounts(){
-        // non-zero A/L -> add + open
-        // zero A/L -> to choose -> if yes -> add + open
-        // E/R -> to choose -> if yes -> add (just!)
 
-        //if 0** has 0 balance (09*-* should have also 0) =>
-    }
+
 }

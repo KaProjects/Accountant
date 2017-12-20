@@ -245,7 +245,7 @@ public class AccountsOverview extends JPanel implements Configurable {
                     if (accountType.equals(Constants.AccountType.EXPENSE) || accountType.equals(Constants.AccountType.REVENUE)){
                         return "-";
                     } else {
-                        return Service.TRANSACTIONS.getAccountInitValue(getConfiguration().getSelectedYear(), account);
+                        return Service.TRANSACTIONS.getAccountInitialValue(getConfiguration().getSelectedYear(), account);
                     }
                 }
                 case 3: return Service.TRANSACTIONS.getAccountTurnover(getConfiguration().getSelectedYear(), account);

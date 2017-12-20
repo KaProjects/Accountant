@@ -9,6 +9,7 @@ import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -117,7 +118,7 @@ public class TransactionsService {
     /**
      * Returns initial value for specified account.
      */
-    public String getAccountInitValue(String year, AccountsModel.Account account) {
+    public String getAccountInitialValue(String year, AccountsModel.Account account) {
         String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
         if (accountType.equals(Constants.AccountType.OFF_BALANCE)
                 || accountType.equals(Constants.AccountType.EXPENSE)
@@ -209,6 +210,14 @@ public class TransactionsService {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
+    }
+
+    /**
+     * todo
+     */
+    public void resolveProfit(String year){
+        // TODO: 12/20/17 balance of profit acc -> closing acc. (positive value!)
+        throw new NotImplementedException();
     }
 
     /**
