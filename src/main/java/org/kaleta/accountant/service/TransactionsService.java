@@ -9,7 +9,6 @@ import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -213,11 +212,27 @@ public class TransactionsService {
     }
 
     /**
-     * todo
+     * Transfers profit value from profit account to closing balance account.
+     * Note: must be used only after closing all the accounts!
      */
-    public void resolveProfit(String year){
-        // TODO: 12/20/17 balance of profit acc -> closing acc. (positive value!)
-        throw new NotImplementedException();
+    public void resolveProfit(String year, String date, AccountsModel.Account profitAccount) {
+        Integer profitBalance = 0;
+        try {
+            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()) {
+                if (tr.getDebit().equals(profitAccount.getFullId())){
+                    profitBalance -= Integer.parseInt(tr.getAmount());
+                }
+                if (tr.getCredit().equals(profitAccount.getFullId())){
+                    profitBalance += Integer.parseInt(tr.getAmount());
+                }
+            }
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+        addTransaction(year, date, String.valueOf(profitBalance),
+                Constants.Account.PROFIT_ACC_ID, Constants.Account.CLOSING_ACC_ID,
+                "profit balance -> closing balance");
     }
 
     /**

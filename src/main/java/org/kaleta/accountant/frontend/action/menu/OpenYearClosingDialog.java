@@ -1,5 +1,6 @@
 package org.kaleta.accountant.frontend.action.menu;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configuration;
@@ -21,14 +22,28 @@ public class OpenYearClosingDialog extends MenuAction {
         if (dialog.getResult()){
             // TODO: 12/20/17 get attributes mandatory for closure from dialog 
             // TODO: 12/20/17 open some info dialog which show info about process
-            //closeAccounts();
-            // TODO: 12/20/17 log + dialog info about finished action
-            //initYear();
-            // TODO: 12/20/17 log + dialog info about finished action
-            //openAccounts();
-            // TODO: 12/20/17 log + dialog info about finished action
-            //importProcedures();
-            // TODO: 12/20/17 log + dialog info about finished action
+            try {
+                closeAccounts();
+                String msg = "";
+                Initializer.LOG.info(msg);
+                // TODO: 12/20/17 add info about finished action
+                //initYear();
+                msg = "";
+                Initializer.LOG.info(msg);
+                // TODO: 12/20/17 add info about finished action
+                //openAccounts();
+                msg = "";
+                Initializer.LOG.info(msg);
+                // TODO: 12/20/17 add info about finished action
+                //importProcedures();
+                msg = "";
+                Initializer.LOG.info(msg);
+                // TODO: 12/20/17 add info about finished action
+            } catch (Exception e){
+                String errmsg = "";
+                Initializer.LOG.severe(errmsg);
+                // TODO: 12/20/17 add info about failed action
+            }
         }
     }
 
@@ -40,7 +55,6 @@ public class OpenYearClosingDialog extends MenuAction {
     private void closeAccounts(){
         String year = getConfiguration().getSelectedYear();
         String closureDate = "3112";
-
         for (AccountsModel.Account account : Service.ACCOUNT.getAllAccounts(year)){
             String balance = Service.TRANSACTIONS.getAccountBalance(year, account);
 
@@ -67,8 +81,7 @@ public class OpenYearClosingDialog extends MenuAction {
                 }
             }
         }
-
-        Service.TRANSACTIONS.resolveProfit(year);
+        Service.TRANSACTIONS.resolveProfit(year, closureDate, Service.ACCOUNT.getAccount(year, Constants.Account.PROFIT_ACC_ID));
     }
 
     /**
