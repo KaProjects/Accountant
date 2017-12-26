@@ -127,6 +127,13 @@ public class AccountsOverview extends JPanel implements Configurable {
                 AccountsOverview.this.updateAccountOverview();
             }
         });
+
+        this.getActionMap().put(Configuration.TRANSACTION_UPDATED, new ConfigurationAction(this) {
+            @Override
+            protected void actionPerformed() {
+                AccountsOverview.this.updateAccountOverview();
+            }
+        });
     }
 
     public void update() {
@@ -169,6 +176,8 @@ public class AccountsOverview extends JPanel implements Configurable {
             accountPane.setVisible(true);
             noAccountLabel.setVisible(false);
             accountTableModel.setAccountList(accountList);
+            accountTable.repaint();
+            accountTable.revalidate();
             this.repaint();
             this.revalidate();
         }

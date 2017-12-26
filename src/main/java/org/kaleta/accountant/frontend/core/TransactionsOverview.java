@@ -8,6 +8,8 @@ import org.kaleta.accountant.frontend.action.configuration.ConfigurationAction;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -16,12 +18,19 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class TransactionsOverview extends JPanel implements Configurable {
+public class TransactionsOverview extends JPanel implements Configurable, DocumentListener {
     private Configuration configuration;
+
     private final TransactionTableModel tableModel;
     private final JTable table;
 
+    private List<TransactionsModel.Transaction> allTransactionList;
+    private String filter;
+    private JTextField textFieldFilter;
+
     public TransactionsOverview(){
+        allTransactionList = new ArrayList<>();
+        filter = "-1";
         tableModel = new TransactionTableModel();
         table = new JTable();
         table.setModel(tableModel);
@@ -53,13 +62,34 @@ public class TransactionsOverview extends JPanel implements Configurable {
             }
         });
 
-        this.setLayout(new GridLayout(1,1));
-        this.add(table);
+        textFieldFilter = new JTextField();
+        textFieldFilter.getDocument().addDocumentListener(this);
+
+        GroupLayout layout = new GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(layout.createParallelGroup().addComponent(textFieldFilter).addComponent(table));
+        layout.setVerticalGroup(layout.createSequentialGroup().addComponent(textFieldFilter,20,20,20).addComponent(table));
     }
 
 
     public void update(){
-        tableModel.setTransactionList(Service.TRANSACTIONS.getTransactions(getConfiguration().getSelectedYear(),null,null));
+        allTransactionList.clear();
+        allTransactionList.addAll(Service.TRANSACTIONS.getTransactions(getConfiguration().getSelectedYear(),null,null));
+        filterTransactions();
+    }
+
+    private void filterTransactions(){
+        if (filter.equals("-1")){
+            tableModel.setTransactionList(allTransactionList);
+        } else {
+            List<TransactionsModel.Transaction> filteredTransactions = new ArrayList<>();
+            for (TransactionsModel.Transaction tr : allTransactionList){
+                if (tr.getCredit().startsWith(filter) || tr.getDebit().startsWith(filter)) {
+                    filteredTransactions.add(tr);
+                }
+            }
+            tableModel.setTransactionList(filteredTransactions);
+        }
         table.repaint();
         table.revalidate();
     }
@@ -74,10 +104,32 @@ public class TransactionsOverview extends JPanel implements Configurable {
         return configuration;
     }
 
+    @Override
+    public void insertUpdate(DocumentEvent documentEvent) {
+        proceedFilter();
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent documentEvent) {
+        proceedFilter();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent documentEvent) {
+        proceedFilter();
+    }
+
+    private void proceedFilter(){
+        if (textFieldFilter.getText().trim().isEmpty()) {
+            filter = "-1";
+        } else {
+            filter = textFieldFilter.getText();
+        }
+        filterTransactions();
+    }
+
     private class TransactionTableModel extends AbstractTableModel implements Comparator<TransactionsModel.Transaction> {
         private List<TransactionsModel.Transaction> transactionList;
-
-        // TODO post 1.0 : transaction filter
 
         TransactionTableModel(){
             transactionList = new ArrayList<>();
