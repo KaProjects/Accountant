@@ -31,6 +31,9 @@ public class TransactionsService {
         if (transactionsModel == null) {
             transactionsModel = new TransactionsManager(year).retrieve();
         }
+        if (!transactionsModel.getYear().equals(year)) {
+            transactionsModel = new TransactionsManager(year).retrieve();
+        }
         return new TransactionsModel(transactionsModel);
     }
 

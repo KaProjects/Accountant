@@ -31,7 +31,7 @@ public class TransactionsModel {
         return this.transaction;
     }
 
-    private String getYear() {
+    public String getYear() {
         return year;
     }
 

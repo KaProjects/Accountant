@@ -29,6 +29,9 @@ public class SchemaService {
             if (schemaModel == null) {
                 schemaModel = new SchemaManager(year).retrieve();
             }
+            if (!schemaModel.getYear().equals(year)) {
+                schemaModel = new SchemaManager(year).retrieve();
+            }
             return new SchemaModel(schemaModel);
         }
     }
@@ -412,6 +415,23 @@ public class SchemaService {
                     schemaId.substring(0, 1)),
                     schemaId.substring(1, 2)),
                     schemaId.substring(2, 3)).getType();
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Imports schema from one year to another.
+     */
+    public void importSchema(String fromYear, String toYear) {
+        try {
+            SchemaModel fromModel = getModel(fromYear);
+            fromModel.setYear(toYear);
+
+            new SchemaManager(toYear).update(fromModel);
+
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

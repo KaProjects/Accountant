@@ -24,6 +24,9 @@ public class ProceduresService {
         if (proceduresModel == null) {
             proceduresModel = new ProceduresManager(year).retrieve();
         }
+        if (!proceduresModel.getYear().equals(year)) {
+            proceduresModel = new ProceduresManager(year).retrieve();
+        }
         return new ProceduresModel(proceduresModel);
     }
 

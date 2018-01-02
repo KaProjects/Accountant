@@ -28,6 +28,9 @@ public class AccountsService {
         if (accountsModel == null) {
             accountsModel = new AccountsManager(year).retrieve();
         }
+        if (!accountsModel.getYear().equals(year)) {
+            accountsModel = new AccountsManager(year).retrieve();
+        }
         return new AccountsModel(accountsModel);
     }
 
@@ -165,6 +168,24 @@ public class AccountsService {
                 }
             }
             throw new IllegalArgumentException("Depreciation account not found for '" + account.getFullId() + "'");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns consumption account for specified resource account.
+     */
+    public AccountsModel.Account getConsumptionAccount(String year, AccountsModel.Account account){
+        String consId = getConsumptionAccountId(account.getSchemaId(), account.getSemanticId());
+        try {
+            for (AccountsModel.Account acc : getModel(year).getAccount()) {
+                if (acc.getFullId().equals(consId)) {
+                    return acc;
+                }
+            }
+            throw new IllegalArgumentException("Consumption account not found for '" + account.getFullId() + "'");
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
