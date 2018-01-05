@@ -25,9 +25,6 @@ public class YearPaneYearSelected extends ConfigurationAction {
         TransactionsOverview transactionsOverview = new TransactionsOverview();
         transactionsOverview.setConfiguration(getConfiguration());
         transactionsOverview.update();
-        TransactionsEditor transactionsEditor = new TransactionsEditor();
-        transactionsEditor.setConfiguration(getConfiguration());
-        transactionsEditor.update();
         BalanceOverview balanceOverview = new BalanceOverview();
         balanceOverview.setConfiguration(getConfiguration());
         balanceOverview.update();
@@ -65,6 +62,8 @@ public class YearPaneYearSelected extends ConfigurationAction {
             JTabbedPane transactionsPane = new JTabbedPane();
             pane.addTab("Transactions", transactionsPane);
             transactionsPane.addTab("Overview", new JScrollPane(transactionsOverview));
+            TransactionsEditor transactionsEditor = new TransactionsEditor(getConfiguration());
+            transactionsEditor.update();
             transactionsPane.addTab("Editor", transactionsEditor);
 
             JTabbedPane accountingPane = new JTabbedPane();

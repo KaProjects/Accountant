@@ -16,5 +16,21 @@ Released: 13.11.2017
     Reworked procedure, transaction managemet.
     Improved dialogs.
     
+Known major bugs:
+
+    Accumulated depreciation accounts are opened wrongly - switched debit/credit 
+        
 ## 1.1
+Released: 5.1.2018
+
+    Improved: accouns overview, edit procedure, schema account/group deletion, add resource dialog.
+    Implemented: transaction filer, year closing procedure.
+    Fixed: major bug, many minor UI/UX fixes
+        
+## 1.2
 Released: in progress
+
+    before release: 
+        pom.xml: x.y-snapshot -> x.y
+        Initializer.VERSION: x.y-snapshot -> x.y
+        Initializer.CONTEXT = production

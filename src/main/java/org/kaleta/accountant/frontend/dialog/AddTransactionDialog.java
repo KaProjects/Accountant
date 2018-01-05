@@ -12,20 +12,18 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class AddTransactionDialog extends Dialog {
-    private final Map<AccountPairModel, List<String>> accountPairDescriptionMap;
+    private final Map<AccountPairModel, Set<String>> accountPairDescriptionMap;
     private final Map<String, List<AccountsModel.Account>> accountMap;
     private final List<SchemaModel.Class> classList;
 
     private final List<TransactionPanel> transactionPanelList;
     private JPanel panelTransactions;
 
-    public AddTransactionDialog(Configuration configuration, Map<AccountPairModel, List<String>> accountPairDescriptionMap,
+    public AddTransactionDialog(Configuration configuration, Map<AccountPairModel, Set<String>> accountPairDescriptionMap,
                                 Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
                                 ProceduresModel.Procedure procedure) {
         super(configuration, "Adding Transaction(s)", "Add");

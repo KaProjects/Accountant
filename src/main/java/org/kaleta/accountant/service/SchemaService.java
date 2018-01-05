@@ -1,12 +1,12 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.manager.Manager;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.SchemaManager;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
-import org.kaleta.accountant.frontend.Initializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.TreeMap;
  * Provides access to data source which is related to schema.
  */
 public class SchemaService {
-
+    private static final Object lock = new Object();
     private SchemaModel schemaModel;
 
     SchemaService(){
@@ -25,10 +25,19 @@ public class SchemaService {
     }
 
     private SchemaModel getModel(String year) throws ManagerException {
-        if (schemaModel == null) {
-            schemaModel = new SchemaManager(year).retrieve();
+        synchronized (lock) {
+            if (schemaModel == null) {
+                schemaModel = new SchemaManager(year).retrieve();
+            }
+            if (!schemaModel.getYear().equals(year)) {
+                schemaModel = new SchemaManager(year).retrieve();
+            }
+            return new SchemaModel(schemaModel);
         }
-        return new SchemaModel(schemaModel);
+    }
+
+    public void invalidateModel(){
+        schemaModel = null;
     }
 
     /**
@@ -165,16 +174,14 @@ public class SchemaService {
      * Returns true if schema group can be deleted, false otherwise.
      */
     public boolean isGroupDeletable(String year, String classId, String groupId) {
-        // TODO post 1.0 : impl. this when conditions decided, e.g. associated opened accounts (don't forget to check associated groups/accounts)
-        return true;
+        return Service.ACCOUNT.getAccountsBySchemaId(year, classId + groupId).isEmpty();
     }
 
     /**
      * Returns true if schema account can be deleted, false otherwise.
      */
     public boolean isAccountDeletable(String year, String classId, String groupId, String accountId) {
-        // TODO post 1.0 : impl. this when conditions decided, e.g. associated opened accounts (don't forget to check associated groups/accounts)
-        return true;
+        return Service.ACCOUNT.getAccountsBySchemaId(year, classId + groupId + accountId).isEmpty();
     }
 
     /**
@@ -190,6 +197,8 @@ public class SchemaService {
             newGroup.setId(groupId);
             getClassById(model, classId).getGroup().add(newGroup);
 
+            List<String> logMsgList = new ArrayList<>();
+            logMsgList.add("Schema Group created: id=" + classId + groupId + " name='" + name + "'");
             switch (classId) {
                 case "0": {
                     SchemaModel.Class.Group.Account accDepAccount = new SchemaModel.Class.Group.Account();
@@ -197,12 +206,14 @@ public class SchemaService {
                     accDepAccount.setName(Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + name);
                     accDepAccount.setType(Constants.AccountType.LIABILITY);
                     getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID).getAccount().add(accDepAccount);
+                    logMsgList.add("Schema Account created: id=" + "0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID + groupId + " name='" + Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + name + "'");
 
                     SchemaModel.Class.Group.Account depAccount = new SchemaModel.Class.Group.Account();
                     depAccount.setId(groupId);
                     depAccount.setName(Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + name);
                     depAccount.setType(Constants.AccountType.EXPENSE);
                     getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID).getAccount().add(depAccount);
+                    logMsgList.add("Schema Account created: id=" + "5" + Constants.Schema.DEPRECIATION_GROUP_ID + groupId + " name='" + Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + name + "'");
                     break;
                 }
                 case "1": {
@@ -211,6 +222,7 @@ public class SchemaService {
                     consumptionAccount.setName(Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + name);
                     consumptionAccount.setType(Constants.AccountType.EXPENSE);
                     getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID).getAccount().add(consumptionAccount);
+                    logMsgList.add("Schema Account created: id=" + "5" + Constants.Schema.CONSUMPTION_GROUP_ID + groupId + " name='" + Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + name + "'");
                     break;
                 }
                 case "2":
@@ -222,8 +234,10 @@ public class SchemaService {
             }
 
             manager.update(model);
-            Initializer.LOG.info("Schema Group created: id=" + classId + groupId + " name='" + name + "'");
-            this.schemaModel = model;
+            for (String logMsg : logMsgList){
+                Initializer.LOG.info(logMsg);
+            }
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -240,18 +254,24 @@ public class SchemaService {
 
             getGroupById(getClassById(model, classId), groupId).setName(newName);
 
+            List<String> logMsgList = new ArrayList<>();
+            logMsgList.add("Schema Group id=" + classId + groupId + " renamed to '" + newName + "'");
             switch (classId) {
                 case "0": {
                     getAccountById(getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID), groupId)
                             .setName(Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + newName);
+                    logMsgList.add("Schema Account id=" + "0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID + groupId + " renamed to '" + Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + newName + "'");
 
                     getAccountById(getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID), groupId)
                             .setName(Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + newName);
+                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.DEPRECIATION_GROUP_ID + groupId + " renamed to '" + Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + newName + "'");
+
                     break;
                 }
                 case "1": {
                     getAccountById(getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID), groupId)
                             .setName(Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + newName);
+                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.CONSUMPTION_GROUP_ID + groupId + " renamed to '" + Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + newName + "'");
                     break;
                 }
                 case "2":
@@ -263,8 +283,10 @@ public class SchemaService {
             }
 
             manager.update(model);
-            Initializer.LOG.info("Schema Group id=" + classId + groupId + " renamed to '" + newName + "'");
-            this.schemaModel = model;
+            for (String logMsg : logMsgList){
+                Initializer.LOG.info(logMsg);
+            }
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -282,18 +304,23 @@ public class SchemaService {
             SchemaModel.Class clazz = getClassById(model, classId);
             clazz.getGroup().remove(getGroupById(clazz, groupId));
 
+            List<String> logMsgList = new ArrayList<>();
+            logMsgList.add("Schema Group id=" + classId + groupId + " deleted");
             switch (classId) {
                 case "0": {
                     SchemaModel.Class.Group groupAccDep = getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID);
                     groupAccDep.getAccount().remove(getAccountById(groupAccDep, groupId));
+                    logMsgList.add("Schema Account id=" + "0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID + groupId + " deleted");
 
                     SchemaModel.Class.Group groupDep = getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID);
                     groupDep.getAccount().remove(getAccountById(groupDep, groupId));
+                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.DEPRECIATION_GROUP_ID + groupId + " deleted");
                     break;
                 }
                 case "1": {
                     SchemaModel.Class.Group groupCons = getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID);
                     groupCons.getAccount().remove(getAccountById(groupCons, groupId));
+                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.CONSUMPTION_GROUP_ID + groupId + " deleted");
                     break;
                 }
                 case "2":
@@ -305,8 +332,10 @@ public class SchemaService {
             }
 
             manager.update(model);
-            Initializer.LOG.info("Schema Group id=" + classId + groupId + " deleted");
-            this.schemaModel = model;
+            for (String logMsg : logMsgList){
+                Initializer.LOG.info(logMsg);
+            }
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -329,7 +358,7 @@ public class SchemaService {
 
             manager.update(model);
             Initializer.LOG.info("Schema Account created: id=" + classId + groupId + accountId + " name='" + name + "'");
-            this.schemaModel = model;
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -348,7 +377,7 @@ public class SchemaService {
 
             manager.update(model);
             Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " renamed to '" + newName + "'");
-            this.schemaModel = model;
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -368,7 +397,7 @@ public class SchemaService {
 
             manager.update(model);
             Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " deleted");
-            this.schemaModel = model;
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -384,6 +413,23 @@ public class SchemaService {
                     schemaId.substring(0, 1)),
                     schemaId.substring(1, 2)),
                     schemaId.substring(2, 3)).getType();
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Imports schema from one year to another.
+     */
+    public void importSchema(String fromYear, String toYear) {
+        try {
+            SchemaModel fromModel = getModel(fromYear);
+            fromModel.setYear(toYear);
+
+            new SchemaManager(toYear).update(fromModel);
+
+            invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

@@ -6,9 +6,23 @@
 
     <groupId>org.kaleta</groupId>
     <artifactId>accountant</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -33,7 +47,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.kaleta.accountant.frontend.Initializer</mainClass>
+                            <mainClass>org.kaleta.accountant.Initializer</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

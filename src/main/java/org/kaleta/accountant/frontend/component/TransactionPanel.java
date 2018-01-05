@@ -14,10 +14,11 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class TransactionPanel extends JPanel implements DocumentListener {
     private final Object lock = new Object();
-    private final Map<AccountPairModel, List<String>> accountPairDescriptionMap;
+    private final Map<AccountPairModel, Set<String>> accountPairDescriptionMap;
 
     private final JButton buttonDelete;
     private final DatePickerTextField tfDate;
@@ -26,7 +27,7 @@ public class TransactionPanel extends JPanel implements DocumentListener {
     private final SelectAccountTextField tfDebit;
     private final SelectAccountTextField tfCredit;
 
-    public TransactionPanel(Configuration configuration, Map<AccountPairModel, List<String>> accountPairDescriptionMap,
+    public TransactionPanel(Configuration configuration, Map<AccountPairModel, Set<String>> accountPairDescriptionMap,
                             Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
                             DocumentListener documentListener, boolean withDate) {
         this.accountPairDescriptionMap = accountPairDescriptionMap;
@@ -159,14 +160,13 @@ public class TransactionPanel extends JPanel implements DocumentListener {
             String debit = tfDebit.getSelectedAccount();
             String credit = tfCredit.getSelectedAccount();
             if (!debit.trim().isEmpty() && !credit.trim().isEmpty()) {
-                List<String> descList = accountPairDescriptionMap.get(new AccountPairModel(debit, credit));
+                Set<String> descList = accountPairDescriptionMap.get(new AccountPairModel(debit, credit));
                 if (descList != null) {
                     String cbValue = ((JTextField)cbDescription.getEditor().getEditorComponent()).getText();
                     DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) cbDescription.getModel();
                     model.removeAllElements();
                     descList.forEach(model::addElement);
                     ((JTextField)cbDescription.getEditor().getEditorComponent()).setText(cbValue);
-
                 }
             }
         }

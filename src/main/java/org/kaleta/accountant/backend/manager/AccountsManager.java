@@ -1,8 +1,8 @@
 package org.kaleta.accountant.backend.manager;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.common.Constants;
-import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
@@ -20,7 +20,7 @@ public class AccountsManager implements Manager<AccountsModel> {
     public AccountsManager(String year) {
         this.year = year;
         schemaUri = "/schema/accounts.xsd";
-        schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "accounts.xml";
+        schemaFileUri = Initializer.getDataSource() + year + File.separator + "accounts.xml";
     }
 
     @Override
@@ -45,6 +45,12 @@ public class AccountsManager implements Manager<AccountsModel> {
         profitAcc.setSchemaId(Constants.Account.PROFIT_ACC_ID.split("\\.")[0]);
         profitAcc.setSemanticId(Constants.Account.PROFIT_ACC_ID.split("\\.")[1]);
         accountsModel.getAccount().add(profitAcc);
+
+        AccountsModel.Account personalCapitalAcc = new AccountsModel.Account();
+        personalCapitalAcc.setName(Constants.Account.GENERAL_ACCOUNT_NAME);
+        personalCapitalAcc.setSchemaId(Constants.Account.PERSONAL_CAPITAL_ACC_ID.split("\\.")[0]);
+        personalCapitalAcc.setSemanticId(Constants.Account.PERSONAL_CAPITAL_ACC_ID.split("\\.")[1]);
+        accountsModel.getAccount().add(personalCapitalAcc);
 
         update(accountsModel);
         Initializer.LOG.info("File created: '" + schemaFileUri + "'");

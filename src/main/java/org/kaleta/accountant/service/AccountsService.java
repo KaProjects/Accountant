@@ -1,12 +1,12 @@
 package org.kaleta.accountant.service;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.manager.AccountsManager;
 import org.kaleta.accountant.backend.manager.Manager;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
-import org.kaleta.accountant.frontend.Initializer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public class AccountsService {
 
     private AccountsModel accountsModel;
 
-    AccountsService(){
+    AccountsService() {
         // package-private
     }
 
@@ -28,7 +28,41 @@ public class AccountsService {
         if (accountsModel == null) {
             accountsModel = new AccountsManager(year).retrieve();
         }
+        if (!accountsModel.getYear().equals(year)) {
+            accountsModel = new AccountsManager(year).retrieve();
+        }
         return new AccountsModel(accountsModel);
+    }
+
+    public void invalidateModel(){
+        accountsModel = null;
+    }
+
+    /**
+     * Returns all accounts.
+     */
+    public List<AccountsModel.Account> getAllAccounts(String year){
+        try {
+            return getModel(year).getAccount();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns model of semantic account specified by full id.
+     */
+    public AccountsModel.Account getAccount(String year, String fullId){
+        try {
+            for (AccountsModel.Account account : getModel(year).getAccount()) {
+                if (account.getFullId().equals(fullId)) return account;
+            }
+            throw new IllegalArgumentException("Account with id='" + fullId + "' not found!");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
     }
 
     /**
@@ -141,6 +175,24 @@ public class AccountsService {
     }
 
     /**
+     * Returns consumption account for specified resource account.
+     */
+    public AccountsModel.Account getConsumptionAccount(String year, AccountsModel.Account account){
+        String consId = getConsumptionAccountId(account.getSchemaId(), account.getSemanticId());
+        try {
+            for (AccountsModel.Account acc : getModel(year).getAccount()) {
+                if (acc.getFullId().equals(consId)) {
+                    return acc;
+                }
+            }
+            throw new IllegalArgumentException("Consumption account not found for '" + account.getFullId() + "'");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
      * Creates semantic account according to specified attributes.
      */
     public AccountsModel.Account createAccount(String year, String name, String schemaId, String semanticId, String metadata){
@@ -157,7 +209,7 @@ public class AccountsService {
 
             manager.update(model);
             Initializer.LOG.info("Account created: id=" + schemaId + "." + semanticId + " name='" + name + "'");
-            this.accountsModel = model;
+            invalidateModel();
             return account;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
@@ -166,19 +218,9 @@ public class AccountsService {
     }
 
     /**
-     * Returns name of semantic account according to specified attributes.
+     * Returns name of semantic account specified by full id.
      */
     public String getAccountName(String year, String fullId){
-        try {
-            for (AccountsModel.Account account : getModel(year).getAccount()){
-                if (account.getFullId().equals(fullId)){
-                    return account.getName();
-                }
-            }
-            throw new IllegalArgumentException("No account found for '"+ fullId + "'");
-        } catch (ManagerException e){
-            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-            throw new ServiceFailureException(e);
-        }
+        return this.getAccount(year, fullId).getName();
     }
 }

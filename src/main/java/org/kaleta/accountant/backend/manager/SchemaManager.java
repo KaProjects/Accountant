@@ -1,8 +1,8 @@
 package org.kaleta.accountant.backend.manager;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
-import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
@@ -22,7 +22,7 @@ public class SchemaManager implements Manager<SchemaModel> {
     public SchemaManager(String year) {
         this.year = year;
         schemaUri = "/schema/schema.xsd";
-        schemaFileUri = Initializer.DATA_SOURCE + year + File.separator + "schema.xml";
+        schemaFileUri = Initializer.getDataSource() + year + File.separator + "schema.xml";
     }
 
     @Override
