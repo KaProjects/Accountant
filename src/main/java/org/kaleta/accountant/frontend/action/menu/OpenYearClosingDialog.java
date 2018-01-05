@@ -15,7 +15,7 @@ public class OpenYearClosingDialog extends MenuAction {
         super(config, "Close Year");
 
         // TODO: 1/2/18 to finish year closure procedure
-        //this.enabled = false;
+        this.enabled = false;
     }
 
     @Override
@@ -33,29 +33,29 @@ public class OpenYearClosingDialog extends MenuAction {
 //        YearClosingDialog dialog = new YearClosingDialog(getConfiguration());
 //        dialog.setVisible(true);
 //        if (dialog.getResult()){
-//            // TODO: 12/20/17 get attributes mandatory for closure from dialog
-//            // TODO: 12/20/17 open some info dialog which show info about process
+//            // TODO post 1.0 : get attributes mandatory for closure from dialog
+//            // TODO post 1.0 : open some info dialog which show info about process
 //            try {
 //                closeAccounts();
 //                String msg = "";
 //                Initializer.LOG.info(msg);
-//                // TODO: 12/20/17 add info about finished action
+//                //  add info about finished action
 //                //initYear();
 //                msg = "";
 //                Initializer.LOG.info(msg);
-//                // TODO: 12/20/17 add info about finished action
+//                //  add info about finished action
 //                //openAccounts();
 //                msg = "";
 //                Initializer.LOG.info(msg);
-//                // TODO: 12/20/17 add info about finished action
+//                // add info about finished action
 //                //importProcedures();
 //                msg = "";
 //                Initializer.LOG.info(msg);
-//                // TODO: 12/20/17 add info about finished action
+//                //  add info about finished action
 //            } catch (Exception e){
 //                String errmsg = "";
 //                Initializer.LOG.severe(errmsg);
-//                // TODO: 12/20/17 add info about failed action
+//                //  add info about failed action
 //            }
 //        }
     }
@@ -117,7 +117,7 @@ public class OpenYearClosingDialog extends MenuAction {
      * closing/profit acc last year -> init acc. new year
      */
     private void openAccounts(){
-        // TODO: 1/2/18 select which E/R acc. to import ?
+        // TODO post 1.0 : which E/R acc. to import ?
         // add E accounts
         for (TransactionsModel.Transaction tr : Service.TRANSACTIONS.getTransactions(lastYear, Constants.Account.PROFIT_ACC_ID, null)) {
             if (tr.getCredit().startsWith("5" + Constants.Schema.DEPRECIATION_GROUP_ID)) continue;
@@ -132,8 +132,7 @@ public class OpenYearClosingDialog extends MenuAction {
             Service.ACCOUNT.createAccount(newYear, acc.getName(), acc.getSchemaId(), acc.getSemanticId(), acc.getMetadata());
         }
 
-        // TODO: 1/2/18 non-zero A/L -> add + open
-        // TODO: 1/2/18  zero A/L -> to choose -> if yes -> add + open (mandatory accounts (like 400) cant be excluded)
+        // TODO post 1.0 : zero A/L -> to choose -> if yes -> add + open (mandatory accounts (like 400) cant be excluded)
         // add + open A accounts
         String openDate = "0101";
         for (TransactionsModel.Transaction tr : Service.TRANSACTIONS.getTransactions(lastYear, Constants.Account.CLOSING_ACC_ID, null)) {
@@ -189,6 +188,6 @@ public class OpenYearClosingDialog extends MenuAction {
     }
 
     private void importProcedures(){
-        // TODO: 12/20/17 import procedures - somehow
+        // TODO post 1.0 : import procedures - somehow
     }
 }

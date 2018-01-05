@@ -174,16 +174,14 @@ public class SchemaService {
      * Returns true if schema group can be deleted, false otherwise.
      */
     public boolean isGroupDeletable(String year, String classId, String groupId) {
-        // TODO post 1.0 : impl. this when conditions decided, e.g. associated opened accounts (don't forget to check associated groups/accounts)
-        return true;
+        return Service.ACCOUNT.getAccountsBySchemaId(year, classId + groupId).isEmpty();
     }
 
     /**
      * Returns true if schema account can be deleted, false otherwise.
      */
     public boolean isAccountDeletable(String year, String classId, String groupId, String accountId) {
-        // TODO post 1.0 : impl. this when conditions decided, e.g. associated opened accounts (don't forget to check associated groups/accounts)
-        return true;
+        return Service.ACCOUNT.getAccountsBySchemaId(year, classId + groupId + accountId).isEmpty();
     }
 
     /**

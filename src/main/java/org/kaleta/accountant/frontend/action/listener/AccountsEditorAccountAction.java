@@ -7,7 +7,6 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
-import java.util.Calendar;
 
 public class AccountsEditorAccountAction extends ActionListener{
     private String schemaId;
@@ -37,8 +36,9 @@ public class AccountsEditorAccountAction extends ActionListener{
 
         AccountsModel.Account createdAccount = Service.ACCOUNT.createAccount(year, name, schemaId, semanticId, "");
 
-        Calendar calendar = Calendar.getInstance();
-        String date = String.format("%1$02d%2$02d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1);
+        //Calendar calendar = Calendar.getInstance();
+        //String date = String.format("%1$02d%2$02d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1);
+        String date = "0101";
 
         String createdAccType = Service.SCHEMA.getSchemaAccountType(year, createdAccount.getSchemaId());
         switch (createdAccType){

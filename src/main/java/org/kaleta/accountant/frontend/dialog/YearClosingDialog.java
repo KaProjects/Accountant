@@ -6,8 +6,8 @@ import org.kaleta.accountant.frontend.component.HintValidatedTextField;
 public class YearClosingDialog extends Dialog {
     private HintValidatedTextField tfNewYearName;
 
-    // TODO: 12/20/17 manage proceed button
-    // TODO: 12/20/17 to decide how select acc. to add + open & import porcedures
+    // TODO post 1.0 : manage proceed button
+    // TODO post 1.0 : to decide how select acc. to add + open & import porcedures
 
     public YearClosingDialog(Configuration configuration) {
         super(configuration, "Closing year", "Proceed");

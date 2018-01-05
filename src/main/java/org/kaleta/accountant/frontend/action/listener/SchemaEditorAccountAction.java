@@ -91,7 +91,7 @@ public class SchemaEditorAccountAction extends ActionListener {
                         getConfiguration().update(Configuration.SCHEMA_UPDATED);
                     }
                 } else {
-                    JOptionPane.showMessageDialog((Component) getConfiguration(), "Schema Account cannot be deleted, because at least one associated account is opened!",
+                    JOptionPane.showMessageDialog((Component) getConfiguration(), "Schema Account cannot be deleted, because at least one associated account is assigned!",
                             "Forbidden Operation!",JOptionPane.WARNING_MESSAGE);
                 }
                 break;
