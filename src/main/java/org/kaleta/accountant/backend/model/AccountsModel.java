@@ -31,7 +31,7 @@ public class AccountsModel {
         return this.account;
     }
 
-    private String getYear() {
+    public String getYear() {
         return year;
     }
 

@@ -54,7 +54,7 @@ public class SchemaEditorGroupAction extends ActionListener {
                     }
                 } else {
                     JOptionPane.showMessageDialog((Component) getConfiguration(),
-                            "Group cannot be deleted, because at least one associated account is opened!",
+                            "Group cannot be deleted, because at least one associated account is assigned!",
                             "Forbidden Operation!",
                             JOptionPane.WARNING_MESSAGE);
                 }

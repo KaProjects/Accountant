@@ -1,5 +1,6 @@
 package org.kaleta.accountant.frontend;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
 import org.kaleta.accountant.frontend.component.YearMenu;
@@ -9,6 +10,7 @@ import org.kaleta.accountant.service.Service;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 public class AppFrame extends JFrame implements Configuration {
@@ -35,17 +37,20 @@ public class AppFrame extends JFrame implements Configuration {
 
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
+        fileMenu.add(new MenuItemWrapper(new OpenYearClosingDialog(this)));
+        fileMenu.add(new JSeparator(SwingConstants.HORIZONTAL));
         fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
+
 
         JMenu addMenu = new JMenu("Add");
         addMenu.setMnemonic(KeyEvent.VK_A);
-        addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, 0)));
-        addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, 0)));
-        addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, 0)));
+        addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK)));
 
         JMenu createMenu = new JMenu("Create");
         createMenu.setMnemonic(KeyEvent.VK_C);
-        createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)));
+        createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK)));
 
         menuBar.add(fileMenu);
         menuBar.add(addMenu);

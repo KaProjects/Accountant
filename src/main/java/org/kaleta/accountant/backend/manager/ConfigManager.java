@@ -1,7 +1,7 @@
 package org.kaleta.accountant.backend.manager;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.model.ConfigModel;
-import org.kaleta.accountant.frontend.Initializer;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
@@ -17,7 +17,7 @@ public class ConfigManager implements Manager<ConfigModel> {
 
     public ConfigManager() {
         schemaUri = "/schema/config.xsd";
-        configFileUri = Initializer.DATA_SOURCE + "config.xml";
+        configFileUri = Initializer.getDataSource() + "config.xml";
     }
 
     @Override

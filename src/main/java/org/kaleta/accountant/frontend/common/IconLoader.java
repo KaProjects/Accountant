@@ -1,7 +1,7 @@
 package org.kaleta.accountant.frontend.common;
 
+import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.common.ErrorHandler;
-import org.kaleta.accountant.frontend.Initializer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

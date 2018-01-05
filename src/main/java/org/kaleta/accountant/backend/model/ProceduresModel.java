@@ -39,7 +39,7 @@ public class ProceduresModel {
         return this.procedure;
     }
 
-    private String getYear() {
+    public String getYear() {
         return year;
     }
 
