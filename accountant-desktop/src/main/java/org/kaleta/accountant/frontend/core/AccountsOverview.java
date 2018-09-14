@@ -2,6 +2,7 @@ package org.kaleta.accountant.frontend.core;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
@@ -24,12 +25,17 @@ public class AccountsOverview extends JPanel implements Configurable {
     private Configuration configuration;
 
     private final DefaultTreeModel accountTreeModel;
+
     private final AccountTableModel accountTableModel;
     private final JScrollPane accountPane;
     private final JLabel noAccountLabel;
     private final JTable accountTable;
 
     private String selectedSchemaAccount;
+
+    private final TransactionTableModel transactionTableModel;
+    private final JScrollPane transactionPane;
+    private final JTable transactionTable;
 
     public AccountsOverview() {
         accountTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
@@ -83,6 +89,8 @@ public class AccountsOverview extends JPanel implements Configurable {
         accountTable.getTableHeader().setReorderingAllowed(false);
         accountTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
+        accountTable.getSelectionModel().addListSelectionListener(event -> updateTransactionOverview(accountTable.getSelectedRow()));
+
         TableColumnModel columnModel = accountTable.getColumnModel();
         columnModel.getColumn(0).setMinWidth(60);
         columnModel.getColumn(0).setMaxWidth(60);
@@ -101,6 +109,34 @@ public class AccountsOverview extends JPanel implements Configurable {
         ((DefaultTableCellRenderer)columnModel.getColumn(4).getCellRenderer()).setHorizontalAlignment(JLabel.RIGHT);
         // TODO post 1.0 : play more with column renderers
 
+        transactionTableModel = new TransactionTableModel();
+        transactionTable = new JTable();
+        transactionPane = new JScrollPane(transactionTable);
+        transactionTable.setModel(transactionTableModel);
+        transactionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        transactionTable.setRowSelectionAllowed(false);
+        transactionTable.setColumnSelectionAllowed(false);
+        transactionTable.getTableHeader().setReorderingAllowed(false);
+        transactionTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        TableColumnModel trColumnModel = transactionTable.getColumnModel();
+        trColumnModel.getColumn(0).setMinWidth(90);
+        trColumnModel.getColumn(0).setMaxWidth(90);
+        trColumnModel.getColumn(0).setCellRenderer(new DefaultTableCellRenderer());
+        ((DefaultTableCellRenderer)trColumnModel.getColumn(0).getCellRenderer()).setHorizontalAlignment(JLabel.CENTER);
+
+        trColumnModel.getColumn(1).setMinWidth(60);
+        trColumnModel.getColumn(1).setMaxWidth(60);
+        trColumnModel.getColumn(1).setCellRenderer(new DefaultTableCellRenderer());
+        ((DefaultTableCellRenderer)trColumnModel.getColumn(1).getCellRenderer()).setHorizontalAlignment(JLabel.RIGHT);
+        trColumnModel.getColumn(2).setMinWidth(60);
+        trColumnModel.getColumn(2).setMaxWidth(60);
+        trColumnModel.getColumn(2).setCellRenderer(new DefaultTableCellRenderer());
+        ((DefaultTableCellRenderer)trColumnModel.getColumn(2).getCellRenderer()).setHorizontalAlignment(JLabel.RIGHT);
+
+        trColumnModel.getColumn(3).setMinWidth(200);
+        trColumnModel.getColumn(4).setMinWidth(200);
+        // TODO post 1.0 : play more with column renderers
 
 
         GroupLayout layout = new GroupLayout(this);
@@ -108,11 +144,13 @@ public class AccountsOverview extends JPanel implements Configurable {
         layout.setVerticalGroup(layout.createParallelGroup()
                 .addComponent(treePane)
                 .addComponent(noAccountLabel)
-                .addComponent(accountPane));
+                .addComponent(accountPane)
+                .addComponent(transactionPane));
         layout.setHorizontalGroup(layout.createSequentialGroup()
                 .addComponent(treePane,300,300,300)
                 .addComponent(noAccountLabel)
-                .addComponent(accountPane));
+                .addComponent(accountPane,500,500,500)
+                .addComponent(transactionPane));
 
         this.getActionMap().put(Configuration.SCHEMA_UPDATED, new ConfigurationAction(this) {
             @Override
@@ -164,23 +202,44 @@ public class AccountsOverview extends JPanel implements Configurable {
 
     private void updateAccountOverview() {
         if (selectedSchemaAccount.equals("-1")) {
-            accountPane.setVisible(false);
             noAccountLabel.setVisible(false);
+            accountPane.setVisible(false);
+            transactionPane.setVisible(false);
             return;
         }
         List<AccountsModel.Account> accountList = Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),selectedSchemaAccount);
         if (accountList.size() == 0) {
-            accountPane.setVisible(false);
             noAccountLabel.setVisible(true);
+            accountPane.setVisible(false);
+            transactionPane.setVisible(false);
         } else {
-            accountPane.setVisible(true);
             noAccountLabel.setVisible(false);
+
+            accountPane.setVisible(true);
             accountTableModel.setAccountList(accountList);
+            accountTable.clearSelection();
             accountTable.repaint();
             accountTable.revalidate();
+
+            transactionPane.setVisible(true);
+            transactionTableModel.setTransactionList(new ArrayList<>(), "-1");
+            transactionTable.repaint();
+            transactionTable.revalidate();
+
             this.repaint();
             this.revalidate();
         }
+    }
+
+    private void updateTransactionOverview(int row) {
+        if (row < 0) return;
+        String selectedAccId = String.valueOf(accountTableModel.getValueAt(row, 0));
+        List<TransactionsModel.Transaction> transactionList = Service.TRANSACTIONS.getTransactionsForAccount(getConfiguration().getSelectedYear(), selectedAccId);
+        transactionTableModel.setTransactionList(transactionList, selectedAccId);
+        transactionTable.repaint();
+        transactionTable.revalidate();
+        this.repaint();
+        this.revalidate();
     }
 
     @Override
@@ -259,6 +318,57 @@ public class AccountsOverview extends JPanel implements Configurable {
                 }
                 case 3: return Service.TRANSACTIONS.getAccountTurnover(getConfiguration().getSelectedYear(), account);
                 case 4: return Service.TRANSACTIONS.getAccountBalance(getConfiguration().getSelectedYear(), account);
+                default: throw new IllegalArgumentException("columnIndex");
+            }
+        }
+    }
+
+    private class TransactionTableModel extends AbstractTableModel {
+        private List<TransactionsModel.Transaction> transactionList;
+        private String accountId;
+
+        TransactionTableModel(){
+            transactionList = new ArrayList<>();
+            accountId = "-1";
+        }
+
+        void setTransactionList(List<TransactionsModel.Transaction> transactionList, String accountId) {
+            this.transactionList.clear();
+            this.transactionList.addAll(transactionList);
+            this.accountId = accountId;
+        }
+
+        @Override
+        public int getRowCount() {
+            return transactionList.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 5;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            switch (column){
+                case 0: return "Date";
+                case 1: return "Debit";
+                case 2: return "Credit";
+                case 3: return "Account Pair";
+                case 4: return "Description";
+                default: throw new IllegalArgumentException("invalid column index");
+            }
+        }
+
+        @Override
+        public Object getValueAt(int row, int column) {
+            TransactionsModel.Transaction transaction = transactionList.get(row);
+            switch (column){
+                case 0: return transaction.getDate().substring(0,2) + "." + transaction.getDate().substring(2,4) + "." + getConfiguration().getSelectedYear();
+                case 1: return transaction.getDebit().equals(accountId) ? transaction.getAmount() + " " : "";
+                case 2: return transaction.getCredit().equals(accountId) ? transaction.getAmount() + " " : "";
+                case 3: return transaction.getDebit().equals(accountId) ? Service.ACCOUNT.getFullAccountName(getConfiguration().getSelectedYear(), transaction.getCredit()) : Service.ACCOUNT.getFullAccountName(getConfiguration().getSelectedYear(), transaction.getDebit());
+                case 4: return transaction.getDescription();
                 default: throw new IllegalArgumentException("columnIndex");
             }
         }

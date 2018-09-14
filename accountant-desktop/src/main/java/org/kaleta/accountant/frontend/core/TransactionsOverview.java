@@ -1,7 +1,6 @@
 package org.kaleta.accountant.frontend.core;
 
 import org.kaleta.accountant.backend.model.TransactionsModel;
-import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.configuration.ConfigurationAction;
@@ -170,8 +169,8 @@ public class TransactionsOverview extends JPanel implements Configurable, Docume
                 case 0: return transaction.getDate().substring(0,2) + "." + transaction.getDate().substring(2,4) + "." + getConfiguration().getSelectedYear();
                 case 1: return transaction.getDescription();
                 case 2: return transaction.getAmount();
-                case 3: return getFullAccountName(transaction.getDebit());
-                case 4: return getFullAccountName(transaction.getCredit());
+                case 3: return Service.ACCOUNT.getFullAccountName(getConfiguration().getSelectedYear(), transaction.getDebit());
+                case 4: return Service.ACCOUNT.getFullAccountName(getConfiguration().getSelectedYear(), transaction.getCredit());
                 default: throw new IllegalArgumentException("columnIndex");
             }
         }
@@ -184,18 +183,6 @@ public class TransactionsOverview extends JPanel implements Configurable, Docume
             } else {
                 return Integer.parseInt(tr1.getDate().substring(0,2)) - Integer.parseInt(tr2.getDate().substring(0,2));
             }
-        }
-
-        private String getFullAccountName(String accountId){
-            String schemaName = Service.SCHEMA.getAccountName(getConfiguration().getSelectedYear(), accountId.substring(0,1),
-                    accountId.substring(1,2), accountId.substring(2,3));
-            String semanticName = Service.ACCOUNT.getAccountName(getConfiguration().getSelectedYear(), accountId);
-            if (semanticName.equals(Constants.Account.GENERAL_ACCOUNT_NAME)){
-                return accountId + " " + schemaName;
-            } else {
-                return accountId + " " + schemaName + " - " + semanticName;
-            }
-
         }
     }
 }

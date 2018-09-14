@@ -100,6 +100,24 @@ public class TransactionsService {
     }
 
     /**
+     * Returns transactions for account specified by full id.
+     */
+    public List<TransactionsModel.Transaction> getTransactionsForAccount(String year, String accountFullId) {
+        try {
+            List<TransactionsModel.Transaction> transactionList = new ArrayList<>();
+            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()){
+                if (transaction.getCredit().equals(accountFullId) || transaction.getDebit().equals(accountFullId)){
+                    transactionList.add(transaction);
+                }
+            }
+            return transactionList;
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
      * Returns list of descriptions mapped by account pair.
      */
     public Map<AccountPairModel, Set<String>> getAccountPairDescriptions(String year){
