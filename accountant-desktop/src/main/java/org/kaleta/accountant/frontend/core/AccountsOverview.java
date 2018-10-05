@@ -13,10 +13,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +22,7 @@ public class AccountsOverview extends JPanel implements Configurable {
     private Configuration configuration;
 
     private final DefaultTreeModel accountTreeModel;
+    private final JTree accountTree;
 
     private final AccountTableModel accountTableModel;
     private final JScrollPane accountPane;
@@ -39,11 +37,11 @@ public class AccountsOverview extends JPanel implements Configurable {
 
     public AccountsOverview() {
         accountTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
-        JTree tree = new JTree(accountTreeModel);
-        tree.setRootVisible(false);
-        tree.setToggleClickCount(1);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.setCellRenderer(new DefaultTreeCellRenderer() {
+        accountTree = new JTree(accountTreeModel);
+        accountTree.setRootVisible(false);
+        accountTree.setToggleClickCount(1);
+        accountTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        accountTree.setCellRenderer(new DefaultTreeCellRenderer() {
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 Component c = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
@@ -66,8 +64,8 @@ public class AccountsOverview extends JPanel implements Configurable {
                 return c;
             }
         });
-        tree.addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        accountTree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) accountTree.getLastSelectedPathComponent();
             if (node instanceof SchemaAccountTreeNode) {
                 selectedSchemaAccount = ((SchemaAccountTreeNode) node).getSchemaId();
             } else {
@@ -75,7 +73,7 @@ public class AccountsOverview extends JPanel implements Configurable {
             }
             updateAccountOverview();
         });
-        JScrollPane treePane = new JScrollPane(tree);
+        JScrollPane treePane = new JScrollPane(accountTree);
 
         noAccountLabel = new JLabel("Selected Schema Account has no accounts assigned.");
 
@@ -192,6 +190,10 @@ public class AccountsOverview extends JPanel implements Configurable {
             }
         }
         accountTreeModel.setRoot(root);
+
+        for (int i = 0; i < root.getChildCount(); i++) {
+            accountTree.expandPath(new TreePath(((DefaultMutableTreeNode)root.getChildAt(i)).getPath()));
+        }
 
         selectedSchemaAccount = "-1";
         updateAccountOverview();

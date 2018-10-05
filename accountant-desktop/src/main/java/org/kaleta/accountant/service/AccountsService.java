@@ -225,6 +225,21 @@ public class AccountsService {
     }
 
     /**
+     * Returns name of account specified by full id. <{schema name} - {semantic name}>
+     */
+    public String getAccountAndGroupName(String year,String fullId){
+        String schemaName = Service.SCHEMA.getAccountName(year, fullId.substring(0,1),
+                fullId.substring(1,2), fullId.substring(2,3));
+        String semanticName = this.getAccountName(year, fullId);
+        if (semanticName.equals(Constants.Account.GENERAL_ACCOUNT_NAME)){
+            return schemaName;
+        } else {
+            return schemaName + " - " + semanticName;
+        }
+
+    }
+
+    /**
      * Returns full name of account specified by full id. <{full id} {schema name} - {semantic name}>
      */
     public String getFullAccountName(String year,String fullId){

@@ -30,7 +30,7 @@ public class SelectAccountDialog extends Dialog {
         selectedAccountId = "";
         buildDialogContent();
         updateTree("");
-        this.setSize(300, 500);
+        this.setSize(350, (int) (0.8f * Toolkit.getDefaultToolkit().getScreenSize().height));
     }
 
     private void buildDialogContent() {
@@ -137,6 +137,11 @@ public class SelectAccountDialog extends Dialog {
             root.add(classNode);
         }
         accountTreeModel.setRoot(root);
+
+        for (int i = 0; i < root.getChildCount(); i++) {
+            accountTree.expandPath(new TreePath(((DefaultMutableTreeNode)root.getChildAt(i)).getPath()));
+        }
+
         if (updatedSchemaAccountNode != null) accountTree.expandPath(new TreePath(updatedSchemaAccountNode.getPath()));
     }
 

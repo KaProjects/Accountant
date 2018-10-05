@@ -76,7 +76,7 @@ public class SelectAccountTextField extends JTextField implements Validable{
 
     public void setSelectedAccount(String selectedAccount){
         this.selectedAccount = selectedAccount;
-        this.setText(Service.ACCOUNT.getAccountName(configuration.getSelectedYear(), selectedAccount));
+        this.setText(Service.ACCOUNT.getAccountAndGroupName(configuration.getSelectedYear(), selectedAccount));
     }
 
     @Override
