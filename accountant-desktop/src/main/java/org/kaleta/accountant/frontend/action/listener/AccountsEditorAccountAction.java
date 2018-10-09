@@ -8,17 +8,17 @@ import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
 
-public class AccountsEditorAccountAction extends ActionListener{
+public class AccountsEditorAccountAction extends ActionListener {
     private String schemaId;
     private JTextField tfName;
 
     public AccountsEditorAccountAction(Configurable configurable, String schemaId, JTextField tfName) {
         super(configurable);
         if (schemaId.startsWith("7") || schemaId.startsWith("0")
-                || schemaId.startsWith("0"+Constants.Schema.ACCUMULATED_DEP_GROUP_ID)
-                || schemaId.startsWith("5"+Constants.Schema.DEPRECIATION_GROUP_ID)
-                || schemaId.startsWith("5"+Constants.Schema.CONSUMPTION_GROUP_ID)){
-            throw new IllegalArgumentException("Adding accounts restricted for '"+schemaId+"'");
+                || schemaId.startsWith("0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID)
+                || schemaId.startsWith("5" + Constants.Schema.DEPRECIATION_GROUP_ID)
+                || schemaId.startsWith("5" + Constants.Schema.CONSUMPTION_GROUP_ID)) {
+            throw new IllegalArgumentException("Adding accounts restricted for '" + schemaId + "'");
         }
         this.schemaId = schemaId;
         this.tfName = tfName;
@@ -30,9 +30,9 @@ public class AccountsEditorAccountAction extends ActionListener{
 
     }
 
-    public AccountsModel.Account subactionPerformed(String name){
+    public AccountsModel.Account subactionPerformed(String name) {
         String year = getConfiguration().getSelectedYear();
-        String semanticId = String.valueOf(Service.ACCOUNT.getAccountsBySchemaId(year,schemaId).size());
+        String semanticId = Service.ACCOUNT.getNextSemanticId(getConfiguration().getSelectedYear(), schemaId);
 
         AccountsModel.Account createdAccount = Service.ACCOUNT.createAccount(year, name, schemaId, semanticId, "");
 
@@ -41,7 +41,7 @@ public class AccountsEditorAccountAction extends ActionListener{
         String date = "0101";
 
         String createdAccType = Service.SCHEMA.getSchemaAccountType(year, createdAccount.getSchemaId());
-        switch (createdAccType){
+        switch (createdAccType) {
             case Constants.AccountType.ASSET: {
                 Service.TRANSACTIONS.addTransaction(year, date, "0", createdAccount.getFullId(), Constants.Account.INIT_ACC_ID, Constants.Transaction.OPEN_DESCRIPTION);
                 break;
@@ -53,7 +53,7 @@ public class AccountsEditorAccountAction extends ActionListener{
             // accounts of other types aren't openable, thus no open transaction
         }
 
-        if (schemaId.startsWith("1")){
+        if (schemaId.startsWith("1")) {
             String consumptionAccId = Service.ACCOUNT.getConsumptionAccountId(schemaId, semanticId);
             String conAccName = (name.equals(Constants.Account.GENERAL_ACCOUNT_NAME))
                     ? "General " + Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + Service.SCHEMA.getAccountName(year, "1", createdAccount.getGroupId(), createdAccount.getSchemaAccountId())

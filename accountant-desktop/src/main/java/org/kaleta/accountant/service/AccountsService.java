@@ -253,4 +253,23 @@ public class AccountsService {
         }
 
     }
+
+    /**
+     * Generates next semantic ID.
+     */
+    public String getNextSemanticId(String year, String schemaId){
+        try {
+            Integer maxValue = -1;
+            for (AccountsModel.Account account : getModel(year).getAccount()) {
+                if (account.getSchemaId().startsWith(schemaId)) {
+                    Integer accSemId = Integer.parseInt(account.getSemanticId());
+                    maxValue =  (accSemId > maxValue) ? accSemId : maxValue;
+                }
+            }
+            return String.valueOf(++maxValue);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
 }

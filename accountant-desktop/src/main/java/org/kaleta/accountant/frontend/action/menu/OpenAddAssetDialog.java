@@ -37,7 +37,7 @@ public class OpenAddAssetDialog extends MenuAction {
                 creditClasses);
         dialog.setVisible(true);
         if (dialog.getResult()) {
-            String semanticId = String.valueOf(Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(),dialog.getSchemaId()).size());
+            String semanticId = Service.ACCOUNT.getNextSemanticId(getConfiguration().getSelectedYear(), dialog.getSchemaId());
 
             Service.ACCOUNT.createAccount(year, dialog.getAccName(), dialog.getSchemaId(), semanticId, "");
 
