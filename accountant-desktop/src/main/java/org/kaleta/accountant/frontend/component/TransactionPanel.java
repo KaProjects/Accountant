@@ -27,6 +27,8 @@ public class TransactionPanel extends JPanel implements DocumentListener {
     private final SelectAccountTextField tfDebit;
     private final SelectAccountTextField tfCredit;
 
+    private boolean isSuppressedUpdate = false;
+    
     public TransactionPanel(Configuration configuration, Map<AccountPairModel, Set<String>> accountPairDescriptionMap,
                             Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
                             DocumentListener documentListener, boolean withDate) {
@@ -125,12 +127,21 @@ public class TransactionPanel extends JPanel implements DocumentListener {
         ((JTextField)cbDescription.getEditor().getEditorComponent()).setText(description);
     }
 
+    public void setDebitCreditDescription(String debit, String credit, String description) {
+        isSuppressedUpdate = true;
+        setDebit(debit);
+        setCredit(credit);
+        updateDescriptions();
+        setDescription(description);
+        isSuppressedUpdate = false;
+    }
+
     @Override
     public void changedUpdate(DocumentEvent e) {
         new SwingWorkerHandler() {
             @Override
             protected void runInBackground() {
-                updateDescriptions();
+                if (!isSuppressedUpdate) updateDescriptions();
             }
         }.execute();
     }
@@ -140,7 +151,7 @@ public class TransactionPanel extends JPanel implements DocumentListener {
         new SwingWorkerHandler() {
             @Override
             protected void runInBackground() {
-                updateDescriptions();
+                if (!isSuppressedUpdate) updateDescriptions();
             }
         }.execute();
     }
@@ -150,7 +161,7 @@ public class TransactionPanel extends JPanel implements DocumentListener {
         new SwingWorkerHandler() {
             @Override
             protected void runInBackground() {
-                updateDescriptions();
+                if (!isSuppressedUpdate) updateDescriptions();
             }
         }.execute();
     }

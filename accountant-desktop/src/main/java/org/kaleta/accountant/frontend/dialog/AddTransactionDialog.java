@@ -205,9 +205,7 @@ public class AddTransactionDialog extends Dialog {
             for (ProceduresModel.Procedure.Transaction transaction : procedureList.get(list.getSelectedIndex()).getTransaction()) {
                 addTransactionPanel(transactionPanel -> {
                     transactionPanel.setAmount(transaction.getAmount());
-                    transactionPanel.setCredit(transaction.getCredit());
-                    transactionPanel.setDebit(transaction.getDebit());
-                    transactionPanel.setDescription(transaction.getDescription());
+                    transactionPanel.setDebitCreditDescription(transaction.getDebit(), transaction.getCredit(), transaction.getDescription());
                 });
             }
         }
