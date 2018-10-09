@@ -8,7 +8,6 @@ import org.kaleta.accountant.frontend.common.SwingWorkerHandler;
 import org.kaleta.accountant.frontend.component.DatePickerTextField;
 import org.kaleta.accountant.frontend.component.HintValidatedTextField;
 import org.kaleta.accountant.frontend.component.SelectAccountTextField;
-import org.kaleta.accountant.frontend.component.ValidatedComboBox;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -27,13 +26,10 @@ public class AddResourcesDialog extends Dialog {
     private final Map<String, List<AccountsModel.Account>> creditAccountMap;
     private final List<SchemaModel.Class> creditClasses;
     private final Map<String, List<AccountsModel.Account>> debitAccountMap;
-    private final List<SchemaModel.Class> debitClasses ;
+    private final List<SchemaModel.Class> debitClasses;
 
     private DatePickerTextField textFieldDate;
-    private JComboBox<SchemaModel.Class> cbCreditClass;
-    private JComboBox<SchemaModel.Class.Group> cbCreditGroup;
-    private JComboBox<SchemaModel.Class.Group.Account> cbCreditAccount;
-    private JComboBox<AccountsModel.Account> cbCreditSemantic;
+    private SelectAccountTextField textFieldCredit;
     private final List<ResourcePanel> resourcePanelList;
     private JPanel resourcesPanel;
 
@@ -57,7 +53,7 @@ public class AddResourcesDialog extends Dialog {
 
     private void buildDialogContent() {
         JLabel labelDate = new JLabel("Date: ");
-        textFieldDate = new DatePickerTextField("",this);
+        textFieldDate = new DatePickerTextField("", this);
         JButton buttonToday = new JButton("Today");
         buttonToday.addActionListener(a -> {
             textFieldDate.focusGained(null);
@@ -67,44 +63,7 @@ public class AddResourcesDialog extends Dialog {
 
         JLabel labelPayedBy = new JLabel("Payed By: ");
 
-        cbCreditClass = new ValidatedComboBox<>("Payed By - Class", this);
-        creditClasses.forEach(clazz -> cbCreditClass.addItem(clazz));
-        cbCreditClass.setSelectedIndex(-1);
-
-        cbCreditGroup = new ValidatedComboBox<>("Payed By - Group", this);
-        cbCreditGroup.setSelectedIndex(-1);
-        cbCreditAccount = new ValidatedComboBox<>("Payed By - Account", this);
-        cbCreditAccount.setSelectedIndex(-1);
-        cbCreditSemantic = new ValidatedComboBox<>("Payed By - Semantic", this);
-        cbCreditSemantic.setSelectedIndex(-1);
-
-        cbCreditClass.addActionListener(a -> {
-            cbCreditGroup.removeAllItems();
-            if (cbCreditClass.getSelectedItem() != null) {
-                ((SchemaModel.Class) cbCreditClass.getSelectedItem()).getGroup().forEach(group -> cbCreditGroup.addItem(group));
-            }
-            cbCreditGroup.setSelectedIndex(-1);
-        });
-        cbCreditGroup.addActionListener(a -> {
-            cbCreditAccount.removeAllItems();
-            if (cbCreditGroup.getSelectedItem() != null && cbCreditGroup.getSelectedIndex() >= 0) {
-                ((SchemaModel.Class.Group) cbCreditGroup.getSelectedItem()).getAccount().forEach(account -> cbCreditAccount.addItem(account));
-            }
-            cbCreditAccount.setSelectedIndex(-1);
-        });
-        cbCreditAccount.addActionListener(a -> {
-            cbCreditSemantic.removeAllItems();
-            if (cbCreditClass.getSelectedItem() != null && cbCreditGroup.getSelectedItem() != null && cbCreditAccount.getSelectedItem() != null
-                    && cbCreditAccount.getSelectedIndex() >= 0) {
-                String schemaId = ((SchemaModel.Class) cbCreditClass.getSelectedItem()).getId()
-                        + ((SchemaModel.Class.Group) cbCreditGroup.getSelectedItem()).getId()
-                        + ((SchemaModel.Class.Group.Account) cbCreditAccount.getSelectedItem()).getId();
-                if (creditAccountMap.get(schemaId) != null) {
-                    creditAccountMap.get(schemaId).forEach(semantic -> cbCreditSemantic.addItem(semantic));
-                }
-            }
-            cbCreditSemantic.setSelectedIndex(-1);
-        });
+        textFieldCredit = new SelectAccountTextField(getConfiguration(), creditAccountMap, creditClasses, "Payed by", this);
 
         resourcesPanel = new JPanel();
         resourcesPanel.setLayout(new BoxLayout(resourcesPanel, BoxLayout.Y_AXIS));
@@ -130,7 +89,7 @@ public class AddResourcesDialog extends Dialog {
                     .addComponent(labelDate)
                     .addGroup(layout.createSequentialGroup().addComponent(textFieldDate, 100, 100, 100).addGap(5).addComponent(buttonToday))
                     .addComponent(labelPayedBy)
-                    .addGroup(layout.createSequentialGroup().addComponent(cbCreditClass).addComponent(cbCreditGroup).addComponent(cbCreditAccount).addComponent(cbCreditSemantic))
+                    .addGroup(layout.createSequentialGroup().addComponent(textFieldCredit))
                     .addComponent(separator1)
                     .addComponent(resourcesPane));
             layout.setVerticalGroup(layout.createSequentialGroup()
@@ -140,7 +99,7 @@ public class AddResourcesDialog extends Dialog {
                     .addGap(5)
                     .addComponent(labelPayedBy)
                     .addGap(2)
-                    .addGroup(layout.createParallelGroup().addComponent(cbCreditClass, 25, 25, 25).addComponent(cbCreditGroup, 25, 25, 25).addComponent(cbCreditAccount, 25, 25, 25).addComponent(cbCreditSemantic, 25, 25, 25))
+                    .addGroup(layout.createParallelGroup().addComponent(textFieldCredit, 25, 25, 25))
                     .addComponent(separator1, 10, 10, 10)
                     .addComponent(resourcesPane));
         });
@@ -158,15 +117,14 @@ public class AddResourcesDialog extends Dialog {
         return textFieldDate.getText();
     }
 
-    public String getCreditAcc(){
-        assert cbCreditSemantic.getSelectedItem() != null;
-        return ((AccountsModel.Account)cbCreditSemantic.getSelectedItem()).getFullId();
+    public String getCreditAcc() {
+        return textFieldCredit.getSelectedAccount();
     }
 
-    public List<ResourceData> getResourceData(){
+    public List<ResourceData> getResourceData() {
         List<ResourceData> resourceData = new ArrayList<>();
-        for (ResourcePanel resourcePanel : resourcePanelList){
-            if (resourcePanel.isConsumed()){
+        for (ResourcePanel resourcePanel : resourcePanelList) {
+            if (resourcePanel.isConsumed()) {
                 resourceData.add(new ResourceData(resourcePanel.getResourceId(), resourcePanel.getAmount(), resourcePanel.getDescription()));
             } else {
                 resourceData.add(new ResourceData(resourcePanel.getResourceId(), resourcePanel.getAmount(), resourcePanel.getDescription(), resourcePanel.getDebitId(), resourcePanel.getDebitInfo()));
@@ -183,11 +141,11 @@ public class AddResourcesDialog extends Dialog {
         private final SelectAccountTextField textFieldDebit;
         private final JTextField textFieldDebitInfo;
 
-        private ResourcePanel(){
+        private ResourcePanel() {
             this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
             tfResource = new SelectAccountTextField(getConfiguration(), resourceAccountMap, resourceClass, "Resource", AddResourcesDialog.this);
-            tfAmount = new HintValidatedTextField("","Amount", "set amount", true, AddResourcesDialog.this);
+            tfAmount = new HintValidatedTextField("", "Amount", "set amount", true, AddResourcesDialog.this);
             cbDescription = new JComboBox<>();
             cbDescription.setEditable(true);
             tfResource.getDocument().addDocumentListener(new DocumentListener() {
@@ -246,7 +204,7 @@ public class AddResourcesDialog extends Dialog {
                 AddResourcesDialog.this.validateDialog();
             });
 
-            JButton buttonDelete = new JButton(IconLoader.getIcon(IconLoader.DELETE,new Dimension(10,10)));
+            JButton buttonDelete = new JButton(IconLoader.getIcon(IconLoader.DELETE, new Dimension(10, 10)));
             buttonDelete.addActionListener(e -> {
                 tfResource.setValidatorEnabled(false);
                 tfAmount.setValidatorEnabled(false);
@@ -258,7 +216,7 @@ public class AddResourcesDialog extends Dialog {
                 if (resourcePanelList.isEmpty()) {
                     AddResourcesDialog.this.setDialogValid("No Resource");
                 } else {
-                    for (ResourcePanel resourcePanel : resourcePanelList){
+                    for (ResourcePanel resourcePanel : resourcePanelList) {
                         resourcesPanel.add(resourcePanel);
                     }
                 }
@@ -269,51 +227,51 @@ public class AddResourcesDialog extends Dialog {
             GroupLayout layout = new GroupLayout(this);
             this.setLayout(layout);
             layout.setHorizontalGroup(layout.createParallelGroup().addGroup(layout.createSequentialGroup()
-                    .addComponent(buttonDelete,10,10,10).addComponent(tfResource).addGap(2).addComponent(tfAmount,70,70,70).addGap(2).addComponent(cbDescription,100,100,1000).addComponent(checkBoxConsumed))
+                    .addComponent(buttonDelete, 10, 10, 10).addComponent(tfResource).addGap(2).addComponent(tfAmount, 70, 70, 70).addGap(2).addComponent(cbDescription, 100, 100, 1000).addComponent(checkBoxConsumed))
                     .addGroup(layout.createSequentialGroup()
                             .addGap(5).addComponent(labelDebit).addComponent(textFieldDebit).addGap(5).addComponent(labelDebitInfo).addComponent(textFieldDebitInfo)));
             layout.setVerticalGroup(layout.createSequentialGroup().addGap(2).addGroup(layout.createParallelGroup()
-                    .addComponent(buttonDelete,25,25,25).addComponent(tfResource,25,25,25).addComponent(tfAmount,25,25,25).addComponent(cbDescription,25,25,25).addComponent(checkBoxConsumed,25,25,25))
+                    .addComponent(buttonDelete, 25, 25, 25).addComponent(tfResource, 25, 25, 25).addComponent(tfAmount, 25, 25, 25).addComponent(cbDescription, 25, 25, 25).addComponent(checkBoxConsumed, 25, 25, 25))
                     .addGroup(layout.createParallelGroup()
-                            .addComponent(labelDebit,25,25,25).addComponent(textFieldDebit,25,25,25).addComponent(labelDebitInfo,25,25,25).addComponent(textFieldDebitInfo,25,25,25))
+                            .addComponent(labelDebit, 25, 25, 25).addComponent(textFieldDebit, 25, 25, 25).addComponent(labelDebitInfo, 25, 25, 25).addComponent(textFieldDebitInfo, 25, 25, 25))
                     .addGap(2));
         }
 
-        String getAmount(){
+        String getAmount() {
             return tfAmount.getText();
         }
 
-        String getResourceId(){
+        String getResourceId() {
             return tfResource.getSelectedAccount();
         }
 
-        String getDescription(){
-            return ((JTextField)cbDescription.getEditor().getEditorComponent()).getText();
+        String getDescription() {
+            return ((JTextField) cbDescription.getEditor().getEditorComponent()).getText();
         }
 
-        boolean isConsumed(){
+        boolean isConsumed() {
             return checkBoxConsumed.isSelected();
         }
 
-        String getDebitId(){
+        String getDebitId() {
             return textFieldDebit.getSelectedAccount();
         }
 
-        String getDebitInfo(){
+        String getDebitInfo() {
             return textFieldDebitInfo.getText();
         }
 
         private void updateDescriptions() {
-            synchronized(lock) {
+            synchronized (lock) {
                 String resource = tfResource.getSelectedAccount();
                 if (!resource.trim().isEmpty()) {
                     List<String> descList = resourceDescriptionMap.get(resource);
                     if (descList != null) {
-                        String cbValue = ((JTextField)cbDescription.getEditor().getEditorComponent()).getText();
+                        String cbValue = ((JTextField) cbDescription.getEditor().getEditorComponent()).getText();
                         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) cbDescription.getModel();
                         model.removeAllElements();
                         descList.forEach(model::addElement);
-                        ((JTextField)cbDescription.getEditor().getEditorComponent()).setText(cbValue);
+                        ((JTextField) cbDescription.getEditor().getEditorComponent()).setText(cbValue);
                     }
                 }
             }
