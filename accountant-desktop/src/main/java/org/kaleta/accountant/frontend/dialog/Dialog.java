@@ -7,6 +7,8 @@ import org.kaleta.accountant.frontend.common.Validable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class Dialog extends JDialog implements Configurable, DocumentListener, ActionListener {
+public abstract class Dialog extends JDialog implements Configurable, DocumentListener, ActionListener, ListSelectionListener {
     private Configuration configuration;
     boolean result;
 
@@ -62,7 +64,7 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
         this.contentPanel.setLayout(contentLayout);
 
         panelButtons = new JPanel();
-        panelButtons.setLayout(new BoxLayout(panelButtons, BoxLayout.Y_AXIS));
+        panelButtons.setLayout(new BoxLayout(panelButtons, BoxLayout.X_AXIS));
 
         GroupLayout layout = new GroupLayout(this.getContentPane());
         this.getContentPane().setLayout(layout);
@@ -162,5 +164,10 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
     @Override
     public void changedUpdate(DocumentEvent documentEvent) {
         validateSource(documentEvent.getDocument().getProperty("owner"));
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        validateSource(e.getSource());
     }
 }

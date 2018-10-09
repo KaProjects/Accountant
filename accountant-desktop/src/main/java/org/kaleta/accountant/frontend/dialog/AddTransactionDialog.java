@@ -3,17 +3,22 @@ package org.kaleta.accountant.frontend.dialog;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
+import org.kaleta.accountant.frontend.common.Validable;
 import org.kaleta.accountant.frontend.component.DatePickerTextField;
 import org.kaleta.accountant.frontend.component.TransactionPanel;
+import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class AddTransactionDialog extends Dialog {
     private final Map<AccountPairModel, Set<String>> accountPairDescriptionMap;
@@ -46,7 +51,7 @@ public class AddTransactionDialog extends Dialog {
             validateDialog();
         }
         pack();
-        this.setSize(new Dimension(this.getWidth(), this.getHeight() + 100));
+        this.setSize(new Dimension(this.getWidth() + 500, this.getHeight() + 500));
     }
 
     private void buildDialogContent() {
@@ -56,6 +61,12 @@ public class AddTransactionDialog extends Dialog {
 
         JButton buttonAddTr = new JButton("Add Transaction");
         buttonAddTr.addActionListener(e -> addTransactionPanel());
+
+        JButton buttonAddProcedure = new JButton("Add Procedure");
+        buttonAddProcedure.addActionListener(e -> addProcedurePanel());
+
+        JButton buttonAddResource = new JButton("Add Resource");
+        buttonAddResource.addActionListener(e -> addResourcePanel());
 
         JButton buttonSetDate = new JButton("Set Date");
         JButton buttonConfirmSetDate = new JButton("Confirm");
@@ -121,10 +132,22 @@ public class AddTransactionDialog extends Dialog {
                     .addGap(5)
                     .addComponent(trPane));
         });
-        setButtons(jPanel -> jPanel.add(buttonAddTr));
+        setButtons(jPanel -> {
+            jPanel.add(buttonAddTr);
+            jPanel.add(buttonAddProcedure);
+            jPanel.add(buttonAddResource);
+        });
+    }
+
+    public List<TransactionPanel> getTransactionPanelList() {
+        return transactionPanelList;
     }
 
     private void addTransactionPanel(){
+        addTransactionPanel(null);
+    }
+
+    private void addTransactionPanel(Consumer<TransactionPanel> transactionPanelConsumer){
         TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, accountMap, classList, this, true);
         transactionPanel.addDeleteAction(e1 -> {
             transactionPanel.disableValidators();
@@ -141,13 +164,117 @@ public class AddTransactionDialog extends Dialog {
             panelTransactions.repaint();
             panelTransactions.revalidate();
         });
+
+        if (transactionPanelConsumer != null) {
+            transactionPanelConsumer.accept(transactionPanel);
+        }
+
         panelTransactions.add(transactionPanel);
         transactionPanelList.add(transactionPanel);
         panelTransactions.repaint();
         panelTransactions.revalidate();
     }
 
-    public List<TransactionPanel> getTransactionPanelList() {
-        return transactionPanelList;
+    private void addProcedurePanel() {
+        Dialog dialog = new Dialog(getConfiguration(), "Selecting Procedure...", "Select") {};
+
+        List<ProceduresModel.Procedure> procedureList = Service.PROCEDURES.getProcedureList(getConfiguration().getSelectedYear());
+
+        JList<String> list = new ValidatedProcedureList(procedureList);
+        list.addListSelectionListener(dialog);
+        list.setSelectedIndex(-1);
+        list.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, "   " + value + "   ", index, isSelected, cellHasFocus);
+                c.setBackground(new JPanel().getBackground());
+                c.setFont(new Font(c.getFont().getName(), Font.BOLD, 15));
+                return c;
+            }
+        });
+
+        dialog.setContent( layout -> {
+            layout.setHorizontalGroup(layout.createParallelGroup().addComponent(list));
+            layout.setVerticalGroup(layout.createSequentialGroup().addGap(5).addComponent(list).addGap(10));
+        });
+
+        dialog.setDialogValid("No Item Selected");
+        dialog.pack();
+        dialog.setVisible(true);
+        if (dialog.getResult()) {
+            for (ProceduresModel.Procedure.Transaction transaction : procedureList.get(list.getSelectedIndex()).getTransaction()) {
+                addTransactionPanel(transactionPanel -> {
+                    transactionPanel.setAmount(transaction.getAmount());
+                    transactionPanel.setCredit(transaction.getCredit());
+                    transactionPanel.setDebit(transaction.getDebit());
+                    transactionPanel.setDescription(transaction.getDescription());
+                });
+            }
+        }
     }
+
+    private void addResourcePanel() {
+        String year = getConfiguration().getSelectedYear();
+        Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(year);
+        Map<String, List<AccountsModel.Account>> resourceAccountMap = new HashMap<>();
+        for (String schemaId : allAccountMap.keySet()){
+            if (schemaId.startsWith("1")){
+                resourceAccountMap.put(schemaId, allAccountMap.get(schemaId));
+            }
+        }
+        List<SchemaModel.Class> resourceClasses = new ArrayList<>();
+        resourceClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(1));
+
+        SelectAccountDialog dialog = new SelectAccountDialog(getConfiguration(), resourceAccountMap, resourceClasses);
+        dialog.setVisible(true);
+        if (dialog.getResult()) {
+            String amount = JOptionPane.showInputDialog(this, "Set Amount");
+            if (amount != null) {
+                String selectedAccId = dialog.getSelectedAccountId();
+
+                addTransactionPanel(transactionPanel -> {
+                    transactionPanel.setDebit(selectedAccId);
+                    transactionPanel.setAmount(amount);
+                    transactionPanel.setDescription(Constants.Transaction.RESOURCE_ACQUIRED);
+                });
+                addTransactionPanel(transactionPanel -> {
+                    transactionPanel.setCredit(selectedAccId);
+                    transactionPanel.setAmount(amount);
+                    transactionPanel.setDebit(Service.ACCOUNT.getConsumptionAccountId(selectedAccId.split("\\.")[0],selectedAccId.split("\\.")[1]));
+                    transactionPanel.setDescription(Constants.Transaction.RESOURCE_CONSUMED);
+                });
+            }
+        }
+    }
+
+    private class ValidatedProcedureList extends JList<String> implements Validable {
+
+        ValidatedProcedureList(List<ProceduresModel.Procedure> procedureList) {
+            super(new ListModel<String>() {
+                @Override
+                public int getSize() {
+                    return procedureList.size();
+                }
+
+                @Override
+                public String getElementAt(int index) {
+                    return procedureList.get(index).getName();
+                }
+
+                @Override
+                public void addListDataListener(ListDataListener l) {}
+
+                @Override
+                public void removeListDataListener(ListDataListener l) {}
+
+
+            });
+        }
+
+        @Override
+        public String validator() {
+            return this.isSelectionEmpty() ? "No Item Selected" : null;
+        }
+    }
+
 }
