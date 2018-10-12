@@ -1,6 +1,9 @@
 package org.kaleta.accountant.frontend.action.configuration;
 
 import org.kaleta.accountant.frontend.core.*;
+import org.kaleta.accountant.frontend.core.accounting.BalanceOverview;
+import org.kaleta.accountant.frontend.core.accounting.CashFlowOverview;
+import org.kaleta.accountant.frontend.core.accounting.ProfitOverview;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -31,6 +34,9 @@ public class YearPaneYearSelected extends ConfigurationAction {
         ProfitOverview profitOverview = new ProfitOverview();
         profitOverview.setConfiguration(getConfiguration());
         profitOverview.update();
+        CashFlowOverview cashFlowOverview = new CashFlowOverview();
+        cashFlowOverview.setConfiguration(getConfiguration());
+        cashFlowOverview.update();
 
         if (pane.getConfiguration().getSelectedYear().equals(Service.CONFIG.getActiveYear())){
             JTabbedPane schemaPane = new JTabbedPane();
@@ -70,12 +76,14 @@ public class YearPaneYearSelected extends ConfigurationAction {
             pane.addTab("Accounting", accountingPane);
             accountingPane.addTab("Balance", new JScrollPane(balanceOverview));
             accountingPane.addTab("Profit", new JScrollPane(profitOverview));
+            accountingPane.addTab("Cash Flow", new JScrollPane(cashFlowOverview));
         } else {
             pane.addTab("Schema", new JScrollPane(schemaOverview));
             pane.addTab("Accounts", new JScrollPane(accountsOverview));
             pane.addTab("Transactions", new JScrollPane(transactionsOverview));
             pane.addTab("Balance", new JScrollPane(balanceOverview));
             pane.addTab("Profit", new JScrollPane(profitOverview));
+            pane.addTab("Cash Flow", new JScrollPane(cashFlowOverview));
         }
         pane.revalidate();
         pane.repaint();

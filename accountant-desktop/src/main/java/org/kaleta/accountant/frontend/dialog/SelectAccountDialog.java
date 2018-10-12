@@ -62,6 +62,8 @@ public class SelectAccountDialog extends Dialog {
                         break;
                     }
                 }
+                c.setBackground(Color.LIGHT_GRAY);
+                ((JLabel) c).setOpaque(value.toString().equals(Constants.Account.GENERAL_ACCOUNT_NAME) && !hasFocus);
                 return c;
             }
         });

@@ -72,7 +72,7 @@ public class OpenYearClosingDialog extends MenuAction {
             String type = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
             if (type.equals(Constants.AccountType.OFF_BALANCE)) continue;
 
-            String balance = Service.TRANSACTIONS.getAccountBalance(year, account);
+            String balance = String.valueOf(Service.TRANSACTIONS.getAccountBalance(year, account));
 
             switch (type){
                 case Constants.AccountType.ASSET:{

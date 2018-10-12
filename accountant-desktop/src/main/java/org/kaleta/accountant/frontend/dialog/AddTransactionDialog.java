@@ -236,10 +236,8 @@ public class AddTransactionDialog extends Dialog {
                     transactionPanel.setDescription(Constants.Transaction.RESOURCE_ACQUIRED);
                 });
                 addTransactionPanel(transactionPanel -> {
-                    transactionPanel.setCredit(selectedAccId);
                     transactionPanel.setAmount(amount);
-                    transactionPanel.setDebit(Service.ACCOUNT.getConsumptionAccountId(selectedAccId.split("\\.")[0],selectedAccId.split("\\.")[1]));
-                    transactionPanel.setDescription(Constants.Transaction.RESOURCE_CONSUMED);
+                    transactionPanel.setDebitCreditDescription(Service.ACCOUNT.getConsumptionAccountId(selectedAccId.split("\\.")[0],selectedAccId.split("\\.")[1]), selectedAccId, Constants.Transaction.RESOURCE_CONSUMED);
                 });
             }
         }

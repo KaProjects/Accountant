@@ -49,9 +49,8 @@ public class OpenExcludeDialog extends ActionListener {
 
         AccountsModel.Account accDepAccount = Service.ACCOUNT.getAccumulatedDepAccount(year,account);
 
-        String assetValue = Service.TRANSACTIONS.getAccountBalance(year, account);
-        Integer residualExpense = Integer.parseInt(assetValue)
-                - Integer.parseInt(Service.TRANSACTIONS.getAccountBalance(year, accDepAccount));
+        Integer assetValue = Service.TRANSACTIONS.getAccountBalance(year, account);
+        Integer residualExpense = assetValue - Service.TRANSACTIONS.getAccountBalance(year, accDepAccount);
 
         ExcludeDialog dialog = (residualExpense == 0)
         ? new ExcludeDialog(getConfiguration(),debitAccountMap,debitClasses,revenueAccountMap,revenueClass)
@@ -63,7 +62,7 @@ public class OpenExcludeDialog extends ActionListener {
                         dialog.getExpenseAccount(), accDepAccount.getFullId(),"residual expense");
             }
 
-            Service.TRANSACTIONS.addTransaction(year,dialog.getDate(), assetValue, accDepAccount.getFullId(), account.getFullId(),"excluded");
+            Service.TRANSACTIONS.addTransaction(year,dialog.getDate(), String.valueOf(assetValue), accDepAccount.getFullId(), account.getFullId(),"excluded");
 
             if (dialog.hasRevenue()){
                 Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), dialog.getRevenueValue(),

@@ -24,7 +24,7 @@ public class AppFrame extends JFrame implements Configuration {
         initComponents();
         applySettings();
         this.pack();
-        this.setSize(1600,1000);
+        this.setSize(1800,1000);
 
         int centerPosX = (Toolkit.getDefaultToolkit().getScreenSize().width - this.getSize().width) / 2;
         int centerPosY = (Toolkit.getDefaultToolkit().getScreenSize().height - this.getSize().height) / 2;

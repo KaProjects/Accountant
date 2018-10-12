@@ -147,6 +147,17 @@ public class SchemaService {
     }
 
     /**
+     * Returns group according to class ID and group ID
+     */
+    public SchemaModel.Class.Group getGroup(String year, String classId, String groupId) {
+        try {
+            return getGroupById(getClassById(getModel(year),classId), groupId);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+    /**
      * Returns name of specified schema group.
      */
     public String getGroupName(String year, String classId, String groupId) {

@@ -8,6 +8,7 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
+import org.kaleta.accountant.common.Utils;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
 
 import java.util.*;
@@ -19,11 +20,11 @@ public class TransactionsService {
 
     private TransactionsModel transactionsModel;
 
-    TransactionsService(){
+    TransactionsService() {
         // package-private
     }
 
-    public void invalidateModel(){
+    public void invalidateModel() {
         transactionsModel = null;
     }
 
@@ -40,7 +41,7 @@ public class TransactionsService {
     /**
      * Adds transaction for specified values.
      */
-    public void addTransaction(String year, String date, String amount, String debit, String credit, String description){
+    public void addTransaction(String year, String date, String amount, String debit, String credit, String description) {
         try {
             Manager<TransactionsModel> manager = new TransactionsManager(year);
             TransactionsModel model = manager.retrieve();
@@ -56,10 +57,10 @@ public class TransactionsService {
 
             manager.update(model);
             Initializer.LOG.info("Transaction added: id=" + transaction.getId() + " amount=" + transaction.getAmount()
-                    + " debit=" +  transaction.getDebit() + " credit=" + transaction.getCredit() + " description='"
+                    + " debit=" + transaction.getDebit() + " credit=" + transaction.getCredit() + " description='"
                     + transaction.getDescription() + "'");
             invalidateModel();
-        } catch (ManagerException e){
+        } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
@@ -72,28 +73,28 @@ public class TransactionsService {
     public List<TransactionsModel.Transaction> getTransactions(String year, String debit, String credit) {
         try {
             List<TransactionsModel.Transaction> transactionList = new ArrayList<>();
-            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()){
-                if (debit == null && credit != null){
-                    if (transaction.getCredit().equals(credit)){
+            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()) {
+                if (debit == null && credit != null) {
+                    if (transaction.getCredit().equals(credit)) {
                         transactionList.add(transaction);
                     }
                 }
-                if (debit != null && credit == null){
-                    if (transaction.getDebit().equals(debit)){
+                if (debit != null && credit == null) {
+                    if (transaction.getDebit().equals(debit)) {
                         transactionList.add(transaction);
                     }
                 }
-                if (debit != null && credit != null){
-                    if (transaction.getDebit().equals(debit) && transaction.getCredit().equals(credit)){
+                if (debit != null && credit != null) {
+                    if (transaction.getDebit().equals(debit) && transaction.getCredit().equals(credit)) {
                         transactionList.add(transaction);
                     }
                 }
-                if (debit == null && credit == null){
+                if (debit == null && credit == null) {
                     transactionList.add(transaction);
                 }
             }
             return transactionList;
-        } catch (ManagerException e){
+        } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
@@ -105,13 +106,13 @@ public class TransactionsService {
     public List<TransactionsModel.Transaction> getTransactionsForAccount(String year, String accountFullId) {
         try {
             List<TransactionsModel.Transaction> transactionList = new ArrayList<>();
-            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()){
-                if (transaction.getCredit().equals(accountFullId) || transaction.getDebit().equals(accountFullId)){
+            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()) {
+                if (transaction.getCredit().equals(accountFullId) || transaction.getDebit().equals(accountFullId)) {
                     transactionList.add(transaction);
                 }
             }
             return transactionList;
-        } catch (ManagerException e){
+        } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
@@ -120,16 +121,16 @@ public class TransactionsService {
     /**
      * Returns list of descriptions mapped by account pair.
      */
-    public Map<AccountPairModel, Set<String>> getAccountPairDescriptions(String year){
+    public Map<AccountPairModel, Set<String>> getAccountPairDescriptions(String year) {
         try {
             Map<AccountPairModel, Set<String>> accountPairDescriptionMap = new HashMap<>();
-            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()){
+            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()) {
                 AccountPairModel accountPair = new AccountPairModel(transaction.getDebit(), transaction.getCredit());
                 accountPairDescriptionMap.computeIfAbsent(accountPair, k -> new HashSet<>());
                 accountPairDescriptionMap.get(accountPair).add(transaction.getDescription());
             }
             return accountPairDescriptionMap;
-        } catch (ManagerException e){
+        } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
@@ -138,30 +139,52 @@ public class TransactionsService {
     /**
      * Returns initial value for specified account.
      */
-    public String getAccountInitialValue(String year, AccountsModel.Account account) {
+    public Integer getAccountInitialValue(String year, AccountsModel.Account account) {
         String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
         if (accountType.equals(Constants.AccountType.OFF_BALANCE)
                 || accountType.equals(Constants.AccountType.EXPENSE)
-                || accountType.equals(Constants.AccountType.REVENUE)){
+                || accountType.equals(Constants.AccountType.REVENUE)) {
             throw new IllegalArgumentException("Accounts of type '" + accountType + "' has no initial value!");
         }
         try {
-            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()){
-                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)){
-                    if (tr.getDebit().equals(account.getFullId()) && tr.getCredit().equals(Constants.Account.INIT_ACC_ID)){
-                        return tr.getAmount();
+            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()) {
+                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
+                    if (tr.getDebit().equals(account.getFullId()) && tr.getCredit().equals(Constants.Account.INIT_ACC_ID)) {
+                        return Integer.valueOf(tr.getAmount());
                     }
                 } else {
-                    if (tr.getCredit().equals(account.getFullId()) && tr.getDebit().equals(Constants.Account.INIT_ACC_ID)){
-                        return tr.getAmount();
+                    if (tr.getCredit().equals(account.getFullId()) && tr.getDebit().equals(Constants.Account.INIT_ACC_ID)) {
+                        return Integer.valueOf(tr.getAmount());
                     }
                 }
             }
             throw new IllegalArgumentException("Account id=" + account.getFullId() + " not yet opened!");
-        } catch (ManagerException e){
+        } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
+    }
+
+    /**
+     * Returns mutual initial value for specified list of accounts.
+     */
+    public Integer getAccountListInitialValue(String year, List<AccountsModel.Account> accountList) {
+        int initialValue = 0;
+        for (AccountsModel.Account account : accountList) {
+            initialValue += this.getAccountInitialValue(year, account);
+        }
+        return initialValue;
+    }
+
+    /**
+     * Returns mutual initial value for accounts matching specified schema ID prefix(es).
+     */
+    public Integer getSchemaIdPrefixInitialValue(String year, String... schemaIdPrefixes){
+        int initialValue = 0;
+        for (String schemaIdPrefix : schemaIdPrefixes){
+            initialValue +=  this.getAccountListInitialValue(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
+        }
+        return initialValue;
     }
 
     /**
@@ -169,24 +192,24 @@ public class TransactionsService {
      */
     public String getAccountTurnover(String year, AccountsModel.Account account) {
         String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
-        if (accountType.equals(Constants.AccountType.OFF_BALANCE)){
+        if (accountType.equals(Constants.AccountType.OFF_BALANCE)) {
             throw new IllegalArgumentException("Off-Balance accounts has no turnover!");
         }
         try {
             Integer turnover = 0;
-            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()){
-                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)){
-                    if (tr.getDebit().equals(account.getFullId()) && !tr.getCredit().equals(Constants.Account.INIT_ACC_ID)){
+            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()) {
+                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
+                    if (tr.getDebit().equals(account.getFullId()) && !tr.getCredit().equals(Constants.Account.INIT_ACC_ID)) {
                         turnover += Integer.parseInt(tr.getAmount());
                     }
                 } else {
-                    if (tr.getCredit().equals(account.getFullId()) && !tr.getDebit().equals(Constants.Account.INIT_ACC_ID)){
+                    if (tr.getCredit().equals(account.getFullId()) && !tr.getDebit().equals(Constants.Account.INIT_ACC_ID)) {
                         turnover += Integer.parseInt(tr.getAmount());
                     }
                 }
             }
             return String.valueOf(turnover);
-        } catch (ManagerException e){
+        } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
@@ -195,41 +218,132 @@ public class TransactionsService {
     /**
      * Returns value of balance for specified account.
      */
-    public String getAccountBalance(String year, AccountsModel.Account account) {
+    public Integer getAccountBalance(String year, AccountsModel.Account account) {
         String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
-        if (accountType.equals(Constants.AccountType.OFF_BALANCE)){
+        if (accountType.equals(Constants.AccountType.OFF_BALANCE)) {
             throw new IllegalArgumentException("Off-Balance accounts has no balance!");
         }
         try {
             Integer balance = 0;
-            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()){
-                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)){
-                    if (tr.getDebit().equals(account.getFullId())){
+            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()) {
+                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
+                    if (tr.getDebit().equals(account.getFullId())) {
                         balance += Integer.parseInt(tr.getAmount());
                     }
-                    if (tr.getCredit().equals(account.getFullId())){
-                        if (tr.getDebit().equals(Constants.Account.CLOSING_ACC_ID) || tr.getDebit().equals(Constants.Account.PROFIT_ACC_ID)){
-                            return tr.getAmount();
+                    if (tr.getCredit().equals(account.getFullId())) {
+                        if (tr.getDebit().equals(Constants.Account.CLOSING_ACC_ID) || tr.getDebit().equals(Constants.Account.PROFIT_ACC_ID)) {
+                            return Integer.parseInt(tr.getAmount());
                         }
                         balance -= Integer.parseInt(tr.getAmount());
                     }
                 } else {
-                    if (tr.getDebit().equals(account.getFullId())){
-                        if (tr.getCredit().equals(Constants.Account.CLOSING_ACC_ID) || tr.getCredit().equals(Constants.Account.PROFIT_ACC_ID)){
-                            return tr.getAmount();
+                    if (tr.getDebit().equals(account.getFullId())) {
+                        if (tr.getCredit().equals(Constants.Account.CLOSING_ACC_ID) || tr.getCredit().equals(Constants.Account.PROFIT_ACC_ID)) {
+                            return Integer.parseInt(tr.getAmount());
                         }
                         balance -= Integer.parseInt(tr.getAmount());
                     }
-                    if (tr.getCredit().equals(account.getFullId())){
+                    if (tr.getCredit().equals(account.getFullId())) {
                         balance += Integer.parseInt(tr.getAmount());
                     }
                 }
             }
-            return String.valueOf(balance);
-        } catch (ManagerException e){
+            return balance;
+        } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
+    }
+
+    /**
+     * Returns value of mutual balance for specified list of accounts.
+     */
+    public Integer getAccountListBalance(String year, List<AccountsModel.Account> accountList) {
+        int balance = 0;
+        for (AccountsModel.Account account : accountList) {
+            balance += this.getAccountBalance(year, account);
+        }
+        return balance;
+    }
+
+    /**
+     * Returns value of mutual balance for accounts matching specified schema ID prefix(es).
+     */
+    public Integer getSchemaIdPrefixBalance(String year, String... schemaIdPrefixes){
+        int balance = 0;
+        for (String schemaIdPrefix : schemaIdPrefixes){
+            balance +=  this.getAccountListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
+        }
+        return balance;
+    }
+
+    /**
+     * Returns value of monthly balance for specified account.
+     */
+    public Integer[] getAccountMonthlyBalance(String year, AccountsModel.Account account) {
+        String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
+        if (accountType.equals(Constants.AccountType.OFF_BALANCE)) {
+            throw new IllegalArgumentException("Off-Balance accounts has no balance!");
+        }
+        try {
+            Integer[] monthlyBalance = new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0};
+            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()) {
+                if (tr.getDebit().equals(Constants.Account.CLOSING_ACC_ID)
+                        || tr.getDebit().equals(Constants.Account.PROFIT_ACC_ID)
+                        || tr.getDebit().equals(Constants.Account.INIT_ACC_ID)
+                        || tr.getCredit().equals(Constants.Account.CLOSING_ACC_ID)
+                        || tr.getCredit().equals(Constants.Account.PROFIT_ACC_ID)
+                        || tr.getCredit().equals(Constants.Account.INIT_ACC_ID)) {
+                    continue;
+                }
+                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
+                    if (tr.getDebit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2,4));
+                        monthlyBalance[month - 1] += Integer.parseInt(tr.getAmount());
+                    }
+                    if (tr.getCredit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2,4));
+                        monthlyBalance[month - 1] -= Integer.parseInt(tr.getAmount());
+                    }
+                } else {
+                    if (tr.getDebit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2,4));
+                        monthlyBalance[month - 1] -= Integer.parseInt(tr.getAmount());
+                    }
+                    if (tr.getCredit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2,4));
+                        monthlyBalance[month - 1] += Integer.parseInt(tr.getAmount());
+                    }
+                }
+            }
+            return monthlyBalance;
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns value of mutual monthly balance for specified list of accounts.
+     */
+    public Integer[] getAccountMonthlyListBalance(String year, List<AccountsModel.Account> accountList) {
+        Integer[] monthlyBalance = new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0};
+        for (AccountsModel.Account account : accountList) {
+            monthlyBalance = Utils.mergeArrays(monthlyBalance, this.getAccountMonthlyBalance(year, account));
+        }
+        return monthlyBalance;
+    }
+
+    /**
+     * Returns value of mutual monthly balance for accounts matching specified schema ID prefix(es).
+     */
+    public Integer[] getMonthlySchemaIdPrefixBalance(String year, String... schemaIdPrefixes){
+        Integer[] monthlyBalance = new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0};
+        for (String schemaIdPrefix : schemaIdPrefixes){
+            Integer[] thisBalance = Service.TRANSACTIONS.getAccountMonthlyListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
+            monthlyBalance =  Utils.mergeArrays(monthlyBalance, thisBalance);
+        }
+        return monthlyBalance;
     }
 
     /**
@@ -240,10 +354,10 @@ public class TransactionsService {
         Integer profitBalance = 0;
         try {
             for (TransactionsModel.Transaction tr : getModel(year).getTransaction()) {
-                if (tr.getDebit().equals(profitAccount.getFullId())){
+                if (tr.getDebit().equals(profitAccount.getFullId())) {
                     profitBalance -= Integer.parseInt(tr.getAmount());
                 }
-                if (tr.getCredit().equals(profitAccount.getFullId())){
+                if (tr.getCredit().equals(profitAccount.getFullId())) {
                     profitBalance += Integer.parseInt(tr.getAmount());
                 }
             }
@@ -259,15 +373,15 @@ public class TransactionsService {
     /**
      * Returns date of last depreciation for specified account.
      */
-    public String getLastDepreciationDate(String year, AccountsModel.Account account){
+    public String getLastDepreciationDate(String year, AccountsModel.Account account) {
         try {
             String depAccId = Service.ACCOUNT.getDepreciationAccountId(account.getSchemaId(), account.getSemanticId());
             String accDepAccId = Service.ACCOUNT.getAccumulatedDepAccountId(account.getSchemaId(), account.getSemanticId());
 
             TransactionsModel.Transaction lastDepTransaction = null;
-            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()){
-                if (transaction.getDebit().equals(depAccId) && transaction.getCredit().equals(accDepAccId)){
-                    if (lastDepTransaction == null){
+            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()) {
+                if (transaction.getDebit().equals(depAccId) && transaction.getCredit().equals(accDepAccId)) {
+                    if (lastDepTransaction == null) {
                         lastDepTransaction = transaction;
                     } else {
                         int newTrId = Integer.parseInt(transaction.getId());
@@ -276,12 +390,12 @@ public class TransactionsService {
                     }
                 }
             }
-            if (lastDepTransaction != null){
+            if (lastDepTransaction != null) {
                 return lastDepTransaction.getDate();
             } else {
                 return null;
             }
-        } catch (ManagerException e){
+        } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }

@@ -28,7 +28,7 @@ public class TransactionPanel extends JPanel implements DocumentListener {
     private final SelectAccountTextField tfCredit;
 
     private boolean isSuppressedUpdate = false;
-    
+
     public TransactionPanel(Configuration configuration, Map<AccountPairModel, Set<String>> accountPairDescriptionMap,
                             Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
                             DocumentListener documentListener, boolean withDate) {

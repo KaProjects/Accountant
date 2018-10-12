@@ -87,6 +87,8 @@ public class Constants {
         public static final java.awt.Color OVERVIEW_CLASS = java.awt.Color.getHSBColor(160 / 360f, 1f, 0.5f);
         public static final java.awt.Color OVERVIEW_GROUP = java.awt.Color.getHSBColor(200 / 360f, 1f, 0.5f);
         public static final java.awt.Color OVERVIEW_ACCOUNT = java.awt.Color.getHSBColor(290 / 360f, 1f, 0.5f);
+
+        public static final java.awt.Color CASH_FLOW_PURPLE = java.awt.Color.getHSBColor(306/360f,0.4f,0.7f);
     }
 
     public static class AccountType {
