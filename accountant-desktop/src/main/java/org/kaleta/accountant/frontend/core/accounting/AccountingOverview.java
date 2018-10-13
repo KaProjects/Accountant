@@ -104,6 +104,8 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
     protected JPanel getGroupPanelInstance(String classId, String groupId, String groupType, int valuesType) {
         String year = getConfiguration().getSelectedYear();
 
+        if (!Service.SCHEMA.checkGroupExists(year, classId, groupId)) return getBodyPanelInstance();
+
         JPanel groupBody = getBodyPanelInstance();
         String groupSchemaId = classId + groupId;
         for (SchemaModel.Class.Group.Account schemaAccount : Service.SCHEMA.getGroup(year, classId, groupId).getAccount()) {

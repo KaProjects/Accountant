@@ -23,11 +23,19 @@ Known major bugs:
 ## 1.1
 Released: 5.1.2018
 
-    Improved: accouns overview, edit procedure, schema account/group deletion, add resource dialog.
+    Improved: accounts overview, edit procedure, schema account/group deletion, add resource dialog.
     Implemented: transaction filer, year closing procedure.
     Fixed: major bug, many minor UI/UX fixes
         
 ## 1.2
+Released: 13.10.2018
+
+    Major reorganization of the project - added web, android projects.
+    Improved: account overview - added transaction info, add transaction dialog - now can add procedures and resources,
+              reworked balance and profit overview. 
+    Implemented: many UI/UX enhancements and bug fixes, created cash flow and assets depreciation overview.
+        
+## 1.3
 Released: in progress
 
     before release: 

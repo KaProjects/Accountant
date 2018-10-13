@@ -157,6 +157,18 @@ public class SchemaService {
             throw new ServiceFailureException(e);
         }
     }
+
+    /**
+     * Returns true if specified group exists, false otherwise.
+     */
+    public boolean checkGroupExists(String year, String classId, String groupId){
+        try {
+            SchemaModel.Class.Group group = this.getGroup(year, classId, groupId);
+            return group != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
     /**
      * Returns name of specified schema group.
      */
