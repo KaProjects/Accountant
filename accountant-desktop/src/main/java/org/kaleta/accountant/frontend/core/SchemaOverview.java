@@ -15,7 +15,7 @@ import java.util.List;
 public class SchemaOverview extends JPanel implements Configurable {
     private Configuration configuration;
 
-    public SchemaOverview(){
+    public SchemaOverview(Configuration configuration){
         this.setLayout(new GridBagLayout());
 
         this.getActionMap().put(Configuration.SCHEMA_UPDATED, new ConfigurationAction(this) {
@@ -24,6 +24,8 @@ public class SchemaOverview extends JPanel implements Configurable {
                 SchemaOverview.this.update();
             }
         });
+        setConfiguration(configuration);
+        update();
     }
 
     public void update(){

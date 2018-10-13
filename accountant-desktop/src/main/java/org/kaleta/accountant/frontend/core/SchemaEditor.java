@@ -37,6 +37,8 @@ public class SchemaEditor extends JTabbedPane implements Configurable {
                 SchemaEditor.this.update();
             }
         });
+
+        update();
     }
 
     public void update() {

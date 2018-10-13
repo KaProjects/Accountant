@@ -20,14 +20,20 @@ import java.util.List;
 public class TransactionsOverview extends JPanel implements Configurable, DocumentListener {
     private Configuration configuration;
 
-    private final TransactionTableModel tableModel;
-    private final JTable table;
+    private TransactionTableModel tableModel;
+    private JTable table;
 
     private List<TransactionsModel.Transaction> allTransactionList;
     private String filter;
     private JTextField textFieldFilter;
 
-    public TransactionsOverview(){
+    public TransactionsOverview(Configuration configuration){
+        initComponents();
+        setConfiguration(configuration);
+        update();
+    }
+
+    private void initComponents(){
         allTransactionList = new ArrayList<>();
         filter = "-1";
         tableModel = new TransactionTableModel();

@@ -1,6 +1,7 @@
 package org.kaleta.accountant.frontend.core.accounting;
 
 import org.kaleta.accountant.common.Utils;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.AccountingRowPanel;
 import org.kaleta.accountant.service.Service;
 
@@ -8,8 +9,9 @@ import javax.swing.*;
 
 public class ProfitOverview extends AccountingOverview {
 
-    public ProfitOverview() {
-
+    public ProfitOverview(Configuration configuration){
+        setConfiguration(configuration);
+        update();
     }
 
     public void update() {

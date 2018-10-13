@@ -21,21 +21,27 @@ import java.util.List;
 public class AccountsOverview extends JPanel implements Configurable {
     private Configuration configuration;
 
-    private final DefaultTreeModel accountTreeModel;
-    private final JTree accountTree;
+    private DefaultTreeModel accountTreeModel;
+    private JTree accountTree;
 
-    private final AccountTableModel accountTableModel;
-    private final JScrollPane accountPane;
-    private final JLabel noAccountLabel;
-    private final JTable accountTable;
+    private AccountTableModel accountTableModel;
+    private JScrollPane accountPane;
+    private JLabel noAccountLabel;
+    private JTable accountTable;
 
     private String selectedSchemaAccount;
 
-    private final TransactionTableModel transactionTableModel;
-    private final JScrollPane transactionPane;
-    private final JTable transactionTable;
+    private TransactionTableModel transactionTableModel;
+    private JScrollPane transactionPane;
+    private JTable transactionTable;
 
-    public AccountsOverview() {
+    public AccountsOverview(Configuration configuration){
+        initComponents();
+        setConfiguration(configuration);
+        update();
+    }
+
+    private void initComponents(){
         accountTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
         accountTree = new JTree(accountTreeModel);
         accountTree.setRootVisible(false);

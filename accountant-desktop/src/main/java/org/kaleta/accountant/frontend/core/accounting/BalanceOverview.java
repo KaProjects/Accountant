@@ -2,6 +2,7 @@ package org.kaleta.accountant.frontend.core.accounting;
 
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.AccountingRowPanel;
 import org.kaleta.accountant.service.Service;
 
@@ -13,8 +14,9 @@ import java.util.List;
 
 public class BalanceOverview extends AccountingOverview {
 
-    public BalanceOverview() {
-
+    public BalanceOverview(Configuration configuration){
+        setConfiguration(configuration);
+        update();
     }
 
     public void update() {

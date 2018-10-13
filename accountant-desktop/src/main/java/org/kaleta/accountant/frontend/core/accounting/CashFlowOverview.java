@@ -1,5 +1,6 @@
 package org.kaleta.accountant.frontend.core.accounting;
 
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.AccountingRowPanel;
 import org.kaleta.accountant.service.Service;
 
@@ -7,8 +8,9 @@ import javax.swing.*;
 
 public class CashFlowOverview extends AccountingOverview {
 
-    public CashFlowOverview() {
-
+    public CashFlowOverview(Configuration configuration){
+        setConfiguration(configuration);
+        update();
     }
 
     @Override

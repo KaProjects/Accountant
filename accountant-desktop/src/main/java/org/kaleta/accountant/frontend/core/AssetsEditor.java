@@ -148,6 +148,8 @@ public class AssetsEditor extends JPanel implements Configurable {
                 cbGroups.setSelectedIndex(0);
             }
         });
+
+        update();
     }
 
     public void update() {

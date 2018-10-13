@@ -49,7 +49,7 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
         return bodyPanel;
     }
 
-    protected JPanel getSumPanelInstance(AccountingRowPanel header, boolean isHeaderOnTop, JPanel... contentPanels) {
+    protected JPanel getSumPanelInstance(JPanel header, boolean isHeaderOnTop, JPanel... contentPanels) {
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         for (JPanel panel : contentPanels) {
