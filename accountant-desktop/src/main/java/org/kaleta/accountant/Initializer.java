@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class Initializer {
     public static final String NAME = "Accountant";
-    public static final String VERSION = "1.2-snapshot";
+    public static final String VERSION = "1.2";
     public static final Logger LOG = Logger.getLogger("Logger");
     public static int CONTEXT;
 
@@ -63,9 +63,6 @@ public class Initializer {
                         Service.CONFIG.setActiveYear(name);
                     }
                 }
-
-                //System.out.println(Service.ANALYSIS.computeL1());
-
 
                 new AppFrame().setVisible(true);
 
