@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html ng-app="Accountant"> <!--ng-app="Tester"-->
+<head>
+    <meta charset="UTF-8">
+    <title>Accountant</title>
+
+    <link rel="stylesheet" href="patternfly/dist/css/patternfly.min.css">
+    <link rel="stylesheet" href="patternfly/dist/css/patternfly-additions.min.css">
+
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/jquery.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/bootstrap.min.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/bootstrap-select.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/jquery-ui.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/jquery.dataTables.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/dataTables.select.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/moment.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/d3.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/c3.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/patternfly-settings.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/patternfly-settings-colors.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/patternfly-settings-charts.js"></script>
+
+    <!--<script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.11/angular.js"></script>
+    <script src='http://ajax.googleapis.com/ajax/libs/angularjs/1.5.11/angular-resource.js'></script>
+
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular-dragdrop.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular-datatables.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular-datatables.select.min.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular-sanitize.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular-animate.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/ui-bootstrap-tpls.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular-bootstrap-prettify.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/lodash.min.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular-patternfly.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular-ui-router.min.js"></script>
+    <script src="http://www.patternfly.org/angular-patternfly/grunt-scripts/angular-drag-and-drop-lists.js"></script>
+
+    <script src="module.js"></script>
+    <script src="transaction/controller.js"></script>
+    <!--<script src="transaction/service-firebase.js"></script>-->
+    <script src="transaction/service.js"></script>
+    <script src="transaction/wizard/controller.js"></script>
+
+    <!--<script src="core/app.js"></script>-->
+    <!--<link rel="stylesheet" href="css/row.css"/>-->
+</head>
+
+<body>
+
+<div ng-include="'transaction/container.html'"></div>
+
+<!--<div ng-controller="MainCtrl as ctrl">-->
+
+    <!--&lt;!&ndash;<h1>{{ctrl.prop}}</h1>&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<input type="text" ng-model="main.key" required>&ndash;&gt;-->
+    <!--&lt;!&ndash;<input type="text" ng-model="main.value" required>&ndash;&gt;-->
+    <!--&lt;!&ndash;<button class="btn btn-primary" ng-click="main.insertRecord()">INSERT</button>&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<br/><br/>&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<input type="text" ng-model="main.id" required>&ndash;&gt;-->
+    <!--&lt;!&ndash;<button class="btn btn-primary" ng-click="main.deleteRecord()">DELETE</button>&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<hr class="col-md-12">&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<h3>Data listing...</h3>&ndash;&gt;-->
+    <!--&lt;!&ndash;<div class="col-md-4">&ndash;&gt;-->
+    <!--&lt;!&ndash;<record class="callout" ng-repeat="record in main.records"/>&ndash;&gt;-->
+    <!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<button class="btn btn-primary" ng-click="ctrl.loadTransactions()">LOAD</button>&ndash;&gt;-->
+    <!---->
+<!--</div>-->
+
+
+</body>
+</html>

@@ -1,2 +1,7 @@
 .idea
 target
+classes
+*.rar
+firebase-config.js
+*.rar
+*.zip

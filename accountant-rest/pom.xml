@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.2.RELEASE</version>
+    </parent>
+
+    <groupId>org.kaleta</groupId>
+    <artifactId>accountant-rest</artifactId>
+    <version>0.0-snapshot</version>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.11</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.2.17.Final</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.0.6.RELEASE</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.0.2.RELEASE</version>
+        </dependency>
+
+
+
+
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                </configuration>
+            </plugin>
+
+
+        </plugins>
+    </build>
+
+    <profiles>
+        <!--
+            This profile builds a Docker image with the Spring Boot application.
+            Before being able to build a Docker image using Maven, the environment
+            variable DOCKER_HOME need to be set to the endpoint of the local
+            Docker API.
+            Example *nix: export set DOCKER_HOME=http://localhost:2375
+            The Docker image is built using the following command:
+            mvn -Pdockerimage package
+
+            If a Docker image with the image name and tag (project version) already
+            exists then one of the following may happen depending on the
+            environment in which the build is run:
+            - The existing image is given the image name and tag <none>.
+            - No new Docker image is generated, but the existing image is retained.
+            The suggested approach is to first delete any existing Docker image
+            using the following Maven command before generating a new image:
+            mvn -Pdockerimage clean
+        -->
+        <profile>
+            <id>dockerimage</id>
+            <dependencies>
+                <!--
+                    Here you declare dependencies to additional artifacts that
+                    are to be copied into the Docker image.
+                    No need to add a dependency to the Spring Boot application JAR
+                    file here.
+                -->
+                <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+            </dependencies>
+            <properties>
+                <!-- Name of Docker image that will be built. -->
+                <docker.image.name>springboot-webapp</docker.image.name>
+                <!--
+                    Directory that holds Docker file and static content
+                    necessary to build the Docker image.
+                -->
+                <docker.image.src.root>src/main/resources/docker</docker.image.src.root>
+                <!--
+                    Directory to which the Docker image artifacts and the Docker
+                    file will be copied to and which will serve as the root directory
+                    when building the Docker image.
+                -->
+                <docker.build.directory>${project.build.directory}/docker</docker.build.directory>
+            </properties>
+            <build>
+                <plugins>
+                    <!--
+                        Copy the directory containing static content to build directory.
+                    -->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-resources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${docker.build.directory}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${docker.image.src.root}</directory>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--
+                        Copy the JAR file containing the Spring Boot application
+                        to the application/lib directory.
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <!--
+                                                Specify groupId, artifactId, version and type for the
+                                                artifact you want to package in the Docker image.
+                                                In the case of a Spring Boot application, these are
+                                                the same as the project group id, artifact id
+                                                and version.
+                                            -->
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>${project.artifactId}</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>jar</type>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${docker.build.directory}/application/lib</outputDirectory>
+                                            <!--
+                                                Specify the destination name as to have one and the same name
+                                                to refer to in the Docker file.
+                                            -->
+                                            <destFileName>springboot-webapp.jar</destFileName>
+                                        </artifactItem>
+                                        <!-- Add additional artifacts to be packaged in the Docker image here. -->
+
+                                    </artifactItems>
+                                    <outputDirectory>${docker.build.directory}</outputDirectory>
+                                    <overWriteReleases>true</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
