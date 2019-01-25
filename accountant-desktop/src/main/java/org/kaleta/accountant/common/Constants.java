@@ -76,6 +76,7 @@ public class Constants {
         public static final String PROFIT_ACC_ID = "710.0";
 
         public static final String PERSONAL_CAPITAL_ACC_ID = "400.0";
+        public static final String ACCUMULATED_EARNINGS_ACC_ID = "401.0";
 
         public static final String GENERAL_ACCOUNT_NAME = "general";
     }

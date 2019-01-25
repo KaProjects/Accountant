@@ -21,7 +21,7 @@ public class OpenYearClosingDialog extends MenuAction {
     @Override
     protected void actionPerformed() {
         lastYear = Service.CONFIG.getActiveYear();
-        newYear = "2018";
+        newYear = "2019";
 
         closeAccounts();
         initYear();
@@ -144,7 +144,6 @@ public class OpenYearClosingDialog extends MenuAction {
         // add + open L accounts
         for (TransactionsModel.Transaction tr : Service.TRANSACTIONS.getTransactions(lastYear, null, Constants.Account.CLOSING_ACC_ID)) {
             if (tr.getDebit().startsWith("0")) continue;
-            if (tr.getDebit().startsWith(Constants.Account.PERSONAL_CAPITAL_ACC_ID)) continue;
             if (tr.getDebit().equals(Constants.Account.PROFIT_ACC_ID)) continue;
             AccountsModel.Account acc = Service.ACCOUNT.getAccount(lastYear, tr.getDebit());
             Service.ACCOUNT.createAccount(newYear, acc.getName(), acc.getSchemaId(), acc.getSemanticId(), acc.getMetadata());
@@ -180,11 +179,9 @@ public class OpenYearClosingDialog extends MenuAction {
             }
         }
 
-        // set personal capital
-        String lastYearPcValue = Service.TRANSACTIONS.getTransactions(lastYear, Constants.Account.PERSONAL_CAPITAL_ACC_ID, Constants.Account.CLOSING_ACC_ID).get(0).getAmount();
+        // set accumulated earnings
         String lastYearProfit = Service.TRANSACTIONS.getTransactions(lastYear, Constants.Account.PROFIT_ACC_ID, Constants.Account.CLOSING_ACC_ID).get(0).getAmount();
-        String newYearPcValue = String.valueOf((Integer.parseInt(lastYearPcValue) + Integer.parseInt(lastYearProfit)));
-        Service.TRANSACTIONS.addTransaction(newYear, openDate, newYearPcValue, Constants.Account.INIT_ACC_ID, Constants.Account.PERSONAL_CAPITAL_ACC_ID, Constants.Transaction.OPEN_DESCRIPTION);
+        Service.TRANSACTIONS.addTransaction(newYear, openDate, lastYearProfit, Constants.Account.INIT_ACC_ID, Constants.Account.ACCUMULATED_EARNINGS_ACC_ID, "Profit from " + lastYear);
     }
 
     private void importProcedures(){
