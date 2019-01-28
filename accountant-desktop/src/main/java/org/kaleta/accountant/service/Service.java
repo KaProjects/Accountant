@@ -35,4 +35,9 @@ public class Service {
      * Instance of analysis service class
      */
     public static final AnalysisService ANALYSIS = new AnalysisService();
+
+    /**
+     * Instance of Firebase service class
+     */
+    public static final FirebaseService FIREBASE = new FirebaseService();
 }

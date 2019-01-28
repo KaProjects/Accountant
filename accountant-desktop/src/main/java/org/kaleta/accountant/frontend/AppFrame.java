@@ -52,9 +52,14 @@ public class AppFrame extends JFrame implements Configuration {
         createMenu.setMnemonic(KeyEvent.VK_C);
         createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK)));
 
+        JMenu importMenu = new JMenu("Import");
+        importMenu.setMnemonic(KeyEvent.VK_I);
+        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_MASK)));
+
         menuBar.add(fileMenu);
         menuBar.add(addMenu);
         menuBar.add(createMenu);
+        menuBar.add(importMenu);
         menuBar.add(new JPanel());
         menuBar.add(new YearMenu());
     }
