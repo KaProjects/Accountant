@@ -89,12 +89,10 @@ public class SelectAccountTextField extends JTextField implements Validable {
     }
 
     public String getSelectedAccount() {
-        System.out.println("GET " + selectedAccount);
         return selectedAccount;
     }
 
     public void setSelectedAccount(String selectedAccount) {
-        System.out.println("SET " + selectedAccount);
         this.selectedAccount = selectedAccount;
         this.setText(Service.ACCOUNT.getAccountAndGroupName(configuration.getSelectedYear(), selectedAccount));
     }

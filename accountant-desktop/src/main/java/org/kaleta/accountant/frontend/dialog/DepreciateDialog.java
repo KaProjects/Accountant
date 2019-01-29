@@ -19,6 +19,9 @@ public class DepreciateDialog extends Dialog {
         this.configs = configs;
         buildDialogContent();
         pack();
+        int adjustedHeight = (this.getHeight() > Toolkit.getDefaultToolkit().getScreenSize().height - 100)
+                ? Toolkit.getDefaultToolkit().getScreenSize().height - 100 : this.getHeight();
+        setSize(new Dimension(this.getWidth(), adjustedHeight));
     }
 
     private void buildDialogContent() {
