@@ -1,5 +1,6 @@
 package org.kaleta.accountant.frontend.core.accounting;
 
+import org.kaleta.accountant.common.Utils;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.AccountingRowPanel;
 import org.kaleta.accountant.service.Service;
@@ -23,14 +24,24 @@ public class CashFlowOverview extends AccountingOverview {
 
         this.add(new AccountingRowPanel(valuesType));
 
-        Integer cashFlow = Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "20", "21", "23");
-        Integer[] cashFlowMonthly = Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "20", "21", "23");
-        Integer initialCashFlow = Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, "20", "21", "23");
+        Integer cashFlow = Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "20", "21", "23", "30")
+                - Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "22", "31");
+
+        Integer[] cashFlowMonthly = Utils.substractArrays(Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "20", "21", "23", "30"),
+                Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "22", "31"));
+
+        Integer initialCashFlow = Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, "20", "21", "23", "30")
+                - Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, "22", "31");
+
         AccountingRowPanel header = new AccountingRowPanel("X", AccountingRowPanel.SUM, "Cash Flow", cashFlow, cashFlowMonthly, initialCashFlow);
+
         this.add(getSumPanelInstance(header, false,
-                getGroupPanelInstance("2", "0", AccountingRowPanel.CF, valuesType),
-                getGroupPanelInstance("2", "1", AccountingRowPanel.CF, valuesType),
-                getGroupPanelInstance("2", "3", AccountingRowPanel.CF, valuesType)));
+                getGroupPanelInstance("2", "0", AccountingRowPanel.CF, valuesType, true),
+                getGroupPanelInstance("2", "1", AccountingRowPanel.CF, valuesType, true),
+                getGroupPanelInstance("2", "3", AccountingRowPanel.CF, valuesType, true),
+                getGroupPanelInstance("2", "2", AccountingRowPanel.CF, valuesType, false),
+                getGroupPanelInstance("3", "0", AccountingRowPanel.CF, valuesType, true),
+                getGroupPanelInstance("3", "1", AccountingRowPanel.CF, valuesType, false)));
 
         this.repaint();
         this.revalidate();

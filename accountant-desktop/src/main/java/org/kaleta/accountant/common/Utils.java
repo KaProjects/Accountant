@@ -27,6 +27,17 @@ public class Utils {
     }
 
     /**
+     * Multiply the values of the array with specified multiplier.
+     */
+    public static Integer[] multiplyArrayValues(Integer[] array, Integer multiplier){
+        Integer[] result = new Integer[array.length];
+        for (int i=0;i<array.length;i++) {
+            result[i] = multiplier * array[i];
+        }
+        return result;
+    }
+
+    /**
      * Substracts two integer arrays of the same length.
      */
     public static String[] IntegerToStringArray(Integer[] array){
