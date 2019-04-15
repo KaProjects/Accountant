@@ -40,4 +40,9 @@ public class Service {
      * Instance of Firebase service class
      */
     public static final FirebaseService FIREBASE = new FirebaseService();
+
+    /**
+     * Instance of BudgetModel service class
+     */
+    public static final BudgetService BUDGET = new BudgetService();
 }

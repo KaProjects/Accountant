@@ -27,6 +27,7 @@ public class OpenYearClosingDialog extends MenuAction {
         initYear();
         openAccounts();
         importProcedures();
+        // TODO: 4.2.2019 import or init budget
         Service.CONFIG.setActiveYear(newYear);
         getConfiguration().selectYear(newYear);
 

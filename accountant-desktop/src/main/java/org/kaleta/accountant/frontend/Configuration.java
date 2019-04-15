@@ -15,6 +15,7 @@ public interface Configuration {
     int ACCOUNT_UPDATED = 4;
     int TRANSACTION_UPDATED = 5;
     int PROCEDURE_UPDATED = 6;
+    int BUDGET_UPDATED = 7;
 
     /**
      * Recursively updates component's tree of app.

@@ -5,6 +5,7 @@ import org.kaleta.accountant.frontend.core.accounting.BalanceOverview;
 import org.kaleta.accountant.frontend.core.accounting.CashFlowOverview;
 import org.kaleta.accountant.frontend.core.accounting.ProfitOverview;
 import org.kaleta.accountant.frontend.core.analysis.AssetDepreciationOverview;
+import org.kaleta.accountant.frontend.core.budgeting.BudgetingPanel;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -46,6 +47,7 @@ public class YearPaneYearSelected extends ConfigurationAction {
             pane.addTab("Transactions", transactionsPane);
             transactionsPane.addTab("Overview", new JScrollPane(transactionsOverview));
             transactionsPane.addTab("Editor", new TransactionsEditor(getConfiguration()));
+
         } else {
             pane.addTab("Schema", new JScrollPane(schemaOverview));
             pane.addTab("Accounts", new JScrollPane(accountsOverview));
@@ -61,6 +63,10 @@ public class YearPaneYearSelected extends ConfigurationAction {
         JTabbedPane analysisPane = new JTabbedPane();
         pane.addTab("Analysis", analysisPane);
         analysisPane.addTab("Assets Depreciation", new JScrollPane(new AssetDepreciationOverview(getConfiguration())));
+
+        pane.addTab("Budgeting", new JScrollPane(new BudgetingPanel(getConfiguration())));
+
+
 
         pane.revalidate();
         pane.repaint();

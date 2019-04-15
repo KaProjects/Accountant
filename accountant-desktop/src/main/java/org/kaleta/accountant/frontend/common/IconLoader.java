@@ -18,6 +18,8 @@ public class IconLoader {
     public static final String TOGGLE_HIDE = "/icon/toggleHide.png";
     public static final String CHART = "/icon/chart.png";
     public static final String WARNING = "/icon/warning.png";
+    public static final String SAVE_CHANGES = "/icon/savechanges.png";
+    public static final String DISCARD_CHANGES = "/icon/discardchanges.png";
 
 
     public static Icon getIcon(String iconPath){
