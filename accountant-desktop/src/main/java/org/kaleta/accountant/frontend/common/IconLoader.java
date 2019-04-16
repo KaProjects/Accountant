@@ -17,6 +17,7 @@ public class IconLoader {
     public static final String TOGGLE_EXPAND = "/icon/toggleExpand.png";
     public static final String TOGGLE_HIDE = "/icon/toggleHide.png";
     public static final String CHART = "/icon/chart.png";
+    public static final String WARNING = "/icon/warning.png";
 
 
     public static Icon getIcon(String iconPath){
