@@ -139,6 +139,36 @@ public class AccountsService {
     }
 
     /**
+     * Composes full id of financial creation account of specified finance account.
+     */
+    public String getFinCreationAccountId(String schemaId, String semanticId) {
+        if (!schemaId.startsWith("230")){
+            throw new IllegalArgumentException("Only accounts of 230 have financial creation accounts");
+        }
+        return Constants.Schema.FIN_CREATION_FULL_ID + "." + semanticId;
+    }
+
+    /**
+     * Composes full id of financial revenue revaluation account of specified finance account.
+     */
+    public String getFinRevRevaluationAccountId(String schemaId, String semanticId) {
+        if (!schemaId.startsWith("230")){
+            throw new IllegalArgumentException("Only accounts of 230 have financial revenue revaluation accounts");
+        }
+        return Constants.Schema.FIN_REV_REVALUATION_FULL_ID + "." + semanticId;
+    }
+
+    /**
+     * Composes full id of financial expense revaluation account of specified finance account.
+     */
+    public String getFinExpRevaluationAccountId(String schemaId, String semanticId) {
+        if (!schemaId.startsWith("230")){
+            throw new IllegalArgumentException("Only accounts of 230 have financial expense revaluation accounts");
+        }
+        return Constants.Schema.FIN_EXP_REVALUATION_FULL_ID + "." + semanticId;
+    }
+
+    /**
      * Returns accumulated depreciation account for specified asset account.
      */
     public AccountsModel.Account getAccumulatedDepAccount(String year, AccountsModel.Account account){
@@ -186,6 +216,60 @@ public class AccountsService {
                 }
             }
             throw new IllegalArgumentException("Consumption account not found for '" + account.getFullId() + "'");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns financial creation account for specified finance account.
+     */
+    public AccountsModel.Account getFinCreationAccount(String year, AccountsModel.Account account){
+        String accDepId = getFinCreationAccountId(account.getSchemaId(), account.getSemanticId());
+        try {
+            for (AccountsModel.Account acc : getModel(year).getAccount()) {
+                if (acc.getFullId().equals(accDepId)) {
+                    return acc;
+                }
+            }
+            throw new IllegalArgumentException("Financial creation account not found for '" + account.getFullId() + "'");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns financial revenue revaluation account for specified finance account.
+     */
+    public AccountsModel.Account getFinRevRevaluationAccount(String year, AccountsModel.Account account){
+        String accDepId = getFinRevRevaluationAccountId(account.getSchemaId(), account.getSemanticId());
+        try {
+            for (AccountsModel.Account acc : getModel(year).getAccount()) {
+                if (acc.getFullId().equals(accDepId)) {
+                    return acc;
+                }
+            }
+            throw new IllegalArgumentException("Financial revenue revaluation account not found for '" + account.getFullId() + "'");
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns financial expense revaluation account for specified finance account.
+     */
+    public AccountsModel.Account getFinExpRevaluationAccount(String year, AccountsModel.Account account){
+        String accDepId = getFinExpRevaluationAccountId(account.getSchemaId(), account.getSemanticId());
+        try {
+            for (AccountsModel.Account acc : getModel(year).getAccount()) {
+                if (acc.getFullId().equals(accDepId)) {
+                    return acc;
+                }
+            }
+            throw new IllegalArgumentException("Financial expense revaluation account not found for '" + account.getFullId() + "'");
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

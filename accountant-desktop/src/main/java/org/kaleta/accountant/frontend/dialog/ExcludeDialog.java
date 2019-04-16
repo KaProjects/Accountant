@@ -60,22 +60,6 @@ public class ExcludeDialog extends Dialog {
     }
 
     private void buildDialogContent() {
-
-        JButton buttonOk = new JButton("Confirm");
-        buttonOk.addActionListener(a -> {
-            if ((!hasExpense || !textFieldExpense.getSelectedAccount().trim().isEmpty())
-                    && (!hasRevenue || (!textFieldDebit.getSelectedAccount().trim().isEmpty() && !textFieldRevenue.getSelectedAccount().trim().isEmpty() && !textFieldRevenueValue.getText().trim().isEmpty()))
-                    && (!textFieldDate.getText().trim().isEmpty() && textFieldDate.getText().length() == 4)){
-                if (JOptionPane.showConfirmDialog(this.getParent(), "Are you sure you want to exclude this asset?",
-                        "Excluding Asset", JOptionPane.YES_NO_OPTION) == 0){
-                    result = true;
-                    dispose();
-                }
-            } else {
-                JOptionPane.showMessageDialog(ExcludeDialog.this, "Mandatory attribute is not set!", "Value Missing", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
         JLabel labelDate = new JLabel("Date: ");
         textFieldDate = new DatePickerTextField("", this);
         JButton buttonToday = new JButton("Today");
