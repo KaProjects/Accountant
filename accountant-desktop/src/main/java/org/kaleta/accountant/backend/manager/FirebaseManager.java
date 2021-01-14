@@ -11,9 +11,8 @@ import com.google.firebase.internal.NonNull;
 import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.model.FirebaseTransactionModel;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,10 +37,10 @@ public class FirebaseManager {
     private FirebaseManager() throws ManagerException {
         FirebaseOptions options;
         try {
-            FileInputStream serviceAccount = new FileInputStream(new File(Initializer.class.getResource(serviceKey).getFile()));
+            InputStream serviceKeyStream = Initializer.class.getResourceAsStream(serviceKey);
 
             options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setCredentials(GoogleCredentials.fromStream(serviceKeyStream))
                     .setDatabaseUrl(databaseUrl)
                     .build();
         } catch (IOException e) {
