@@ -142,30 +142,30 @@ public class AccountsService {
      * Composes full id of financial creation account of specified finance account.
      */
     public String getFinCreationAccountId(String schemaId, String semanticId) {
-        if (!schemaId.startsWith("230")){
-            throw new IllegalArgumentException("Only accounts of 230 have financial creation accounts");
+        if (!schemaId.startsWith("23")){
+            throw new IllegalArgumentException("Only accounts of 23x have financial creation accounts");
         }
-        return Constants.Schema.FIN_CREATION_FULL_ID + "." + semanticId;
+        return Constants.Schema.FIN_CREATION_FULL_ID + "." + schemaId.substring(2,3) + "-" + semanticId;
     }
 
     /**
      * Composes full id of financial revenue revaluation account of specified finance account.
      */
     public String getFinRevRevaluationAccountId(String schemaId, String semanticId) {
-        if (!schemaId.startsWith("230")){
-            throw new IllegalArgumentException("Only accounts of 230 have financial revenue revaluation accounts");
+        if (!schemaId.startsWith("23")){
+            throw new IllegalArgumentException("Only accounts of 23x have financial revenue revaluation accounts");
         }
-        return Constants.Schema.FIN_REV_REVALUATION_FULL_ID + "." + semanticId;
+        return Constants.Schema.FIN_REV_REVALUATION_FULL_ID + "." + schemaId.substring(2,3) + "-" + semanticId;
     }
 
     /**
      * Composes full id of financial expense revaluation account of specified finance account.
      */
     public String getFinExpRevaluationAccountId(String schemaId, String semanticId) {
-        if (!schemaId.startsWith("230")){
-            throw new IllegalArgumentException("Only accounts of 230 have financial expense revaluation accounts");
+        if (!schemaId.startsWith("23")){
+            throw new IllegalArgumentException("Only accounts of 23x have financial expense revaluation accounts");
         }
-        return Constants.Schema.FIN_EXP_REVALUATION_FULL_ID + "." + semanticId;
+        return Constants.Schema.FIN_EXP_REVALUATION_FULL_ID + "." + schemaId.substring(2,3) + "-" + semanticId;
     }
 
     /**

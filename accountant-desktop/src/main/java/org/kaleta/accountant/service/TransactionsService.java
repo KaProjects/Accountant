@@ -406,8 +406,8 @@ public class TransactionsService {
      * Note: an account needs revaluation if no revaluation was done after purchasing new assets.
      */
     public boolean financialAssetNeedsRevaluation(String year, AccountsModel.Account account) {
-        if (!account.getSchemaId().startsWith("230")) {
-            throw new IllegalArgumentException("Only accounts of 230 are considered for revaluation");
+        if (!account.getSchemaId().startsWith("23")) {
+            throw new IllegalArgumentException("Only accounts of 23x are considered for revaluation");
         }
         String creationAccId = Service.ACCOUNT.getFinCreationAccountId(account.getSchemaId(), account.getSemanticId());
         String revRevAccId = Service.ACCOUNT.getFinRevRevaluationAccountId(account.getSchemaId(), account.getSemanticId());

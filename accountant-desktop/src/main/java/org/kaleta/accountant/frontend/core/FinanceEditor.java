@@ -81,7 +81,7 @@ public class FinanceEditor extends JPanel implements Configurable {
     private void updateLTFinItems() {
         ltFinItems.removeAll();
 
-        for (AccountsModel.Account account : Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(), "230")) {
+        for (AccountsModel.Account account : Service.ACCOUNT.getAccountsBySchemaId(getConfiguration().getSelectedYear(), "23")) {
             ltFinItems.add(new LongTermFinPanel(account));
         }
 

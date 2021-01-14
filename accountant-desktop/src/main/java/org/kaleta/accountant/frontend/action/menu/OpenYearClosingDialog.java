@@ -21,7 +21,7 @@ public class OpenYearClosingDialog extends MenuAction {
     @Override
     protected void actionPerformed() {
         lastYear = Service.CONFIG.getActiveYear();
-        newYear = "2019";
+        newYear = "2021";
 
         closeAccounts();
         initYear();
