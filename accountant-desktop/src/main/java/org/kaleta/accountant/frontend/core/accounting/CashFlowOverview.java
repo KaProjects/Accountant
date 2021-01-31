@@ -24,14 +24,15 @@ public class CashFlowOverview extends AccountingOverview {
 
         this.add(new AccountingRowPanel(valuesType));
 
-        Integer cashFlow = Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "20", "21", "23", "30")
-                - Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "22", "31");
+        Integer cashFlow = Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "20", "21", "23")
+                - Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "22");
 
-        Integer[] cashFlowMonthly = Utils.substractArrays(Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "20", "21", "23", "30"),
-                Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "22", "31"));
+        Integer[] cashFlowMonthly = Utils.substractArrays(
+                Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "20", "21", "23"),
+                Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "22"));
 
-        Integer initialCashFlow = Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, "20", "21", "23", "30")
-                - Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, "22", "31");
+        Integer initialCashFlow = Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, "20", "21", "23")
+                - Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, "22");
 
         AccountingRowPanel header = new AccountingRowPanel("X", AccountingRowPanel.SUM, "Cash Flow", cashFlow, cashFlowMonthly, initialCashFlow);
 
@@ -39,9 +40,7 @@ public class CashFlowOverview extends AccountingOverview {
                 getGroupPanelInstance("2", "0", AccountingRowPanel.CF, valuesType, true),
                 getGroupPanelInstance("2", "1", AccountingRowPanel.CF, valuesType, true),
                 getGroupPanelInstance("2", "3", AccountingRowPanel.CF, valuesType, true),
-                getGroupPanelInstance("2", "2", AccountingRowPanel.CF, valuesType, false),
-                getGroupPanelInstance("3", "0", AccountingRowPanel.CF, valuesType, true),
-                getGroupPanelInstance("3", "1", AccountingRowPanel.CF, valuesType, false)));
+                getGroupPanelInstance("2", "2", AccountingRowPanel.CF, valuesType, false)));
 
         this.repaint();
         this.revalidate();

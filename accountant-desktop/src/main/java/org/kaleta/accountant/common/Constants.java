@@ -65,7 +65,7 @@ public class Constants {
         public static final String CLOSING_BALANCE_ACCOUNT_ID = "1";
 
         public static final String PROFIT_GROUP_NAME = "Vysledkove";
-        public static final String PROFIT_GROUP_ID = "0";
+        public static final String PROFIT_GROUP_ID = "1";
         public static final String PROFIT_STATEMENT_ACCOUNT_NAME = "Vykaz Zisku a Strat";
         public static final String PROFIT_STATEMENT_ACCOUNT_ID = "0";
 
