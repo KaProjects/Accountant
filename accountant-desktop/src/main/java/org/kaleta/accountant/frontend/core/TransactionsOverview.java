@@ -4,6 +4,7 @@ import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.configuration.ConfigurationAction;
+import org.kaleta.accountant.frontend.common.TransactionComparator;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -14,7 +15,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class TransactionsOverview extends JPanel implements Configurable, DocumentListener {
@@ -133,7 +133,7 @@ public class TransactionsOverview extends JPanel implements Configurable, Docume
         filterTransactions();
     }
 
-    private class TransactionTableModel extends AbstractTableModel implements Comparator<TransactionsModel.Transaction> {
+    private class TransactionTableModel extends AbstractTableModel {
         private List<TransactionsModel.Transaction> transactionList;
 
         TransactionTableModel(){
@@ -143,7 +143,7 @@ public class TransactionsOverview extends JPanel implements Configurable, Docume
         void setTransactionList(List<TransactionsModel.Transaction> newTransactionList) {
             transactionList.clear();
             transactionList.addAll(newTransactionList);
-            transactionList.sort(this);
+            transactionList.sort(new TransactionComparator());
         }
 
         @Override
@@ -178,16 +178,6 @@ public class TransactionsOverview extends JPanel implements Configurable, Docume
                 case 3: return Service.ACCOUNT.getFullAccountName(getConfiguration().getSelectedYear(), transaction.getDebit());
                 case 4: return Service.ACCOUNT.getFullAccountName(getConfiguration().getSelectedYear(), transaction.getCredit());
                 default: throw new IllegalArgumentException("columnIndex");
-            }
-        }
-
-        @Override
-        public int compare(TransactionsModel.Transaction tr1, TransactionsModel.Transaction tr2) {
-            int monthDiff = Integer.parseInt(tr2.getDate().substring(2,4)) - Integer.parseInt(tr1.getDate().substring(2,4));
-            if (monthDiff != 0) {
-                return monthDiff;
-            } else {
-                return Integer.parseInt(tr2.getDate().substring(0,2)) - Integer.parseInt(tr1.getDate().substring(0,2));
             }
         }
     }

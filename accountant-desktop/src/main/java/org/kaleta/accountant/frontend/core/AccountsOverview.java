@@ -7,6 +7,7 @@ import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.configuration.ConfigurationAction;
+import org.kaleta.accountant.frontend.common.TransactionComparator;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -340,10 +341,11 @@ public class AccountsOverview extends JPanel implements Configurable {
             accountId = "-1";
         }
 
-        void setTransactionList(List<TransactionsModel.Transaction> transactionList, String accountId) {
-            this.transactionList.clear();
-            this.transactionList.addAll(transactionList);
-            this.accountId = accountId;
+        void setTransactionList(List<TransactionsModel.Transaction> newTransactionList, String newAccountId) {
+            transactionList.clear();
+            transactionList.addAll(newTransactionList);
+            transactionList.sort(new TransactionComparator());
+            accountId = newAccountId;
         }
 
         @Override
