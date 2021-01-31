@@ -5,10 +5,16 @@ import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.AccountsEditorAccountAction;
+import org.kaleta.accountant.frontend.component.SelectAccountTextField;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,16 +30,25 @@ public class SelectAccountDialog extends Dialog {
     private JTree accountTree;
 
     public SelectAccountDialog(Configuration configuration, Map<String, java.util.List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList) {
-        super(configuration, "Selecting Account", "Select");
+        this(configuration, accountMap, classList, false, true);
+    }
+
+    public SelectAccountDialog(Configuration configuration, Map<String, java.util.List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList, boolean expanded) {
+        this(configuration, accountMap, classList, expanded, true);
+    }
+
+    public SelectAccountDialog(Configuration configuration, Map<String, java.util.List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList, boolean expanded, boolean modal) {
+        super(configuration, modal? "Selecting Account" : "Showing Accounts", modal? "Select" : "Close");
         this.accountMap = accountMap;
         this.classList = classList;
         selectedAccountId = "";
-        buildDialogContent();
-        updateTree("");
+        buildDialogContent(expanded, modal);
+        updateTree("", expanded);
+        setModal(modal);
         this.setSize(350, (int) (0.8f * Toolkit.getDefaultToolkit().getScreenSize().height));
     }
 
-    private void buildDialogContent() {
+    private void buildDialogContent(boolean expanded, boolean modal) {
         JButton buttonAddAccount = new JButton("Add Account");
         buttonAddAccount.setEnabled(false);
 
@@ -73,13 +88,18 @@ public class SelectAccountDialog extends Dialog {
                 selectedAccountId = ((SelectAccountDialog.AccountTreeNode) node).getSchemaFullId();
                 selectedAccountName = ((SelectAccountDialog.AccountTreeNode) node).getFullName();
                 SelectAccountDialog.this.setDialogValid(null);
+                if (!modal) accountTree.setDragEnabled(true);
             } else {
                 selectedAccountId = "";
                 selectedAccountName = "";
                 SelectAccountDialog.this.setDialogValid("No account selected");
+                if (!modal) accountTree.setDragEnabled(false);
             }
             buttonAddAccount.setEnabled(node instanceof SelectAccountDialog.SchemaAccountTreeNode);
         });
+
+        if (!modal) accountTree.setTransferHandler(new SelectAccountDialogTransferHandler(this));
+
         JScrollPane accountTreeScrollPane = new JScrollPane(accountTree);
 
         buttonAddAccount.addActionListener(e -> {
@@ -92,7 +112,7 @@ public class SelectAccountDialog extends Dialog {
                 AccountsModel.Account createdAccount = action.subactionPerformed(name);
                 accountList.add(createdAccount);
                 accountMap.put(schemaId, accountList);
-                updateTree(schemaId);
+                updateTree(schemaId, expanded);
             }
         });
 
@@ -106,7 +126,7 @@ public class SelectAccountDialog extends Dialog {
         setButtons(jPanel -> jPanel.add(buttonAddAccount));
     }
 
-    private void updateTree(String updatedSchemaId){
+    private void updateTree(String updatedSchemaId, boolean expanded){
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) accountTreeModel.getRoot();
         root.removeAllChildren();
         DefaultMutableTreeNode updatedSchemaAccountNode = null;
@@ -141,10 +161,23 @@ public class SelectAccountDialog extends Dialog {
         accountTreeModel.setRoot(root);
 
         for (int i = 0; i < root.getChildCount(); i++) {
-            accountTree.expandPath(new TreePath(((DefaultMutableTreeNode)root.getChildAt(i)).getPath()));
-        }
+            DefaultMutableTreeNode nodeClasses = (DefaultMutableTreeNode) root.getChildAt(i);
+            accountTree.expandPath(new TreePath(nodeClasses.getPath()));
+            if (expanded) {
+                for (int j = 0; j < nodeClasses.getChildCount(); j++) {
+                    DefaultMutableTreeNode nodeGroups = (DefaultMutableTreeNode) nodeClasses.getChildAt(j);
+                    accountTree.expandPath(new TreePath(nodeGroups.getPath()));
 
-        if (updatedSchemaAccountNode != null) accountTree.expandPath(new TreePath(updatedSchemaAccountNode.getPath()));
+                    for (int k = 0; k < nodeGroups.getChildCount(); k++) {
+                        DefaultMutableTreeNode nodeAccounts = (DefaultMutableTreeNode) nodeGroups.getChildAt(k);
+                        accountTree.expandPath(new TreePath(nodeAccounts.getPath()));
+                    }
+                }
+            }
+        }
+        if (updatedSchemaAccountNode != null && !expanded) accountTree.expandPath(new TreePath(updatedSchemaAccountNode.getPath()));
+
+
     }
 
     public String getSelectedAccountId() {
@@ -193,6 +226,40 @@ public class SelectAccountDialog extends Dialog {
 
         void setSchemaId(String schemaId) {
             this.schemaId = schemaId;
+        }
+    }
+
+
+    private class SelectAccountDialogTransferHandler extends TransferHandler {
+        private SelectAccountDialog dialog;
+        SelectAccountDialogTransferHandler(SelectAccountDialog dialog){
+            super();
+            this.dialog = dialog;
+        }
+        public int getSourceActions(JComponent c) {
+            return COPY;
+        }
+
+        public Transferable createTransferable(JComponent c) {
+            return new StringSelection(dialog.getSelectedAccountId());
+        }
+
+        public void exportDone(JComponent c, Transferable t, int action) {
+
+        }
+
+        public boolean canImport(TransferSupport ts) {
+            return ts.getComponent() instanceof SelectAccountTextField;
+        }
+
+        public boolean importData(TransferSupport ts) {
+            try {
+                ((SelectAccountTextField) ts.getComponent())
+                        .setSelectedAccount((String) ts.getTransferable().getTransferData(DataFlavor.stringFlavor));
+                return true;
+            } catch (UnsupportedFlavorException | IOException e) {
+                return false;
+            }
         }
     }
 }

@@ -58,7 +58,7 @@ public class SelectAccountTextField extends JTextField implements Validable {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (e.getButton() != 3) {
+                if (e.getButton() == 3) {
                     SelectAccountDialog selectExpenseAccountDialog = new SelectAccountDialog(configuration, accountMap, classes);
                     selectExpenseAccountDialog.setVisible(true);
                     if (selectExpenseAccountDialog.getResult()) {
@@ -73,7 +73,7 @@ public class SelectAccountTextField extends JTextField implements Validable {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.getButton() == 3) {
+                if (e.getButton() == 1) {
                     SelectAccountTextField c = (SelectAccountTextField) e.getSource();
                     TransferHandler handler = c.getTransferHandler();
                     handler.exportAsDrag(c, e, TransferHandler.COPY);

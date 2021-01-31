@@ -16,8 +16,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class AddTransactionDialog extends Dialog {
@@ -32,6 +32,7 @@ public class AddTransactionDialog extends Dialog {
                                 Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
                                 ProceduresModel.Procedure procedure) {
         super(configuration, "Adding Transaction(s)", "Add");
+        setModal(false);
         this.accountPairDescriptionMap = accountPairDescriptionMap;
         this.accountMap = accountMap;
         this.classList = classList;
@@ -67,6 +68,9 @@ public class AddTransactionDialog extends Dialog {
 
         JButton buttonAddResource = new JButton("Add Resource");
         buttonAddResource.addActionListener(e -> addResourcePanel());
+
+        JButton buttonShowAccounts = new JButton("Show Accounts");
+        buttonShowAccounts.addActionListener(e -> showAccounts());
 
         JButton buttonSetDate = new JButton("Set Date");
         JButton buttonConfirmSetDate = new JButton("Confirm");
@@ -136,7 +140,13 @@ public class AddTransactionDialog extends Dialog {
             jPanel.add(buttonAddTr);
             jPanel.add(buttonAddProcedure);
             jPanel.add(buttonAddResource);
+            jPanel.add(buttonShowAccounts);
         });
+    }
+
+    private void showAccounts() {
+        SelectAccountDialog selectExpenseAccountDialog = new SelectAccountDialog(getConfiguration(), accountMap, classList, false, false);
+        selectExpenseAccountDialog.setVisible(true);
     }
 
     public List<TransactionPanel> getTransactionPanelList() {

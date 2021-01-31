@@ -52,7 +52,7 @@ public class HintValidatedTextField extends JTextField implements FocusListener,
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.getButton() == 3) {
+                if (e.getButton() == 1) {
                     HintValidatedTextField c = (HintValidatedTextField) e.getSource();
                     TransferHandler handler = c.getTransferHandler();
                     handler.exportAsDrag(c, e, TransferHandler.COPY);
