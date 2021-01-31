@@ -233,7 +233,7 @@ public class AddTransactionDialog extends Dialog {
         List<SchemaModel.Class> resourceClasses = new ArrayList<>();
         resourceClasses.add(Service.SCHEMA.getSchemaClassMap(year).get(1));
 
-        SelectAccountDialog dialog = new SelectAccountDialog(getConfiguration(), resourceAccountMap, resourceClasses);
+        SelectAccountDialog dialog = new SelectAccountDialog(getConfiguration(), resourceAccountMap, resourceClasses, true);
         dialog.setVisible(true);
         if (dialog.getResult()) {
             String amount = JOptionPane.showInputDialog(this, "Set Amount");
