@@ -30,19 +30,19 @@ public class ProfitOverview extends AccountingOverview {
                 Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "55"));
         AccountingRowPanel nwiHeader = new AccountingRowPanel("X", AccountingRowPanel.SUM, "Cisty Pracovny Prijem", netWorkIncome, netWorkIncomeMonthly);
         this.add(getSumPanelInstance(nwiHeader, false,
-                getGroupPanelInstance("6", "0", AccountingRowPanel.REVENUE, valuesType),
-                getGroupPanelInstance("5", "5", AccountingRowPanel.EXPENSE, valuesType),
-                getGroupPanelInstance("6", "3", AccountingRowPanel.REVENUE, valuesType)));
+                getGroupPanelInstance("6", "0", AccountingRowPanel.REVENUE, valuesType, true),
+                getGroupPanelInstance("5", "5", AccountingRowPanel.EXPENSE, valuesType, true),
+                getGroupPanelInstance("6", "3", AccountingRowPanel.REVENUE, valuesType, true)));
 
         Integer operatingBalance = netWorkIncome - Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "50", "51", "52", "53");
         Integer[] operatingBalanceMonthly = Utils.substractArrays(netWorkIncomeMonthly,
                 Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "50", "51", "52", "53"));
         AccountingRowPanel obHeader = new AccountingRowPanel("X", AccountingRowPanel.SUM, "Prevadzkovy Zisk", operatingBalance, operatingBalanceMonthly);
         this.add(getSumPanelInstance(obHeader, false,
-                getGroupPanelInstance("5", "0", AccountingRowPanel.EXPENSE, valuesType),
-                getGroupPanelInstance("5", "1", AccountingRowPanel.EXPENSE, valuesType),
-                getGroupPanelInstance("5", "2", AccountingRowPanel.EXPENSE, valuesType),
-                getGroupPanelInstance("5", "3", AccountingRowPanel.EXPENSE, valuesType)));
+                getGroupPanelInstance("5", "0", AccountingRowPanel.EXPENSE, valuesType, true),
+                getGroupPanelInstance("5", "1", AccountingRowPanel.EXPENSE, valuesType, true),
+                getGroupPanelInstance("5", "2", AccountingRowPanel.EXPENSE, valuesType, true),
+                getGroupPanelInstance("5", "3", AccountingRowPanel.EXPENSE, valuesType, true)));
 
         Integer netBalance = operatingBalance + Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "61", "62")
                 - Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, "54", "56");
@@ -51,10 +51,10 @@ public class ProfitOverview extends AccountingOverview {
                 Service.TRANSACTIONS.getMonthlySchemaIdPrefixBalance(year, "54", "56"));
         AccountingRowPanel nbHeader = new AccountingRowPanel("X", AccountingRowPanel.SUM, "Cisty Zisk/Strata", netBalance, netBalanceMonthly);
         this.add(getSumPanelInstance(nbHeader, false,
-                getGroupPanelInstance("6", "1", AccountingRowPanel.REVENUE, valuesType),
-                getGroupPanelInstance("5", "6", AccountingRowPanel.EXPENSE, valuesType),
-                getGroupPanelInstance("6", "2", AccountingRowPanel.REVENUE, valuesType),
-                getGroupPanelInstance("5", "4", AccountingRowPanel.EXPENSE, valuesType)));
+                getGroupPanelInstance("6", "1", AccountingRowPanel.REVENUE, valuesType, true),
+                getGroupPanelInstance("5", "6", AccountingRowPanel.EXPENSE, valuesType, true),
+                getGroupPanelInstance("6", "2", AccountingRowPanel.REVENUE, valuesType, true),
+                getGroupPanelInstance("5", "4", AccountingRowPanel.EXPENSE, valuesType, true)));
 
         this.repaint();
         this.revalidate();

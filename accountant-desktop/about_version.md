@@ -36,7 +36,15 @@ Released: 13.10.2018
     Implemented: many UI/UX enhancements and bug fixes, created cash flow and assets depreciation overview.
         
 ## 1.3
-Released: in progress
+Released: 1.2.2021
+    
+    Implemented: importing transactions from firebase database, DnD support for various components, 
+                 auxiliary all accounts dialog
+    Improved: cashflow overview, finance tab
+    Fixed: long-term fin. assets expense semantic accounts bug, account overview transaction list ordering, 
+
+
+
 
     before release: 
         pom.xml: x.y-snapshot -> x.y

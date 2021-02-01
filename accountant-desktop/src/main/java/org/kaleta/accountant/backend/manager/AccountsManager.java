@@ -46,11 +46,11 @@ public class AccountsManager implements Manager<AccountsModel> {
         profitAcc.setSemanticId(Constants.Account.PROFIT_ACC_ID.split("\\.")[1]);
         accountsModel.getAccount().add(profitAcc);
 
-        AccountsModel.Account personalCapitalAcc = new AccountsModel.Account();
-        personalCapitalAcc.setName(Constants.Account.GENERAL_ACCOUNT_NAME);
-        personalCapitalAcc.setSchemaId(Constants.Account.PERSONAL_CAPITAL_ACC_ID.split("\\.")[0]);
-        personalCapitalAcc.setSemanticId(Constants.Account.PERSONAL_CAPITAL_ACC_ID.split("\\.")[1]);
-        accountsModel.getAccount().add(personalCapitalAcc);
+//        AccountsModel.Account personalCapitalAcc = new AccountsModel.Account();
+//        personalCapitalAcc.setName(Constants.Account.GENERAL_ACCOUNT_NAME);
+//        personalCapitalAcc.setSchemaId(Constants.Account.PERSONAL_CAPITAL_ACC_ID.split("\\.")[0]);
+//        personalCapitalAcc.setSemanticId(Constants.Account.PERSONAL_CAPITAL_ACC_ID.split("\\.")[1]);
+//        accountsModel.getAccount().add(personalCapitalAcc);
 
         update(accountsModel);
         Initializer.LOG.info("File created: '" + schemaFileUri + "'");

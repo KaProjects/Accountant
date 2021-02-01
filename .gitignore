@@ -2,6 +2,8 @@
 target
 classes
 *.rar
-firebase-config.js
-*.rar
 *.zip
+firebase-config.js
+google-services.json
+accountant-andr-servicekey.json
+

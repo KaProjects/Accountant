@@ -65,9 +65,16 @@ public class Constants {
         public static final String CLOSING_BALANCE_ACCOUNT_ID = "1";
 
         public static final String PROFIT_GROUP_NAME = "Vysledkove";
-        public static final String PROFIT_GROUP_ID = "0";
+        public static final String PROFIT_GROUP_ID = "1";
         public static final String PROFIT_STATEMENT_ACCOUNT_NAME = "Vykaz Zisku a Strat";
         public static final String PROFIT_STATEMENT_ACCOUNT_ID = "0";
+
+        public static final String FIN_CREATION_FULL_ID = "546";
+        public static final String FIN_CREATION_ACCOUNT_PREFIX = "Creation of ";
+        public static final String FIN_REV_REVALUATION_FULL_ID = "624";
+        public static final String FIN_REV_REVALUATION_ACCOUNT_PREFIX = "Revaluation of ";
+        public static final String FIN_EXP_REVALUATION_FULL_ID = "544";
+        public static final String FIN_EXP_REVALUATION_ACCOUNT_PREFIX = "Revaluation of ";
     }
 
     public static class Account {
@@ -76,6 +83,7 @@ public class Constants {
         public static final String PROFIT_ACC_ID = "710.0";
 
         public static final String PERSONAL_CAPITAL_ACC_ID = "400.0";
+        public static final String ACCUMULATED_EARNINGS_ACC_ID = "401.0";
 
         public static final String GENERAL_ACCOUNT_NAME = "general";
     }

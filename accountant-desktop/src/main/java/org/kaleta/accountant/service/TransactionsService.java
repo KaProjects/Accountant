@@ -179,10 +179,10 @@ public class TransactionsService {
     /**
      * Returns mutual initial value for accounts matching specified schema ID prefix(es).
      */
-    public Integer getSchemaIdPrefixInitialValue(String year, String... schemaIdPrefixes){
+    public Integer getSchemaIdPrefixInitialValue(String year, String... schemaIdPrefixes) {
         int initialValue = 0;
-        for (String schemaIdPrefix : schemaIdPrefixes){
-            initialValue +=  this.getAccountListInitialValue(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
+        for (String schemaIdPrefix : schemaIdPrefixes) {
+            initialValue += this.getAccountListInitialValue(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
         }
         return initialValue;
     }
@@ -269,10 +269,10 @@ public class TransactionsService {
     /**
      * Returns value of mutual balance for accounts matching specified schema ID prefix(es).
      */
-    public Integer getSchemaIdPrefixBalance(String year, String... schemaIdPrefixes){
+    public Integer getSchemaIdPrefixBalance(String year, String... schemaIdPrefixes) {
         int balance = 0;
-        for (String schemaIdPrefix : schemaIdPrefixes){
-            balance +=  this.getAccountListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
+        for (String schemaIdPrefix : schemaIdPrefixes) {
+            balance += this.getAccountListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
         }
         return balance;
     }
@@ -286,7 +286,7 @@ public class TransactionsService {
             throw new IllegalArgumentException("Off-Balance accounts has no balance!");
         }
         try {
-            Integer[] monthlyBalance = new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0};
+            Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             for (TransactionsModel.Transaction tr : getModel(year).getTransaction()) {
                 if (tr.getDebit().equals(Constants.Account.CLOSING_ACC_ID)
                         || tr.getDebit().equals(Constants.Account.PROFIT_ACC_ID)
@@ -298,20 +298,20 @@ public class TransactionsService {
                 }
                 if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
                     if (tr.getDebit().equals(account.getFullId())) {
-                        int month = Integer.parseInt(tr.getDate().substring(2,4));
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
                         monthlyBalance[month - 1] += Integer.parseInt(tr.getAmount());
                     }
                     if (tr.getCredit().equals(account.getFullId())) {
-                        int month = Integer.parseInt(tr.getDate().substring(2,4));
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
                         monthlyBalance[month - 1] -= Integer.parseInt(tr.getAmount());
                     }
                 } else {
                     if (tr.getDebit().equals(account.getFullId())) {
-                        int month = Integer.parseInt(tr.getDate().substring(2,4));
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
                         monthlyBalance[month - 1] -= Integer.parseInt(tr.getAmount());
                     }
                     if (tr.getCredit().equals(account.getFullId())) {
-                        int month = Integer.parseInt(tr.getDate().substring(2,4));
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
                         monthlyBalance[month - 1] += Integer.parseInt(tr.getAmount());
                     }
                 }
@@ -327,7 +327,7 @@ public class TransactionsService {
      * Returns value of mutual monthly balance for specified list of accounts.
      */
     public Integer[] getAccountMonthlyListBalance(String year, List<AccountsModel.Account> accountList) {
-        Integer[] monthlyBalance = new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0};
+        Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (AccountsModel.Account account : accountList) {
             monthlyBalance = Utils.mergeArrays(monthlyBalance, this.getAccountMonthlyBalance(year, account));
         }
@@ -337,11 +337,11 @@ public class TransactionsService {
     /**
      * Returns value of mutual monthly balance for accounts matching specified schema ID prefix(es).
      */
-    public Integer[] getMonthlySchemaIdPrefixBalance(String year, String... schemaIdPrefixes){
-        Integer[] monthlyBalance = new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0};
-        for (String schemaIdPrefix : schemaIdPrefixes){
+    public Integer[] getMonthlySchemaIdPrefixBalance(String year, String... schemaIdPrefixes) {
+        Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        for (String schemaIdPrefix : schemaIdPrefixes) {
             Integer[] thisBalance = Service.TRANSACTIONS.getAccountMonthlyListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
-            monthlyBalance =  Utils.mergeArrays(monthlyBalance, thisBalance);
+            monthlyBalance = Utils.mergeArrays(monthlyBalance, thisBalance);
         }
         return monthlyBalance;
     }
@@ -381,6 +381,82 @@ public class TransactionsService {
             TransactionsModel.Transaction lastDepTransaction = null;
             for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()) {
                 if (transaction.getDebit().equals(depAccId) && transaction.getCredit().equals(accDepAccId)) {
+                    if (lastDepTransaction == null) {
+                        lastDepTransaction = transaction;
+                    } else {
+                        int newTrId = Integer.parseInt(transaction.getId());
+                        int lastTrId = Integer.parseInt(lastDepTransaction.getId());
+                        lastDepTransaction = (newTrId > lastTrId) ? transaction : lastDepTransaction;
+                    }
+                }
+            }
+            if (lastDepTransaction != null) {
+                return lastDepTransaction.getDate();
+            } else {
+                return null;
+            }
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns true if specified financial account needs revaluation, false otherwise.
+     * Note: an account needs revaluation if no revaluation was done after purchasing new assets.
+     */
+    public boolean financialAssetNeedsRevaluation(String year, AccountsModel.Account account) {
+        if (!account.getSchemaId().startsWith("23")) {
+            throw new IllegalArgumentException("Only accounts of 23x are considered for revaluation");
+        }
+        String creationAccId = Service.ACCOUNT.getFinCreationAccountId(account.getSchemaId(), account.getSemanticId());
+        String revRevAccId = Service.ACCOUNT.getFinRevRevaluationAccountId(account.getSchemaId(), account.getSemanticId());
+        String expRevAccId = Service.ACCOUNT.getFinExpRevaluationAccountId(account.getSchemaId(), account.getSemanticId());
+
+        TransactionsModel.Transaction lastCreationTransaction = null;
+        TransactionsModel.Transaction lastRevTransaction = null;
+        try {
+            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()) {
+                if (transaction.getDebit().equals(creationAccId)) {
+                    if (lastCreationTransaction == null) {
+                        lastCreationTransaction = transaction;
+                    } else {
+                        int newTrId = Integer.parseInt(transaction.getId());
+                        int lastTrId = Integer.parseInt(lastCreationTransaction.getId());
+                        lastCreationTransaction = (newTrId > lastTrId) ? transaction : lastCreationTransaction;
+                    }
+                }
+                if (transaction.getDebit().equals(expRevAccId) || transaction.getCredit().equals(revRevAccId)) {
+                    if (lastRevTransaction == null) {
+                        lastRevTransaction = transaction;
+                    } else {
+                        int newTrId = Integer.parseInt(transaction.getId());
+                        int lastTrId = Integer.parseInt(lastRevTransaction.getId());
+                        lastRevTransaction = (newTrId > lastTrId) ? transaction : lastRevTransaction;
+                    }
+                }
+            }
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+
+        if (lastCreationTransaction == null) return false;
+        if (lastRevTransaction == null) return true;
+        return (Integer.parseInt(lastCreationTransaction.getId()) > Integer.parseInt(lastRevTransaction.getId()));
+    }
+
+    /**
+     * Returns date of last revaluation for specified account.
+     */
+    public String getLastRevaluationDate(String year, AccountsModel.Account account) {
+        try {
+            String revRevAccId = Service.ACCOUNT.getFinRevRevaluationAccountId(account.getSchemaId(), account.getSemanticId());
+            String expRevAccId = Service.ACCOUNT.getFinExpRevaluationAccountId(account.getSchemaId(), account.getSemanticId());
+
+            TransactionsModel.Transaction lastDepTransaction = null;
+            for (TransactionsModel.Transaction transaction : getModel(year).getTransaction()) {
+                if (transaction.getDebit().equals(expRevAccId) || transaction.getCredit().equals(revRevAccId)) {
                     if (lastDepTransaction == null) {
                         lastDepTransaction = transaction;
                     } else {

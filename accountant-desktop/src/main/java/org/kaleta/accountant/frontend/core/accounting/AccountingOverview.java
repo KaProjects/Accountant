@@ -2,6 +2,7 @@ package org.kaleta.accountant.frontend.core.accounting;
 
 
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.common.Utils;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.AccountingRowPanel;
@@ -101,10 +102,12 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
         return sumPanel;
     }
 
-    protected JPanel getGroupPanelInstance(String classId, String groupId, String groupType, int valuesType) {
+    protected JPanel getGroupPanelInstance(String classId, String groupId, String groupType, int valuesType, boolean isPositive) {
         String year = getConfiguration().getSelectedYear();
 
         if (!Service.SCHEMA.checkGroupExists(year, classId, groupId)) return getBodyPanelInstance();
+
+        int sign = isPositive ? 1 : -1;
 
         JPanel groupBody = getBodyPanelInstance();
         String groupSchemaId = classId + groupId;
@@ -113,12 +116,12 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
             AccountingRowPanel accountPanel = new AccountingRowPanel(accSchemaId,
                     AccountingRowPanel.ACCOUNT,
                     schemaAccount.getName(),
-                    Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, accSchemaId),
+                    sign * Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, accSchemaId),
                     (valuesType > AccountingRowPanel.VALUE_BALANCE)
-                            ? Service.TRANSACTIONS.getAccountMonthlyListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, accSchemaId))
+                            ? Utils.multiplyArrayValues(Service.TRANSACTIONS.getAccountMonthlyListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, accSchemaId)), sign)
                             : null,
                     (valuesType > AccountingRowPanel.VALUE_MONTHLY_BALANCE)
-                            ? Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, accSchemaId)
+                            ? sign * Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, accSchemaId)
                             : null);
             groupBody.add(accountPanel);
         }
@@ -126,12 +129,12 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
         AccountingRowPanel groupHeader = new AccountingRowPanel(groupSchemaId,
                 groupType,
                 Service.SCHEMA.getGroupName(year, classId, groupId),
-                Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, groupSchemaId),
+                sign * Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, groupSchemaId),
                 (valuesType > AccountingRowPanel.VALUE_BALANCE)
-                        ? Service.TRANSACTIONS.getAccountMonthlyListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, groupSchemaId))
+                        ? Utils.multiplyArrayValues(Service.TRANSACTIONS.getAccountMonthlyListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, groupSchemaId)), sign)
                         : null,
                 (valuesType > AccountingRowPanel.VALUE_MONTHLY_BALANCE)
-                        ? Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, groupSchemaId)
+                        ? sign * Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, groupSchemaId)
                         : null);
         groupHeader.addMouseListener(new MouseAdapter() {
             @Override

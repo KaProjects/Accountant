@@ -3,6 +3,7 @@ package org.kaleta.accountant.frontend;
 import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
+import org.kaleta.accountant.frontend.component.ActiveYearMenu;
 import org.kaleta.accountant.frontend.component.YearMenu;
 import org.kaleta.accountant.frontend.core.YearPane;
 import org.kaleta.accountant.service.Service;
@@ -42,19 +43,25 @@ public class AppFrame extends JFrame implements Configuration {
         fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
 
 
-        JMenu addMenu = new JMenu("Add");
+        JMenu addMenu = new ActiveYearMenu("Add");
         addMenu.setMnemonic(KeyEvent.VK_A);
         addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK)));
         addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK)));
         addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddFinAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK)));
 
-        JMenu createMenu = new JMenu("Create");
+        JMenu createMenu = new ActiveYearMenu("Create");
         createMenu.setMnemonic(KeyEvent.VK_C);
         createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK)));
+
+        JMenu importMenu = new ActiveYearMenu("Import");
+        importMenu.setMnemonic(KeyEvent.VK_I);
+        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_MASK)));
 
         menuBar.add(fileMenu);
         menuBar.add(addMenu);
         menuBar.add(createMenu);
+        menuBar.add(importMenu);
         menuBar.add(new JPanel());
         menuBar.add(new YearMenu());
     }

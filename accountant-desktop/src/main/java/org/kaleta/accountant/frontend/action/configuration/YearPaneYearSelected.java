@@ -25,7 +25,7 @@ public class YearPaneYearSelected extends ConfigurationAction {
         AccountsOverview accountsOverview = new AccountsOverview(getConfiguration());
         TransactionsOverview transactionsOverview = new TransactionsOverview(getConfiguration());
 
-        if (pane.getConfiguration().getSelectedYear().equals(Service.CONFIG.getActiveYear())){
+        if (getConfiguration().getSelectedYear().equals(Service.CONFIG.getActiveYear())){
             JTabbedPane schemaPane = new JTabbedPane();
             pane.addTab("Schema", schemaPane);
             schemaPane.addTab("Overview", new JScrollPane(schemaOverview));
