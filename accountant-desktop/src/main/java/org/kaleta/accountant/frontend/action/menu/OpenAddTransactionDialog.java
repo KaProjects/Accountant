@@ -8,6 +8,8 @@ import org.kaleta.accountant.frontend.component.TransactionPanel;
 import org.kaleta.accountant.frontend.dialog.AddTransactionDialog;
 import org.kaleta.accountant.service.Service;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,13 +27,22 @@ public class OpenAddTransactionDialog extends MenuAction {
         Map<AccountPairModel, Set<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
 
         AddTransactionDialog dialog = new AddTransactionDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, null);
-        dialog.setVisible(true);
-        if (dialog.getResult()){
-            for (TransactionPanel panel : dialog.getTransactionPanelList()){
-                Service.TRANSACTIONS.addTransaction(getConfiguration().getSelectedYear(),
-                        panel.getDate(), panel.getAmount(), panel.getDebit(), panel.getCredit(), panel.getDescription());
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (dialog.getResult()){
+                    for (TransactionPanel panel : dialog.getTransactionPanelList()){
+                        Service.TRANSACTIONS.addTransaction(getConfiguration().getSelectedYear(),
+                                panel.getDate(), panel.getAmount(), panel.getDebit(), panel.getCredit(), panel.getDescription());
+                    }
+                    getConfiguration().update(Configuration.TRANSACTION_UPDATED);
+                }
             }
-            getConfiguration().update(Configuration.TRANSACTION_UPDATED);
-        }
+            @Override
+            public void windowClosing(WindowEvent e) {
+            }
+        });
+
+        dialog.setVisible(true);
     }
 }
