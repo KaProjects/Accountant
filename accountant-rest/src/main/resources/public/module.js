@@ -1,1 +1,0 @@
-angular.module('Accountant', ['patternfly.toolbars', 'patternfly.views','patternfly.table','ngResource']);
