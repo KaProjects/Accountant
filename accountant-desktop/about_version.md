@@ -43,10 +43,16 @@ Released: 1.2.2021
     Improved: cashflow overview, finance tab
     Fixed: long-term fin. assets expense semantic accounts bug, account overview transaction list ordering, 
 
-
+## 1.4
+Released: WIP
 
 
     before release: 
         pom.xml: x.y-snapshot -> x.y
         Initializer.VERSION: x.y-snapshot -> x.y
         Initializer.CONTEXT = production
+    after release:
+        create tag
+        pom.xml: x.y -> x.y+1-snapshot
+        Initializer.VERSION: x.y -> x.y+1-snapshot
+        Initializer.CONTEXT = devel

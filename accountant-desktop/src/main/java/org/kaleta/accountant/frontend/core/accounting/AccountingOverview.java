@@ -2,7 +2,6 @@ package org.kaleta.accountant.frontend.core.accounting;
 
 
 import org.kaleta.accountant.backend.model.SchemaModel;
-import org.kaleta.accountant.common.Utils;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.AccountingRowPanel;
@@ -112,30 +111,13 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
         JPanel groupBody = getBodyPanelInstance();
         String groupSchemaId = classId + groupId;
         for (SchemaModel.Class.Group.Account schemaAccount : Service.SCHEMA.getGroup(year, classId, groupId).getAccount()) {
-            String accSchemaId = groupSchemaId + schemaAccount.getId();
-            AccountingRowPanel accountPanel = new AccountingRowPanel(accSchemaId,
-                    AccountingRowPanel.ACCOUNT,
-                    schemaAccount.getName(),
-                    sign * Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, accSchemaId),
-                    (valuesType > AccountingRowPanel.VALUE_BALANCE)
-                            ? Utils.multiplyArrayValues(Service.TRANSACTIONS.getAccountMonthlyListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, accSchemaId)), sign)
-                            : null,
-                    (valuesType > AccountingRowPanel.VALUE_MONTHLY_BALANCE)
-                            ? sign * Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, accSchemaId)
-                            : null);
+            AccountAggregate accountAggregate = AccountAggregate.create(schemaAccount.getName()).increasing(groupSchemaId + schemaAccount.getId());
+            AccountingRowPanel accountPanel = new AccountingRowPanel(getConfiguration(), accountAggregate, AccountingRowPanel.ACCOUNT, valuesType, isPositive);
             groupBody.add(accountPanel);
         }
 
-        AccountingRowPanel groupHeader = new AccountingRowPanel(groupSchemaId,
-                groupType,
-                Service.SCHEMA.getGroupName(year, classId, groupId),
-                sign * Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, groupSchemaId),
-                (valuesType > AccountingRowPanel.VALUE_BALANCE)
-                        ? Utils.multiplyArrayValues(Service.TRANSACTIONS.getAccountMonthlyListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, groupSchemaId)), sign)
-                        : null,
-                (valuesType > AccountingRowPanel.VALUE_MONTHLY_BALANCE)
-                        ? sign * Service.TRANSACTIONS.getSchemaIdPrefixInitialValue(year, groupSchemaId)
-                        : null);
+        AccountAggregate groupAggregate = AccountAggregate.create(Service.SCHEMA.getGroupName(year, groupSchemaId)).increasing(groupSchemaId);
+        AccountingRowPanel groupHeader = new AccountingRowPanel(getConfiguration(), groupAggregate, groupType, valuesType, isPositive);
         groupHeader.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {

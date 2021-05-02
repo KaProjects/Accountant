@@ -326,10 +326,10 @@ public class TransactionsService {
     /**
      * Returns value of mutual monthly balance for specified list of accounts.
      */
-    public Integer[] getAccountMonthlyListBalance(String year, List<AccountsModel.Account> accountList) {
+    public Integer[] getMonthlyAccountListBalance(String year, List<AccountsModel.Account> accountList) {
         Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (AccountsModel.Account account : accountList) {
-            monthlyBalance = Utils.mergeArrays(monthlyBalance, this.getAccountMonthlyBalance(year, account));
+            monthlyBalance = Utils.mergeArrays(monthlyBalance, Service.TRANSACTIONS.getAccountMonthlyBalance(year, account));
         }
         return monthlyBalance;
     }
@@ -340,7 +340,140 @@ public class TransactionsService {
     public Integer[] getMonthlySchemaIdPrefixBalance(String year, String... schemaIdPrefixes) {
         Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (String schemaIdPrefix : schemaIdPrefixes) {
-            Integer[] thisBalance = Service.TRANSACTIONS.getAccountMonthlyListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
+            Integer[] thisBalance = Service.TRANSACTIONS.getMonthlyAccountListBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
+            monthlyBalance = Utils.mergeArrays(monthlyBalance, thisBalance);
+        }
+        return monthlyBalance;
+    }
+
+    /**
+     * Returns value of monthly balance for specified account.
+     */
+    public Integer[] getAccountMonthlyCumulativeBalance(String year, AccountsModel.Account account) {
+        String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
+        if (accountType.equals(Constants.AccountType.OFF_BALANCE)) {
+            throw new IllegalArgumentException("Off-Balance accounts has no balance!");
+        }
+        try {
+            Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()) {
+                if (tr.getDebit().equals(Constants.Account.CLOSING_ACC_ID)
+                        || tr.getDebit().equals(Constants.Account.PROFIT_ACC_ID)
+                        || tr.getCredit().equals(Constants.Account.CLOSING_ACC_ID)
+                        || tr.getCredit().equals(Constants.Account.PROFIT_ACC_ID)) {
+                    continue;
+                }
+                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
+                    if (tr.getDebit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
+                        monthlyBalance[month - 1] += Integer.parseInt(tr.getAmount());
+                    }
+                    if (tr.getCredit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
+                        monthlyBalance[month - 1] -= Integer.parseInt(tr.getAmount());
+                    }
+                } else {
+                    if (tr.getDebit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
+                        monthlyBalance[month - 1] -= Integer.parseInt(tr.getAmount());
+                    }
+                    if (tr.getCredit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
+                        monthlyBalance[month - 1] += Integer.parseInt(tr.getAmount());
+                    }
+                }
+            }
+
+            for (int i=1;i<12;i++){
+                monthlyBalance[i] += monthlyBalance[i - 1];
+            }
+
+            return monthlyBalance;
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns value of mutual monthly cumulative balance for specified list of accounts.
+     */
+    public Integer[] getMonthlyAccountListCumulativeBalance(String year, List<AccountsModel.Account> accountList) {
+        Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        for (AccountsModel.Account account : accountList) {
+            monthlyBalance = Utils.mergeArrays(monthlyBalance, Service.TRANSACTIONS.getAccountMonthlyCumulativeBalance(year, account));
+        }
+        return monthlyBalance;
+    }
+
+    /**
+     * Returns value of mutual monthly cumulative balance for accounts matching specified schema ID prefix(es).
+     */
+    public Integer[] getMonthlySchemaIdPrefixCumulativeBalance(String year, String... schemaIdPrefixes) {
+        Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        for (String schemaIdPrefix : schemaIdPrefixes) {
+            Integer[] thisBalance = Service.TRANSACTIONS.getMonthlyAccountListCumulativeBalance(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
+            monthlyBalance = Utils.mergeArrays(monthlyBalance, thisBalance);
+        }
+        return monthlyBalance;
+    }
+
+    /**
+     * Returns value of monthly turnover for specified account.
+     */
+    public Integer[] getAccountMonthlyTurnover(String year, AccountsModel.Account account) {
+        String accountType = Service.SCHEMA.getSchemaAccountType(year, account.getSchemaId());
+        if (accountType.equals(Constants.AccountType.OFF_BALANCE)) {
+            throw new IllegalArgumentException("Off-Balance accounts has no balance!");
+        }
+        try {
+            Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            for (TransactionsModel.Transaction tr : getModel(year).getTransaction()) {
+                if (tr.getDebit().equals(Constants.Account.CLOSING_ACC_ID)
+                        || tr.getDebit().equals(Constants.Account.PROFIT_ACC_ID)
+                        || tr.getDebit().equals(Constants.Account.INIT_ACC_ID)
+                        || tr.getCredit().equals(Constants.Account.CLOSING_ACC_ID)
+                        || tr.getCredit().equals(Constants.Account.PROFIT_ACC_ID)
+                        || tr.getCredit().equals(Constants.Account.INIT_ACC_ID)) {
+                    continue;
+                }
+                if (accountType.equals(Constants.AccountType.ASSET) || accountType.equals(Constants.AccountType.EXPENSE)) {
+                    if (tr.getDebit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
+                        monthlyBalance[month - 1] += Integer.parseInt(tr.getAmount());
+                    }
+                } else {
+                    if (tr.getCredit().equals(account.getFullId())) {
+                        int month = Integer.parseInt(tr.getDate().substring(2, 4));
+                        monthlyBalance[month - 1] += Integer.parseInt(tr.getAmount());
+                    }
+                }
+            }
+            return monthlyBalance;
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns value of mutual monthly turnover for specified list of accounts.
+     */
+    public Integer[] getMonthlyAccountListTurnover(String year, List<AccountsModel.Account> accountList) {
+        Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        for (AccountsModel.Account account : accountList) {
+            monthlyBalance = Utils.mergeArrays(monthlyBalance, Service.TRANSACTIONS.getAccountMonthlyTurnover(year, account));
+        }
+        return monthlyBalance;
+    }
+
+    /**
+     * Returns value of mutual monthly turnover for accounts matching specified schema ID prefix(es).
+     */
+    public Integer[] getMonthlySchemaIdPrefixTurnover(String year, String... schemaIdPrefixes) {
+        Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        for (String schemaIdPrefix : schemaIdPrefixes) {
+            Integer[] thisBalance = Service.TRANSACTIONS.getMonthlyAccountListTurnover(year, Service.ACCOUNT.getAccountsBySchemaId(year, schemaIdPrefix));
             monthlyBalance = Utils.mergeArrays(monthlyBalance, thisBalance);
         }
         return monthlyBalance;
