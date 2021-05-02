@@ -1,6 +1,7 @@
 .idea
 target
 classes
+*.iml
 *.rar
 *.zip
 firebase-config.js
