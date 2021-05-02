@@ -169,6 +169,19 @@ public class SchemaService {
             return false;
         }
     }
+
+    /**
+     * Returns name of specified schema class.
+     */
+    public String getClassName(String year, String schemaId) {
+        try {
+            return getClassById(getModel(year), schemaId.substring(0,1)).getName();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
     /**
      * Returns name of specified schema group.
      */
@@ -182,6 +195,13 @@ public class SchemaService {
     }
 
     /**
+     * Returns name of specified schema group.
+     */
+    public String getGroupName(String year, String schemaId) {
+        return getGroupName(year, schemaId.substring(0,1), schemaId.substring(1,2));
+    }
+
+    /**
      * Returns name of specified schema account.
      */
     public String getAccountName(String year, String classId, String groupId, String accountId) {
@@ -191,6 +211,13 @@ public class SchemaService {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
+    }
+
+    /**
+     * Returns name of specified schema account.
+     */
+    public String getAccountName(String year, String schemaId) {
+        return getAccountName(year, schemaId.substring(0,1), schemaId.substring(1,2), schemaId.substring(2,3));
     }
 
     /**

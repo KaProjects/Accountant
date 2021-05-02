@@ -2,7 +2,11 @@ package org.kaleta.accountant.frontend.component;
 
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.Utils;
+import org.kaleta.accountant.frontend.Configurable;
+import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.IconLoader;
+import org.kaleta.accountant.frontend.core.accounting.AccountAggregate;
+import org.kaleta.accountant.frontend.dialog.AccountingChartDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +15,7 @@ import java.awt.event.MouseEvent;
 import java.text.DateFormatSymbols;
 import java.util.Locale;
 
-public class AccountingRowPanel extends JPanel {
+public class AccountingRowPanel extends JPanel implements Configurable {
     public static final String HEADER = "HEADER";
     public static final String SUM = "SUM";
     public static final String CLASS = "CLASS";
@@ -25,7 +29,7 @@ public class AccountingRowPanel extends JPanel {
     public static final int VALUE_MONTHLY_BALANCE = 1;
     public static final int VALUE_INIT_MONTHLY_BALANCE = 2;
 
-    private String schemaId;
+    private AccountAggregate aggregate;
     private String rowType;
     private String title;
     private String initialValue;
@@ -36,58 +40,50 @@ public class AccountingRowPanel extends JPanel {
     private Font cellValueFont;
     private Color backgroundColor;
 
+    private Configuration configuration;
+
     /**
      * Constructor for the table header
      */
     public AccountingRowPanel(int valuesType) {
-        this.schemaId = "X";
+        this.aggregate = null;
         this.rowType = HEADER;
         this.title = "";
         this.initialValue = valuesType == 2 ? "Initial" : null;
-        this.monthlyBalance = new DateFormatSymbols(Locale.US).getMonths();
+        this.monthlyBalance = valuesType > 0 ? new DateFormatSymbols(Locale.US).getMonths() : null;
         this.balance = "Total";
         initDesign();
         initComponents();
     }
 
     /**
-     * Constructor for the single final balance
+     * Constructor for positive aggregate.
      */
-    public AccountingRowPanel(String schemaId, String rowType, String title, Integer balance) {
-        this.schemaId = schemaId;
+    public AccountingRowPanel(Configuration configuration, AccountAggregate aggregate, String rowType, int valuesType) {
+        setConfiguration(configuration);
+        this.aggregate = aggregate;
         this.rowType = rowType;
-        this.title = title;
-        this.initialValue = null;
-        this.monthlyBalance = null;
-        this.balance = String.valueOf(balance);
+        this.title = aggregate.getName();
+        this.initialValue = valuesType > 1 ? String.valueOf(aggregate.getInitialValue(configuration.getSelectedYear())) : null;
+        this.monthlyBalance = valuesType > 0 ? Utils.IntegerToStringArray(aggregate.getMonthlyBalance(configuration.getSelectedYear())) : null;
+        this.balance = String.valueOf(aggregate.getBalance(configuration.getSelectedYear()));
         initDesign();
         initComponents();
     }
 
     /**
-     * Constructor for the monthly and final balances.
+     * Constructor for aggregate.
      */
-    public AccountingRowPanel(String schemaId, String rowType, String title, Integer balance, Integer[] monthlyBalance) {
-        this.schemaId = schemaId;
+    public AccountingRowPanel(Configuration configuration, AccountAggregate aggregate, String rowType, int valuesType, boolean isPositive) {
+        setConfiguration(configuration);
+        this.aggregate = aggregate;
         this.rowType = rowType;
-        this.title = title;
-        this.initialValue = null;
-        this.monthlyBalance = monthlyBalance != null ? Utils.IntegerToStringArray(monthlyBalance) : null;
-        this.balance = String.valueOf(balance);
-        initDesign();
-        initComponents();
-    }
+        this.title = aggregate.getName();
 
-    /**
-     * Constructor for the initial, monthly and final balances.
-     */
-    public AccountingRowPanel(String schemaId, String rowType, String title, Integer balance, Integer[] monthlyBalance, Integer initialValue) {
-        this.schemaId = schemaId;
-        this.rowType = rowType;
-        this.title = title;
-        this.initialValue = initialValue != null ? String.valueOf(initialValue) : null;
-        this.monthlyBalance = monthlyBalance != null ? Utils.IntegerToStringArray(monthlyBalance) : null;
-        this.balance = String.valueOf(balance);
+        int sign = isPositive ? 1 : -1;
+        this.initialValue = valuesType > 1 ? String.valueOf(sign * aggregate.getInitialValue(configuration.getSelectedYear())) : null;
+        this.monthlyBalance = valuesType > 0 ? Utils.IntegerToStringArray(Utils.multiplyArrayValues(aggregate.getMonthlyBalance(configuration.getSelectedYear()), sign)) : null;
+        this.balance = String.valueOf(sign * aggregate.getBalance(configuration.getSelectedYear()));
         initDesign();
         initComponents();
     }
@@ -154,7 +150,7 @@ public class AccountingRowPanel extends JPanel {
         buttonGraph.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                // TODO: 6.1.2018 open graph and stuff..
+                new AccountingChartDialog(getConfiguration(), aggregate).setVisible(true);
             }
 
             @Override
@@ -171,7 +167,7 @@ public class AccountingRowPanel extends JPanel {
                 buttonGraph.revalidate();
             }
         });
-        if (schemaId.equals("X")) buttonGraph.setVisible(false);
+        if (aggregate == null) buttonGraph.setVisible(false);
 
         JPanel panelHeader = new JPanel();
         panelHeader.setLayout(new BoxLayout(panelHeader, BoxLayout.X_AXIS));
@@ -235,11 +231,17 @@ public class AccountingRowPanel extends JPanel {
                 .addComponent(panelValues, rowHeight, rowHeight, rowHeight));
     }
 
-    public String getSchemaId() {
-        return schemaId;
-    }
-
     public String getType() {
         return rowType;
+    }
+
+    @Override
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
     }
 }

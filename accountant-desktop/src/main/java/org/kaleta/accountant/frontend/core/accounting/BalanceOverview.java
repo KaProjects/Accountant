@@ -10,17 +10,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BalanceOverview extends AccountingOverview {
 
-    public BalanceOverview(Configuration configuration){
+    public BalanceOverview(Configuration configuration) {
         setConfiguration(configuration);
         update();
     }
 
     public void update() {
         String year = getConfiguration().getSelectedYear();
+        int valuesType = AccountingRowPanel.VALUE_BALANCE;
 
         List<SchemaModel.Class> assetsClasses = Service.SCHEMA.getSchemaClassListByAccountType(year, Constants.AccountType.ASSET);
         assetsClasses.get(0).getGroup().add(Service.SCHEMA.getGroup(year, "0", "9"));
@@ -29,68 +31,80 @@ public class BalanceOverview extends AccountingOverview {
 
         JPanel assetsContent = new JPanel();
         assetsContent.setLayout(new BoxLayout(assetsContent, BoxLayout.Y_AXIS));
-        int assetsBalance = 0;
+
+        List<String> assetGroupSchemaIds = new ArrayList<>();
         for (SchemaModel.Class clazz : assetsClasses) {
             JPanel classBody = getBodyPanelInstance();
-            int classBalance = 0;
+
+            List<String> groupSchemaIds = new ArrayList<>();
+
             for (SchemaModel.Class.Group group : clazz.getGroup()) {
                 JPanel groupBody = getBodyPanelInstance();
-                String groupSchemaId = clazz.getId() + group.getId();
-                Integer groupBalance = Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, groupSchemaId);
-                if (groupSchemaId.equals("09")) groupBalance = -groupBalance;
+                AccountAggregate groupAggregate = AccountAggregate.create(group.getName()).increasing(clazz.getId() + group.getId());
+                if (!groupAggregate.getSchemaId().equals("09")) {
+                    groupSchemaIds.add(groupAggregate.getSchemaId());
+                }
+
                 for (SchemaModel.Class.Group.Account schemaAccount : group.getAccount()) {
-                    String accSchemaId = groupSchemaId + schemaAccount.getId();
-                    Integer accBalance = Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, accSchemaId);
-                    if (groupSchemaId.equals("09")) accBalance = -accBalance;
-                    AccountingRowPanel accountHeader = new AccountingRowPanel(accSchemaId, AccountingRowPanel.ACCOUNT, schemaAccount.getName(), accBalance);
+                    AccountAggregate accountAggregate = AccountAggregate.create(schemaAccount.getName()).increasing(groupAggregate.getSchemaId() + schemaAccount.getId());
+                    AccountingRowPanel accountHeader = new AccountingRowPanel(getConfiguration(), accountAggregate, AccountingRowPanel.ACCOUNT, valuesType, !groupAggregate.getSchemaId().equals("09"));
                     groupBody.add(accountHeader);
                 }
-                AccountingRowPanel groupHeader = new AccountingRowPanel(clazz.getId() + group.getId(), AccountingRowPanel.GROUP, group.getName(), groupBalance);
+                AccountingRowPanel groupHeader = new AccountingRowPanel(getConfiguration(), groupAggregate, AccountingRowPanel.GROUP, valuesType, !groupAggregate.getSchemaId().equals("09"));
                 classBody.add(getListPanel(groupHeader, groupBody));
-                classBalance += groupBalance;
             }
-            AccountingRowPanel classHeader = new AccountingRowPanel(clazz.getId(), AccountingRowPanel.CLASS, clazz.getName(), classBalance);
+
+            AccountAggregate classAgg = AccountAggregate.create(clazz.getName()).increasing(groupSchemaIds.toArray(new String[]{}));
+            if (clazz.getId().equals("0")) {
+                classAgg.decreasing("09");
+            }
+            AccountingRowPanel classHeader = new AccountingRowPanel(getConfiguration(), classAgg, AccountingRowPanel.CLASS, valuesType);
             assetsContent.add(getListPanel(classHeader, classBody));
-            assetsBalance += classBalance;
+            assetGroupSchemaIds.addAll(groupSchemaIds);
         }
-        AccountingRowPanel assetsHeader = new AccountingRowPanel("A", AccountingRowPanel.SUM, "Debit Sum", assetsBalance);
+
+        AccountAggregate assetAgg = AccountAggregate.create("Debit Sum").increasing(assetGroupSchemaIds.toArray(new String[]{})).decreasing("09");
+        AccountingRowPanel assetsHeader = new AccountingRowPanel(getConfiguration(), assetAgg, AccountingRowPanel.SUM, valuesType);
         JPanel assetsPanel = getListPanel(assetsHeader, assetsContent);
         assetsPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
 
         JPanel liabilitiesContent = new JPanel();
         liabilitiesContent.setLayout(new BoxLayout(liabilitiesContent, BoxLayout.Y_AXIS));
-        int liabilitiesBalance = 0;
+
+        List<String> liabilitiesGroupSchemaIds = new ArrayList<>();
         for (SchemaModel.Class clazz : liabilitiesClasses) {
             JPanel classBody = getBodyPanelInstance();
-            int classBalance = 0;
+
+            List<String> groupSchemaIds = new ArrayList<>();
+
             for (SchemaModel.Class.Group group : clazz.getGroup()) {
                 JPanel groupBody = getBodyPanelInstance();
-                String groupSchemaId = clazz.getId() + group.getId();
-                Integer groupBalance = Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, groupSchemaId);
+                AccountAggregate groupAggregate = AccountAggregate.create(group.getName()).increasing(clazz.getId() + group.getId());
+                groupSchemaIds.add(groupAggregate.getSchemaId());
                 for (SchemaModel.Class.Group.Account schemaAccount : group.getAccount()) {
-                    String accSchemaId = groupSchemaId + schemaAccount.getId();
-                    Integer accBalance = Service.TRANSACTIONS.getSchemaIdPrefixBalance(year, accSchemaId);
-                    AccountingRowPanel accountHeader = new AccountingRowPanel(accSchemaId, AccountingRowPanel.ACCOUNT, schemaAccount.getName(), accBalance);
+                    AccountAggregate accountAggregate = AccountAggregate.create(schemaAccount.getName()).increasing(groupAggregate.getSchemaId() + schemaAccount.getId());
+                    AccountingRowPanel accountHeader = new AccountingRowPanel(getConfiguration(), accountAggregate, AccountingRowPanel.ACCOUNT, valuesType);
                     groupBody.add(accountHeader);
                 }
-                AccountingRowPanel groupHeader = new AccountingRowPanel(clazz.getId() + group.getId(), AccountingRowPanel.GROUP, group.getName(), groupBalance);
+                AccountingRowPanel groupHeader = new AccountingRowPanel(getConfiguration(), groupAggregate, AccountingRowPanel.GROUP, valuesType);
                 classBody.add(getListPanel(groupHeader, groupBody));
-                classBalance += groupBalance;
             }
-            AccountingRowPanel classHeader = new AccountingRowPanel(clazz.getId(), AccountingRowPanel.CLASS, clazz.getName(), classBalance);
+            AccountAggregate classAgg = AccountAggregate.create(clazz.getName()).increasing(groupSchemaIds.toArray(new String[]{}));
+            AccountingRowPanel classHeader = new AccountingRowPanel(getConfiguration(), classAgg, AccountingRowPanel.CLASS, valuesType);
             liabilitiesContent.add(getListPanel(classHeader, classBody));
-            liabilitiesBalance += classBalance;
+            liabilitiesGroupSchemaIds.addAll(groupSchemaIds);
         }
 
-        int profit = assetsBalance - liabilitiesBalance;
-        AccountingRowPanel profitHeader = new AccountingRowPanel("X", AccountingRowPanel.SUM, "Profit", profit);
-        liabilitiesContent.add(profitHeader);
-        liabilitiesBalance += profit;
-
-        AccountingRowPanel liabilitiesHeader = new AccountingRowPanel("L", AccountingRowPanel.SUM, "Credit Sum", liabilitiesBalance);
+        AccountAggregate liabilitiesAgg = AccountAggregate.create("Credit Sum").increasing(liabilitiesGroupSchemaIds.toArray(new String[]{}));
+        AccountingRowPanel liabilitiesHeader = new AccountingRowPanel(getConfiguration(), liabilitiesAgg, AccountingRowPanel.SUM, valuesType);
         JPanel liabilitiesPanel = getListPanel(liabilitiesHeader, liabilitiesContent);
         liabilitiesPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        liabilitiesGroupSchemaIds.add("09");
+        AccountAggregate profitAgg = AccountAggregate.create("Profit").increasing(assetGroupSchemaIds.toArray(new String[]{})).decreasing(liabilitiesGroupSchemaIds.toArray(new String[]{}));
+        AccountingRowPanel profitHeader = new AccountingRowPanel(getConfiguration(), profitAgg, AccountingRowPanel.SUM, valuesType);
+        liabilitiesContent.add(profitHeader);
 
         this.removeAll();
         GroupLayout layout = new GroupLayout(this);
