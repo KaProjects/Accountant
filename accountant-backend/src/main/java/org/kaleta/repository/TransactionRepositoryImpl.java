@@ -15,7 +15,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     @Override
     public void syncTransactions(Transactions data) {
-        entityManager.createQuery("DELETE FROM Transaction WHERE year=:year").setParameter("year", data.getYear()).executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM Transaction WHERE year=?")
+                .setParameter(1, data.getYear())
+                .executeUpdate();
 
         for (Transactions.Transaction transaction : data.getTransaction()) {
             entityManager.createNativeQuery("INSERT INTO Transaction (id, year, date, description, amount, debit, credit) VALUES (?,?,?,?,?,?,?)")
@@ -25,7 +27,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                     .setParameter(4, transaction.getDescription())
                     .setParameter(5, transaction.getAmount())
                     .setParameter(6, transaction.getDebit())
-                    .setParameter(7, transaction.getCredit()).executeUpdate();
+                    .setParameter(7, transaction.getCredit())
+                    .executeUpdate();
 
         }
     }
@@ -35,6 +38,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         return entityManager.createQuery("SELECT t FROM Transaction t WHERE t.year=:year AND t.debit LIKE :debit AND t.credit LIKE :credit", Transaction.class)
                 .setParameter("year", year)
                 .setParameter("debit", debitPrefix + "%")
-                .setParameter("credit", creditPrefix + "%").getResultList();
+                .setParameter("credit", creditPrefix + "%")
+                .getResultList();
     }
 }

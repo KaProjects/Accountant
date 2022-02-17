@@ -23,13 +23,27 @@ public class TransactionResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @JacksonFeatures(serializationEnable =  { SerializationFeature.INDENT_OUTPUT })
+    @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}/{debitPrefix}/{creditPrefix}")
     public List<YearTransactionDto> getTransactionsMatching(@PathParam String year, @PathParam String debitPrefix, @PathParam String creditPrefix) {
-        if (!year.matches("2\\d\\d\\d")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
-        if (!debitPrefix.matches("\\d?\\d?\\d")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Debit Prefix Parameter");
-        if (!creditPrefix.matches("\\d?\\d?\\d")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Credit Prefix Parameter");
+        if (!year.matches("20\\d\\d"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
+        if (!debitPrefix.matches("\\d?\\d?\\d"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Debit Prefix Parameter");
+        if (!creditPrefix.matches("\\d?\\d?\\d"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Credit Prefix Parameter");
 
         return service.getTransactionsMatching(year, debitPrefix, creditPrefix);
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
+    @Path("/{year}")
+    public List<YearTransactionDto> getTransactionsMatching(@PathParam String year) {
+        if (!year.matches("20\\d\\d"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
+
+        return service.getTransactionsMatching(year, "", "");
     }
 }

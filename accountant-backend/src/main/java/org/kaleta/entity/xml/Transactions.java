@@ -19,7 +19,7 @@ public class Transactions {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Transactions{year='" + year + "', transaction=[\n");
-        for (Transaction tr : transaction){
+        for (Transaction tr : transaction) {
             sb.append("    {" +
                     "id='" + tr.id + '\'' +
                     ", date='" + tr.date + '\'' +

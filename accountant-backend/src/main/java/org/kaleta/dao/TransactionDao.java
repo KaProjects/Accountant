@@ -5,7 +5,7 @@ import org.kaleta.repository.TransactionRepository;
 import org.springframework.data.repository.CrudRepository;
 
 /**
- * Only to group CrudRepo and TransactionRepo.
+ * Only to group CrudRepository and TransactionRepository.
  */
 public interface TransactionDao extends CrudRepository<Transaction, String>, TransactionRepository {
 
