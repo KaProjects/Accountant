@@ -8,7 +8,7 @@ import javax.persistence.PersistenceContext;
 public class SchemaRepositoryImpl implements SchemaRepository {
 
     @PersistenceContext
-    private EntityManager entityManager;
+    EntityManager entityManager;
 
     @Override
     public void syncSchema(Schema data) {

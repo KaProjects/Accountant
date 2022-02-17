@@ -8,7 +8,7 @@ import javax.persistence.PersistenceContext;
 public class AccountRepositoryImpl implements AccountRepository {
 
     @PersistenceContext
-    private EntityManager entityManager;
+    EntityManager entityManager;
 
     @Override
     public void syncAccounts(Accounts data) {
