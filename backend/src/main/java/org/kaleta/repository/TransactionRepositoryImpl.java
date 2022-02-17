@@ -11,7 +11,7 @@ import java.util.UUID;
 public class TransactionRepositoryImpl implements TransactionRepository {
 
     @PersistenceContext
-    private EntityManager entityManager;
+    EntityManager entityManager;
 
     @Override
     public void syncTransactions(Transactions data) {
