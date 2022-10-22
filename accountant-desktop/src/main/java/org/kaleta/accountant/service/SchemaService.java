@@ -171,6 +171,20 @@ public class SchemaService {
     }
 
     /**
+     * Returns true if specified account exists, false otherwise.
+     */
+    public boolean checkAccountExists(String year, String classId, String groupId, String accountId){
+        try {
+            SchemaModel.Class.Group group = this.getGroup(year, classId, groupId);
+            if (group == null) return false;
+            SchemaModel.Class.Group.Account account = this.getAccountById(group, accountId);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * Returns name of specified schema class.
      */
     public String getClassName(String year, String schemaId) {
