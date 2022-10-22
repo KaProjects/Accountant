@@ -12,6 +12,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AccountingOverview extends JPanel implements Configurable {
     public static final String HIDEABLE = "HIDEABLE";
@@ -101,12 +103,34 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
         return sumPanel;
     }
 
-    protected JPanel getGroupPanelInstance(String classId, String groupId, String groupType, int valuesType, boolean isPositive) {
+    protected JPanel getSubGroupPanelInstance(String classId, String groupId, List<String> accIds, String groupType, int valuesType){
         String year = getConfiguration().getSelectedYear();
 
         if (!Service.SCHEMA.checkGroupExists(year, classId, groupId)) return getBodyPanelInstance();
 
-        int sign = isPositive ? 1 : -1;
+        JPanel groupBody = getBodyPanelInstance();
+        String groupSchemaId = classId + groupId;
+        java.util.List<String> schemaIds = new ArrayList<>();
+        for (String accId : accIds) {
+            String schemaId = groupSchemaId + accId;
+            if (Service.SCHEMA.checkAccountExists(year, classId, groupId, accId)) {
+                schemaIds.add(schemaId);
+                String accountName = Service.SCHEMA.getAccountName(year, schemaId);
+                AccountAggregate accountAggregate = AccountAggregate.create(accountName).increasing(schemaId);
+                AccountingRowPanel accountPanel = new AccountingRowPanel(getConfiguration(), accountAggregate, AccountingRowPanel.ACCOUNT, valuesType, true);
+                groupBody.add(accountPanel);
+            }
+        }
+
+        AccountAggregate groupAggregate = AccountAggregate.create(Service.SCHEMA.getGroupName(year, groupSchemaId)).increasing(schemaIds.toArray(new String[]{}));
+
+        return constructGroupPanel(groupType, valuesType, true, groupBody, groupAggregate);
+    }
+
+    protected JPanel getGroupPanelInstance(String classId, String groupId, String groupType, int valuesType, boolean isPositive) {
+        String year = getConfiguration().getSelectedYear();
+
+        if (!Service.SCHEMA.checkGroupExists(year, classId, groupId)) return getBodyPanelInstance();
 
         JPanel groupBody = getBodyPanelInstance();
         String groupSchemaId = classId + groupId;
@@ -117,6 +141,11 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
         }
 
         AccountAggregate groupAggregate = AccountAggregate.create(Service.SCHEMA.getGroupName(year, groupSchemaId)).increasing(groupSchemaId);
+
+        return constructGroupPanel(groupType, valuesType, isPositive, groupBody, groupAggregate);
+    }
+
+    private JPanel constructGroupPanel(String groupType, int valuesType, boolean isPositive, JPanel groupBody, AccountAggregate groupAggregate) {
         AccountingRowPanel groupHeader = new AccountingRowPanel(getConfiguration(), groupAggregate, groupType, valuesType, isPositive);
         groupHeader.addMouseListener(new MouseAdapter() {
             @Override
