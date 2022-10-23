@@ -56,7 +56,8 @@ public class AppFrame extends JFrame implements Configuration {
 
         JMenu importMenu = new ActiveYearMenu("Import");
         importMenu.setMnemonic(KeyEvent.VK_I);
-        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_MASK)));
+        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsFromAndroidDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK)));
+        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsFromPdfDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK)));
 
         menuBar.add(fileMenu);
         menuBar.add(addMenu);

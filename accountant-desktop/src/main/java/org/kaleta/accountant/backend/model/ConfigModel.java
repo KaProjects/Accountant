@@ -6,18 +6,22 @@ import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "years"
+        "years",
+        "mapping"
 })
 @XmlRootElement(name = "config")
 public class ConfigModel {
 
     @XmlElement(required = true)
-    private ConfigModel.Years years = new Years();
+    protected ConfigModel.Years years;
+    @XmlElement(required = true)
+    protected ConfigModel.Mapping mapping;
 
     public ConfigModel(){}
 
     public ConfigModel(ConfigModel configModel){
         this.setYears(new ConfigModel.Years(configModel.getYears()));
+        this.setMapping(new ConfigModel.Mapping(configModel.getMapping()));
     }
 
     public ConfigModel.Years getYears() {
@@ -28,6 +32,13 @@ public class ConfigModel {
         this.years = value;
     }
 
+    public ConfigModel.Mapping getMapping() {
+        return mapping;
+    }
+
+    public void setMapping(ConfigModel.Mapping value) {
+        this.mapping = value;
+    }
 
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
@@ -83,6 +94,65 @@ public class ConfigModel {
 
             public void setName(String value) {
                 this.name = value;
+            }
+
+        }
+
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+            "debit"
+    })
+    public static class Mapping {
+
+        protected List<ConfigModel.Mapping.Debit> debit;
+
+        public Mapping(){}
+
+        Mapping(Mapping mapping){
+            for (ConfigModel.Mapping.Debit debit : mapping.getDebit()){
+                this.getDebit().add(new ConfigModel.Mapping.Debit(debit));
+            }
+        }
+
+        public List<ConfigModel.Mapping.Debit> getDebit() {
+            if (debit == null) {
+                debit = new ArrayList<>();
+            }
+            return this.debit;
+        }
+
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "")
+        public static class Debit {
+
+            @XmlAttribute(name = "substring", required = true)
+            protected String substring;
+            @XmlAttribute(name = "account", required = true)
+            protected String account;
+
+            public Debit(){}
+
+            Debit(Mapping.Debit debit){
+                this.setSubstring(debit.getSubstring());
+                this.setAccount(debit.getAccount());
+            }
+
+            public String getSubstring() {
+                return substring;
+            }
+
+            public void setSubstring(String value) {
+                this.substring = value;
+            }
+
+            public String getAccount() {
+                return account;
+            }
+
+            public void setAccount(String value) {
+                this.account = value;
             }
 
         }

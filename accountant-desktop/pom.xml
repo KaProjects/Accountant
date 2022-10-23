@@ -6,7 +6,7 @@
 
     <groupId>org.kaleta</groupId>
     <artifactId>accountant-desktop</artifactId>
-    <version>1.4.1</version>
+    <version>1.5</version>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/junit/junit -->
@@ -35,6 +35,22 @@
             <version>1.5.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parser-pdf-module</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+        </dependency>
 
     </dependencies>
 

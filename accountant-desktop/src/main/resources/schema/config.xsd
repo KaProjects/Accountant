@@ -15,6 +15,18 @@
                         <xs:attribute name="active" use="required" type="xs:string"/>
                     </xs:complexType>
                 </xs:element>
+                <xs:element name="mapping">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="debit" minOccurs="0" maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:attribute name="substring" use="required" type="xs:string"/>
+                                    <xs:attribute name="account" use="required" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
