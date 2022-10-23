@@ -10,8 +10,14 @@
         Initializer.VERSION: x.y -> x.y+1-snapshot
         Initializer.CONTEXT = devel
 
-## 1.5
+## 1.6
 Released: TODO
+
+
+## 1.5
+Released: 23.10.2022
+
+    pdf parser for repeating transactions, updated config to store mappings
 
 ## 1.4.1
 Released: 22.10.2022
