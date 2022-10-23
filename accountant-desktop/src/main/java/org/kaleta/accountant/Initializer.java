@@ -23,6 +23,8 @@ public class Initializer {
     public static final Logger LOG = Logger.getLogger("Logger");
     public static int CONTEXT;
 
+    public static final String DEFAULT_FILES_DIR = "C:/Users/stanley/Downloads";
+
     public static String getDataSource(){
         String appParentPath = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation().getPath())
                 .getParentFile().getPath() + File.separator;

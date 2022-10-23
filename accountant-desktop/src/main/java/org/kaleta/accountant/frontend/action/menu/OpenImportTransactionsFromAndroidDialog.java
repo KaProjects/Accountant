@@ -2,18 +2,18 @@ package org.kaleta.accountant.frontend.action.menu;
 
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.TransactionPanel;
-import org.kaleta.accountant.frontend.dialog.ImportTransactionsDialog;
+import org.kaleta.accountant.frontend.dialog.ImportTransactionsFromAndroidDialog;
 import org.kaleta.accountant.service.Service;
 
-public class OpenImportTransactionsDialog extends MenuAction {
+public class OpenImportTransactionsFromAndroidDialog extends MenuAction {
 
-    public OpenImportTransactionsDialog(Configuration config) {
-        super(config, "Import Transaction(s)");
+    public OpenImportTransactionsFromAndroidDialog(Configuration config) {
+        super(config, "Android Transaction(s)");
     }
 
     @Override
     protected void actionPerformed() {
-        ImportTransactionsDialog dialog = new ImportTransactionsDialog(getConfiguration(), Service.FIREBASE.loadTransactions());
+        ImportTransactionsFromAndroidDialog dialog = new ImportTransactionsFromAndroidDialog(getConfiguration());
         dialog.setVisible(true);
         if (dialog.getResult()) {
             for (TransactionPanel panel : dialog.getTransactionPanelList()) {

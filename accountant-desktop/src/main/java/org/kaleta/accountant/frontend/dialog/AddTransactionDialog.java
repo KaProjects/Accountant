@@ -157,7 +157,7 @@ public class AddTransactionDialog extends Dialog {
         addTransactionPanel(null);
     }
 
-    private void addTransactionPanel(Consumer<TransactionPanel> transactionPanelConsumer){
+    public void addTransactionPanel(Consumer<TransactionPanel> transactionPanelConsumer){
         TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, accountMap, classList, this, true);
         transactionPanel.addDeleteAction(e1 -> {
             transactionPanel.disableValidators();

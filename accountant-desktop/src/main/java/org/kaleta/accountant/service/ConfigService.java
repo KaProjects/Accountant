@@ -188,4 +188,16 @@ public class ConfigService {
             throw new ServiceFailureException(e);
         }
     }
+
+    /**
+     * Loads all debit mappings [substring,account] specified in configuration file.
+     */
+    public List<ConfigModel.Mapping.Debit> getDebitMappings(){
+        try {
+            return getModel().getMapping().getDebit();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
 }
