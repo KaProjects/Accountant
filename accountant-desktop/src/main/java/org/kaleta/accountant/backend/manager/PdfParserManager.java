@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PdfParserManager {
@@ -105,6 +106,8 @@ public class PdfParserManager {
 
             transactions.add(transaction);
         }
+        System.out.println("transactions loaded: " + transactions.size());
+        Collections.reverse(transactions);
         return transactions;
     }
 
