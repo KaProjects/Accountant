@@ -22,3 +22,13 @@ CREATE TABLE Account (
     metadata TINYTEXT NOT NULL,
     PRIMARY KEY(year, schema_id, semantic_id)
 );
+CREATE TABLE Budgeting (
+    year CHAR(4) NOT NULL,
+    id VARCHAR(10) NOT NULL,
+    name TINYTEXT NOT NULL,
+    debit VARCHAR(9),
+    credit VARCHAR(9),
+    description TINYTEXT,
+    planning TINYTEXT,
+    PRIMARY KEY(year, id)
+);

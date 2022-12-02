@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
-@Table(name = "ASchema")
-public class Schema {
+@Table(name = "Budgeting")
+public class Budgeting {
 
     @EmbeddedId
     private YearId yearId;
@@ -20,7 +20,15 @@ public class Schema {
     @NotNull
     private String name;
 
-    @Column(name = "type")
-    @NotNull
-    private String type;
+    @Column(name = "debit")
+    private String debit;
+
+    @Column(name = "credit")
+    private String credit;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "planning")
+    private String planning;
 }

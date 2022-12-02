@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Data
 @Embeddable
-public class SchemaId implements Serializable {
+public class YearId implements Serializable {
 
     @Column(name = "year")
     @NotNull

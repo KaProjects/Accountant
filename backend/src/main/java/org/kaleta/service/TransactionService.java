@@ -8,4 +8,8 @@ public interface TransactionService {
 
 
     List<YearTransactionDto> getTransactionsMatching(String year, String debitPrefix, String creditPrefix);
+
+    Integer[] monthlyBalanceByAccounts(String year, String debit, String credit);
+
+    Integer[] monthlyBalanceByAccounts(String year, String debit, String credit, String description);
 }
