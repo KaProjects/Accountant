@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <EditText
+        android:id="@+id/textName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="name"
+        android:inputType="text"
+        android:textAlignment="center" />
+    <Spinner
+        android:id="@+id/debitSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="53dp"
+        android:spinnerMode="dialog"
+        android:layout_span="2"/>
+    <Spinner
+        android:id="@+id/creditSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="53dp"
+        android:spinnerMode="dialog"
+        android:layout_span="2" />
+    <EditText
+        android:id="@+id/textAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="amount"
+        android:inputType="number"
+        android:textAlignment="textEnd" />
+    <EditText
+        android:id="@+id/textDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="description"
+        android:inputType="text" />
+</LinearLayout>

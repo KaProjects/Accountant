@@ -1,11 +1,18 @@
 package org.kaleta.accountant;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import org.kaleta.accountant.dialog.AddAccountDialog;
+import org.kaleta.accountant.dialog.AddTemplateDialog;
+import org.kaleta.accountant.dialog.AddTransactionDialog;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,7 +25,11 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.add);
         fab.setOnClickListener(view -> {
-            new AddTransactionDialog(this).show();
+            AddTransactionDialog builder = new AddTransactionDialog(this);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            builder.createValidator(dialog.getButton(AlertDialog.BUTTON_POSITIVE));
+
         });
 
         RecyclerView recyclerView = findViewById(R.id.transaction);
@@ -30,26 +41,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // TODO: 15.9.2018 if menu
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_add_account) {
+            AddAccountDialog builder = new AddAccountDialog(this);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            builder.createValidator(dialog.getButton(AlertDialog.BUTTON_POSITIVE));
+
+            return true;
+        }
+        if (id == R.id.action_create_template) {
+            AddTemplateDialog builder = new AddTemplateDialog(this);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            builder.createValidator(dialog.getButton(AlertDialog.BUTTON_POSITIVE));
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
