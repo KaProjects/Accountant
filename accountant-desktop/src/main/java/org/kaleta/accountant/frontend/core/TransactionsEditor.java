@@ -18,14 +18,20 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionsEditor extends JPanel implements Configurable {
     private Configuration configuration;
 
     private final JPanel panelProcedures;
 
+    private List<ProceduresModel.Group> procedureGroups = new ArrayList<>();
     public TransactionsEditor(Configuration configuration) {
         setConfiguration(configuration);
+
+        procedureGroups.addAll(Service.PROCEDURES.getProcedureGroupList(getConfiguration().getSelectedYear()));
+
         JButton buttonAddTr = new JButton("Add Transaction(s)");
         buttonAddTr.addActionListener(new OpenAddTransactionDialog(this));
 
@@ -35,7 +41,7 @@ public class TransactionsEditor extends JPanel implements Configurable {
         panelProcedures = new JPanel();
         panelProcedures.setLayout(new WrapLayout(FlowLayout.LEFT));
         panelProcedures.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Constants.Color.OVERVIEW_CLASS.brighter()),
-                "Created Procedures",
+                "Procedures",
                 TitledBorder.DEFAULT_JUSTIFICATION,
                 TitledBorder.DEFAULT_POSITION,
                 new JLabel().getFont(),
@@ -62,11 +68,31 @@ public class TransactionsEditor extends JPanel implements Configurable {
         update();
     }
 
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        panelProcedures.repaint();
+        panelProcedures.revalidate();
+    }
+
     public void update(){
         panelProcedures.removeAll();
-        for (ProceduresModel.Procedure procedure : Service.PROCEDURES.getProcedureList(getConfiguration().getSelectedYear())) {
-            ProcedurePanel procedurePanel = new ProcedurePanel(procedure);
-            panelProcedures.add(procedurePanel);
+        for (ProceduresModel.Group group : procedureGroups) {
+            JPanel panelProcedureGroup = new JPanel();
+            panelProcedureGroup.setLayout(new WrapLayout(FlowLayout.LEFT));
+            panelProcedureGroup.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Constants.Color.OVERVIEW_GROUP.brighter()),
+                    group.getName(),
+                    TitledBorder.DEFAULT_JUSTIFICATION,
+                    TitledBorder.DEFAULT_POSITION,
+                    new JLabel().getFont(),
+                    Constants.Color.OVERVIEW_GROUP));
+            panelProcedureGroup.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            for (ProceduresModel.Group.Procedure procedure : group.getProcedure()){
+                ProcedurePanel procedurePanel = new ProcedurePanel(procedure, group.getName());
+                panelProcedureGroup.add(procedurePanel);
+            }
+            panelProcedures.add(panelProcedureGroup);
         }
         panelProcedures.repaint();
         panelProcedures.revalidate();
@@ -83,7 +109,7 @@ public class TransactionsEditor extends JPanel implements Configurable {
     }
 
     private class ProcedurePanel extends JPanel {
-        ProcedurePanel(ProceduresModel.Procedure procedure){
+        ProcedurePanel(ProceduresModel.Group.Procedure procedure, String groupName){
             this.setBorder(BorderFactory.createLineBorder(Constants.Color.OVERVIEW_GROUP, 2, true));
             this.setBackground(Color.LIGHT_GRAY);
 
@@ -108,7 +134,7 @@ public class TransactionsEditor extends JPanel implements Configurable {
             });
             JButton buttonEdit = new JButton(IconLoader.getIcon(IconLoader.EDIT, new Dimension(15,15)));
             buttonEdit.setBackground(Color.LIGHT_GRAY);
-            buttonEdit.addActionListener(new OpenEditProcedureDialog(getConfiguration(), procedure));
+            buttonEdit.addActionListener(new OpenEditProcedureDialog(getConfiguration(), procedure, groupName));
 
             GroupLayout layout = new GroupLayout(this);
             this.setLayout(layout);

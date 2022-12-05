@@ -14,11 +14,13 @@ import java.util.Map;
 import java.util.Set;
 
 public class OpenEditProcedureDialog extends MenuAction {
-    private ProceduresModel.Procedure procedure;
+    private ProceduresModel.Group.Procedure procedure;
+    private String procedureGroup;
 
-    public OpenEditProcedureDialog(Configuration config, ProceduresModel.Procedure procedure) {
+    public OpenEditProcedureDialog(Configuration config, ProceduresModel.Group.Procedure procedure, String procedureGroup) {
         super(config, "Edit Procedure");
         this.procedure = procedure;
+        this.procedureGroup = procedureGroup;
     }
 
     @Override
@@ -26,11 +28,12 @@ public class OpenEditProcedureDialog extends MenuAction {
         Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
         List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
         Map<AccountPairModel, Set<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
+        List<String> procedureGroupNameList = Service.PROCEDURES.getProcedureGroupNameList(getConfiguration().getSelectedYear());
 
-        CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, procedure);
+        CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, procedure, procedureGroup, procedureGroupNameList);
         dialog.setVisible(true);
         if (dialog.getResult()){
-            Service.PROCEDURES.updateProcedure(getConfiguration().getSelectedYear(), procedure.getId(), dialog.getProcedureName(), dialog.getTransactions());
+            Service.PROCEDURES.updateProcedure(getConfiguration().getSelectedYear(), procedure.getId(), dialog.getProcedureName(), dialog.getGroupName(), dialog.getTransactions());
             getConfiguration().update(Configuration.PROCEDURE_UPDATED);
         }
     }

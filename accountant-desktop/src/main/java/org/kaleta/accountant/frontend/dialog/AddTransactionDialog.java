@@ -30,7 +30,7 @@ public class AddTransactionDialog extends Dialog {
 
     public AddTransactionDialog(Configuration configuration, Map<AccountPairModel, Set<String>> accountPairDescriptionMap,
                                 Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
-                                ProceduresModel.Procedure procedure) {
+                                ProceduresModel.Group.Procedure procedure) {
         super(configuration, "Adding Transaction(s)", "Add");
         setModal(false);
         this.accountPairDescriptionMap = accountPairDescriptionMap;
@@ -41,7 +41,7 @@ public class AddTransactionDialog extends Dialog {
         if (procedure == null) {
             addTransactionPanel();
         } else {
-            for (ProceduresModel.Procedure.Transaction preparedTr : procedure.getTransaction()){
+            for (ProceduresModel.Group.Procedure.Transaction preparedTr : procedure.getTransaction()){
                 addTransactionPanel();
                 TransactionPanel panel = transactionPanelList.get(transactionPanelList.size() - 1);
                 panel.setDescription(preparedTr.getDescription());
@@ -188,31 +188,43 @@ public class AddTransactionDialog extends Dialog {
     private void addProcedurePanel() {
         Dialog dialog = new Dialog(getConfiguration(), "Selecting Procedure...", "Select") {};
 
-        List<ProceduresModel.Procedure> procedureList = Service.PROCEDURES.getProcedureList(getConfiguration().getSelectedYear());
+        List<ProceduresModel.Group> procedureGroupList = Service.PROCEDURES.getProcedureGroupList(getConfiguration().getSelectedYear());
 
-        JList<String> list = new ValidatedProcedureList(procedureList);
-        list.addListSelectionListener(dialog);
-        list.setSelectedIndex(-1);
-        list.setCellRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                Component c = super.getListCellRendererComponent(list, "   " + value + "   ", index, isSelected, cellHasFocus);
-                c.setBackground(new JPanel().getBackground());
-                c.setFont(new Font(c.getFont().getName(), Font.BOLD, 15));
-                return c;
-            }
-        });
+        List<JList<String>> uiLists = new ArrayList<>();
+
+        JTabbedPane pane = new JTabbedPane();
+        for(ProceduresModel.Group group : procedureGroupList)
+        {
+            JList<String> list = new ValidatedProcedureList(group.getProcedure());
+            list.addListSelectionListener(dialog);
+            list.setSelectedIndex(-1);
+            list.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    Component c = super.getListCellRendererComponent(list, "   " + value + "   ", index, isSelected, cellHasFocus);
+                    c.setBackground(new JPanel().getBackground());
+                    c.setFont(new Font(c.getFont().getName(), Font.BOLD, 15));
+                    return c;
+                }
+            });
+
+            uiLists.add(list);
+            pane.addTab(group.getName(), new JScrollPane(list));
+        }
 
         dialog.setContent( layout -> {
-            layout.setHorizontalGroup(layout.createParallelGroup().addComponent(list));
-            layout.setVerticalGroup(layout.createSequentialGroup().addGap(5).addComponent(list).addGap(10));
+            layout.setHorizontalGroup(layout.createParallelGroup().addComponent(pane));
+            layout.setVerticalGroup(layout.createSequentialGroup().addGap(5).addComponent(pane).addGap(10));
         });
 
         dialog.setDialogValid("No Item Selected");
         dialog.pack();
+        dialog.setSize(dialog.getWidth()*2,dialog.getHeight());
         dialog.setVisible(true);
         if (dialog.getResult()) {
-            for (ProceduresModel.Procedure.Transaction transaction : procedureList.get(list.getSelectedIndex()).getTransaction()) {
+            ProceduresModel.Group group = procedureGroupList.get(pane.getSelectedIndex());
+            ProceduresModel.Group.Procedure procedure = group.getProcedure().get(uiLists.get(pane.getSelectedIndex()).getSelectedIndex());
+            for (ProceduresModel.Group.Procedure.Transaction transaction : procedure.getTransaction()) {
                 addTransactionPanel(transactionPanel -> {
                     transactionPanel.setAmount(transaction.getAmount());
                     transactionPanel.setDebitCreditDescription(transaction.getDebit(), transaction.getCredit(), transaction.getDescription());
@@ -255,7 +267,7 @@ public class AddTransactionDialog extends Dialog {
 
     private class ValidatedProcedureList extends JList<String> implements Validable {
 
-        ValidatedProcedureList(List<ProceduresModel.Procedure> procedureList) {
+        ValidatedProcedureList(List<ProceduresModel.Group.Procedure> procedureList) {
             super(new ListModel<String>() {
                 @Override
                 public int getSize() {
