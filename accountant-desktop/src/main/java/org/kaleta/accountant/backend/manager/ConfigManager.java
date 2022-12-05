@@ -26,6 +26,7 @@ public class ConfigManager implements Manager<ConfigModel> {
         ConfigModel.Years years = new ConfigModel.Years();
         years.setActive("-1");
         configModel.setYears(years);
+        configModel.setMapping(new ConfigModel.Mapping());
         update(configModel);
         Initializer.LOG.info("File created: '" + configFileUri + "'");
     }

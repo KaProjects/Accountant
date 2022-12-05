@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class ProcedurePanelClicked extends MouseAction {
-    private final ProceduresModel.Procedure procedure;
+    private final ProceduresModel.Group.Procedure procedure;
 
-    public ProcedurePanelClicked(Configurable configurable, ProceduresModel.Procedure procedure) {
+    public ProcedurePanelClicked(Configurable configurable, ProceduresModel.Group.Procedure procedure) {
         super(configurable);
         this.procedure = procedure;
     }

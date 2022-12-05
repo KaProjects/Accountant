@@ -14,12 +14,12 @@ import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "procedure"
+    "group"
 })
 @XmlRootElement(name = "procedures")
 public class ProceduresModel {
 
-    private List<Procedure> procedure;
+    private List<Group> group;
     @XmlAttribute(name = "year", required = true)
     private String year;
 
@@ -27,16 +27,16 @@ public class ProceduresModel {
 
     public ProceduresModel(ProceduresModel proceduresModel){
         this.setYear(proceduresModel.getYear());
-        for (ProceduresModel.Procedure procedure : proceduresModel.getProcedure()){
-            this.getProcedure().add(new ProceduresModel.Procedure(procedure));
+        for (ProceduresModel.Group group : proceduresModel.getGroup()){
+            this.getGroup().add(new ProceduresModel.Group(group));
         }
     }
 
-    public List<Procedure> getProcedure() {
-        if (procedure == null) {
-            procedure = new ArrayList<>();
+    public List<Group> getGroup() {
+        if (group == null) {
+            group = new ArrayList<>();
         }
-        return this.procedure;
+        return this.group;
     }
 
     public String getYear() {
@@ -49,40 +49,20 @@ public class ProceduresModel {
 
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "transaction"
+            "procedure"
     })
-    public static class Procedure {
+    public static class Group {
 
-        @XmlElement(required = true)
-        List<Transaction> transaction;
-        @XmlAttribute(name = "id", required = true)
-        String id;
         @XmlAttribute(name = "name", required = true)
-        String name;
+        private String name;
+        private List<Procedure> procedure;
 
-        public Procedure(){}
-
-        Procedure(Procedure procedure){
-            this.setId(procedure.getId());
-            this.setName(procedure.getName());
-            for (ProceduresModel.Procedure.Transaction transaction : procedure.getTransaction()){
-                this.getTransaction().add(new ProceduresModel.Procedure.Transaction(transaction));
+        public Group(){}
+        public Group(Group group) {
+            this.setName(group.name);
+            for (ProceduresModel.Group.Procedure procedure : group.getProcedure()){
+                this.getProcedure().add(new ProceduresModel.Group.Procedure(procedure));
             }
-        }
-
-        public List<Transaction> getTransaction() {
-            if (transaction == null) {
-                transaction = new ArrayList<>();
-            }
-            return this.transaction;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String value) {
-            this.id = value;
         }
 
         public String getName() {
@@ -93,58 +73,112 @@ public class ProceduresModel {
             this.name = value;
         }
 
+        public List<Procedure> getProcedure(){
+            if (procedure == null){
+                procedure = new ArrayList<>();
+            }
+            return this.procedure;
+        }
+
         @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "")
-        public static class Transaction {
+        @XmlType(name = "", propOrder = {
+                "transaction"
+        })
+        public static class Procedure {
 
-            @XmlAttribute(name = "description", required = true)
-            String description;
-            @XmlAttribute(name = "amount", required = true)
-            String amount;
-            @XmlAttribute(name = "debit", required = true)
-            String debit;
-            @XmlAttribute(name = "credit", required = true)
-            String credit;
+            @XmlElement(required = true)
+            List<Transaction> transaction;
+            @XmlAttribute(name = "id", required = true)
+            String id;
+            @XmlAttribute(name = "name", required = true)
+            String name;
 
-            public Transaction(){}
+            public Procedure(){}
 
-            Transaction(Transaction transaction){
-                this.setAmount(transaction.getAmount());
-                this.setDescription(transaction.getDescription());
-                this.setCredit(transaction.getCredit());
-                this.setDebit(transaction.getDebit());
+            Procedure(Procedure procedure){
+                this.setId(procedure.getId());
+                this.setName(procedure.getName());
+                for (ProceduresModel.Group.Procedure.Transaction transaction : procedure.getTransaction()){
+                    this.getTransaction().add(new ProceduresModel.Group.Procedure.Transaction(transaction));
+                }
             }
 
-            public String getDescription() {
-                return description;
+            public List<Transaction> getTransaction() {
+                if (transaction == null) {
+                    transaction = new ArrayList<>();
+                }
+                return this.transaction;
             }
 
-            public void setDescription(String value) {
-                this.description = value;
+            public String getId() {
+                return id;
             }
 
-            public String getAmount() {
-                return amount;
+            public void setId(String value) {
+                this.id = value;
             }
 
-            public void setAmount(String value) {
-                this.amount = value;
+            public String getName() {
+                return name;
             }
 
-            public String getDebit() {
-                return debit;
+            public void setName(String value) {
+                this.name = value;
             }
 
-            public void setDebit(String value) {
-                this.debit = value;
-            }
+            @XmlAccessorType(XmlAccessType.FIELD)
+            @XmlType(name = "")
+            public static class Transaction {
 
-            public String getCredit() {
-                return credit;
-            }
+                @XmlAttribute(name = "description", required = true)
+                String description;
+                @XmlAttribute(name = "amount", required = true)
+                String amount;
+                @XmlAttribute(name = "debit", required = true)
+                String debit;
+                @XmlAttribute(name = "credit", required = true)
+                String credit;
 
-            public void setCredit(String value) {
-                this.credit = value;
+                public Transaction(){}
+
+                Transaction(Transaction transaction){
+                    this.setAmount(transaction.getAmount());
+                    this.setDescription(transaction.getDescription());
+                    this.setCredit(transaction.getCredit());
+                    this.setDebit(transaction.getDebit());
+                }
+
+                public String getDescription() {
+                    return description;
+                }
+
+                public void setDescription(String value) {
+                    this.description = value;
+                }
+
+                public String getAmount() {
+                    return amount;
+                }
+
+                public void setAmount(String value) {
+                    this.amount = value;
+                }
+
+                public String getDebit() {
+                    return debit;
+                }
+
+                public void setDebit(String value) {
+                    this.debit = value;
+                }
+
+                public String getCredit() {
+                    return credit;
+                }
+
+                public void setCredit(String value) {
+                    this.credit = value;
+                }
             }
         }
     }

@@ -7,6 +7,7 @@ import org.kaleta.accountant.backend.manager.ProceduresManager;
 import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.common.ErrorHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,11 +36,27 @@ public class ProceduresService {
     }
 
     /**
-     * Returns list of schema classes.
+     * Returns list of procedure groups.
      */
-    public List<ProceduresModel.Procedure> getProcedureList(String year) {
+    public List<ProceduresModel.Group> getProcedureGroupList(String year) {
         try {
-            return getModel(year).getProcedure();
+            return getModel(year).getGroup();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Returns list of procedure group names.
+     */
+    public List<String> getProcedureGroupNameList(String year) {
+        try {
+            List<String> names = new ArrayList<>();
+            for (ProceduresModel.Group group : getModel(year).getGroup()){
+                names.add(group.getName());
+            }
+            return names;
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -49,19 +66,30 @@ public class ProceduresService {
     /**
      * Creates procedure according to specified values.
      */
-    public void createProcedure(String year, String name, List<ProceduresModel.Procedure.Transaction> transactions){
+    public void createProcedure(String year, String name, String groupName, List<ProceduresModel.Group.Procedure.Transaction> transactions){
         try {
             Manager<ProceduresModel> manager = new ProceduresManager(year);
             ProceduresModel model = manager.retrieve();
 
-            ProceduresModel.Procedure procedure = new ProceduresModel.Procedure();
+            ProceduresModel.Group group = null;
+            for (ProceduresModel.Group groupModel : model.getGroup()){
+                if (groupModel.getName().equals(groupName)) group = groupModel;
+            }
+            if (group == null) {
+                ProceduresModel.Group newGroup = new ProceduresModel.Group();
+                newGroup.setName(groupName);
+                model.getGroup().add(newGroup);
+                group = newGroup;
+            }
+
+            ProceduresModel.Group.Procedure procedure = new ProceduresModel.Group.Procedure();
             procedure.setName(name);
-            procedure.setId(String.valueOf(model.getProcedure().size()));
+            procedure.setId(String.valueOf(group.getProcedure().size()));
             procedure.getTransaction().addAll(transactions);
-            model.getProcedure().add(procedure);
+            group.getProcedure().add(procedure);
 
             manager.update(model);
-            Initializer.LOG.info("Procedure created: id=" + procedure.getId() + " name='" + procedure.getName() + "'");
+            Initializer.LOG.info("Procedure created: group=" + groupName + " id=" + procedure.getId() + " name='" + procedure.getName() + "'");
             invalidateModel();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
@@ -70,14 +98,22 @@ public class ProceduresService {
     }
 
     /**
-     * Updates procedure specified by 'id' according to new values.
+     * Updates procedure specified by 'id' and 'type' according to new values.
      */
-    public void updateProcedure(String year, String id, String newName, List<ProceduresModel.Procedure.Transaction> newTransactions){
+    public void updateProcedure(String year, String id, String newName, String groupName,  List<ProceduresModel.Group.Procedure.Transaction> newTransactions){
         try {
             Manager<ProceduresModel> manager = new ProceduresManager(year);
             ProceduresModel model = manager.retrieve();
 
-            for (ProceduresModel.Procedure procedure : model.getProcedure()){
+            ProceduresModel.Group group = null;
+            for (ProceduresModel.Group groupModel : model.getGroup()){
+                if (groupModel.getName().equals(groupName)) group = groupModel;
+            }
+            if (group == null) {
+                throw new ManagerException("Group '" + groupName + "' not found!");
+            }
+
+            for (ProceduresModel.Group.Procedure procedure : group.getProcedure()){
                 if (procedure.getId().equals(id)){
                     procedure.setName(newName);
                     procedure.getTransaction().clear();

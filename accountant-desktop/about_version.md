@@ -3,7 +3,7 @@
     before release: 
         pom.xml: x.y-snapshot -> x.y
         Initializer.VERSION: x.y-snapshot -> x.y
-        Initializer.CONTEXT = production
+        Initializer.CONTEXT = PRODUCTION
     after release:
         create tag
         pom.xml: x.y -> x.y+1-snapshot
@@ -11,8 +11,9 @@
         Initializer.CONTEXT = devel
 
 ## 1.6
-Released: TODO
+Released: 5.12.2022
 
+    implemented procedure groups, revolut statement parser, minor fixes
 
 ## 1.5
 Released: 23.10.2022

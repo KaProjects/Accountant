@@ -22,11 +22,12 @@ public class OpenCreateProcedureDialog extends MenuAction {
         Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
         List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
         Map<AccountPairModel, Set<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
+        List<String> procedureGroupNameList = Service.PROCEDURES.getProcedureGroupNameList(getConfiguration().getSelectedYear());
 
-        CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, null);
+        CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, null, null, procedureGroupNameList);
         dialog.setVisible(true);
         if (dialog.getResult()){
-            Service.PROCEDURES.createProcedure(getConfiguration().getSelectedYear(), dialog.getProcedureName(), dialog.getTransactions());
+            Service.PROCEDURES.createProcedure(getConfiguration().getSelectedYear(), dialog.getProcedureName(), dialog.getGroupName(), dialog.getTransactions());
             getConfiguration().update(Configuration.PROCEDURE_UPDATED);
         }
     }
