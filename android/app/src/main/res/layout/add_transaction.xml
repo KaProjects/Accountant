@@ -12,6 +12,18 @@
         android:layout_gravity="center_horizontal">
 
         <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Spinner
+                android:id="@+id/templatesSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="53dp"
+                android:layout_span="2"
+                android:spinnerMode="dialog"/>
+        </TableRow>
+
+        <TableRow
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
 
@@ -38,56 +50,54 @@
         </TableRow>
 
         <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Spinner
+                android:id="@+id/debitSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="53dp"
+                android:spinnerMode="dialog"
+                android:layout_span="2"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Spinner
+                android:id="@+id/creditSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="53dp"
+                android:spinnerMode="dialog"
+                android:layout_span="2" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <EditText
                 android:id="@+id/textAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:ems="10"
                 android:hint="amount"
                 android:inputType="number"
                 android:textAlignment="textEnd" />
         </TableRow>
 
         <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-            <Spinner
-                android:id="@+id/debitSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:layout_column="0"
-                android:layout_span="2" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-            <Spinner
-                android:id="@+id/creditSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="53dp"
-                android:layout_column="0"
-                android:layout_span="2" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <EditText
                 android:id="@+id/textDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_span="2"
                 android:hint="description"
                 android:inputType="text" />
+
         </TableRow>
 
     </TableLayout>

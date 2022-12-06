@@ -33,4 +33,19 @@ public class TransactionServiceImpl implements TransactionService {
         }
         return output;
     }
+
+    public Integer[] monthlyBalanceByAccounts(String year, String debit, String credit){
+        return monthlyBalanceByAccounts(year, debit, credit, "");
+    }
+    @Override
+    public Integer[] monthlyBalanceByAccounts(String year, String debit, String credit, String description) {
+        List<Transaction> transactions = transactionDao.listByAccounts(year, debit, credit, description);
+        Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        for (Transaction tr : transactions) {
+            int month = Integer.parseInt(tr.getDate().substring(2, 4));
+            monthlyBalance[month - 1] += tr.getAmount();
+        }
+
+        return monthlyBalance;
+    }
 }

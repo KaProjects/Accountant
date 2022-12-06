@@ -4,6 +4,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.kaleta.accountant.data.Account;
 import org.kaleta.accountant.data.DataSource;
+import org.kaleta.accountant.data.Template;
 import org.kaleta.accountant.data.Transaction;
 
 import java.util.List;
@@ -19,24 +20,22 @@ public class Service {
         reference.child(id).setValue(transaction);
     }
 
-    private static void prepareAccounts() {
-        DatabaseReference reference = DataSource.getInstance().getDebitRef();
-        reference.child("530a12").setValue("Restauracie");
-        reference.child("531a6").setValue("FastFood");
-        reference.child("532a7").setValue("Kaviarne");
-        reference.child("533a0").setValue("Bary");
+    public static void addAccount(Account account, boolean isDebit) {
+        DatabaseReference reference = isDebit
+                ? DataSource.getInstance().getDebitRef()
+                : DataSource.getInstance().getCreditRef();
+        reference.child(account.getId().replace(".","a")).setValue(account.getName());
+    }
 
-        reference.child("521a0").setValue("Masaz");
-        reference.child("521a1").setValue("Wellness");
-        reference.child("521a2").setValue("Fitko");
-        reference.child("521a3").setValue("Kupko/Bazen");
-        reference.child("521a7").setValue("Pece o zuby");
+    public static void addTemplate(Template template) {
+        DatabaseReference reference = DataSource.getInstance().getTemplatesRef();
+        String name = template.getName();
+        template.setName(null);
+        reference.child(name).setValue(template);
+    }
 
-        reference = DataSource.getInstance().getCreditRef();
-        reference.child("200a0").setValue("Hotovost - EUR");
-        reference.child("200a1").setValue("Hotovost - CZK");
-        reference.child("201a0").setValue("Stravenky");
-        reference.child("601a3").setValue("Multi Sport - vstupy");
+    public static List<Template> getTemplates() {
+        return DataSource.getInstance().getTemplatesList();
     }
 
     public static List<Account> getDebitAccounts() {

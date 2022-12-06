@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="20dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/trDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="2"/>
-
-    <Space
-        android:layout_width="5dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
-
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_item_background"
+        android:textColor="@color/colorPrimary"
+        android:textAlignment="center"
+        android:paddingTop="5dp"
+        />
     <TextView
         android:id="@+id/trAmount"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:ems="3"
-        android:textAlignment="textEnd" />
-
-    <Space
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
-
+        android:layout_toEndOf="@id/trDate"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_item_background"
+        android:textColor="@color/colorPrimary"
+        android:textAlignment="textEnd"
+        android:paddingTop="5dp"
+        android:paddingEnd="5dp"
+        />
     <TextView
         android:id="@+id/trDebit"
-        android:layout_width="78dp"
-        android:layout_height="wrap_content"
-        android:ems="10" />
-
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:ems="1"
-        android:text="/" />
-
+        android:layout_toEndOf="@id/trAmount"
+        android:layout_width="130dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_item_background"
+        android:textColor="@color/colorPrimary"
+        android:paddingTop="5dp"
+        android:paddingStart="5dp"
+        />
     <TextView
         android:id="@+id/trCredit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-         />
-</LinearLayout>
+        android:layout_toEndOf="@id/trDebit"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/row_item_background"
+        android:textColor="@color/colorPrimary"
+        android:paddingTop="5dp"
+        android:paddingStart="5dp"
+        />
+</RelativeLayout>

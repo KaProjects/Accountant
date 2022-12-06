@@ -1,6 +1,6 @@
 package org.kaleta.accountant.data;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,10 +21,12 @@ public class DataSource {
     private final DatabaseReference transactionRef = database.getReference("transaction");
     private final DatabaseReference debitRef = database.getReference("accounts/debit");
     private final DatabaseReference creditRef = database.getReference("accounts/credit");
+    private final DatabaseReference templatesRef = database.getReference("templates");
 
     private final List<Transaction> transactionList = new ArrayList<>();
     private final List<Account> debitAccountList = new ArrayList<>();
     private final List<Account> creditAccountList = new ArrayList<>();
+    private final List<Template> templatesList = new ArrayList<>();
 
     public static DataSource getInstance() {
         if (instance == null) {
@@ -78,6 +80,22 @@ public class DataSource {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+
+        templatesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                templatesList.clear();
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Template template = postSnapshot.getValue(Template.class);
+                    template.setName(postSnapshot.getKey());
+                    templatesList.add(template);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     public FirebaseDatabase getDatabase() {
@@ -96,6 +114,10 @@ public class DataSource {
         return creditRef;
     }
 
+    public DatabaseReference getTemplatesRef() {
+        return templatesRef;
+    }
+
     public List<Transaction> getTransactionList() {
         return transactionList;
     }
@@ -106,5 +128,9 @@ public class DataSource {
 
     public List<Account> getCreditAccountList() {
         return creditAccountList;
+    }
+
+    public List<Template> getTemplatesList() {
+        return templatesList;
     }
 }

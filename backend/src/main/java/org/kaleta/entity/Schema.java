@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 public class Schema {
 
     @EmbeddedId
-    private SchemaId schemaId;
+    private YearId yearId;
 
     @Column(name = "name")
     @NotNull
