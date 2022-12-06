@@ -8,4 +8,4 @@ classes
 firebase-config.js
 google-services.json
 accountant-andr-servicekey.json
-
+.DS_Store
