@@ -1,5 +1,6 @@
 package org.kaleta.repository;
 
+import org.kaleta.entity.Account;
 import org.kaleta.entity.xml.Schema;
 
 import javax.persistence.EntityManager;
@@ -42,5 +43,14 @@ public class SchemaRepositoryImpl implements SchemaRepository {
                 }
             }
         }
+    }
+
+    @Override
+    public String getNameById(String year, String id) {
+        return (String) entityManager.createQuery("SELECT s.name FROM Schema s " +
+                        "WHERE s.yearId.year=:year AND s.yearId.id=:id")
+                .setParameter("year", year)
+                .setParameter("id", id)
+                .getSingleResult();
     }
 }

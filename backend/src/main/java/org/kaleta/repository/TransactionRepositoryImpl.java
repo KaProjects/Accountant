@@ -102,13 +102,23 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public List<Transaction> listForAccount(String year, String account)
+    public List<Transaction> listByAccount(String year, String account)
     {
         return entityManager.createQuery(selectYearly
                         + " AND (t.debit=:account OR t.credit=:account)"
                         + excludeOffBalanceTransactions, Transaction.class)
                 .setParameter("year", year)
                 .setParameter("account", account)
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> listByDescriptionMatching(String year, String descriptionSubString) {
+        return entityManager.createQuery(selectYearly
+                        + " AND t.description LIKE :description"
+                        + excludeOffBalanceTransactions, Transaction.class)
+                .setParameter("year", year)
+                .setParameter("description", "%" + descriptionSubString + "%")
                 .getResultList();
     }
 }

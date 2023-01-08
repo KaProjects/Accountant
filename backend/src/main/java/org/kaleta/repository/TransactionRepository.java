@@ -25,7 +25,7 @@ public interface TransactionRepository {
      * @param debit - debit condition
      * @param credit - credit condition
      * @param description - required string in description
-     *
+     * <p>
      * debit, credit inputs: exact account (e.g. 500.1 - this one account)
      *                       account prefix with % (e.g. 50% all accounts that id starts with 50)
      *                       null or empty string - all accounts
@@ -44,5 +44,15 @@ public interface TransactionRepository {
      *
      * Note: off-balance transactions excluded
      */
-    List<Transaction> listForAccount(String year, String account);
+    List<Transaction> listByAccount(String year, String account);
+
+    /**
+     * @param year year condition
+     * @param descriptionSubString description substring condition
+     *
+     * @return transactions matching conditions
+     *
+     * Note: off-balance transactions excluded
+     */
+    List<Transaction> listByDescriptionMatching(String year, String descriptionSubString);
 }
