@@ -8,7 +8,7 @@
 ## 1.2
 Released: 9.1.2023
 
-    created vacations endpoint, sync all years endpoint
+    created vacations endpoint, sync all years endpoint and account endpoint
 
 ## 1.1
 Released: 9.12.2022
