@@ -1,9 +1,11 @@
 package org.kaleta.repository;
 
+import org.kaleta.entity.Account;
 import org.kaleta.entity.xml.Accounts;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 public class AccountRepositoryImpl implements AccountRepository {
 
@@ -26,5 +28,12 @@ public class AccountRepositoryImpl implements AccountRepository {
                     .executeUpdate();
 
         }
+    }
+
+    @Override
+    public List<Account> list(String year){
+        return entityManager.createQuery("SELECT a FROM Account a WHERE a.accountId.year=:year", Account.class)
+                .setParameter("year", year)
+                .getResultList();
     }
 }

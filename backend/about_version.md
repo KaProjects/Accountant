@@ -1,9 +1,14 @@
 ## release workflow:
 
      rest/web same versioning
-     check configuration.properties 
+     check appliaction.properties 
      bump pom.xml version
      bump build deploy sh versions 
+
+## 1.2
+Released: 9.1.2023
+
+    created vacations endpoint, sync all years endpoint
 
 ## 1.1
 Released: 9.12.2022

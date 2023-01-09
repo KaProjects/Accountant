@@ -1,4 +1,4 @@
-docker build -t accountant-frontend:v1.1 .
+docker build -t accountant-frontend:v1.2 .
 
 docker run -d -p 3301:3000 \
     -v ${pwd}:/app \

@@ -1,27 +1,37 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import axios from "axios";
 import Paper from '@mui/material/Paper';
-import {Divider, IconButton} from "@mui/material";
+import {IconButton} from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Loader from "./components/Loader";
 
 const Budgeting = props => {
-    const { year } = useParams();
+    const { year } = useParams()
 
-    const [loaded, setLoaded] = useState(false);
-    const [budget, setBudget] = useState(null);
+    const [loaded, setLoaded] = useState(false)
+    const [error, setError] = useState(null)
+    const [budget, setBudget] = useState(null)
+
+
+    const loadData = useCallback((props, year) => {
+        axios.get("http://" + props.host + ":" + props.port + "/budget/" + year).then(
+            (response) => {
+                setBudget(response.data)
+                setError(null)
+                setLoaded(true)
+            }).catch((error) => {
+                console.error(error)
+                setError(error)
+            })
+    }, [])
 
     useEffect(() => {
-        loadData();
-    }, []);
+        loadData(props, year)
+    }, [loadData, props, year])
 
-    async function loadData() {
-        const response = await axios.get("http://" + props.host + ":" + props.port + "/budget/" + year);
-        setBudget(response.data);
-        setLoaded(true);
-    }
 
     function getRowStyle(type, hasLeftBorder, hasRightBorder){
         const borderLeft = hasLeftBorder ? "2px solid" : "0px";
@@ -208,6 +218,9 @@ const Budgeting = props => {
 
     return (
     <>
+    {!loaded &&
+        <Loader error ={error}/>
+    }
     {loaded &&
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
@@ -227,7 +240,7 @@ const Budgeting = props => {
         </TableContainer>
     }
     </>
-    );
+    )
 }
 
 export default Budgeting;
