@@ -8,6 +8,8 @@ import java.util.List;
 @Data
 public class VacationDto {
 
+    private List<String> columns = new ArrayList<>(List.of("Date", "Amount", "Debit", "Credit", "Description"));
+
     private List<Vacation> vacations = new ArrayList<>();
 
 

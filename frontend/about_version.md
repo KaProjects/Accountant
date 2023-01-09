@@ -4,7 +4,12 @@
      check src/properties.js
      bump package.json version
      bump build deploy sh versions 
-     
+
+## 1.2
+Released: 9.1.2023
+
+    created vacations web page
+
 ## 1.1
 Released: 9.12.2022
 

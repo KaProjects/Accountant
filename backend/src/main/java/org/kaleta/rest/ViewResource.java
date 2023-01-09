@@ -47,17 +47,23 @@ public class ViewResource {
 
         for (String key : vacations.keySet()){
             VacationDto.Vacation vacation = new VacationDto.Vacation();
-            vacation.setName(key);
+            vacation.setName(key.replace("_", " "));
             vacation.setExpenses(String.valueOf(transactionService.sumExpensesOf(vacations.get(key))));
 
             for (Transaction transaction : vacations.get(key)){
                 VacationDto.Vacation.Transaction vacTr = new VacationDto.Vacation.Transaction();
                 vacTr.setDate(transaction.getDate());
-                vacTr.setAmount(String.valueOf(transaction.getAmount()));
                 vacTr.setDescription(transaction.getDescription());
                 vacTr.setDescription(vacTr.getDescription().replace("vac="+key, ""));
                 vacTr.setDebit(accountNames.get(transaction.getDebit()));
                 vacTr.setCredit(accountNames.get(transaction.getCredit()));
+
+                String amountPrefix = transaction.getDebit().startsWith("5")
+                        ? transaction.getCredit().startsWith("5") ? "~" : ""
+                        : "-";
+
+                vacTr.setAmount(amountPrefix + transaction.getAmount());
+
                 vacation.getTransactions().add(vacTr);
             }
             dto.getVacations().add(vacation);

@@ -11,6 +11,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
 @Path("/sync")
 public class SyncResource {
@@ -29,5 +30,17 @@ public class SyncResource {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
         String dataSource = dataLocation + year;
         return service.sync(dataSource);
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/all")
+    public String syncAll() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        for (String year : service.getYears(dataLocation)){
+            String dataSource = dataLocation + year;
+            sb.append(service.sync(dataSource));
+        }
+        return sb.toString();
     }
 }

@@ -3,6 +3,7 @@ import './App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Budgeting from "./Budgeting";
 import {properties} from "./properties";
+import Vacation from "./Vacation";
 
 class App extends Component {
     constructor(props) {
@@ -10,7 +11,7 @@ class App extends Component {
         this.state = {
             host: properties.host,
             port: properties.port,
-        };
+        }
         // this.componentDidMount = this.componentDidMount.bind(this);
     }
     render() {
@@ -21,12 +22,13 @@ class App extends Component {
                     <Routes>
                         {/*<Route exact path="/" element={<Menu {...this.state}/> }/>*/}
                         <Route exact path="/budget/:year" element={<Budgeting {...this.state}/> }/>
+                        <Route exact path="/view/:year/vacation" element={<Vacation {...this.state}/> }/>
                     </Routes>
                 </BrowserRouter>
 
 
             </div>
-        );
+        )
     }
 }
 

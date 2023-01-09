@@ -6,6 +6,7 @@ import org.kaleta.dao.AccountDao;
 import org.kaleta.dao.SchemaDao;
 import org.kaleta.dao.TransactionDao;
 import org.kaleta.entity.xml.Accounts;
+import org.kaleta.entity.xml.Config;
 import org.kaleta.entity.xml.Schema;
 import org.kaleta.entity.xml.Transactions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.kaleta.Utils.inputStreamToString;
 
@@ -53,6 +56,18 @@ public class SyncServiceImpl implements SyncService {
         } catch (IOException ioe) {
             return ioe.toString();
         }
+    }
+
+    public List<String> getYears(String dataSource) throws IOException {
+        XmlMapper xmlMapper = new XmlMapper();
+        List<String> years = new ArrayList<>();
+
+        String configXml = inputStreamToString(new FileInputStream(dataSource + "config.xml"));
+        Config config = xmlMapper.readValue(configXml, Config.class);
+        for (Config.Years.Year year : config.getYears().getYear()){
+            years.add(year.getName());
+        }
+        return years;
     }
 
 

@@ -55,7 +55,10 @@ public class TransactionServiceImpl implements TransactionService {
         Integer sum = 0;
         for (Transaction transaction : transactions) {
             if (transaction.getDebit().startsWith("5")){
-                sum += transaction.getAmount();
+                if (!transaction.getCredit().startsWith("5")){
+                    sum += transaction.getAmount();
+                }
+                // else: no action - it's just change of expense
             } else if (transaction.getCredit().startsWith("5")) {
                 sum -= transaction.getAmount();
             } else {
