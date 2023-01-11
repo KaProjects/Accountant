@@ -23,4 +23,8 @@ public class Account {
     @Column(name = "metadata")
     @NotNull
     private String metadata;
+
+    public String getFullId(){
+        return accountId.getSchemaId() + "." + accountId.getSemanticId();
+    }
 }

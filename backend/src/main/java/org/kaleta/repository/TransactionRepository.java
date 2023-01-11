@@ -55,4 +55,6 @@ public interface TransactionRepository {
      * Note: off-balance transactions excluded
      */
     List<Transaction> listByDescriptionMatching(String year, String descriptionSubString);
+
+    Transaction getInitialTransaction(String year, String accountId, boolean isDebit);
 }

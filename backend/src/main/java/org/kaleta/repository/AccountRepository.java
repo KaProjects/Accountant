@@ -10,4 +10,8 @@ public interface AccountRepository {
     void syncAccounts(Accounts data);
 
     List<Account> list(String year);
+
+    List<Account> list(String year, String schemaIdPrefix);
+
+    Account get(String year, String schemaId, String semanticId);
 }

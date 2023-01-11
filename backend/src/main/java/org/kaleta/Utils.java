@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class Utils {
 
@@ -55,5 +59,28 @@ public class Utils {
             result[i] = base[i] - subtraction[i];
         }
         return result;
+    }
+
+    public static Integer[] toCumulativeArray(Integer initialValue, Integer[] linearArray)
+    {
+        Integer[] cumulativeArray = new Integer[linearArray.length + 1];
+
+        cumulativeArray[0] = initialValue;
+        Integer sum = initialValue;
+        for (int i=0;i<linearArray.length;i++){
+            sum += linearArray[i];
+            cumulativeArray[i + 1] = sum;
+        }
+        return cumulativeArray;
+    }
+    public static <T> T[] concatArrays(T[] array1, T[] array2) {
+        List<T> resultList = new ArrayList<>(array1.length + array2.length);
+        Collections.addAll(resultList, array1);
+        Collections.addAll(resultList, array2);
+
+        @SuppressWarnings("unchecked")
+        //the type cast is safe as the array1 has the type T[]
+        T[] resultArray = (T[]) Array.newInstance(array1.getClass().getComponentType(), 0);
+        return resultList.toArray(resultArray);
     }
 }

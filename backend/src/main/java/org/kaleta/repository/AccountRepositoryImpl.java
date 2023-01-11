@@ -9,6 +9,8 @@ import java.util.List;
 
 public class AccountRepositoryImpl implements AccountRepository {
 
+    private String selectYearly = "SELECT a FROM Account a WHERE a.accountId.year=:year";
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -32,8 +34,29 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public List<Account> list(String year){
-        return entityManager.createQuery("SELECT a FROM Account a WHERE a.accountId.year=:year", Account.class)
+        return entityManager.createQuery(selectYearly, Account.class)
                 .setParameter("year", year)
                 .getResultList();
     }
+
+    @Override
+    public List<Account> list(String year, String schemaIdPrefix) {
+        return entityManager.createQuery(selectYearly + " AND a.accountId.schemaId LIKE :schemaId", Account.class)
+                .setParameter("year", year)
+                .setParameter("schemaId", schemaIdPrefix + "%")
+                .getResultList();
+    }
+
+    @Override
+    public Account get(String year, String schemaId, String semanticId) {
+        return entityManager.createQuery(selectYearly +
+                        " AND a.accountId.schemaId=:schemaId" +
+                        " AND a.accountId.semanticId=:semanticId", Account.class)
+                .setParameter("year", year)
+                .setParameter("schemaId", schemaId)
+                .setParameter("semanticId", semanticId)
+                .getSingleResult();
+    }
+
+
 }

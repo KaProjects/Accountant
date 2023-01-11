@@ -2,6 +2,7 @@ package org.kaleta.service;
 
 import org.kaleta.dao.TransactionDao;
 import org.kaleta.dto.YearTransactionDto;
+import org.kaleta.entity.Account;
 import org.kaleta.entity.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     TransactionDao transactionDao;
+
+    @Autowired
+    SchemaService schemaService;
 
     @Override
     public List<YearTransactionDto> getTransactionsMatching(String year, String debitPrefix, String creditPrefix) {
@@ -67,5 +71,19 @@ public class TransactionServiceImpl implements TransactionService {
             }
         }
         return sum;
+    }
+
+    @Override
+    public Integer getInitialValue(Account account) {
+        String type = schemaService.getAccountType(account.getAccountId().getYear(), account.getAccountId().getSchemaId());
+
+        if (type.equals("A")) {
+            return transactionDao.getInitialTransaction(account.getAccountId().getYear(), account.getFullId(), true).getAmount();
+        } else if (type.equals("L")){
+            return transactionDao.getInitialTransaction(account.getAccountId().getYear(), account.getFullId(), false).getAmount();
+        } else {
+            throw new IllegalArgumentException("Only types A(ssets) and L(iabilities) have initial state, " +
+                    "but was '" + type + "' for account '" + account.getFullId()+ ":" + account.getName() + "'");
+        }
     }
 }

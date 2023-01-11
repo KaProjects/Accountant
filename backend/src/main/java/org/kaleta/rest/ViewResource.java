@@ -8,8 +8,6 @@ import org.kaleta.entity.Transaction;
 import org.kaleta.service.AccountService;
 import org.kaleta.service.TransactionService;
 import org.kaleta.service.ViewService;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -37,8 +35,7 @@ public class ViewResource {
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}/vacation")
     public VacationDto getBudget(@PathParam String year){
-        if (!year.matches("20\\d\\d"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
+        InputValidators.validateYear(year);
 
         Map<String, List<Transaction>> vacations = viewService.getVacationMap(year);
         Map<String, String> accountNames = accountService.getAccountNamesMap(year);

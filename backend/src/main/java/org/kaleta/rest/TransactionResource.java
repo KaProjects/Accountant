@@ -26,8 +26,8 @@ public class TransactionResource {
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}/{debitPrefix}/{creditPrefix}")
     public List<YearTransactionDto> getTransactionsMatching(@PathParam String year, @PathParam String debitPrefix, @PathParam String creditPrefix) {
-        if (!year.matches("20\\d\\d"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
+        InputValidators.validateYear(year);
+
         if (!debitPrefix.matches("\\d?\\d?\\d"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Debit Prefix Parameter");
         if (!creditPrefix.matches("\\d?\\d?\\d"))
@@ -41,8 +41,7 @@ public class TransactionResource {
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}")
     public List<YearTransactionDto> getTransactionsMatching(@PathParam String year) {
-        if (!year.matches("20\\d\\d"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
+        InputValidators.validateYear(year);
 
         return service.getTransactionsMatching(year, "", "");
     }

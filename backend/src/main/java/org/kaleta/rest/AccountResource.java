@@ -7,8 +7,6 @@ import org.kaleta.dto.AccountDto;
 import org.kaleta.entity.Account;
 import org.kaleta.service.AccountService;
 import org.kaleta.service.SchemaService;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -32,8 +30,8 @@ public class AccountResource {
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}")
     public List<AccountDto> getAllAccounts(@PathParam String year) {
-        if (!year.matches("20\\d\\d"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
+        InputValidators.validateYear(year);
+
         List<AccountDto> list = new ArrayList<>();
         for (Account account : accountService.list(year)) {
             AccountDto dto = new AccountDto(account);

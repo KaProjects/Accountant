@@ -1,5 +1,6 @@
 package org.kaleta.service;
 
+import org.kaleta.Constants;
 import org.kaleta.dao.AccountDao;
 import org.kaleta.entity.Account;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,43 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public List<Account> list(String year) {
         return accountDao.list(year);
+    }
+
+    @Override
+    public List<Account> listBySchemaId(String year, String schemaIdPrefix){
+        return accountDao.list(year, schemaIdPrefix);
+    }
+
+    @Override
+    public String getFinCreationAccountId(String finAssetFullId) {
+        validateFinAssetFullIdParam(finAssetFullId);
+        return Constants.Schema.FIN_CREATION_ID + "." + finAssetFullId.charAt(2) + "-" + finAssetFullId.split("\\.")[1];
+    }
+
+    @Override
+    public String getFinRevRevaluationAccountId(String finAssetFullId) {
+        validateFinAssetFullIdParam(finAssetFullId);
+        return Constants.Schema.FIN_REV_REVALUATION_ID + "." + finAssetFullId.charAt(2) + "-" + finAssetFullId.split("\\.")[1];
+    }
+
+    @Override
+    public String getFinExpRevaluationAccountId(String finAssetFullId) {
+        validateFinAssetFullIdParam(finAssetFullId);
+        return Constants.Schema.FIN_EXP_REVALUATION_ID + "." + finAssetFullId.charAt(2) + "-" + finAssetFullId.split("\\.")[1];
+    }
+
+    @Override
+    public Account getAccount(String year, String fullId) {
+        String[] split = fullId.split("\\.");
+        return accountDao.get(year, split[0], split[1]);
+    }
+
+    private void validateFinAssetFullIdParam(String fullId){
+        if (!fullId.startsWith("23")){
+            throw new IllegalArgumentException("Only accounts of 23x have financial expense revaluation accounts");
+        }
+        if (!fullId.contains(".")){
+            throw new IllegalArgumentException("Full account id required, e.i. 'groupId.semanticId'");
+        }
     }
 }
