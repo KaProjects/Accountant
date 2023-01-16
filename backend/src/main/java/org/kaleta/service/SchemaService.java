@@ -15,4 +15,6 @@ public interface SchemaService {
     List<Schema> getSchemaAccountsByGroup(String year, String groupId);
 
     String getAccountType(String year, String accountId);
+
+    List<Schema> list(String year);
 }

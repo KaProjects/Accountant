@@ -44,21 +44,36 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public String getFinCreationAccountId(String finAssetFullId) {
-        validateFinAssetFullIdParam(finAssetFullId);
-        return Constants.Schema.FIN_CREATION_ID + "." + finAssetFullId.charAt(2) + "-" + finAssetFullId.split("\\.")[1];
+    public String getFinCreationAccountId(Account account) {
+        String id = account.getFullId();
+        validateFinAssetFullIdParam(id);
+        if (Integer.parseInt(account.getAccountId().getYear()) > 2020) {
+            return Constants.Schema.FIN_CREATION_ID + "." + id.charAt(2) + "-" + id.split("\\.")[1];
+        } else {
+            return Constants.Schema.FIN_CREATION_ID  + "." + id.split("\\.")[1];
+        }
     }
 
     @Override
-    public String getFinRevRevaluationAccountId(String finAssetFullId) {
-        validateFinAssetFullIdParam(finAssetFullId);
-        return Constants.Schema.FIN_REV_REVALUATION_ID + "." + finAssetFullId.charAt(2) + "-" + finAssetFullId.split("\\.")[1];
+    public String getFinRevRevaluationAccountId(Account account) {
+        String id = account.getFullId();
+        validateFinAssetFullIdParam(id);
+        if (Integer.parseInt(account.getAccountId().getYear()) > 2020) {
+            return Constants.Schema.FIN_REV_REVALUATION_ID + "." + id.charAt(2) + "-" + id.split("\\.")[1];
+        } else {
+            return Constants.Schema.FIN_REV_REVALUATION_ID  + "." + id.split("\\.")[1];
+        }
     }
 
     @Override
-    public String getFinExpRevaluationAccountId(String finAssetFullId) {
-        validateFinAssetFullIdParam(finAssetFullId);
-        return Constants.Schema.FIN_EXP_REVALUATION_ID + "." + finAssetFullId.charAt(2) + "-" + finAssetFullId.split("\\.")[1];
+    public String getFinExpRevaluationAccountId(Account account) {
+        String id = account.getFullId();
+        validateFinAssetFullIdParam(id);
+        if (Integer.parseInt(account.getAccountId().getYear()) > 2020) {
+            return Constants.Schema.FIN_EXP_REVALUATION_ID + "." + id.charAt(2) + "-" + id.split("\\.")[1];
+        } else {
+            return Constants.Schema.FIN_EXP_REVALUATION_ID  + "." + id.split("\\.")[1];
+        }
     }
 
     @Override

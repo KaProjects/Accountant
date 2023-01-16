@@ -45,23 +45,15 @@ public class FinancialResource {
 
         FinancialAssetsDto dto = new FinancialAssetsDto();
 
-        for (Schema schemaAcc : schemaService.getSchemaAccountsByGroup(year, Constants.Schema.FIN_GROUP_ID)){
+        for (Schema schemaAcc : schemaService.getSchemaAccountsByGroup(year, Constants.Schema.FIN_GROUP_ID))
+        {
             FinancialAssetsDto.Group groupDto = new FinancialAssetsDto.Group();
-            groupDto.setName(schemaAcc.getName());
+            groupDto.setName(schemaAcc.getName().toUpperCase());
 
-            for (Account account : accountService.listBySchemaId(year, schemaAcc.getYearId().getId())){
-                FinancialAssetsDto.Group.Account accountDto = new FinancialAssetsDto.Group.Account();
-                accountDto.setName(account.getName());
-
+            for (Account account : accountService.listBySchemaId(year, schemaAcc.getYearId().getId()))
+            {
                 FinancialAsset asset = financialService.getFinancialAsset(account);
-                accountDto.setValuationSequence(asset.getMonthlyCumulativeValuation());
-                accountDto.setFundingSequence(asset.getMonthlyCumulativeFunding());
-                accountDto.setDeposits(asset.getDeposits());
-                accountDto.setRevaluations(asset.getRevaluations());
-                accountDto.setWithdrawals(asset.getWithdrawals());
-                accountDto.setLabels(asset.getLabels());
-
-                groupDto.getAccounts().add(accountDto);
+                groupDto.getAccounts().add(constructAccountDto(asset));
             }
 
             dto.getGroups().add(groupDto);
@@ -74,41 +66,44 @@ public class FinancialResource {
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/assets")
-    public FinancialAssetsDto getFinancialAssetsProgress() throws IOException {
-        // TODO: 11.01.2023 construct FinancialAsset for every year, not one for all
-        // TODO: 11.01.2023 try concat years with initial value for every year as base
-
-        // TODO: 11.01.2023 for current asset: check previous years for account (avoid config.json)
-
-
+    public FinancialAssetsDto getFinancialAssetsProgress() throws IOException
+    {
         JsonMapper mapper = new JsonMapper();
-        String json = inputStreamToString(getClass().getClassLoader().getResourceAsStream("fin_assets.json"));
+        String json = inputStreamToString(getClass().getClassLoader().getResourceAsStream("fin_assets_config.json"));
         FinAssetsConfig config = mapper.readValue(json, FinAssetsConfig.class);
 
         FinancialAssetsDto dto = new FinancialAssetsDto();
 
-        for (FinAssetsConfig.Group group : config.getGroups()){
+        for (FinAssetsConfig.Group group : config.getGroups())
+        {
             FinancialAssetsDto.Group groupDto = new FinancialAssetsDto.Group();
-            groupDto.setName(group.getName());
+            groupDto.setName(group.getName().toUpperCase());
 
-            for (FinAssetsConfig.Group.Account account : group.getAccounts()){
-                FinancialAssetsDto.Group.Account accountDto = new FinancialAssetsDto.Group.Account();
-                accountDto.setName(account.getName());
-
+            for (FinAssetsConfig.Group.Account account : group.getAccounts())
+            {
                 FinancialAsset asset = financialService.getFinancialAsset(account);
-                accountDto.setValuationSequence(asset.getMonthlyCumulativeValuation());
-                accountDto.setFundingSequence(asset.getMonthlyCumulativeFunding());
-                accountDto.setDeposits(asset.getDeposits());
-                accountDto.setRevaluations(asset.getRevaluations());
-                accountDto.setWithdrawals(asset.getWithdrawals());
-                accountDto.setLabels(asset.getLabels());
-
-                groupDto.getAccounts().add(accountDto);
+                groupDto.getAccounts().add(constructAccountDto(asset));
             }
 
             dto.getGroups().add(groupDto);
         }
 
         return dto;
+    }
+
+    private FinancialAssetsDto.Group.Account constructAccountDto(FinancialAsset asset)
+    {
+        FinancialAssetsDto.Group.Account accountDto = new FinancialAssetsDto.Group.Account();
+        accountDto.setName(asset.getName());
+        accountDto.setInitialValue(asset.getInitialValue());
+        accountDto.setFunding(asset.getMonthlyCumulativeFunding());
+        accountDto.setDeposits(asset.getDeposits());
+        accountDto.setRevaluations(asset.getRevaluations());
+        accountDto.setWithdrawals(asset.getWithdrawals());
+        accountDto.setLabels(asset.getLabels());
+        accountDto.setBalances(asset.getBalances());
+        accountDto.setCumulativeDeposits(asset.getMonthlyCumulativeDeposits());
+        accountDto.setCumulativeWithdrawals(asset.getMonthlyCumulativeWithdrawals());
+        return accountDto;
     }
 }

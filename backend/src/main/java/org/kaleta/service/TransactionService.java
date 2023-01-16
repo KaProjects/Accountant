@@ -17,4 +17,6 @@ public interface TransactionService {
     Integer sumExpensesOf(List<Transaction> transactions);
 
     Integer getInitialValue(Account account);
+
+    Integer[] monthlyBalanceByAccount(Account account);
 }

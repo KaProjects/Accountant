@@ -27,21 +27,28 @@ public class FinancialServiceImpl implements FinancialService {
         String year = account.getAccountId().getYear();
         String accountId = account.getFullId();
 
-        model.setDeposits(transactionService.monthlyBalanceByAccounts(
-                year, accountService.getFinCreationAccountId(accountId), ""));
-
         Integer[] revaluationsPositive = transactionService.monthlyBalanceByAccounts(
-                year, accountId, accountService.getFinRevRevaluationAccountId(accountId));
+                year, accountId, accountService.getFinRevRevaluationAccountId(account));
 
         Integer[] revaluationsNegative = transactionService.monthlyBalanceByAccounts(
-                year, accountService.getFinExpRevaluationAccountId(accountId), accountId);
+                year, accountService.getFinExpRevaluationAccountId(account), accountId);
 
         model.setRevaluations(Utils.subtractIntegerArrays(revaluationsPositive, revaluationsNegative));
+
+        model.setDeposits(Utils.addIntegerArrays(
+                transactionService.monthlyBalanceByAccounts(year, accountService.getFinCreationAccountId(account), ""),
+                Utils.subtractIntegerArrays(
+                        transactionService.monthlyBalanceByAccounts(year, accountId, ""),
+                        revaluationsPositive
+                )
+        ));
 
         model.setWithdrawals(Utils.subtractIntegerArrays(
                 transactionService.monthlyBalanceByAccounts(year, "", accountId),
                 revaluationsNegative
         ));
+
+        model.setBalances(transactionService.monthlyBalanceByAccount(account));
 
         model.setLabels(constructLabels(year));
 
@@ -57,50 +64,35 @@ public class FinancialServiceImpl implements FinancialService {
     }
 
     @Override
-    public FinancialAsset getFinancialAsset(FinAssetsConfig.Group.Account account) {
+    public FinancialAsset getFinancialAsset(FinAssetsConfig.Group.Account configAccount) {
         FinancialAsset model = new FinancialAsset();
-        model.setName(account.getName());
+        model.setName(configAccount.getName());
 
-        FinAssetsConfig.Group.Account.Record firstRecord = account.getRecords().get(0);
+        FinAssetsConfig.Group.Account.Record firstRecord = configAccount.getRecords().get(0);
         model.setInitialValue(transactionService.getInitialValue(accountService.getAccount(firstRecord.getYear(), firstRecord.getId())));
 
         Integer[] deposits = new Integer[]{};
-        Integer[] revaluationsPositive = new Integer[]{};
-        Integer[] revaluationsNegative = new Integer[]{};
+        Integer[] revaluations = new Integer[]{};
         Integer[] withdrawals = new Integer[]{};
         String[] labels = new String[]{};
+        Integer[] balances = new Integer[]{};
 
-        for (FinAssetsConfig.Group.Account.Record record : account.getRecords()){
+        for (FinAssetsConfig.Group.Account.Record record : configAccount.getRecords()){
+            Account account = accountService.getAccount(record.getYear(), record.getId());
+            FinancialAsset accountModel = this.getFinancialAsset(account);
 
-            Integer[] depositsAdd = transactionService.monthlyBalanceByAccounts(
-                    record.getYear(), accountService.getFinCreationAccountId(record.getId()), "");
-            deposits = Utils.concatArrays(deposits, depositsAdd);
-
-            Integer[] revaluationsPositiveAdd = transactionService.monthlyBalanceByAccounts(
-                    record.getYear(), record.getId(), accountService.getFinRevRevaluationAccountId(record.getId()));
-            revaluationsPositive = Utils.concatArrays(revaluationsPositive, revaluationsPositiveAdd);
-
-            Integer[] revaluationsNegativeAdd = transactionService.monthlyBalanceByAccounts(
-                    record.getYear(), accountService.getFinExpRevaluationAccountId(record.getId()), record.getId());
-            revaluationsNegative = Utils.concatArrays(revaluationsNegative, revaluationsNegativeAdd);
-
-            Integer[] withdrawalsAdd = transactionService.monthlyBalanceByAccounts(record.getYear(), "", record.getId());
-            withdrawals = Utils.concatArrays(withdrawals, withdrawalsAdd);
-
-            String[] labelsAdd = constructLabels(record.getYear());
-            labels = Utils.concatArrays(labels, labelsAdd);
+            deposits = Utils.concatArrays(deposits, accountModel.getDeposits());
+            revaluations = Utils.concatArrays(revaluations, accountModel.getRevaluations());
+            withdrawals = Utils.concatArrays(withdrawals, accountModel.getWithdrawals());
+            labels = Utils.concatArrays(labels, accountModel.getLabels());
+            balances = Utils.concatArrays(balances, accountModel.getBalances());
         }
 
         model.setDeposits(deposits);
-
-        model.setRevaluations(Utils.subtractIntegerArrays(revaluationsPositive, revaluationsNegative));
-
-        model.setWithdrawals(Utils.subtractIntegerArrays(
-                withdrawals,
-                revaluationsNegative
-        ));
-
+        model.setRevaluations(revaluations);
+        model.setWithdrawals(withdrawals);
         model.setLabels(labels);
+        model.setBalances(balances);
 
         return model;
     }

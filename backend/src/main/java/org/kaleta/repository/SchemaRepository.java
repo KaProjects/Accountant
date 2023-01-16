@@ -13,4 +13,6 @@ public interface SchemaRepository {
     List<Schema> getAccountByGroup(String year, String groupId);
 
     Schema getAccountById(String year, String accountId);
+
+    List<Schema> list(String year);
 }

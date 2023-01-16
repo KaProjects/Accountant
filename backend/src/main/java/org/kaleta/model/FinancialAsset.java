@@ -16,17 +16,7 @@ public class FinancialAsset {
 
     private String[] labels;
 
-    /**
-     *
-     * valuation = initial value +/- revaluations - withdrawals
-     * @return cumulative valuation
-     */
-    public Integer[] getMonthlyCumulativeValuation()
-    {
-        Integer[] monthlyValuation = Utils.subtractIntegerArrays(revaluations, withdrawals);
-
-        return Utils.toCumulativeArray(initialValue, monthlyValuation);
-    }
+    private Integer[] balances;
 
     /**
      *
@@ -36,12 +26,16 @@ public class FinancialAsset {
     public Integer[] getMonthlyCumulativeFunding()
     {
         Integer[] monthlyFunding = Utils.subtractIntegerArrays(deposits, withdrawals);
+        monthlyFunding[0] += initialValue;
 
-        return Utils.toCumulativeArray(initialValue, monthlyFunding);
+        return Utils.toCumulativeArray(monthlyFunding);
     }
 
-    public String[] getLabels(){
-        return Utils.concatArrays(new String[]{"0"}, labels);
+    public Integer[] getMonthlyCumulativeDeposits() {
+        return Utils.toCumulativeArray(deposits);
     }
 
+    public Integer[] getMonthlyCumulativeWithdrawals() {
+        return Utils.toCumulativeArray(withdrawals);
+    }
 }

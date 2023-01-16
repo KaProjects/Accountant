@@ -16,17 +16,17 @@ public interface AccountService {
     /**
      * Composes full id of financial creation account of specified finance asset account.
      */
-    String getFinCreationAccountId(String finAssetFullId);
+    String getFinCreationAccountId(Account account);
 
     /**
      * Composes full id of financial revenue revaluation account of specified finance asset account.
      */
-    String getFinRevRevaluationAccountId(String finAssetFullId);
+    String getFinRevRevaluationAccountId(Account account);
 
     /**
      * Composes full id of financial expense revaluation account of specified finance asset account.
      */
-    String getFinExpRevaluationAccountId(String finAssetFullId);
+    String getFinExpRevaluationAccountId(Account account);
 
     Account getAccount(String year, String fullId);
 }

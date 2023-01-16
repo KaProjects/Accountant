@@ -49,4 +49,8 @@ public class SchemaServiceImpl implements SchemaService{
         }
     }
 
+    @Override
+    public List<Schema> list(String year) {
+        return schemaDao.list(year);
+    }
 }

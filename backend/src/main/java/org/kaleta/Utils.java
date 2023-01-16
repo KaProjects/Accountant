@@ -61,15 +61,31 @@ public class Utils {
         return result;
     }
 
-    public static Integer[] toCumulativeArray(Integer initialValue, Integer[] linearArray)
-    {
-        Integer[] cumulativeArray = new Integer[linearArray.length + 1];
+    /**
+     * add two integer arrays of the same length.
+     */
+    public static Integer[] addIntegerArrays(Integer[] base, Integer[] subtraction){
+        // check same length
+        if (!(base.length == subtraction.length)){
+            throw new IllegalArgumentException("arrays not same length: a0=" + base.length + " != an="+subtraction.length);
+        }
 
-        cumulativeArray[0] = initialValue;
-        Integer sum = initialValue;
+        Integer[] result = new Integer[base.length];
+
+        for (int i=0;i<base.length;i++) {
+            result[i] = base[i] + subtraction[i];
+        }
+        return result;
+    }
+
+    public static Integer[] toCumulativeArray(Integer[] linearArray)
+    {
+        Integer[] cumulativeArray = new Integer[linearArray.length];
+
+        Integer sum = 0;
         for (int i=0;i<linearArray.length;i++){
             sum += linearArray[i];
-            cumulativeArray[i + 1] = sum;
+            cumulativeArray[i] = sum;
         }
         return cumulativeArray;
     }

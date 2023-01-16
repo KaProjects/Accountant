@@ -1,5 +1,6 @@
 package org.kaleta.service;
 
+import org.kaleta.Utils;
 import org.kaleta.dao.TransactionDao;
 import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Account;
@@ -85,5 +86,27 @@ public class TransactionServiceImpl implements TransactionService {
             throw new IllegalArgumentException("Only types A(ssets) and L(iabilities) have initial state, " +
                     "but was '" + type + "' for account '" + account.getFullId()+ ":" + account.getName() + "'");
         }
+    }
+
+    @Override
+    public Integer[] monthlyBalanceByAccount(Account account) {
+        String year = account.getAccountId().getYear();
+        String type = schemaService.getAccountType(year, account.getAccountId().getSchemaId());
+        boolean isDebit = type.equals("A") || type.equals("E");
+
+        Integer[] monthlySums = new Integer[]{getInitialValue(account), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+        for (Transaction tr : transactionDao.listByAccount(year, account.getFullId())) {
+            int month = Integer.parseInt(tr.getDate().substring(2, 4));
+
+            if (tr.getDebit().equals(account.getFullId())) {
+                monthlySums[month - 1] +=  isDebit ? tr.getAmount() : -tr.getAmount();
+            } else {
+                monthlySums[month - 1] +=  isDebit ? -tr.getAmount() : tr.getAmount();
+
+            }
+        }
+
+        return Utils.toCumulativeArray(monthlySums);
     }
 }

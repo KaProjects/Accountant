@@ -19,15 +19,18 @@ public class FinancialAssetsDto {
         public static class Account {
             private String name;
 
-            private Integer[] valuationSequence;
-
-            private Integer[] fundingSequence;
+            private Integer initialValue;
 
             private Integer[] deposits;
             private Integer[] withdrawals;
             private Integer[] revaluations;
 
             private String[] labels;
+
+            private Integer[] balances;
+            private Integer[] funding;
+            private Integer[] cumulativeDeposits;
+            private Integer[] cumulativeWithdrawals;
 
         }
     }

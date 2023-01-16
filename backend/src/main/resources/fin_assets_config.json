@@ -7,6 +7,10 @@
           "name": "Met Life - inv. ziv. poistenie 1",
           "records" : [
             {
+              "year": "2017",
+              "id": "230.0"
+            },
+            {
               "year": "2018",
               "id": "230.1"
             },
@@ -23,6 +27,14 @@
         {
           "name": "Met Life - inv. ziv. poistenie 2",
           "records" : [
+            {
+              "year": "2017",
+              "id": "230.1"
+            },
+            {
+              "year": "2018",
+              "id": "230.2"
+            },
             {
               "year": "2019",
               "id": "230.2"
@@ -49,6 +61,22 @@
           "name": "Pioneer Investments",
           "records" : [
             {
+              "year": "2017",
+              "id": "230.2"
+            },
+            {
+              "year": "2018",
+              "id": "230.0"
+            },
+            {
+              "year": "2019",
+              "id": "230.0"
+            },
+            {
+              "year": "2020",
+              "id": "230.0"
+            },
+            {
               "year": "2021",
               "id": "230.0"
             },
@@ -66,6 +94,18 @@
           "name": "ČSOB Akciový dlouhodobé spotřeby",
           "records" : [
             {
+              "year": "2018",
+              "id": "230.3"
+            },
+            {
+              "year": "2019",
+              "id": "230.3"
+            },
+            {
+              "year": "2020",
+              "id": "230.3"
+            },
+            {
               "year": "2021",
               "id": "230.3"
             },
@@ -76,8 +116,33 @@
           ]
         },
         {
+          "name": "ČSOB Komoditní",
+          "records" : [
+            {
+              "year": "2018",
+              "id": "230.4"
+            },
+            {
+              "year": "2019",
+              "id": "230.4"
+            },
+            {
+              "year": "2020",
+              "id": "230.4"
+            }
+          ]
+        },
+        {
           "name": "ČSOB Akciový vodního bohatství",
           "records" : [
+            {
+              "year": "2019",
+              "id": "230.6"
+            },
+            {
+              "year": "2020",
+              "id": "230.6"
+            },
             {
               "year": "2021",
               "id": "230.6"
@@ -91,6 +156,14 @@
         {
           "name": "ČSOB Akciový realitní",
           "records" : [
+            {
+              "year": "2019",
+              "id": "230.7"
+            },
+            {
+              "year": "2020",
+              "id": "230.7"
+            },
             {
               "year": "2021",
               "id": "230.7"
@@ -140,6 +213,14 @@
           "name": "Patria Finance - portfolio",
           "records" : [
             {
+              "year": "2019",
+              "id": "230.5"
+            },
+            {
+              "year": "2020",
+              "id": "230.5"
+            },
+            {
               "year": "2021",
               "id": "231.0"
             },
@@ -156,6 +237,10 @@
         {
           "name": "Revolut - investice",
           "records" : [
+            {
+              "year": "2020",
+              "id": "230.8"
+            },
             {
               "year": "2021",
               "id": "231.1"
@@ -179,6 +264,10 @@
           "name": "Golden Gate - komodity",
           "records" : [
             {
+              "year": "2020",
+              "id": "230.9"
+            },
+            {
               "year": "2021",
               "id": "232.0"
             },
@@ -200,6 +289,10 @@
         {
           "name": "Revolut - krypto",
           "records" : [
+            {
+              "year": "2021",
+              "id": "233.0"
+            },
             {
               "year": "2022",
               "id": "233.0"

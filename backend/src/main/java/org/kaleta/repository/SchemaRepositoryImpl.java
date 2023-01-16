@@ -72,4 +72,11 @@ public class SchemaRepositoryImpl implements SchemaRepository {
                 .setParameter("id", accountId)
                 .getSingleResult();
     }
+
+    @Override
+    public List<Schema> list(String year) {
+        return entityManager.createQuery(selectYearly, Schema.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
 }
