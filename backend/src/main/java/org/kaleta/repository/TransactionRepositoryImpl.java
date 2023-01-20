@@ -10,8 +10,8 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.UUID;
 
-public class TransactionRepositoryImpl implements TransactionRepository {
-
+public class TransactionRepositoryImpl implements TransactionRepository
+{
     @PersistenceContext
     EntityManager entityManager;
 
@@ -42,8 +42,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     public List<Transaction> listMatching(String year, String debitPrefix, String creditPrefix)
     {
         return entityManager.createQuery(selectYearly
-                        + " AND t.debit LIKE :debit AND t.credit LIKE :credit"
-                        + excludeOffBalanceTransactions, Transaction.class)
+                        + " AND t.debit LIKE :debit AND t.credit LIKE :credit", Transaction.class)
                 .setParameter("year", year)
                 .setParameter("debit", debitPrefix + "%")
                 .setParameter("credit", creditPrefix + "%")

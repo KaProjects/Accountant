@@ -11,13 +11,14 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class ViewServiceImpl implements ViewService {
-
+public class ViewServiceImpl implements ViewService
+{
     @Autowired
     TransactionDao transactionDao;
 
     @Override
-    public Map<String, List<Transaction>> getVacationMap(String year){
+    public Map<String, List<Transaction>> getVacationMap(String year)
+    {
         List<Transaction> vacationTransactions = transactionDao.listByDescriptionMatching(year,"vac=");
         Map<String, List<Transaction>> map = new HashMap<>();
 
@@ -30,10 +31,10 @@ public class ViewServiceImpl implements ViewService {
         }
 
         return map;
-
     }
 
-    private String extractVacationKey(String description){
+    private String extractVacationKey(String description)
+    {
         for (String split : description.split(" ")) {
             if (split.startsWith("vac=")){
                 return split.substring(4);

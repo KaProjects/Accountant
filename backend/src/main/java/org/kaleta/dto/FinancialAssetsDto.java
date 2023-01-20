@@ -6,17 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class FinancialAssetsDto {
+public class FinancialAssetsDto
+{
     private List<Group> groups = new ArrayList<>();
 
     @Data
-    public static class Group {
+    public static class Group
+    {
         private String name;
 
         private List<Account> accounts = new ArrayList<>();
 
         @Data
-        public static class Account {
+        public static class Account
+        {
             private String name;
 
             private Integer initialValue;
@@ -31,7 +34,6 @@ public class FinancialAssetsDto {
             private Integer[] funding;
             private Integer[] cumulativeDeposits;
             private Integer[] cumulativeWithdrawals;
-
         }
     }
 }

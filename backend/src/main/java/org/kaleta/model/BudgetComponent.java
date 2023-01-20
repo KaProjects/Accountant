@@ -3,15 +3,17 @@ package org.kaleta.model;
 import lombok.Data;
 import org.kaleta.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
-public class BudgetComponent {
-
+public class BudgetComponent
+{
     private final List<Row> rows = new ArrayList<>();
     private String name;
 
-    public Integer[] getActualMonths() {
+    public Integer[] getActualMonths()
+    {
         if (rows.size() == 0){
             return new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0};
         }
@@ -22,7 +24,8 @@ public class BudgetComponent {
         return Utils.mergeIntegerArrays(rowMonths);
     }
 
-    public Integer[] getPlannedMonths() {
+    public Integer[] getPlannedMonths()
+    {
         if (rows.size() == 0){
             return new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0};
         }
@@ -34,14 +37,15 @@ public class BudgetComponent {
     }
 
     @Data
-    public static class Row {
-
+    public static class Row
+    {
         private final List<Row> subRows = new ArrayList<>();
         private String name;
         private Integer[] monthsPlanned = new Integer[]{};
         private Integer[] monthsActual = new Integer[]{};
 
-        public Integer[] getActualMonths() {
+        public Integer[] getActualMonths()
+        {
             if (monthsActual.length != 0){
                 return monthsActual;
             } else {
@@ -53,7 +57,8 @@ public class BudgetComponent {
             }
         }
 
-        public Integer[] getPlannedMonths() {
+        public Integer[] getPlannedMonths()
+        {
             if (monthsPlanned.length != 0){
                 return monthsPlanned;
             } else {
@@ -64,6 +69,5 @@ public class BudgetComponent {
                 return Utils.mergeIntegerArrays(subRowMonths);
             }
         }
-
     }
 }

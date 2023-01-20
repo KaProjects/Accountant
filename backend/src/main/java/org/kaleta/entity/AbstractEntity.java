@@ -12,14 +12,14 @@ import java.util.UUID;
 @Setter
 @MappedSuperclass
 @EqualsAndHashCode(of = "id")
-public abstract class AbstractEntity {
-
+public abstract class AbstractEntity
+{
     @Id
     protected String id = UUID.randomUUID().toString();
 
-
     @Override
-    public String toString() {
+    public String toString()
+    {
         return getClass().getSimpleName() + "@" + id;
     }
 }

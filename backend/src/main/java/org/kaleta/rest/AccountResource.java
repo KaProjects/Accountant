@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Path("/account")
-public class AccountResource {
-
+public class AccountResource
+{
     @Inject
     AccountService accountService;
 
@@ -29,8 +29,9 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}")
-    public List<AccountDto> getAllAccounts(@PathParam String year) {
-        InputValidators.validateYear(year);
+    public List<AccountDto> getAllAccounts(@PathParam String year)
+    {
+        ParamValidators.validateYear(year);
 
         List<AccountDto> list = new ArrayList<>();
         for (Account account : accountService.list(year)) {

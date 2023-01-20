@@ -18,18 +18,18 @@ import java.util.List;
 import static org.kaleta.dto.BudgetDto.Row.Type.*;
 
 @Path("/budget")
-public class BudgetResource {
-
+public class BudgetResource
+{
     @Inject
     BudgetingService service;
-
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}")
-    public BudgetDto getBudget(@PathParam String year) {
-        InputValidators.validateYear(year);
+    public BudgetDto getBudget(@PathParam String year)
+    {
+        ParamValidators.validateYear(year);
 
         BudgetComponent incomeComponent = service.getBudgetComponent(year, "Income", "i");
         BudgetComponent mandatoryExpensesComponent = service.getBudgetComponent(year, "Total Mandatory Expenses", "me");
@@ -62,7 +62,8 @@ public class BudgetResource {
         return budgetDto;
     }
 
-    private Integer computeLastFilledMonth(List<BudgetComponent> components){
+    private Integer computeLastFilledMonth(List<BudgetComponent> components)
+    {
         Boolean[] flags = new Boolean[]{false,false,false,false,false,false,false,false,false,false,false,false};
         for (BudgetComponent component: components){
             Integer[] months = component.getActualMonths();
@@ -80,7 +81,9 @@ public class BudgetResource {
         }
         return lastFilledMonth;
     }
-    private void constructBudgetComponentDtoRows(BudgetComponent component, BudgetDto dto, BudgetDto.Row.Type type){
+
+    private void constructBudgetComponentDtoRows(BudgetComponent component, BudgetDto dto, BudgetDto.Row.Type type)
+    {
         for (BudgetComponent.Row row : component.getRows()){
             BudgetDto.Row rowDto = dto.addRow(type, row.getName(), row.getActualMonths(), row.getPlannedMonths());
             for (BudgetComponent.Row subRows : row.getSubRows()){

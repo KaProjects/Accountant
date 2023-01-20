@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class TransactionServiceImpl implements TransactionService {
-
+public class TransactionServiceImpl implements TransactionService
+{
     @Autowired
     TransactionDao transactionDao;
 
@@ -21,16 +21,20 @@ public class TransactionServiceImpl implements TransactionService {
     SchemaService schemaService;
 
     @Override
-    public List<YearTransactionDto> getTransactionsMatching(String year, String debitPrefix, String creditPrefix) {
+    public List<YearTransactionDto> getTransactionsMatching(String year, String debitPrefix, String creditPrefix)
+    {
         return mapYearTransactions(transactionDao.listMatching(year, debitPrefix, creditPrefix));
     }
 
     @Override
-    public Integer[] monthlyBalanceByAccounts(String year, String debit, String credit){
+    public Integer[] monthlyBalanceByAccounts(String year, String debit, String credit)
+    {
         return monthlyBalanceByAccounts(year, debit, credit, "");
     }
+
     @Override
-    public Integer[] monthlyBalanceByAccounts(String year, String debit, String credit, String description) {
+    public Integer[] monthlyBalanceByAccounts(String year, String debit, String credit, String description)
+    {
         List<Transaction> transactions = transactionDao.listByAccounts(year, debit, credit, description);
         Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (Transaction tr : transactions) {
@@ -41,22 +45,9 @@ public class TransactionServiceImpl implements TransactionService {
         return monthlyBalance;
     }
 
-    private List<YearTransactionDto> mapYearTransactions(List<Transaction> transactions) {
-        List<YearTransactionDto> output = new ArrayList<>();
-        for (Transaction transaction : transactions) {
-            YearTransactionDto dto = new YearTransactionDto();
-            dto.setDate(transaction.getDate());
-            dto.setDescription(transaction.getDescription());
-            dto.setAmount(String.valueOf(transaction.getAmount()));
-            dto.setDebit(transaction.getDebit());
-            dto.setCredit(transaction.getCredit());
-            output.add(dto);
-        }
-        return output;
-    }
-
     @Override
-    public Integer sumExpensesOf(List<Transaction> transactions) {
+    public Integer sumExpensesOf(List<Transaction> transactions)
+    {
         Integer sum = 0;
         for (Transaction transaction : transactions) {
             if (transaction.getDebit().startsWith("5")){
@@ -75,7 +66,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Integer getInitialValue(Account account) {
+    public Integer getInitialValue(Account account)
+    {
         String type = schemaService.getAccountType(account.getAccountId().getYear(), account.getAccountId().getSchemaId());
 
         if (type.equals("A")) {
@@ -83,13 +75,14 @@ public class TransactionServiceImpl implements TransactionService {
         } else if (type.equals("L")){
             return transactionDao.getInitialTransaction(account.getAccountId().getYear(), account.getFullId(), false).getAmount();
         } else {
-            throw new IllegalArgumentException("Only types A(ssets) and L(iabilities) have initial state, " +
+            throw new IllegalArgumentException("Only types A(ssets) and L(iabilities) have initial value, " +
                     "but was '" + type + "' for account '" + account.getFullId()+ ":" + account.getName() + "'");
         }
     }
 
     @Override
-    public Integer[] monthlyBalanceByAccount(Account account) {
+    public Integer[] monthlyBalanceByAccount(Account account)
+    {
         String year = account.getAccountId().getYear();
         String type = schemaService.getAccountType(year, account.getAccountId().getSchemaId());
         boolean isDebit = type.equals("A") || type.equals("E");
@@ -108,5 +101,20 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         return Utils.toCumulativeArray(monthlySums);
+    }
+
+    private List<YearTransactionDto> mapYearTransactions(List<Transaction> transactions)
+    {
+        List<YearTransactionDto> output = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            YearTransactionDto dto = new YearTransactionDto();
+            dto.setDate(transaction.getDate());
+            dto.setDescription(transaction.getDescription());
+            dto.setAmount(String.valueOf(transaction.getAmount()));
+            dto.setDebit(transaction.getDebit());
+            dto.setCredit(transaction.getCredit());
+            output.add(dto);
+        }
+        return output;
     }
 }

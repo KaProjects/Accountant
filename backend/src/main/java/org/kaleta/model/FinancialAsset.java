@@ -4,8 +4,8 @@ import lombok.Data;
 import org.kaleta.Utils;
 
 @Data
-public class FinancialAsset {
-
+public class FinancialAsset
+{
     private String fullId;
     private String name;
 
@@ -31,11 +31,13 @@ public class FinancialAsset {
         return Utils.toCumulativeArray(monthlyFunding);
     }
 
-    public Integer[] getMonthlyCumulativeDeposits() {
+    public Integer[] getMonthlyCumulativeDeposits()
+    {
         return Utils.toCumulativeArray(deposits);
     }
 
-    public Integer[] getMonthlyCumulativeWithdrawals() {
+    public Integer[] getMonthlyCumulativeWithdrawals()
+    {
         return Utils.toCumulativeArray(withdrawals);
     }
 }

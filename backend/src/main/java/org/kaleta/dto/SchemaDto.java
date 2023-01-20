@@ -4,8 +4,8 @@ import lombok.Data;
 import org.kaleta.entity.Schema;
 
 @Data
-public class SchemaDto {
-
+public class SchemaDto
+{
     private String year;
     private String id;
     private String name;
@@ -13,7 +13,8 @@ public class SchemaDto {
 
     public SchemaDto() {}
 
-    public SchemaDto(Schema schema) {
+    public SchemaDto(Schema schema)
+    {
         this.year = schema.getYearId().getYear();
         this.id = schema.getYearId().getId();
         this.name = schema.getName();

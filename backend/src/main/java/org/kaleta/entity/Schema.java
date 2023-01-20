@@ -11,8 +11,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @Entity
 @Table(name = "ASchema")
-public class Schema {
-
+public class Schema
+{
     @EmbeddedId
     private YearId yearId;
 

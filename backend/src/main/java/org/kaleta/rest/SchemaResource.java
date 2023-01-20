@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Path("/schema")
-public class SchemaResource {
-
+public class SchemaResource
+{
     @Inject
     SchemaService schemaService;
 
@@ -25,8 +25,9 @@ public class SchemaResource {
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}")
-    public List<SchemaDto> getSchema(@PathParam String year) {
-        InputValidators.validateYear(year);
+    public List<SchemaDto> getSchema(@PathParam String year)
+    {
+        ParamValidators.validateYear(year);
 
         List<SchemaDto> list = new ArrayList<>();
         for (Schema schema : schemaService.list(year)) {

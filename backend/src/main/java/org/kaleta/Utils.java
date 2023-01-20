@@ -10,9 +10,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Utils {
-
-    public static String inputStreamToString(InputStream is) throws IOException {
+public class Utils
+{
+    public static String inputStreamToString(InputStream is) throws IOException
+    {
         StringBuilder sb = new StringBuilder();
         String line;
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -26,7 +27,8 @@ public class Utils {
     /**
      * Merges integer arrays of the same length.
      */
-    public static Integer[] mergeIntegerArrays(Integer[]... arrays){
+    public static Integer[] mergeIntegerArrays(Integer[]... arrays)
+    {
         // check same length
         for(Integer[] array : arrays){
             if (!(array.length == arrays[0].length)){
@@ -47,7 +49,8 @@ public class Utils {
     /**
      * subtract two integer arrays of the same length.
      */
-    public static Integer[] subtractIntegerArrays(Integer[] base, Integer[] subtraction){
+    public static Integer[] subtractIntegerArrays(Integer[] base, Integer[] subtraction)
+    {
         // check same length
         if (!(base.length == subtraction.length)){
             throw new IllegalArgumentException("arrays not same length: a0=" + base.length + " != an="+subtraction.length);
@@ -64,7 +67,8 @@ public class Utils {
     /**
      * add two integer arrays of the same length.
      */
-    public static Integer[] addIntegerArrays(Integer[] base, Integer[] subtraction){
+    public static Integer[] addIntegerArrays(Integer[] base, Integer[] subtraction)
+    {
         // check same length
         if (!(base.length == subtraction.length)){
             throw new IllegalArgumentException("arrays not same length: a0=" + base.length + " != an="+subtraction.length);
@@ -89,7 +93,8 @@ public class Utils {
         }
         return cumulativeArray;
     }
-    public static <T> T[] concatArrays(T[] array1, T[] array2) {
+    public static <T> T[] concatArrays(T[] array1, T[] array2)
+    {
         List<T> resultList = new ArrayList<>(array1.length + array2.length);
         Collections.addAll(resultList, array1);
         Collections.addAll(resultList, array2);

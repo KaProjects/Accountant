@@ -11,8 +11,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @Entity
 @Table(name = "Account")
-public class Account {
-
+public class Account
+{
     @EmbeddedId
     private AccountId accountId;
 
@@ -24,7 +24,8 @@ public class Account {
     @NotNull
     private String metadata;
 
-    public String getFullId(){
+    public String getFullId()
+    {
         return accountId.getSchemaId() + "." + accountId.getSemanticId();
     }
 }

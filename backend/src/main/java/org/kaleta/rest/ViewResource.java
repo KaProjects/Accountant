@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 @Path("/view")
-public class ViewResource {
-
+public class ViewResource
+{
     @Inject
     ViewService viewService;
 
@@ -29,13 +29,13 @@ public class ViewResource {
     @Inject
     AccountService accountService;
 
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}/vacation")
-    public VacationDto getBudget(@PathParam String year){
-        InputValidators.validateYear(year);
+    public VacationDto getBudget(@PathParam String year)
+    {
+        ParamValidators.validateYear(year);
 
         Map<String, List<Transaction>> vacations = viewService.getVacationMap(year);
         Map<String, String> accountNames = accountService.getAccountNamesMap(year);

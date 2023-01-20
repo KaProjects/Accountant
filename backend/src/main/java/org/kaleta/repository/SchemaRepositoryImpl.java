@@ -6,15 +6,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
-public class SchemaRepositoryImpl implements SchemaRepository {
-
-    private String selectYearly = "SELECT s FROM Schema s WHERE s.yearId.year=:year";
-
+public class SchemaRepositoryImpl implements SchemaRepository
+{
     @PersistenceContext
     EntityManager entityManager;
 
+    private String selectYearly = "SELECT s FROM Schema s WHERE s.yearId.year=:year";
+
     @Override
-    public void syncSchema(org.kaleta.entity.xml.Schema data) {
+    public void syncSchema(org.kaleta.entity.xml.Schema data)
+    {
         entityManager.createNativeQuery("DELETE FROM ASchema WHERE year=?")
                 .setParameter(1, data.getYear())
                 .executeUpdate();
@@ -48,7 +49,8 @@ public class SchemaRepositoryImpl implements SchemaRepository {
     }
 
     @Override
-    public String getNameById(String year, String id) {
+    public String getNameById(String year, String id)
+    {
         return (String) entityManager.createQuery("SELECT s.name FROM Schema s " +
                         "WHERE s.yearId.year=:year AND s.yearId.id=:id")
                 .setParameter("year", year)
@@ -57,7 +59,8 @@ public class SchemaRepositoryImpl implements SchemaRepository {
     }
 
     @Override
-    public List<Schema> getAccountByGroup(String year, String groupId) {
+    public List<Schema> getAccountByGroup(String year, String groupId)
+    {
         return entityManager.createQuery(selectYearly
                         + " AND s.yearId.id LIKE :id AND length(s.yearId.id) = 3", Schema.class)
                 .setParameter("year", year)
@@ -66,7 +69,8 @@ public class SchemaRepositoryImpl implements SchemaRepository {
     }
 
     @Override
-    public Schema getAccountById(String year, String accountId) {
+    public Schema getAccountById(String year, String accountId)
+    {
         return entityManager.createQuery(selectYearly + " AND s.yearId.id=:id", Schema.class)
                 .setParameter("year", year)
                 .setParameter("id", accountId)
@@ -74,7 +78,8 @@ public class SchemaRepositoryImpl implements SchemaRepository {
     }
 
     @Override
-    public List<Schema> list(String year) {
+    public List<Schema> list(String year)
+    {
         return entityManager.createQuery(selectYearly, Schema.class)
                 .setParameter("year", year)
                 .getResultList();

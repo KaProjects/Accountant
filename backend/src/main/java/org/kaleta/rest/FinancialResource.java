@@ -24,8 +24,8 @@ import java.io.IOException;
 import static org.kaleta.Utils.inputStreamToString;
 
 @Path("/financial")
-public class FinancialResource {
-
+public class FinancialResource
+{
     @Inject
     FinancialService financialService;
 
@@ -41,7 +41,7 @@ public class FinancialResource {
     @Path("/assets/{year}")
     public FinancialAssetsDto getFinancialAssetsProgress(@PathParam String year)
     {
-        InputValidators.validateYear(year);
+        ParamValidators.validateYear(year);
 
         FinancialAssetsDto dto = new FinancialAssetsDto();
 

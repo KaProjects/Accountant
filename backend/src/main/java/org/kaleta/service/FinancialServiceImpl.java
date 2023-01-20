@@ -7,9 +7,11 @@ import org.kaleta.model.FinancialAsset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-public class FinancialServiceImpl implements FinancialService {
+import static org.kaleta.service.AccountServiceImpl.validateFinAssetAccount;
 
+@Service
+public class FinancialServiceImpl implements FinancialService
+{
     @Autowired
     TransactionService transactionService;
 
@@ -17,7 +19,10 @@ public class FinancialServiceImpl implements FinancialService {
     AccountService accountService;
 
     @Override
-    public FinancialAsset getFinancialAsset(Account account){
+    public FinancialAsset getFinancialAsset(Account account)
+    {
+        validateFinAssetAccount(account.getFullId());
+
         FinancialAsset model = new FinancialAsset();
         model.setName(account.getName());
         model.setFullId(account.getFullId());
@@ -55,16 +60,9 @@ public class FinancialServiceImpl implements FinancialService {
         return model;
     }
 
-    private String[] constructLabels(String year){
-        String[] labels = new String[12];
-        for(int i=0;i<12;i++){
-            labels[i] = String.valueOf(i+1) + "/" + year.substring(2,4);
-        }
-        return labels;
-    }
-
     @Override
-    public FinancialAsset getFinancialAsset(FinAssetsConfig.Group.Account configAccount) {
+    public FinancialAsset getFinancialAsset(FinAssetsConfig.Group.Account configAccount)
+    {
         FinancialAsset model = new FinancialAsset();
         model.setName(configAccount.getName());
 
@@ -78,6 +76,8 @@ public class FinancialServiceImpl implements FinancialService {
         Integer[] balances = new Integer[]{};
 
         for (FinAssetsConfig.Group.Account.Record record : configAccount.getRecords()){
+            validateFinAssetAccount(record.getId());
+
             Account account = accountService.getAccount(record.getYear(), record.getId());
             FinancialAsset accountModel = this.getFinancialAsset(account);
 
@@ -95,5 +95,14 @@ public class FinancialServiceImpl implements FinancialService {
         model.setBalances(balances);
 
         return model;
+    }
+
+    private String[] constructLabels(String year)
+    {
+        String[] labels = new String[12];
+        for(int i=0;i<12;i++){
+            labels[i] = String.valueOf(i+1) + "/" + year.substring(2,4);
+        }
+        return labels;
     }
 }

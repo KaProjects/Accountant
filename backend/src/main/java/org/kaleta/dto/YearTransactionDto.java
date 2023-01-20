@@ -3,7 +3,8 @@ package org.kaleta.dto;
 import lombok.Data;
 
 @Data
-public class YearTransactionDto {
+public class YearTransactionDto
+{
     private String date;
     private String description;
     private String amount;
