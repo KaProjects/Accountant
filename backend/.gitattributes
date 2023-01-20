@@ -6,6 +6,8 @@ src/main/resources/application.properties filter=git-crypt diff=git-crypt
 
 src/main/resources/createTestDb.sql filter=git-crypt diff=git-crypt
 
+src/main/resources/users.json filter=git-crypt diff=git-crypt
+
 sql/createBudgeting.sql filter=git-crypt diff=git-crypt
 
 build_deploy.sh filter=git-crypt diff=git-crypt

@@ -9,7 +9,6 @@ export const useData = (url) => {
 
     useEffect(() => {
         const dataFetch = async () => {
-            console.log("URL: " + url)
             axios.get(url).then(
                 (response) => {
                     setData(response.data);

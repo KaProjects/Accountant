@@ -5,6 +5,7 @@ import Budgeting from "./Budgeting";
 import {properties} from "./properties";
 import Vacation from "./Vacation";
 import FinancialAssets from "./FinancialAssets";
+import Login from "./components/Login";
 
 class App extends Component {
     constructor(props) {
@@ -12,10 +13,32 @@ class App extends Component {
         this.state = {
             host: properties.host,
             port: properties.port,
+            token: null
         }
-        // this.componentDidMount = this.componentDidMount.bind(this);
+
+        this.setToken = this.setToken.bind(this);
+        this.getToken = this.getToken.bind(this);
     }
+
+    setToken(token){
+        sessionStorage.setItem('token', token);
+        this.setState({token: token})
+    }
+
+    getToken() {
+        if (this.state.token != null) {
+            return this.state.token
+        } else {
+            return sessionStorage.getItem('token');
+        }
+    }
+
     render() {
+
+        if (!this.getToken()) {
+            return <Login setToken={this.setToken}/>
+        }
+
         return (
             <div>
                 {/*<MainBar {...this.state} />*/}

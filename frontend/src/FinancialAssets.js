@@ -1,7 +1,6 @@
 import {useParams} from "react-router-dom";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useState} from "react";
 import Loader from "./components/Loader";
-import axios from "axios";
 import FinancialChart from "./components/FinancialChart";
 import {Checkbox, Collapse, FormControlLabel, List, ListItem, ListItemText, ListSubheader} from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
