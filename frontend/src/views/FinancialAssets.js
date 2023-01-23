@@ -1,19 +1,23 @@
 import {useParams} from "react-router-dom";
-import React, {useState} from "react";
-import Loader from "./components/Loader";
-import FinancialChart from "./components/FinancialChart";
+import React, {useEffect, useState} from "react";
+import Loader from "../components/Loader";
+import FinancialChart from "../components/FinancialChart";
 import {Checkbox, Collapse, FormControlLabel, List, ListItem, ListItemText, ListSubheader} from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
-import {useData} from "./fetch";
+import {useData} from "../fetch";
 
 
 const FinancialAssets = props => {
-    let { year } = useParams();
+    let { all } = useParams();
 
     const [chartFlags, setChartFlags] = useState([])
     const [chartOptions, setChartOptions] = useState([false])
 
-    const {data, loaded, error} = useData("http://" + props.host + ":" + props.port + "/financial/assets/" + ((year === undefined) ? "" : year))
+    const {data, loaded, error} = useData("http://" + props.host + ":" + props.port + "/financial/assets/" + (all === undefined ? props.year : ""))
+
+    useEffect(() => {
+        props.setYearly(all === undefined)
+    }, []);
 
     function constructInitialFlags(data)
     {
@@ -121,8 +125,7 @@ const FinancialAssets = props => {
 
                             <FinancialChart data={constructChartData(account)}
                                             decomposedFunding={chartOptions[0]}
-                                            width={year === "" || year === undefined ? "98%" : 700}/>
-
+                                            width={all === undefined ? 700 : "98%"}/>
 
                          </Collapse>
                      </div>

@@ -1,19 +1,21 @@
-import {useParams} from "react-router-dom";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Collapse, List, ListItem, ListItemText} from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Paper from "@mui/material/Paper";
-import Loader from "./components/Loader";
-import {useData} from "./fetch";
+import Loader from "../components/Loader";
+import {useData} from "../fetch";
 
 
 const Vacation = props => {
-    const { year } = useParams();
 
     const [transactionFlags, setTransactionFlags] = useState([])
 
-    const {data, loaded, error} = useData("http://" + props.host + ":" + props.port + "/view/" + year + "/vacation")
+    const {data, loaded, error} = useData("http://" + props.host + ":" + props.port + "/view/" + props.year + "/vacation")
+
+    useEffect(() => {
+        props.setYearly(true)
+    }, []);
 
     function toggleTransactions(index){
         const newFlag = !transactionFlags[index]

@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import './App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import Budgeting from "./Budgeting";
+import Budgeting from "./views/Budgeting";
 import {properties} from "./properties";
-import Vacation from "./Vacation";
-import FinancialAssets from "./FinancialAssets";
+import Vacation from "./views/Vacation";
+import FinancialAssets from "./views/FinancialAssets";
 import Login from "./components/Login";
+import MainBar from "./components/MainBar";
 
 class App extends Component {
     constructor(props) {
@@ -13,15 +14,23 @@ class App extends Component {
         this.state = {
             host: properties.host,
             port: properties.port,
-            token: null
+            token: null,
+            year: new Date().getFullYear(),
+            isYearly: true,
+            setYearly: this.setYearly.bind(this)
         }
 
         this.setToken = this.setToken.bind(this);
         this.getToken = this.getToken.bind(this);
+        this.setYear = this.setYear.bind(this);
     }
 
     setToken(token){
-        sessionStorage.setItem('token', token);
+        if (token == null){
+            sessionStorage.removeItem('token')
+        } else {
+            sessionStorage.setItem('token', token);
+        }
         this.setState({token: token})
     }
 
@@ -33,6 +42,14 @@ class App extends Component {
         }
     }
 
+    setYear(year){
+        this.setState({year: year})
+    }
+
+    setYearly(yearly){
+        this.setState({isYearly: yearly})
+    }
+
     render() {
 
         if (!this.getToken()) {
@@ -41,19 +58,21 @@ class App extends Component {
 
         return (
             <div>
-                {/*<MainBar {...this.state} />*/}
+                <MainBar setYear={this.setYear} setToken={this.setToken} {...this.state} />
                 <BrowserRouter>
                     <Routes>
                         {/*<Route exact path="/" element={<Menu {...this.state}/> }/>*/}
-                        <Route exact path="/budget/:year" element={<Budgeting {...this.state}/> }/>
-                        <Route exact path="/view/:year/vacation" element={<Vacation {...this.state}/> }/>
-                        <Route exact path="/financial/assets/:year" element={<FinancialAssets {...this.state}/> }/>
+                        <Route exact path="/budgeting" element={<Budgeting {...this.state}/> }/>
+                        <Route exact path="/view/vacation" element={<Vacation {...this.state}/> }/>
+                        <Route exact path="/financial/assets/:all" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/financial/assets" element={<FinancialAssets {...this.state}/> }/>
 
                     </Routes>
                 </BrowserRouter>
 
-
+                {/*<div style={{width: '100%', position: 'fixed', bottom: 0, justifyContent: "center"}}>*/}
+                {/*    Copyright © {new Date().getFullYear()} Stanislav Kaleta*/}
+                {/*</div>*/}
             </div>
         )
     }
