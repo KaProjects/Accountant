@@ -5,6 +5,11 @@
      bump pom.xml version
      bump build deploy sh versions 
 
+## 1.3
+Released: 24.1.2023
+
+    swagger api docs, auth rest, financial assets rest, schema rest, added older budgets sql, switched to https
+
 ## 1.2
 Released: 9.1.2023
 
