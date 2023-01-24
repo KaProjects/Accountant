@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Schema {
+public class Schema
+{
     private String year;
 
     @JacksonXmlElementWrapper(useWrapping = false)
@@ -16,7 +17,8 @@ public class Schema {
     private List<Schema.Clazz> clazz = new ArrayList<>();
 
     @Data
-    public static class Clazz {
+    public static class Clazz
+    {
         private String id;
         private String name;
 
@@ -24,7 +26,8 @@ public class Schema {
         private List<Schema.Clazz.Group> group = new ArrayList<>();
 
         @Data
-        public static class Group {
+        public static class Group
+        {
             private String id;
             private String name;
 
@@ -32,7 +35,8 @@ public class Schema {
             private List<Schema.Clazz.Group.Account> account = new ArrayList<>();
 
             @Data
-            public static class Account {
+            public static class Account
+            {
                 private String id;
                 private String name;
                 private String type;

@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-public class BudgetingServiceImpl implements BudgetingService {
-
+public class BudgetingServiceImpl implements BudgetingService
+{
     @Autowired
     TransactionService transactionService;
 
@@ -20,7 +20,8 @@ public class BudgetingServiceImpl implements BudgetingService {
     BudgetingDao budgetingDao;
 
     @Override
-    public BudgetComponent getBudgetComponent(String year, String name, String idPrefix){
+    public BudgetComponent getBudgetComponent(String year, String name, String idPrefix)
+    {
         BudgetComponent budgetComponent = new BudgetComponent();
         budgetComponent.setName(name);
 
@@ -54,7 +55,8 @@ public class BudgetingServiceImpl implements BudgetingService {
         return budgetComponent;
     }
 
-    private Integer[] parsePlanning(String planning){
+    private Integer[] parsePlanning(String planning)
+    {
         Integer[] output = new Integer[12];
         if (planning == null || planning.isEmpty()) {
             Arrays.fill(output, 0);
@@ -71,7 +73,8 @@ public class BudgetingServiceImpl implements BudgetingService {
         return output;
     }
 
-    private Integer[] getMonthlyBalanceForBudgetingRow(String year, Budgeting row) {
+    private Integer[] getMonthlyBalanceForBudgetingRow(String year, Budgeting row)
+    {
         if (row.getDebit().equals(row.getCredit())){
             Integer[] debitMonthlyBalance = transactionService.monthlyBalanceByAccounts(year, row.getDebit(), "", row.getDescription());
             Integer[] creditMonthlyBalance = transactionService.monthlyBalanceByAccounts(year, "", row.getCredit(), row.getDescription());
@@ -84,6 +87,4 @@ public class BudgetingServiceImpl implements BudgetingService {
             return transactionService.monthlyBalanceByAccounts(year, row.getDebit(), row.getCredit(), row.getDescription());
         }
     }
-
-
 }

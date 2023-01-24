@@ -1,0 +1,322 @@
+{
+  "groups": [
+    {
+      "name": "podiely",
+      "accounts":[
+        {
+          "name": "Met Life - inv. ziv. poistenie 1",
+          "records" : [
+            {
+              "year": "2017",
+              "id": "230.0"
+            },
+            {
+              "year": "2018",
+              "id": "230.1"
+            },
+            {
+              "year": "2019",
+              "id": "230.1"
+            },
+            {
+              "year": "2020",
+              "id": "230.1"
+            }
+          ]
+        },
+        {
+          "name": "Met Life - inv. ziv. poistenie 2",
+          "records" : [
+            {
+              "year": "2017",
+              "id": "230.1"
+            },
+            {
+              "year": "2018",
+              "id": "230.2"
+            },
+            {
+              "year": "2019",
+              "id": "230.2"
+            },
+            {
+              "year": "2020",
+              "id": "230.2"
+            },
+            {
+              "year": "2021",
+              "id": "230.2"
+            },
+            {
+              "year": "2022",
+              "id": "230.2"
+            },
+            {
+              "year": "2023",
+              "id": "230.2"
+            }
+          ]
+        },
+        {
+          "name": "Pioneer Investments",
+          "records" : [
+            {
+              "year": "2017",
+              "id": "230.2"
+            },
+            {
+              "year": "2018",
+              "id": "230.0"
+            },
+            {
+              "year": "2019",
+              "id": "230.0"
+            },
+            {
+              "year": "2020",
+              "id": "230.0"
+            },
+            {
+              "year": "2021",
+              "id": "230.0"
+            },
+            {
+              "year": "2022",
+              "id": "230.0"
+            },
+            {
+              "year": "2023",
+              "id": "230.0"
+            }
+          ]
+        },
+        {
+          "name": "ČSOB Akciový dlouhodobé spotřeby",
+          "records" : [
+            {
+              "year": "2018",
+              "id": "230.3"
+            },
+            {
+              "year": "2019",
+              "id": "230.3"
+            },
+            {
+              "year": "2020",
+              "id": "230.3"
+            },
+            {
+              "year": "2021",
+              "id": "230.3"
+            },
+            {
+              "year": "2022",
+              "id": "230.3"
+            }
+          ]
+        },
+        {
+          "name": "ČSOB Komoditní",
+          "records" : [
+            {
+              "year": "2018",
+              "id": "230.4"
+            },
+            {
+              "year": "2019",
+              "id": "230.4"
+            },
+            {
+              "year": "2020",
+              "id": "230.4"
+            }
+          ]
+        },
+        {
+          "name": "ČSOB Akciový vodního bohatství",
+          "records" : [
+            {
+              "year": "2019",
+              "id": "230.6"
+            },
+            {
+              "year": "2020",
+              "id": "230.6"
+            },
+            {
+              "year": "2021",
+              "id": "230.6"
+            },
+            {
+              "year": "2022",
+              "id": "230.6"
+            }
+          ]
+        },
+        {
+          "name": "ČSOB Akciový realitní",
+          "records" : [
+            {
+              "year": "2019",
+              "id": "230.7"
+            },
+            {
+              "year": "2020",
+              "id": "230.7"
+            },
+            {
+              "year": "2021",
+              "id": "230.7"
+            },
+            {
+              "year": "2022",
+              "id": "230.7"
+            }
+          ]
+        },
+        {
+          "name": "ČSOB Akciovy Trendy",
+          "records" : [
+            {
+              "year": "2021",
+              "id": "230.8"
+            },
+            {
+              "year": "2022",
+              "id": "230.8"
+            }
+          ]
+        },
+        {
+          "name": "ČSOB Bohatstvi - drobne",
+          "records" : [
+            {
+              "year": "2021",
+              "id": "230.9"
+            },
+            {
+              "year": "2022",
+              "id": "230.9"
+            },
+            {
+              "year": "2023",
+              "id": "230.9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "akcie",
+      "accounts":[
+        {
+          "name": "Patria Finance - portfolio",
+          "records" : [
+            {
+              "year": "2019",
+              "id": "230.5"
+            },
+            {
+              "year": "2020",
+              "id": "230.5"
+            },
+            {
+              "year": "2021",
+              "id": "231.0"
+            },
+            {
+              "year": "2022",
+              "id": "231.0"
+            },
+            {
+              "year": "2023",
+              "id": "231.0"
+            }
+          ]
+        },
+        {
+          "name": "Revolut - investice",
+          "records" : [
+            {
+              "year": "2020",
+              "id": "230.8"
+            },
+            {
+              "year": "2021",
+              "id": "231.1"
+            },
+            {
+              "year": "2022",
+              "id": "231.1"
+            },
+            {
+              "year": "2023",
+              "id": "231.1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "komodity",
+      "accounts":[
+        {
+          "name": "Golden Gate - komodity",
+          "records" : [
+            {
+              "year": "2020",
+              "id": "230.9"
+            },
+            {
+              "year": "2021",
+              "id": "232.0"
+            },
+            {
+              "year": "2022",
+              "id": "232.0"
+            },
+            {
+              "year": "2023",
+              "id": "232.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "kryptomeny",
+      "accounts":[
+        {
+          "name": "Revolut - krypto",
+          "records" : [
+            {
+              "year": "2021",
+              "id": "233.0"
+            },
+            {
+              "year": "2022",
+              "id": "233.0"
+            },
+            {
+              "year": "2023",
+              "id": "233.0"
+            }
+          ]
+        },
+        {
+          "name": "Golden Gate - Bitcoin",
+          "records" : [
+            {
+              "year": "2022",
+              "id": "233.1"
+            },
+            {
+              "year": "2023",
+              "id": "233.1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

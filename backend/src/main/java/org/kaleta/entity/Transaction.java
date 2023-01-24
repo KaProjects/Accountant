@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @Entity
 @Table(name = "Transaction")
-public class Transaction extends AbstractEntity {
-
+public class Transaction extends AbstractEntity
+{
     @Column(name = "year")
     @NotNull
     private String year;

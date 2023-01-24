@@ -1,5 +1,6 @@
 package org.kaleta.repository;
 
+import org.kaleta.Constants;
 import org.kaleta.entity.Transaction;
 import org.kaleta.entity.xml.Transactions;
 
@@ -9,8 +10,8 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.UUID;
 
-public class TransactionRepositoryImpl implements TransactionRepository {
-
+public class TransactionRepositoryImpl implements TransactionRepository
+{
     @PersistenceContext
     EntityManager entityManager;
 
@@ -41,8 +42,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     public List<Transaction> listMatching(String year, String debitPrefix, String creditPrefix)
     {
         return entityManager.createQuery(selectYearly
-                        + " AND t.debit LIKE :debit AND t.credit LIKE :credit"
-                        + excludeOffBalanceTransactions, Transaction.class)
+                        + " AND t.debit LIKE :debit AND t.credit LIKE :credit", Transaction.class)
                 .setParameter("year", year)
                 .setParameter("debit", debitPrefix + "%")
                 .setParameter("credit", creditPrefix + "%")
@@ -113,12 +113,27 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public List<Transaction> listByDescriptionMatching(String year, String descriptionSubString) {
+    public List<Transaction> listByDescriptionMatching(String year, String descriptionSubString)
+    {
         return entityManager.createQuery(selectYearly
                         + " AND t.description LIKE :description"
                         + excludeOffBalanceTransactions, Transaction.class)
                 .setParameter("year", year)
                 .setParameter("description", "%" + descriptionSubString + "%")
                 .getResultList();
+    }
+
+    @Override
+    public Transaction getInitialTransaction(String year, String accountId, boolean isDebit)
+    {
+        String accountsCondition = isDebit
+                ? " AND t.debit=:accountId AND t.credit=:initialId"
+                : " AND t.debit=:initialId AND t.credit=:accountId";
+
+        return entityManager.createQuery(selectYearly + accountsCondition, Transaction.class)
+                .setParameter("year", year)
+                .setParameter("accountId", accountId)
+                .setParameter("initialId", Constants.Account.INIT_ACC_ID)
+                .getSingleResult();
     }
 }

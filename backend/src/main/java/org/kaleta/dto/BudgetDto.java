@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Locale;
 
 @Data
-public class BudgetDto {
-
+public class BudgetDto
+{
     private List<String> columns = new ArrayList<>();
     private List<Row> rows = new ArrayList<>();
     private Integer lastFilledMonth;
 
-    public BudgetDto(String year, Integer lastFilledMonth){
+    public BudgetDto(String year, Integer lastFilledMonth)
+    {
         this.lastFilledMonth = lastFilledMonth;
         columns.add("Budget " + year);
         columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
@@ -26,7 +27,8 @@ public class BudgetDto {
         columns.add("delta/"+lastFilledMonth);
     }
 
-    public BudgetDto.Row addRow(BudgetDto.Row.Type type, String name, Integer[] monthlyActual, Integer[] monthlyPlanned){
+    public BudgetDto.Row addRow(BudgetDto.Row.Type type, String name, Integer[] monthlyActual, Integer[] monthlyPlanned)
+    {
         BudgetDto.Row row = new BudgetDto.Row(lastFilledMonth);
         row.setType(type);
         row.setName(name);
@@ -49,7 +51,8 @@ public class BudgetDto {
     }
 
     @Data
-    public static class Row {
+    public static class Row
+    {
         private Type type;
         private String name;
         private List<Integer> actual = new ArrayList<>();
@@ -64,11 +67,13 @@ public class BudgetDto {
         private Integer deltaAvg;
         private List<Row> subRows = new ArrayList<>();
         private Integer lastFilledMonth;
-        public Row(Integer lastFilledMonth){
+        public Row(Integer lastFilledMonth)
+        {
             this.lastFilledMonth = lastFilledMonth;
         }
 
-        public void addSubRow(String name, Integer[] monthlyActual, Integer[] monthlyPlanned){
+        public void addSubRow(String name, Integer[] monthlyActual, Integer[] monthlyPlanned)
+        {
             BudgetDto.Row row = new BudgetDto.Row(lastFilledMonth);
             row.setType(Type.SUB_ROW);
             row.setName(name);
@@ -88,7 +93,8 @@ public class BudgetDto {
             row.setDeltaAvg(row.getActualAvg() - row.getPlannedAvgToFilledMonth());
             this.getSubRows().add(row);
         }
-        public enum Type {
+        public enum Type
+        {
             INCOME,
             INCOME_SUM,
             EXPENSE,

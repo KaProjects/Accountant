@@ -1,38 +1,21 @@
-import {useParams} from "react-router-dom";
-import React, {useCallback, useEffect, useState} from "react";
-import axios from "axios";
+import React, {useEffect, useState} from "react";
 import {Collapse, List, ListItem, ListItemText} from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Paper from "@mui/material/Paper";
-import Loader from "./components/Loader";
+import Loader from "../components/Loader";
+import {useData} from "../fetch";
 
 
 const Vacation = props => {
-    const { year } = useParams();
 
-    const [loaded, setLoaded] = useState(false)
-    const [error, setError] = useState(null)
-    const [data, setData] = useState(null)
     const [transactionFlags, setTransactionFlags] = useState([])
 
-    const loadData = useCallback((props, year) => {
-        axios.get("http://" + props.host + ":" + props.port + "/view/" + year + "/vacation").then(
-            (response) => {
-                setData(response.data);
-                setTransactionFlags(Array(response.data.vacations.length).fill(false))
-                setError(null)
-                setLoaded(true);
-            }).catch((error) => {
-                console.error(error)
-                setError(error)
-            })
-    }, [])
+    const {data, loaded, error} = useData("/view/" + props.year + "/vacation")
 
     useEffect(() => {
-        loadData(props, year);
-    }, [loadData, props, year]);
-
+        props.setYearly(true)
+    }, []);
 
     function toggleTransactions(index){
         const newFlag = !transactionFlags[index]

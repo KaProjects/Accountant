@@ -1,37 +1,63 @@
 package org.kaleta.service;
 
 import org.kaleta.dao.SchemaDao;
+import org.kaleta.entity.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-public class SchemaServiceImpl implements SchemaService{
+import java.util.List;
 
+@Service
+public class SchemaServiceImpl implements SchemaService
+{
     @Autowired
     SchemaDao schemaDao;
 
     @Override
-    public String getAccountName(String year, String accountId){
-        if (accountId.length() != 3) {
-            throw new IllegalArgumentException("Account id length should be 3, but provided id='" + accountId + "'");
-        }
+    public String getAccountName(String year, String accountId)
+    {
+        validateIdLength(accountId, 3);
         return schemaDao.getNameById(year, accountId);
     }
 
     @Override
-    public String getGroupName(String year, String groupId){
-        if (groupId.length() != 2) {
-            throw new IllegalArgumentException("Group id length should be 2, but provided id='" + groupId + "'");
-        }
+    public String getGroupName(String year, String groupId)
+    {
+        validateIdLength(groupId, 2);
         return schemaDao.getNameById(year, groupId);
     }
 
     @Override
-    public String getClassName(String year, String classId){
-        if (classId.length() != 1) {
-            throw new IllegalArgumentException("Class id length should be 1, but provided id='" + classId + "'");
-        }
+    public String getClassName(String year, String classId)
+    {
+        validateIdLength(classId, 1);
         return schemaDao.getNameById(year, classId);
     }
 
+    @Override
+    public List<Schema> getSchemaAccountsByGroup(String year, String groupId)
+    {
+        validateIdLength(groupId, 2);
+        return schemaDao.getAccountByGroup(year, groupId);
+    }
+
+    @Override
+    public String getAccountType(String year, String accountId)
+    {
+        validateIdLength(accountId, 3);
+        return schemaDao.getAccountById(year, accountId).getType();
+    }
+
+    @Override
+    public List<Schema> list(String year)
+    {
+        return schemaDao.list(year);
+    }
+
+    private void validateIdLength(String id, Integer expected)
+    {
+        if (id.length() != expected) {
+            throw new IllegalArgumentException("Id length should be " + expected + ", but provided id='" + id + "'");
+        }
+    }
 }

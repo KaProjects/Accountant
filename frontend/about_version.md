@@ -5,6 +5,11 @@
      bump package.json version
      bump build deploy sh versions 
 
+## 1.3
+Released: 24.1.2023
+
+    login page, year changing component, financial assets overview
+
 ## 1.2
 Released: 9.1.2023
 

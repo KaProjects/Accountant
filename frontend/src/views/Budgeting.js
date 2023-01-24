@@ -1,37 +1,20 @@
-import React, {useCallback, useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import React, {useEffect} from "react";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
-import axios from "axios";
 import Paper from '@mui/material/Paper';
 import {IconButton} from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import Loader from "./components/Loader";
+import Loader from "../components/Loader";
+import {useData} from "../fetch";
+
 
 const Budgeting = props => {
-    const { year } = useParams()
 
-    const [loaded, setLoaded] = useState(false)
-    const [error, setError] = useState(null)
-    const [budget, setBudget] = useState(null)
-
-
-    const loadData = useCallback((props, year) => {
-        axios.get("http://" + props.host + ":" + props.port + "/budget/" + year).then(
-            (response) => {
-                setBudget(response.data)
-                setError(null)
-                setLoaded(true)
-            }).catch((error) => {
-                console.error(error)
-                setError(error)
-            })
-    }, [])
+    const {data, loaded, error} = useData("/budget/" + props.year)
 
     useEffect(() => {
-        loadData(props, year)
-    }, [loadData, props, year])
-
+        props.setYearly(true)
+    }, []);
 
     function getRowStyle(type, hasLeftBorder, hasRightBorder){
         const borderLeft = hasLeftBorder ? "2px solid" : "0px";
@@ -226,13 +209,13 @@ const Budgeting = props => {
             <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                 <TableHead>
                     <TableRow>
-                        {budget.columns.map((column, index) => (
+                        {data.columns.map((column, index) => (
                             <TableCell key={index} style={getHeaderStyle(index)}>{column}</TableCell>
                         ))}
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {budget.rows.map((row, index) => (
+                    {data.rows.map((row, index) => (
                         <Row key={index} row={row}/>
                     ))}
                 </TableBody>

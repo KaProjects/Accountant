@@ -4,7 +4,8 @@ import lombok.Data;
 import org.kaleta.entity.Account;
 
 @Data
-public class AccountDto {
+public class AccountDto
+{
     private String year;
     private String schemaId;
     private String semanticId;
@@ -17,7 +18,8 @@ public class AccountDto {
 
     public AccountDto(){}
 
-    public AccountDto(Account account){
+    public AccountDto(Account account)
+    {
         this.year = account.getAccountId().getYear();
         this.schemaId = account.getAccountId().getSchemaId();
         this.semanticId = account.getAccountId().getSemanticId();

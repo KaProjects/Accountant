@@ -11,8 +11,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @Entity
 @Table(name = "Budgeting")
-public class Budgeting {
-
+public class Budgeting
+{
     @EmbeddedId
     private YearId yearId;
 

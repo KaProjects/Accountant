@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class VacationDto {
-
+public class VacationDto
+{
     private List<String> columns = new ArrayList<>(List.of("Date", "Amount", "Debit", "Credit", "Description"));
 
     private List<Vacation> vacations = new ArrayList<>();
 
-
-    public static int compare(Vacation vacation1, Vacation vacation2) {
+    public static int compare(Vacation vacation1, Vacation vacation2)
+    {
         String date1 = vacation1.getTransactions().get(0).getDate();
         String date2 = vacation2.getTransactions().get(0).getDate();
 
@@ -31,13 +31,15 @@ public class VacationDto {
     }
 
     @Data
-    public static class Vacation {
+    public static class Vacation
+    {
         private String name;
         private String expenses;
         private List<Transaction> transactions = new ArrayList<>();
 
         @Data
-        public static class Transaction {
+        public static class Transaction
+        {
             private String date;
             private String amount;
             private String debit;

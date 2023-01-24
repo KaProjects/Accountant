@@ -5,8 +5,6 @@ import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.service.TransactionService;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -16,8 +14,8 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @Path("/transaction")
-public class TransactionResource {
-
+public class TransactionResource
+{
     @Inject
     TransactionService service;
 
@@ -25,13 +23,11 @@ public class TransactionResource {
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}/{debitPrefix}/{creditPrefix}")
-    public List<YearTransactionDto> getTransactionsMatching(@PathParam String year, @PathParam String debitPrefix, @PathParam String creditPrefix) {
-        if (!year.matches("20\\d\\d"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
-        if (!debitPrefix.matches("\\d?\\d?\\d"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Debit Prefix Parameter");
-        if (!creditPrefix.matches("\\d?\\d?\\d"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Credit Prefix Parameter");
+    public List<YearTransactionDto> getTransactionsMatching(@PathParam String year, @PathParam String debitPrefix, @PathParam String creditPrefix)
+    {
+        ParamValidators.validateYear(year);
+        ParamValidators.validateDebitPrefix(debitPrefix);
+        ParamValidators.validateCreditPrefix(creditPrefix);
 
         return service.getTransactionsMatching(year, debitPrefix, creditPrefix);
     }
@@ -40,9 +36,9 @@ public class TransactionResource {
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}")
-    public List<YearTransactionDto> getTransactionsMatching(@PathParam String year) {
-        if (!year.matches("20\\d\\d"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter");
+    public List<YearTransactionDto> getTransactionsMatching(@PathParam String year)
+    {
+        ParamValidators.validateYear(year);
 
         return service.getTransactionsMatching(year, "", "");
     }

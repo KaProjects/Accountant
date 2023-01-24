@@ -7,13 +7,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
-public class AccountRepositoryImpl implements AccountRepository {
-
+public class AccountRepositoryImpl implements AccountRepository
+{
     @PersistenceContext
     EntityManager entityManager;
 
+    private String selectYearly = "SELECT a FROM Account a WHERE a.accountId.year=:year";
+
     @Override
-    public void syncAccounts(Accounts data) {
+    public void syncAccounts(Accounts data)
+    {
         entityManager.createNativeQuery("DELETE FROM Account WHERE year=?")
                 .setParameter(1, data.getYear())
                 .executeUpdate();
@@ -31,9 +34,31 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public List<Account> list(String year){
-        return entityManager.createQuery("SELECT a FROM Account a WHERE a.accountId.year=:year", Account.class)
+    public List<Account> list(String year)
+    {
+        return entityManager.createQuery(selectYearly, Account.class)
                 .setParameter("year", year)
                 .getResultList();
+    }
+
+    @Override
+    public List<Account> list(String year, String schemaIdPrefix)
+    {
+        return entityManager.createQuery(selectYearly + " AND a.accountId.schemaId LIKE :schemaId", Account.class)
+                .setParameter("year", year)
+                .setParameter("schemaId", schemaIdPrefix + "%")
+                .getResultList();
+    }
+
+    @Override
+    public Account get(String year, String schemaId, String semanticId)
+    {
+        return entityManager.createQuery(selectYearly +
+                        " AND a.accountId.schemaId=:schemaId" +
+                        " AND a.accountId.semanticId=:semanticId", Account.class)
+                .setParameter("year", year)
+                .setParameter("schemaId", schemaId)
+                .setParameter("semanticId", semanticId)
+                .getSingleResult();
     }
 }

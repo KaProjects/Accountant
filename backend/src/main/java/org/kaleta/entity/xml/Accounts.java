@@ -7,15 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Accounts {
-
+public class Accounts
+{
     private String year;
 
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<Accounts.Account> account = new ArrayList<>();
 
     @Data
-    public static class Account {
+    public static class Account
+    {
         private String schemaId;
         private String semanticId;
         private String name;

@@ -1,7 +1,7 @@
-docker build -t accountant-frontend:v1.2 .
+docker build -t accountant-frontend:v1.3 .
 
 docker run -d -p 3301:3000 \
     -v ${pwd}:/app \
     -v /app/node_modules \
     -e CHOKIDAR_USEPOLLING=true \
-    accountant-frontend:v1.1
+    accountant-frontend:v1.3

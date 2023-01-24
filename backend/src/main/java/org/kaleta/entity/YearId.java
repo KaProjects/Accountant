@@ -9,8 +9,8 @@ import java.io.Serializable;
 
 @Data
 @Embeddable
-public class YearId implements Serializable {
-
+public class YearId implements Serializable
+{
     @Column(name = "year")
     @NotNull
     private String year;

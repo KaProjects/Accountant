@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Transactions {
-
+public class Transactions
+{
     private String year;
 
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<Transaction> transaction = new ArrayList<>();
 
-
     @Override
-    public String toString() {
+    public String toString()
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("Transactions{year='" + year + "', transaction=[\n");
         for (Transaction tr : transaction) {
@@ -34,7 +34,8 @@ public class Transactions {
     }
 
     @Data
-    public static class Transaction {
+    public static class Transaction
+    {
         private String id;
         private String date;
         private String description;

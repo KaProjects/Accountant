@@ -5,8 +5,11 @@ import org.kaleta.entity.xml.Transactions;
 
 import java.util.List;
 
-public interface TransactionRepository {
-
+public interface TransactionRepository
+{
+    /**
+     * Syncs transactions in database from data specified
+     */
     void syncTransactions(Transactions data);
 
     /**
@@ -15,8 +18,6 @@ public interface TransactionRepository {
      * @param creditPrefix
      *
      * @return transactions matching parameters
-     *
-     * Note: off-balance transactions excluded
      */
     List<Transaction> listMatching(String year, String debitPrefix, String creditPrefix);
 
@@ -29,6 +30,10 @@ public interface TransactionRepository {
      * debit, credit inputs: exact account (e.g. 500.1 - this one account)
      *                       account prefix with % (e.g. 50% all accounts that id starts with 50)
      *                       null or empty string - all accounts
+     * <p>
+     * description inputs: a value that must be present in the description of transaction
+     *                     a value prefixed with '!' that can't be in description
+     *                     null or empty string - all descriptions
      *
      * @return transactions matching conditions
      *
@@ -55,4 +60,10 @@ public interface TransactionRepository {
      * Note: off-balance transactions excluded
      */
     List<Transaction> listByDescriptionMatching(String year, String descriptionSubString);
+
+    /**
+     * @param isDebit whether account is debit-like, false for credit-like
+     * @return initial transaction for specified account ID
+     */
+    Transaction getInitialTransaction(String year, String accountId, boolean isDebit);
 }
