@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import './App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Budgeting from "./views/Budgeting";
-import {properties} from "./properties";
 import Vacation from "./views/Vacation";
 import FinancialAssets from "./views/FinancialAssets";
 import Login from "./components/Login";
@@ -12,8 +11,6 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            host: properties.host,
-            port: properties.port,
             token: null,
             year: new Date().getFullYear(),
             isYearly: true,

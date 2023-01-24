@@ -11,7 +11,7 @@ const Vacation = props => {
 
     const [transactionFlags, setTransactionFlags] = useState([])
 
-    const {data, loaded, error} = useData("http://" + props.host + ":" + props.port + "/view/" + props.year + "/vacation")
+    const {data, loaded, error} = useData("/view/" + props.year + "/vacation")
 
     useEffect(() => {
         props.setYearly(true)

@@ -10,7 +10,7 @@ import {useData} from "../fetch";
 
 const Budgeting = props => {
 
-    const {data, loaded, error} = useData("http://" + props.host + ":" + props.port + "/budget/" + props.year)
+    const {data, loaded, error} = useData("/budget/" + props.year)
 
     useEffect(() => {
         props.setYearly(true)

@@ -18,7 +18,7 @@ export default function Login({ setToken}){
 
         axios({
             method: 'post',
-            url: "http://" + props.host + ":" + props.port + "/authenticate",
+            url: props.protocol + "://" + props.host + ":" + props.port + "/authenticate",
             headers: {'Content-Type': 'application/json'},
             data: {username, password}
         }).then(

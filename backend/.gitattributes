@@ -2,10 +2,10 @@
 
 cmds.md filter=git-crypt diff=git-crypt
 
+src/main/resources/accountant.jks filter=git-crypt diff=git-crypt
 src/main/resources/application.properties filter=git-crypt diff=git-crypt
-
 src/main/resources/createTestDb.sql filter=git-crypt diff=git-crypt
-
+src/main/resources/fin_assets_config.json filter=git-crypt diff=git-crypt
 src/main/resources/users.json filter=git-crypt diff=git-crypt
 
 sql/createBudgeting.sql filter=git-crypt diff=git-crypt

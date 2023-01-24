@@ -1,7 +1,8 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
+import {properties} from "./properties";
 
-export const useData = (url) => {
+export const useData = (path) => {
 
     const [data, setData] = useState(null);
     const [loaded, setLoaded] = useState(false);
@@ -9,7 +10,7 @@ export const useData = (url) => {
 
     useEffect(() => {
         const dataFetch = async () => {
-            axios.get(url).then(
+            axios.get(properties.protocol + "://" + properties.host + ":" + properties.port + path).then(
                 (response) => {
                     setData(response.data);
                     setError(null)
@@ -21,7 +22,7 @@ export const useData = (url) => {
         };
 
         dataFetch();
-    }, [url]);
+    }, [path]);
 
     return { data, loaded, error };
 };

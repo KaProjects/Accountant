@@ -13,7 +13,7 @@ const FinancialAssets = props => {
     const [chartFlags, setChartFlags] = useState([])
     const [chartOptions, setChartOptions] = useState([false])
 
-    const {data, loaded, error} = useData("http://" + props.host + ":" + props.port + "/financial/assets/" + (all === undefined ? props.year : ""))
+    const {data, loaded, error} = useData("/financial/assets/" + (all === undefined ? props.year : ""))
 
     useEffect(() => {
         props.setYearly(all === undefined)
