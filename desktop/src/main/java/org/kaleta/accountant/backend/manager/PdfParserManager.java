@@ -218,8 +218,6 @@ public class PdfParserManager {
         for (String record: content.split("\n")){
             String[] values = record.split(",");
 
-            System.out.println(record);
-
             PdfTransactionModel transaction = null;
 
             if (values[0].equals("CARD_PAYMENT")) {
@@ -269,7 +267,6 @@ public class PdfParserManager {
                 }
 
                 transactions.add(transaction);
-                System.out.println(transaction);
             }
         }
 

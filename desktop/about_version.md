@@ -8,10 +8,12 @@
         create tag
         pom.xml: x.y -> x.y+1-snapshot
         Initializer.VERSION: x.y -> x.y+1-snapshot
-        Initializer.CONTEXT = devel
+        Initializer.CONTEXT = DEVEL
 
 ## 1.7
 Released: TODO
+
+    Revolut CSV Parser
 
 
 ## 1.6
