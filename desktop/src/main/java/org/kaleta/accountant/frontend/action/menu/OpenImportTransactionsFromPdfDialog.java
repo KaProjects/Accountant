@@ -27,7 +27,7 @@ import static org.kaleta.accountant.Initializer.DEFAULT_FILES_DIR;
 public class OpenImportTransactionsFromPdfDialog extends MenuAction {
 
     public OpenImportTransactionsFromPdfDialog(Configuration config) {
-        super(config, "PDF Transaction(s)");
+        super(config, "PDF/CSV Transaction(s)");
     }
 
     @Override
@@ -42,12 +42,12 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
                     return true;
                 }
                 String extension = Arrays.stream(f.getName().split("\\.")).reduce((a, b) -> b).orElse(null);
-                return  extension != null && extension.equals("pdf");
+                return  extension != null && (extension.equals("pdf") || extension.equals("csv"));
             }
 
             @Override
             public String getDescription() {
-                return "PDF files";
+                return "PDF & CSV files";
             }
         });
 

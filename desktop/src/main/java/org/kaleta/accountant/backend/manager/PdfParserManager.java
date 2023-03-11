@@ -10,21 +10,26 @@ import org.kaleta.accountant.backend.model.PdfTransactionModel;
 import org.kaleta.accountant.service.Service;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class PdfParserManager {
 
-    public static final String CSOB_CREDIT_PARSER_10_2022 = "CSOB - Kreditka 10/2022";
-    public static final String REVOLUT_PARSER_12_2022 = "Revolut 12/2022";
+    public static final String CSOB_CREDIT_PARSER_10_2022 = "CSOB - Kreditka 10/22";
+    public static final String REVOLUT_PARSER_12_2022 = "Revolut 12/22";
+    public static final String REVOLUT_CSV_PARSER_03_2023 = "Revolut CSV 03/23";
 
     public static String[] getDataTypeOptions(){
-        return new String[]{CSOB_CREDIT_PARSER_10_2022, REVOLUT_PARSER_12_2022};
+        return new String[]{CSOB_CREDIT_PARSER_10_2022, REVOLUT_PARSER_12_2022, REVOLUT_CSV_PARSER_03_2023};
     }
 
     private final File file;
@@ -36,16 +41,24 @@ public class PdfParserManager {
         this.dataType = dataType;
     }
 
-    public String loadContent() throws IOException, TikaException, SAXException{
-        BodyContentHandler contentHandler = new BodyContentHandler();
-        FileInputStream fis = new FileInputStream(file);
-        Metadata metadata = new Metadata();
-        ParseContext context = new ParseContext();
-        PDFParser pdfparser = new PDFParser();
+    public String loadContent() throws IOException, TikaException, SAXException {
+        if (Objects.equals(dataType, REVOLUT_PARSER_12_2022) || Objects.equals(dataType, CSOB_CREDIT_PARSER_10_2022)) {
+            BodyContentHandler contentHandler = new BodyContentHandler();
+            FileInputStream fis = new FileInputStream(file);
+            Metadata metadata = new Metadata();
+            ParseContext context = new ParseContext();
+            PDFParser pdfparser = new PDFParser();
 
-        pdfparser.parse(fis, contentHandler, metadata, context);
+            pdfparser.parse(fis, contentHandler, metadata, context);
 
-        content = contentHandler.toString();
+            content = contentHandler.toString();
+
+        } else if (Objects.equals(dataType, REVOLUT_CSV_PARSER_03_2023)) {
+            byte[] encoded = Files.readAllBytes(file.toPath());
+            content = new String(encoded, Charset.defaultCharset());
+        } else {
+            throw new RuntimeException("Illegal data type");
+        }
         return content;
     }
 
@@ -59,6 +72,7 @@ public class PdfParserManager {
         switch (dataType){
             case CSOB_CREDIT_PARSER_10_2022: return use_CSOB_CREDIT_PARSER_10_2022();
             case REVOLUT_PARSER_12_2022: return use_REVOLUT_PARSER_12_2022();
+            case REVOLUT_CSV_PARSER_03_2023: return use_REVOLUT_CSV_PARSER_03_2023();
 
             default: throw new IllegalArgumentException("unknown dataType");
         }
@@ -116,7 +130,6 @@ public class PdfParserManager {
 
     private List<PdfTransactionModel> use_REVOLUT_PARSER_12_2022(){
         List<PdfTransactionModel> transactions = new ArrayList<>();
-        System.out.println(content);
 
         String[] records = content.split("\n\n");
         for (int i=1;i<records.length;i++){
@@ -199,4 +212,68 @@ public class PdfParserManager {
         return transactions;
     }
 
+    private List<PdfTransactionModel> use_REVOLUT_CSV_PARSER_03_2023(){
+        List<PdfTransactionModel> transactions = new ArrayList<>();
+
+        for (String record: content.split("\n")){
+            String[] values = record.split(",");
+
+            System.out.println(record);
+
+            PdfTransactionModel transaction = null;
+
+            if (values[0].equals("CARD_PAYMENT")) {
+                transaction = new PdfTransactionModel();
+
+                transaction.setCredit("210.3");
+                transaction.setDescription(values[4]);
+
+                for (ConfigModel.Mapping.Debit mapping : Service.CONFIG.getDebitMappings()){
+                    if (transaction.getDescription().contains(mapping.getSubstring())){
+                        transaction.setDebit(mapping.getAccount());
+                    }
+                }
+
+            } else if (values[0].equals("TRANSFER")) {
+                transaction = new PdfTransactionModel();
+
+                if (values[4].startsWith("From")){
+                    transaction.setDebit("210.3");
+                } else if (values[4].startsWith("To")){
+                    transaction.setCredit("210.3");
+                }
+                transaction.setDescription(values[4]);
+            }
+
+            if (transaction != null){
+                String[] date = values[2].split(" ")[0].split("-");
+                transaction.setDate(date[2] + date[1]);
+
+                Double amount = Double.parseDouble(values[5].replace("-", ""));
+                if (values[7].equals("CZK")) {
+                    // no change
+                } else if (values[7].equals("EUR")) {
+                    amount = amount * 25;
+                } else if (values[7].equals("USD")) {
+                    amount = amount * 23;
+                } else {
+                    amount = null;
+                }
+
+                if (amount != null){
+                    transaction.setAmount(String.valueOf(amount.intValue()));
+                }
+
+                if (!values[7].equals("CZK")) {
+                    transaction.setDescription(values[5].replace("-", "") + values[7] + " " + transaction.getDescription());
+                }
+
+                transactions.add(transaction);
+                System.out.println(transaction);
+            }
+        }
+
+        System.out.println("transactions loaded: " + transactions.size());
+        return transactions;
+    }
 }
