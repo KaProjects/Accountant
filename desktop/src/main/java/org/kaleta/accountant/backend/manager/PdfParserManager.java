@@ -216,7 +216,18 @@ public class PdfParserManager {
         List<PdfTransactionModel> transactions = new ArrayList<>();
 
         for (String record: content.split("\n")){
-            String[] values = record.split(",");
+
+            boolean inString = false;
+            StringBuilder RecordSb = new StringBuilder(record);
+            for (int i=0; i<RecordSb.length(); i++){
+                if (RecordSb.charAt(i) == '"') {
+                    inString = !inString;
+                } else if (RecordSb.charAt(i) == ',' && !inString) {
+                    RecordSb.setCharAt(i, ';');
+                }
+            }
+
+            String[] values = RecordSb.toString().split(";");
 
             PdfTransactionModel transaction = null;
 
