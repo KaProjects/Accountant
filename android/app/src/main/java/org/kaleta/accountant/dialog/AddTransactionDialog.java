@@ -43,8 +43,16 @@ public class AddTransactionDialog extends AlertDialog.Builder implements Validab
             Transaction transaction = new Transaction();
             transaction.setDate(String.valueOf(textDate.getText()));
             transaction.setAmount(String.valueOf(textAmount.getText()));
-            transaction.setDebit(Service.getDebitAccounts().get(debitSpinner.getSelectedItemPosition() - 1).getId());
-            transaction.setCredit(Service.getCreditAccounts().get(creditSpinner.getSelectedItemPosition() - 1).getId());
+            if (debitSpinner.getSelectedItemPosition() > 0) {
+                transaction.setDebit(Service.getDebitAccounts().get(debitSpinner.getSelectedItemPosition() - 1).getId());
+            } else {
+                transaction.setDebit("");
+            }
+            if (creditSpinner.getSelectedItemPosition() > 0) {
+                transaction.setCredit(Service.getCreditAccounts().get(creditSpinner.getSelectedItemPosition() - 1).getId());
+            } else {
+                transaction.setCredit("");
+            }
             transaction.setDescription(String.valueOf(textDescription.getText()));
 
             Service.addTransaction(transaction);
@@ -87,6 +95,7 @@ public class AddTransactionDialog extends AlertDialog.Builder implements Validab
         creditSpinner.setOnItemSelectedListener(new ValidatorOnItemSelectedListener(this));
 
         textDescription = dialogViewItems.findViewById(R.id.textDescription);
+        textDescription.addTextChangedListener(new ValidatorTextWatcher(this));
 
         List<Template> templateList = new ArrayList<>();
         templateList.add(new Template("<no template>"));
@@ -130,9 +139,9 @@ public class AddTransactionDialog extends AlertDialog.Builder implements Validab
     public void validate() {
         if (confirmButton != null){
             confirmButton.setEnabled(!textDate.getText().toString().isEmpty()
-            && !textAmount.getText().toString().isEmpty()
-            && debitSpinner.getSelectedItemPosition() > 0
-            && creditSpinner.getSelectedItemPosition() > 0);
+                    && !textAmount.getText().toString().isEmpty()
+                    && ((debitSpinner.getSelectedItemPosition() > 0 && creditSpinner.getSelectedItemPosition() > 0) || !textDescription.getText().toString().isEmpty())
+            );
         }
     }
 }

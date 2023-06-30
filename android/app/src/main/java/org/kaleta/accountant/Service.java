@@ -20,6 +20,7 @@ public class Service {
         reference.child(id).setValue(transaction);
     }
 
+    @Deprecated
     public static void addAccount(Account account, boolean isDebit) {
         DatabaseReference reference = isDebit
                 ? DataSource.getInstance().getDebitRef()

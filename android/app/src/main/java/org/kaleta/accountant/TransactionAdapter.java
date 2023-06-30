@@ -60,10 +60,20 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         public void setTransaction(Transaction transaction) {
             ((TextView) itemView.findViewById(R.id.trDate)).setText(transaction.getDate());
             ((TextView) itemView.findViewById(R.id.trAmount)).setText(transaction.getAmount());
-            ((TextView) itemView.findViewById(R.id.trDebit))
-                    .setText(Service.getDebitAccount(transaction.getDebit()).toString());
-            ((TextView) itemView.findViewById(R.id.trCredit))
-                    .setText(Service.getCreditAccount(transaction.getCredit()).toString());
+            if (!transaction.getDebit().isEmpty()) {
+                ((TextView) itemView.findViewById(R.id.trDebit))
+                        .setText(Service.getDebitAccount(transaction.getDebit()).toString());
+            } else {
+                ((TextView) itemView.findViewById(R.id.trDebit))
+                        .setText("undefined");
+            }
+            if (!transaction.getCredit().isEmpty()) {
+                ((TextView) itemView.findViewById(R.id.trCredit))
+                        .setText(Service.getCreditAccount(transaction.getCredit()).toString());
+            } else {
+                ((TextView) itemView.findViewById(R.id.trCredit))
+                        .setText("undefined");
+            }
         }
     }
 }
