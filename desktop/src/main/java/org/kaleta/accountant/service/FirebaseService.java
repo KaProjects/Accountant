@@ -30,4 +30,15 @@ public class FirebaseService {
     public void clearLoadedTransactions() {
         manager.clearTransactions();
     }
+
+    public void addAccountsIfMissing(String year, String debit, String credit) {
+        if (!manager.hasAccount(debit, true)) {
+            String name = Service.ACCOUNT.getAccountAndGroupName(year, debit);
+            manager.pushAccount(debit, name, true);
+        }
+        if (!manager.hasAccount(credit, false)) {
+            String name = Service.ACCOUNT.getAccountAndGroupName(year, credit);
+            manager.pushAccount(credit, name, false);
+        }
+    }
 }
