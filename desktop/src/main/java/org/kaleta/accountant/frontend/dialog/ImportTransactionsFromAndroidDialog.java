@@ -48,8 +48,12 @@ public class ImportTransactionsFromAndroidDialog extends Dialog {
                 TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, this, true);
                 transactionPanel.setDate(transactionModel.getDate());
                 transactionPanel.setAmount(transactionModel.getAmount());
-                transactionPanel.setDebit(transactionModel.getDebit());
-                transactionPanel.setCredit(transactionModel.getCredit());
+                if (!transactionModel.getDebit().isEmpty()) {
+                    transactionPanel.setDebit(transactionModel.getDebit());
+                }
+                if (!transactionModel.getCredit().isEmpty()) {
+                    transactionPanel.setCredit(transactionModel.getCredit());
+                }
                 transactionPanel.setDescription(transactionModel.getDescription());
 
                 panelTransactions.add(transactionPanel);
