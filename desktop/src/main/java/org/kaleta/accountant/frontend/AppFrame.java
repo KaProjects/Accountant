@@ -50,6 +50,7 @@ public class AppFrame extends JFrame implements Configuration {
         addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK)));
         addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK)));
         addMenu.add(new MenuItemWrapper(new OpenAddFinAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddMonthlyTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK)));
 
         JMenu createMenu = new ActiveYearMenu("Create");
         createMenu.setMnemonic(KeyEvent.VK_C);
