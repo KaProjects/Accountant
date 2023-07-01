@@ -3,11 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="org.kaleta.accountant.MainActivity">
     <item
-        android:id="@+id/action_add_account"
-        android:orderInCategory="100"
-        android:title="@string/action_add_account"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_create_template"
         android:orderInCategory="100"
         android:title="@string/createTemplate"

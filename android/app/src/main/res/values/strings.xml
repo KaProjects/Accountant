@@ -5,6 +5,7 @@
     <string name="add_transaction_title">Add Transaction</string>
     <string name="add_account_title">Add Account</string>
     <string name="dialog_submit">Add</string>
+    <string name="dialog_submit_edit">Save</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="textCredit">Credit</string>
     <string name="textDebit">Debit</string>
@@ -12,4 +13,5 @@
     <string name="textId">id</string>
     <string name="createTemplate">Create Template</string>
     <string name="add_template_title">Add Template</string>
+    <string name="edit_transaction_title">Edit Transaction</string>
 </resources>

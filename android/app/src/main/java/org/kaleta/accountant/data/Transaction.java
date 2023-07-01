@@ -8,6 +8,7 @@ public class Transaction {
     private String amount;
     private String debit;
     private String credit;
+    private String id;
 
     public String getDate() {
         return date;
@@ -49,20 +50,24 @@ public class Transaction {
         this.credit = credit;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Transaction that = (Transaction) o;
-        return Objects.equals(date, that.date) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(amount, that.amount) &&
-                Objects.equals(debit, that.debit) &&
-                Objects.equals(credit, that.credit);
+        return Objects.equals(date, that.date) && Objects.equals(description, that.description) && Objects.equals(amount, that.amount) && Objects.equals(debit, that.debit) && Objects.equals(credit, that.credit) && Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(date, description, amount, debit, credit);
+        return Objects.hash(date, description, amount, debit, credit, id);
     }
 }

@@ -42,6 +42,7 @@ public class DataSource {
                 transactionList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Transaction transaction = postSnapshot.getValue(Transaction.class);
+                    transaction.setId(postSnapshot.getKey());
                     transactionList.add(transaction);
                 }
             }

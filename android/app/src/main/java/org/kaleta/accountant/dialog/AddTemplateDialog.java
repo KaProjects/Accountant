@@ -12,6 +12,7 @@ import org.kaleta.accountant.R;
 import org.kaleta.accountant.Service;
 import org.kaleta.accountant.data.Account;
 import org.kaleta.accountant.data.Template;
+import org.kaleta.accountant.data.Transaction;
 import org.kaleta.accountant.validation.Validable;
 import org.kaleta.accountant.validation.ValidatorOnItemSelectedListener;
 import org.kaleta.accountant.validation.ValidatorTextWatcher;
@@ -29,8 +30,12 @@ public class AddTemplateDialog extends AlertDialog.Builder implements Validable 
     private Button confirmButton;
 
     public AddTemplateDialog(Context context) {
+        this(context, null);
+    }
+
+    public AddTemplateDialog(Context context, Transaction transaction) {
         super(context, R.style.DialogTheme);
-        initComponents();
+        initComponents(transaction);
 
         this.setTitle(R.string.add_template_title);
         this.setPositiveButton(R.string.dialog_submit, (dialog, which) -> {
@@ -47,7 +52,7 @@ public class AddTemplateDialog extends AlertDialog.Builder implements Validable 
         });
     }
 
-    private void initComponents() {
+    private void initComponents(Transaction transaction) {
         View dialogViewItems = View.inflate(getContext(), R.layout.add_template, null);
 
         textName = dialogViewItems.findViewById(R.id.textName);
@@ -55,6 +60,7 @@ public class AddTemplateDialog extends AlertDialog.Builder implements Validable 
 
         textAmount = dialogViewItems.findViewById(R.id.textAmount);
         textAmount.addTextChangedListener(new ValidatorTextWatcher(this));
+        if (transaction != null) textAmount.setText(transaction.getAmount());
 
         List<Account> debitList = new ArrayList<>();
         debitList.add(new Account("-1", "<select debit>"));
@@ -63,6 +69,9 @@ public class AddTemplateDialog extends AlertDialog.Builder implements Validable 
         debitSpinner = dialogViewItems.findViewById(R.id.debitSpinner);
         debitSpinner.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, debitList));
         debitSpinner.setOnItemSelectedListener(new ValidatorOnItemSelectedListener(this));
+        if (transaction != null) {
+            debitSpinner.setSelection(debitList.indexOf(Service.getDebitAccount(transaction.getDebit())));
+        }
 
         List<Account> creditList = new ArrayList<>();
         creditList.add(new Account("-1", "<select credit>"));
@@ -71,8 +80,12 @@ public class AddTemplateDialog extends AlertDialog.Builder implements Validable 
         creditSpinner = dialogViewItems.findViewById(R.id.creditSpinner);
         creditSpinner.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, creditList));
         creditSpinner.setOnItemSelectedListener(new ValidatorOnItemSelectedListener(this));
+        if (transaction != null) {
+            creditSpinner.setSelection(creditList.indexOf(Service.getCreditAccount(transaction.getCredit())));
+        }
 
         textDescription = dialogViewItems.findViewById(R.id.textDescription);
+        if (transaction != null) textDescription.setText(transaction.getDescription());
 
         this.setView(dialogViewItems);
     }

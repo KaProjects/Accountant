@@ -20,6 +20,7 @@ public class Service {
         reference.child(id).setValue(transaction);
     }
 
+    @Deprecated
     public static void addAccount(Account account, boolean isDebit) {
         DatabaseReference reference = isDebit
                 ? DataSource.getInstance().getDebitRef()
@@ -60,4 +61,16 @@ public class Service {
         throw new IllegalArgumentException("Account with id=" + id + " not found!");
     }
 
+    public static void updateTransaction(Transaction transaction) {
+        String id = transaction.getId();
+        transaction.setId(null);
+        DatabaseReference reference = DataSource.getInstance().getTransactionRef();
+        reference.child(id).setValue(transaction);
+
+    }
+
+    public static void deleteTransaction(String id) {
+        DatabaseReference reference = DataSource.getInstance().getTransactionRef();
+        reference.child(id).removeValue();
+    }
 }

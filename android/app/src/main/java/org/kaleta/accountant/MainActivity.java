@@ -10,7 +10,6 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.kaleta.accountant.dialog.AddAccountDialog;
 import org.kaleta.accountant.dialog.AddTemplateDialog;
 import org.kaleta.accountant.dialog.AddTransactionDialog;
 
@@ -55,15 +54,6 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_add_account) {
-            AddAccountDialog builder = new AddAccountDialog(this);
-            AlertDialog dialog = builder.create();
-            dialog.show();
-            builder.createValidator(dialog.getButton(AlertDialog.BUTTON_POSITIVE));
-
-            return true;
-        }
         if (id == R.id.action_create_template) {
             AddTemplateDialog builder = new AddTemplateDialog(this);
             AlertDialog dialog = builder.create();
