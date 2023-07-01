@@ -111,6 +111,14 @@ public class EditTransactionDialog extends AlertDialog.Builder implements Valida
             alert.show();
         });
 
+        toTemplateButton = dialogViewItems.findViewById(R.id.buttonTemplate);
+        toTemplateButton.setOnClickListener(l -> {
+            AddTemplateDialog builder = new AddTemplateDialog(this.getContext(), transaction);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            builder.createValidator(dialog.getButton(AlertDialog.BUTTON_POSITIVE));
+        });
+
         this.setView(dialogViewItems);
     }
 
