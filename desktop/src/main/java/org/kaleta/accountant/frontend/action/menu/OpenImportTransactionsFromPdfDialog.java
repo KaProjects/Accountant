@@ -3,6 +3,7 @@ package org.kaleta.accountant.frontend.action.menu;
 import org.kaleta.accountant.backend.manager.PdfParserManager;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.PdfTransactionModel;
+import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Configuration;
@@ -87,7 +88,7 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
             List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
             Map<AccountPairModel, Set<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
 
-            AddTransactionDialog dialog = new AddTransactionDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, null);
+            AddTransactionDialog dialog = new AddTransactionDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, new ProceduresModel.Group.Procedure());
             dialog.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {

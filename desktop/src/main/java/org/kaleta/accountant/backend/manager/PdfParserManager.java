@@ -10,12 +10,11 @@ import org.kaleta.accountant.backend.model.PdfTransactionModel;
 import org.kaleta.accountant.service.Service;
 import org.xml.sax.SAXException;
 
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,11 +24,13 @@ import java.util.Objects;
 public class PdfParserManager {
 
     public static final String CSOB_CREDIT_PARSER_10_2022 = "CSOB - Kreditka 10/22";
+    public static final String CSOB_CREDIT_CSV_PARSER_07_2023 = "CSOB - Kreditka CSV 07/23";
     public static final String REVOLUT_PARSER_12_2022 = "Revolut 12/22";
     public static final String REVOLUT_CSV_PARSER_03_2023 = "Revolut CSV 03/23";
 
+
     public static String[] getDataTypeOptions(){
-        return new String[]{CSOB_CREDIT_PARSER_10_2022, REVOLUT_PARSER_12_2022, REVOLUT_CSV_PARSER_03_2023};
+        return new String[]{CSOB_CREDIT_PARSER_10_2022, CSOB_CREDIT_CSV_PARSER_07_2023, REVOLUT_PARSER_12_2022, REVOLUT_CSV_PARSER_03_2023};
     }
 
     private final File file;
@@ -53,7 +54,7 @@ public class PdfParserManager {
 
             content = contentHandler.toString();
 
-        } else if (Objects.equals(dataType, REVOLUT_CSV_PARSER_03_2023)) {
+        } else if (Objects.equals(dataType, REVOLUT_CSV_PARSER_03_2023) || Objects.equals(dataType, CSOB_CREDIT_CSV_PARSER_07_2023)) {
             byte[] encoded = Files.readAllBytes(file.toPath());
             content = new String(encoded, Charset.defaultCharset());
         } else {
@@ -73,6 +74,7 @@ public class PdfParserManager {
             case CSOB_CREDIT_PARSER_10_2022: return use_CSOB_CREDIT_PARSER_10_2022();
             case REVOLUT_PARSER_12_2022: return use_REVOLUT_PARSER_12_2022();
             case REVOLUT_CSV_PARSER_03_2023: return use_REVOLUT_CSV_PARSER_03_2023();
+            case CSOB_CREDIT_CSV_PARSER_07_2023: return use_CSOB_CREDIT_CSV_PARSER_07_2023();
 
             default: throw new IllegalArgumentException("unknown dataType");
         }
@@ -282,6 +284,44 @@ public class PdfParserManager {
         }
 
         System.out.println("transactions loaded: " + transactions.size());
+        return transactions;
+    }
+
+    private List<PdfTransactionModel> use_CSOB_CREDIT_CSV_PARSER_07_2023() {
+        List<PdfTransactionModel> transactions = new ArrayList<>();
+
+        for (String record: content.split("\n")) {
+            if (!record.startsWith("289260419")) continue;
+
+            String[] split = record.split(";");
+
+            if (!split[2].startsWith("-")) continue;
+
+            String amount = split[2].replace("-", "").split(",")[0];
+
+            if (!split[14].startsWith("Částka:")) continue;
+
+            String description = split[14].split("Místo: ")[1];
+
+            String date = split[1].replace(".", "").substring(0,4);
+
+            PdfTransactionModel transaction = new PdfTransactionModel();
+            transaction.setAmount(amount);
+            transaction.setDate(date);
+            transaction.setDescription(description);
+            transaction.setCredit("222.0");
+
+            for (ConfigModel.Mapping.Debit mapping : Service.CONFIG.getDebitMappings()){
+                if (transaction.getDescription().contains(mapping.getSubstring())){
+                    transaction.setDebit(mapping.getAccount());
+                }
+            }
+
+            transactions.add(transaction);
+        }
+
+        System.out.println("transactions loaded: " + transactions.size());
+        Collections.reverse(transactions);
         return transactions;
     }
 }
