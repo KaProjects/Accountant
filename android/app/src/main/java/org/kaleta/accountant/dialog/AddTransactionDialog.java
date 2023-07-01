@@ -73,6 +73,8 @@ public class AddTransactionDialog extends AlertDialog.Builder implements Validab
             DateFormat dateFormat = new SimpleDateFormat("ddMM");
             Date date = new Date();
             textDate.setText(dateFormat.format(date));
+            buttonToday.setVisibility(Button.INVISIBLE);
+            textDate.setEms(14);
         });
 
         textAmount = dialogViewItems.findViewById(R.id.textAmount);
