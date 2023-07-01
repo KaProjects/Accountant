@@ -68,4 +68,9 @@ public class Service {
         reference.child(id).setValue(transaction);
 
     }
+
+    public static void deleteTransaction(String id) {
+        DatabaseReference reference = DataSource.getInstance().getTransactionRef();
+        reference.child(id).removeValue();
+    }
 }

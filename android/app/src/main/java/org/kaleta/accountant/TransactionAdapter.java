@@ -91,6 +91,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             AlertDialog dialog = builder.create();
             dialog.show();
             builder.createValidator(dialog.getButton(AlertDialog.BUTTON_POSITIVE));
+            builder.enableCancellation(dialog.getButton(AlertDialog.BUTTON_NEGATIVE));
             return true;
         }
     }

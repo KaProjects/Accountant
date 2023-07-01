@@ -60,5 +60,30 @@
             android:textAlignment="textEnd"
             />
 
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/buttonDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:text="Delete"
+                android:textAllCaps="false"
+                />
+
+            <Button
+                android:id="@+id/buttonTemplate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:text="To Template"
+                android:textAllCaps="false"
+                />
+
+        </TableRow>
+
     </LinearLayout>
 </LinearLayout>

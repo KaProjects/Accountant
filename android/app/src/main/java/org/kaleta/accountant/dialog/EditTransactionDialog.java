@@ -26,7 +26,11 @@ public class EditTransactionDialog extends AlertDialog.Builder implements Valida
     private Spinner creditSpinner;
     private TextView textDescription;
 
+    private Button deleteButton;
+    private Button toTemplateButton;
+
     private Button confirmButton;
+    private Button cancelButton;
 
     private Transaction transaction;
 
@@ -91,12 +95,32 @@ public class EditTransactionDialog extends AlertDialog.Builder implements Valida
         textDescription.addTextChangedListener(new ValidatorTextWatcher(this));
         textDescription.setText(transaction.getDescription());
 
+        deleteButton = dialogViewItems.findViewById(R.id.buttonDelete);
+        deleteButton.setOnClickListener(l -> {
+            AlertDialog alert = new AlertDialog.Builder(dialogViewItems.getContext())
+                    .setTitle("Delete Transaction?")
+                    .setPositiveButton("Confirm", (dialog, which) -> {
+                        Service.deleteTransaction(transaction.getId());
+                        EditTransactionDialog.this.
+                        cancelButton.performClick();
+                    })
+                    .setNegativeButton("Cancel",(dialog, which) -> {
+                        dialog.cancel();
+                    }).create();
+
+            alert.show();
+        });
+
         this.setView(dialogViewItems);
     }
 
     public void createValidator(Button button) {
         confirmButton = button;
         validate();
+    }
+
+    public void enableCancellation(Button button) {
+        cancelButton = button;
     }
 
     @Override
