@@ -47,6 +47,22 @@ public class SchemaManager implements Manager<SchemaModel> {
         SchemaModel.Class c2 = new SchemaModel.Class();
         c2.setId("2");
         c2.setName(CLASS_2_NAME);
+        SchemaModel.Class.Group c2Cash = new SchemaModel.Class.Group();
+        c2Cash.setId("0");
+        c2Cash.setName(FINANCE_GROUP_0_NAME);
+        c2.getGroup().add(c2Cash);
+        SchemaModel.Class.Group c2Debit = new SchemaModel.Class.Group();
+        c2Debit.setId("1");
+        c2Debit.setName(FINANCE_GROUP_1_NAME);
+        c2.getGroup().add(c2Debit);
+        SchemaModel.Class.Group c2Credit = new SchemaModel.Class.Group();
+        c2Credit.setId("2");
+        c2Credit.setName(FINANCE_GROUP_2_NAME);
+        c2.getGroup().add(c2Credit);
+        SchemaModel.Class.Group c2Assets = new SchemaModel.Class.Group();
+        c2Assets.setId("3");
+        c2Assets.setName(FINANCE_GROUP_3_NAME);
+        c2.getGroup().add(c2Assets);
         newSchemaModel.getClazz().add(c2);
 
         SchemaModel.Class c3 = new SchemaModel.Class();
