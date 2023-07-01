@@ -11,7 +11,7 @@
         Initializer.CONTEXT = DEVEL
 
 ## 1.7
-Released: TODO
+Released: 2.7.2023
 
     Revolut CSV parser, CSOB CSV parser, improvements for Firebase importer, invalidate models on demand, support for generating monthly bulk transactions
 
