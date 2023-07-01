@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/textDescription"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="30dp"
+            android:layout_height="wrap_content"
+            android:hint="description"
+            android:inputType="text" />
+
+        <Spinner
+            android:id="@+id/debitSpinner"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="30dp"
+            android:layout_height="53dp"
+            android:spinnerMode="dialog"
+            android:layout_span="2"
+            />
+
+        <Spinner
+            android:id="@+id/creditSpinner"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="30dp"
+            android:layout_height="53dp"
+            android:spinnerMode="dialog"
+            android:layout_span="2"
+            />
+
+        <EditText
+            android:id="@+id/textDay"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="30dp"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:ems="10"
+            android:hint="date"
+            android:inputType="date"
+            android:textAlignment="textEnd"
+            />
+
+        <EditText
+            android:id="@+id/textAmount"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="30dp"
+            android:layout_height="wrap_content"
+            android:hint="amount"
+            android:inputType="number"
+            android:textAlignment="textEnd"
+            />
+
+    </LinearLayout>
+</LinearLayout>

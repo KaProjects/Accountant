@@ -2,6 +2,8 @@ package org.kaleta.accountant;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.kaleta.accountant.data.DataSource;
 import org.kaleta.accountant.data.Transaction;
+import org.kaleta.accountant.dialog.EditTransactionDialog;
 
 import java.util.List;
 
@@ -51,13 +54,17 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public void onCancelled(@NonNull DatabaseError databaseError) {
     }
 
-    public class TransactionViewHolder extends RecyclerView.ViewHolder {
+    public class TransactionViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
+
+        private Transaction transaction;
 
         public TransactionViewHolder(View v) {
             super(v);
         }
 
         public void setTransaction(Transaction transaction) {
+            this.transaction = transaction;
+
             ((TextView) itemView.findViewById(R.id.trDate)).setText(transaction.getDate());
             ((TextView) itemView.findViewById(R.id.trAmount)).setText(transaction.getAmount());
             if (!transaction.getDebit().isEmpty()) {
@@ -74,6 +81,17 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 ((TextView) itemView.findViewById(R.id.trCredit))
                         .setText("undefined");
             }
+
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            EditTransactionDialog builder = new EditTransactionDialog(itemView.getContext(), transaction);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            builder.createValidator(dialog.getButton(AlertDialog.BUTTON_POSITIVE));
+            return true;
         }
     }
 }

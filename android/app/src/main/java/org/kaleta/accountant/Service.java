@@ -61,4 +61,11 @@ public class Service {
         throw new IllegalArgumentException("Account with id=" + id + " not found!");
     }
 
+    public static void updateTransaction(Transaction transaction) {
+        String id = transaction.getId();
+        transaction.setId(null);
+        DatabaseReference reference = DataSource.getInstance().getTransactionRef();
+        reference.child(id).setValue(transaction);
+
+    }
 }
