@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class Initializer {
     public static final String NAME = "Accountant";
-    public static final String VERSION = "1.7";
+    public static final String VERSION = "1.8-snapshot";
     public static final Logger LOG = Logger.getLogger("Logger");
     public static int CONTEXT;
 
@@ -55,7 +55,7 @@ public class Initializer {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                CONTEXT = Constants.Context.PRODUCTION;
+                CONTEXT = Constants.Context.DEVEL;
                 Service.CONFIG.checkResources();
                 Service.CONFIG.checkData();
                 initLogger();

@@ -10,6 +10,11 @@
         Initializer.VERSION: x.y -> x.y+1-snapshot
         Initializer.CONTEXT = DEVEL
 
+## 1.8
+Released: TODO
+
+    TODO
+
 ## 1.7
 Released: 2.7.2023
 
