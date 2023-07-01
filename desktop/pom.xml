@@ -6,7 +6,7 @@
 
     <groupId>org.kaleta</groupId>
     <artifactId>accountant-desktop</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/junit/junit -->

@@ -17,8 +17,9 @@ public class OpenImportTransactionsFromAndroidDialog extends MenuAction {
         dialog.setVisible(true);
         if (dialog.getResult()) {
             for (TransactionPanel panel : dialog.getTransactionPanelList()) {
-                Service.TRANSACTIONS.addTransaction(getConfiguration().getSelectedYear(),
-                        panel.getDate(), panel.getAmount(), panel.getDebit(), panel.getCredit(), panel.getDescription());
+                String year = getConfiguration().getSelectedYear();
+                Service.TRANSACTIONS.addTransaction(year, panel.getDate(), panel.getAmount(), panel.getDebit(), panel.getCredit(), panel.getDescription());
+                Service.FIREBASE.addAccountsIfMissing(year, panel.getDebit(), panel.getCredit());
             }
             getConfiguration().update(Configuration.TRANSACTION_UPDATED);
 

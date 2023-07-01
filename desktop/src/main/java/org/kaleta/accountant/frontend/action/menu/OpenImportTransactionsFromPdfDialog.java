@@ -3,6 +3,7 @@ package org.kaleta.accountant.frontend.action.menu;
 import org.kaleta.accountant.backend.manager.PdfParserManager;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.PdfTransactionModel;
+import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Configuration;
@@ -27,7 +28,7 @@ import static org.kaleta.accountant.Initializer.DEFAULT_FILES_DIR;
 public class OpenImportTransactionsFromPdfDialog extends MenuAction {
 
     public OpenImportTransactionsFromPdfDialog(Configuration config) {
-        super(config, "PDF Transaction(s)");
+        super(config, "PDF/CSV Transaction(s)");
     }
 
     @Override
@@ -42,12 +43,12 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
                     return true;
                 }
                 String extension = Arrays.stream(f.getName().split("\\.")).reduce((a, b) -> b).orElse(null);
-                return  extension != null && extension.equals("pdf");
+                return  extension != null && (extension.equals("pdf") || extension.equals("csv"));
             }
 
             @Override
             public String getDescription() {
-                return "PDF files";
+                return "PDF & CSV files";
             }
         });
 
@@ -87,7 +88,7 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
             List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
             Map<AccountPairModel, Set<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
 
-            AddTransactionDialog dialog = new AddTransactionDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, null);
+            AddTransactionDialog dialog = new AddTransactionDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, new ProceduresModel.Group.Procedure());
             dialog.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {

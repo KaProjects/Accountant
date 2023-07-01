@@ -38,6 +38,7 @@ public class AppFrame extends JFrame implements Configuration {
 
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
+        fileMenu.add(new MenuItemWrapper(new InvalidateModels(this)));
         fileMenu.add(new MenuItemWrapper(new OpenYearClosingDialog(this)));
         fileMenu.add(new JSeparator(SwingConstants.HORIZONTAL));
         fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
@@ -49,6 +50,7 @@ public class AppFrame extends JFrame implements Configuration {
         addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK)));
         addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK)));
         addMenu.add(new MenuItemWrapper(new OpenAddFinAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddMonthlyTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK)));
 
         JMenu createMenu = new ActiveYearMenu("Create");
         createMenu.setMnemonic(KeyEvent.VK_C);

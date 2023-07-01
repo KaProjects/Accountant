@@ -1,5 +1,6 @@
 package org.kaleta.accountant;
 
+import org.kaleta.accountant.backend.manager.PdfParserManager;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.common.LogFormatter;
@@ -19,11 +20,11 @@ import java.util.logging.Logger;
  */
 public class Initializer {
     public static final String NAME = "Accountant";
-    public static final String VERSION = "1.6";
+    public static final String VERSION = "1.7";
     public static final Logger LOG = Logger.getLogger("Logger");
     public static int CONTEXT;
 
-    public static final String DEFAULT_FILES_DIR = "C:/Users/stanley/Downloads";
+    public static String DEFAULT_FILES_DIR = "C:/Users/stanley/Downloads";
 
     public static String getDataSource(){
         String appParentPath = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation().getPath())
@@ -64,6 +65,10 @@ public class Initializer {
                         Service.CONFIG.initYearData(name);
                         Service.CONFIG.setActiveYear(name);
                     }
+                }
+
+                if (System.getProperty("os.name").startsWith("Mac")) {
+                    DEFAULT_FILES_DIR = "/Users/skaleta/Downloads";
                 }
 
                 new AppFrame().setVisible(true);

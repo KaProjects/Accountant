@@ -8,7 +8,12 @@
         create tag
         pom.xml: x.y -> x.y+1-snapshot
         Initializer.VERSION: x.y -> x.y+1-snapshot
-        Initializer.CONTEXT = devel
+        Initializer.CONTEXT = DEVEL
+
+## 1.7
+Released: 2.7.2023
+
+    Revolut CSV parser, CSOB CSV parser, improvements for Firebase importer, invalidate models on demand, support for generating monthly bulk transactions
 
 ## 1.6
 Released: 5.12.2022

@@ -24,7 +24,10 @@ public class Constants {
         public static final String ACCUMULATED_DEP_GROUP_NAME = "Accumulated Depreciation";
         public static final String ACCUMULATED_DEP_GROUP_ID = "9";
         public static final String ACCUMULATED_DEP_ACCOUNT_PREFIX = "a. d. of ";
-
+        public static final String FINANCE_GROUP_0_NAME = "Penazne prostriedky";
+        public static final String FINANCE_GROUP_1_NAME = "Debetne ucty";
+        public static final String FINANCE_GROUP_2_NAME = "Kreditne ucty";
+        public static final String FINANCE_GROUP_3_NAME = "Dl. Financny majetok";
         public static final String RECEIVABLES_GROUP_NAME = "Receivables";
         public static final String RECEIVABLES_GROUP_ID = "0";
         public static final String RECEIVABLES_PERSONAL_ACCOUNT_NAME = "receivables to persons";

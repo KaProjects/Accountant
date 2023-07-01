@@ -3,6 +3,7 @@ package org.kaleta.accountant.frontend.dialog;
 import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.FirebaseTransactionModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
+import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
 import org.kaleta.accountant.frontend.component.TransactionPanel;
@@ -37,27 +38,36 @@ public class ImportTransactionsFromAndroidDialog extends Dialog {
         JButton buttonLoad = new JButton("Load Transactions");
 
         buttonLoad.addActionListener(l -> {
-            panelTransactions.removeAll();
-            transactionPanelList.clear();
+            try {
+                panelTransactions.removeAll();
+                transactionPanelList.clear();
 
-            Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
-            List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
-            Map<AccountPairModel, Set<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
+                Map<String, List<AccountsModel.Account>> allAccountMap = Service.ACCOUNT.getAccountsViaSchemaMap(getConfiguration().getSelectedYear());
+                List<SchemaModel.Class> classList = Service.SCHEMA.getSchemaClassList(getConfiguration().getSelectedYear());
+                Map<AccountPairModel, Set<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
 
-            for (FirebaseTransactionModel transactionModel : Service.FIREBASE.loadTransactions()) {
-                TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, this, true);
-                transactionPanel.setDate(transactionModel.getDate());
-                transactionPanel.setAmount(transactionModel.getAmount());
-                transactionPanel.setDebit(transactionModel.getDebit());
-                transactionPanel.setCredit(transactionModel.getCredit());
-                transactionPanel.setDescription(transactionModel.getDescription());
+                for (FirebaseTransactionModel transactionModel : Service.FIREBASE.loadTransactions()) {
+                    TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, this, true);
+                    transactionPanel.setDate(transactionModel.getDate());
+                    transactionPanel.setAmount(transactionModel.getAmount());
+                    if (!transactionModel.getDebit().isEmpty()) {
+                        transactionPanel.setDebit(transactionModel.getDebit());
+                    }
+                    if (!transactionModel.getCredit().isEmpty()) {
+                        transactionPanel.setCredit(transactionModel.getCredit());
+                    }
+                    transactionPanel.setDescription(transactionModel.getDescription());
 
-                panelTransactions.add(transactionPanel);
-                transactionPanelList.add(transactionPanel);
+                    panelTransactions.add(transactionPanel);
+                    transactionPanelList.add(transactionPanel);
+                }
+                panelTransactions.repaint();
+                panelTransactions.revalidate();
+                buttonLoad.setEnabled(false);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                ErrorHandler.getThrowableDialog(e).setVisible(true);
             }
-            panelTransactions.repaint();
-            panelTransactions.revalidate();
-            buttonLoad.setEnabled(false);
         });
 
         setContent(layout -> {
