@@ -38,6 +38,7 @@ public class AppFrame extends JFrame implements Configuration {
 
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
+        fileMenu.add(new MenuItemWrapper(new InvalidateModels(this)));
         fileMenu.add(new MenuItemWrapper(new OpenYearClosingDialog(this)));
         fileMenu.add(new JSeparator(SwingConstants.HORIZONTAL));
         fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));

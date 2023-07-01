@@ -13,7 +13,7 @@
 ## 1.7
 Released: TODO
 
-    Revolut CSV Parser
+    Revolut CSV parser, improvements for Firebase importer, invalidate models on demand, 
 
 
 ## 1.6
