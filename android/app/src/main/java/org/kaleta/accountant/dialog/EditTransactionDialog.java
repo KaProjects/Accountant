@@ -76,7 +76,9 @@ public class EditTransactionDialog extends AlertDialog.Builder implements Valida
         debitSpinner = dialogViewItems.findViewById(R.id.debitSpinner);
         debitSpinner.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, debitList));
         debitSpinner.setOnItemSelectedListener(new ValidatorOnItemSelectedListener(this));
-        debitSpinner.setSelection(debitList.indexOf(Service.getDebitAccount(transaction.getDebit())));
+        if (!transaction.getDebit().isEmpty()) {
+            debitSpinner.setSelection(debitList.indexOf(Service.getDebitAccount(transaction.getDebit())));
+        }
 
         List<Account> creditList = new ArrayList<>();
         creditList.add(new Account("-1", "<select credit>"));
@@ -85,7 +87,9 @@ public class EditTransactionDialog extends AlertDialog.Builder implements Valida
         creditSpinner = dialogViewItems.findViewById(R.id.creditSpinner);
         creditSpinner.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, creditList));
         creditSpinner.setOnItemSelectedListener(new ValidatorOnItemSelectedListener(this));
-        creditSpinner.setSelection(creditList.indexOf(Service.getCreditAccount(transaction.getCredit())));
+        if (!transaction.getCredit().isEmpty()) {
+            creditSpinner.setSelection(creditList.indexOf(Service.getCreditAccount(transaction.getCredit())));
+        }
 
         textAmount = dialogViewItems.findViewById(R.id.textAmount);
         textAmount.addTextChangedListener(new ValidatorTextWatcher(this));
