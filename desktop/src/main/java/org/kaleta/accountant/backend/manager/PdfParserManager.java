@@ -303,7 +303,9 @@ public class PdfParserManager {
 
             String description = split[14].split("Místo: ")[1];
 
-            String date = split[1].replace(".", "").substring(0,4);
+            String fullDate = split[14].split(" ")[3].replace(",", "");
+            if (fullDate.length() != 10 || fullDate.charAt(2) != '.' | fullDate.charAt(5) != '.') continue;
+            String date = fullDate.replace(".", "").substring(0,4);
 
             PdfTransactionModel transaction = new PdfTransactionModel();
             transaction.setAmount(amount);
