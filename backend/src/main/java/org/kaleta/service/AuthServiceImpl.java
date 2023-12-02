@@ -6,12 +6,16 @@ import org.kaleta.model.UsersConfig;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import static org.kaleta.Utils.inputStreamToString;
 
 @Service
 public class AuthServiceImpl implements AuthService
 {
+
+    private String token = null;
+
     @Override
     public boolean userExists(String username)
     {
@@ -49,5 +53,18 @@ public class AuthServiceImpl implements AuthService
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setToken(String token)
+    {
+        this.token = token;
+    }
+
+    @Override
+    public boolean validateToken(String token)
+    {
+        if (this.token == null) return false;
+        return Objects.equals(this.token, token);
     }
 }

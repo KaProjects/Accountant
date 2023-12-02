@@ -10,14 +10,16 @@ export const useData = (path) => {
 
     useEffect(() => {
         const dataFetch = async () => {
-            axios.get(properties.protocol + "://" + properties.host + ":" + properties.port + path).then(
+            const url = properties.protocol + "://" + properties.host + ":" + properties.port + path;
+            const headers = { headers: {Authorization: 'Bearer ' + sessionStorage.getItem('token')}};
+            await axios.get(url, headers).then(
                 (response) => {
-                    setData(response.data);
+                    setData(response.data)
                     setError(null)
-                    setLoaded(true);
+                    setLoaded(true)
                 }).catch((error) => {
-                console.error(error)
-                setError(error)
+                    console.error(error)
+                    setError(error)
             })
         };
 

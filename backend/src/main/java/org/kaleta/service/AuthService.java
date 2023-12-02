@@ -1,7 +1,5 @@
 package org.kaleta.service;
 
-import java.security.NoSuchAlgorithmException;
-
 public interface AuthService
 {
     /**
@@ -13,4 +11,17 @@ public interface AuthService
      * @return true if user authenticated, false otherwise
      */
     boolean authenticateUser(String username, String password);
+
+    /**
+     * sets the security token for the authenticated user
+     * @param token
+     */
+    void setToken(String token);
+
+    /**
+     * checks the validity of provided token
+     * @param token
+     * @return true if token is valid, false otherwise
+     */
+    boolean validateToken(String token);
 }

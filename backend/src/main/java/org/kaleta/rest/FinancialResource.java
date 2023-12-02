@@ -3,6 +3,7 @@ package org.kaleta.rest;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.kaleta.Constants;
 import org.kaleta.dto.FinancialAssetsDto;
@@ -36,6 +37,8 @@ public class FinancialResource
     AccountService accountService;
 
     @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/assets/{year}")
@@ -63,6 +66,8 @@ public class FinancialResource
     }
 
     @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/assets")

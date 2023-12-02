@@ -22,7 +22,7 @@ public class AuthResource
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/")
     public Response authenticate(CredentialsDto credentialsDto)
@@ -34,7 +34,9 @@ public class AuthResource
         } else if (!authService.authenticateUser(credentialsDto.getUsername(), credentialsDto.getPassword())) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Credentials doesn't match!").build();
         } else {
-            return Response.status(Response.Status.OK).entity(UUID.randomUUID().toString()).build();
+            String token = UUID.randomUUID().toString();
+            authService.setToken(token);
+            return Response.status(Response.Status.OK).entity(token).build();
         }
     }
 }

@@ -2,6 +2,7 @@ package org.kaleta.rest;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.kaleta.Utils;
 import org.kaleta.dto.BudgetDto;
@@ -15,7 +16,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-import static org.kaleta.dto.BudgetDto.Row.Type.*;
+import static org.kaleta.dto.BudgetDto.Row.Type.BALANCE;
+import static org.kaleta.dto.BudgetDto.Row.Type.EXPENSE;
+import static org.kaleta.dto.BudgetDto.Row.Type.EXPENSE_SUM;
+import static org.kaleta.dto.BudgetDto.Row.Type.INCOME;
+import static org.kaleta.dto.BudgetDto.Row.Type.INCOME_SUM;
+import static org.kaleta.dto.BudgetDto.Row.Type.OF_BUDGET;
+import static org.kaleta.dto.BudgetDto.Row.Type.OF_BUDGET_BALANCE;
 
 @Path("/budget")
 public class BudgetResource
@@ -24,6 +31,8 @@ public class BudgetResource
     BudgetingService service;
 
     @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}")
