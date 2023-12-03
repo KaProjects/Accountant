@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {Collapse, List, ListItem, ListItemText} from "@mui/material";
+import '../vacationContainer.css';
+import {Collapse, List, ListItem, ListItemText, TableFooter} from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Paper from "@mui/material/Paper";
 import Loader from "../components/Loader";
 import {useData} from "../fetch";
+import VacationChart from "../components/VacationChart";
 
 
 const Vacation = props => {
@@ -60,39 +62,48 @@ const Vacation = props => {
                     {transactionFlags[index] ? <ExpandLess /> : <ExpandMore />}
                 </ListItem>
                 <Collapse in={transactionFlags[index]} timeout="auto" unmountOnExit>
-                    <TableContainer component={Paper}>
-                        <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                            <TableHead>
-                                <TableRow>
-                                    {data.columns.map((column, index) => (
-                                        <TableCell key={index} style={getHeaderStyle(index)}>{column}</TableCell>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {vacation.transactions.map((transaction, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>{transaction.date}</TableCell>
-                                        <TableCell style={{textAlign: "right"}}>{transaction.amount}</TableCell>
-                                        <TableCell>{transaction.debit}</TableCell>
-                                        <TableCell>{transaction.credit}</TableCell>
-                                        <TableCell>{transaction.description}</TableCell>
-                                    </TableRow>
-                                ))}
-                                <TableRow key="-1">
-                                    <TableCell style={{fontWeight: "bold"}}>Expenses:</TableCell>
-                                    <TableCell style={{textAlign: "right", fontWeight: "bold"}}>{vacation.expenses}</TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                    <div className={"parent"}>
+                        <div>
+                            <TableContainer component={Paper} style={{ height: 350 }}>
+                                <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table" stickyHeader>
+                                    <TableHead >
+                                        <TableRow>
+                                            {data.columns.map((column, index) => (
+                                                <TableCell key={index} style={getHeaderStyle(index)}>{column}</TableCell>
+                                            ))}
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {vacation.transactions.map((transaction, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>{transaction.date}</TableCell>
+                                                <TableCell style={{textAlign: "right"}}>{transaction.amount}</TableCell>
+                                                <TableCell>{transaction.debit}</TableCell>
+                                                <TableCell>{transaction.credit}</TableCell>
+                                                <TableCell>{transaction.description}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                            <TableRow>
+                                <TableCell style={{fontWeight: "bold"}}>Expenses:</TableCell>
+                                <TableCell style={{textAlign: "right", fontWeight: "bold"}}>{vacation.expenses}</TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                            </TableRow>
+                        </div>
+                        <div className={"chartBottom"}>
+                            <VacationChart data={vacation.chartData} isBottom={true}/>
+                        </div>
+                        <div className={"chartRight"}>
+                            <VacationChart data={vacation.chartData} isBottom={false}/>
+                        </div>
+                    </div>
                 </Collapse>
                 </div>
             ))}
-
             </List>
         }
         </>
