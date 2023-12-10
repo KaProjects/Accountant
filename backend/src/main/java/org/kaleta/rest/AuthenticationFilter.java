@@ -1,6 +1,7 @@
 package org.kaleta.rest;
 
 import org.kaleta.service.AuthService;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -10,7 +11,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
+import java.util.Objects;
 
 @Secured
 @Provider
@@ -19,12 +20,19 @@ public class AuthenticationFilter implements ContainerRequestFilter
 {
     private static final String SCHEME = "Bearer";
 
+    @Value("${environment}")
+    private String environment;
+    @Value("${auth.bypass:false}")
+    private boolean bypassAuth;
+
     @Inject
     AuthService authService;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException
+    public void filter(ContainerRequestContext requestContext)
     {
+        if (Objects.equals(environment, "DEVEL") && bypassAuth) return;
+
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.toLowerCase().startsWith(SCHEME.toLowerCase() + " "))

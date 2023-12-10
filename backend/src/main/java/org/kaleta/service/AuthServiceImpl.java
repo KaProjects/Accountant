@@ -13,7 +13,6 @@ import static org.kaleta.Utils.inputStreamToString;
 @Service
 public class AuthServiceImpl implements AuthService
 {
-
     private String token = null;
 
     @Override
