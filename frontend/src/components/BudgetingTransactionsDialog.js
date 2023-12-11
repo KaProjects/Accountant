@@ -3,6 +3,8 @@ import Loader from "./Loader";
 import {Dialog, DialogTitle} from "@mui/material";
 import {properties} from "../properties";
 import axios from "axios";
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import Paper from "@mui/material/Paper";
 
 
 const BudgetingTransactionsDialog = props => {
@@ -36,12 +38,20 @@ const BudgetingTransactionsDialog = props => {
 
     }, [props.open]);
 
+    const columns = ["Date", "Amount", "Debit", "Credit", "Description"]
+
+    function getTotal(){
+        let sum = 0;
+        data.forEach((transaction) => sum += parseInt(transaction.amount))
+        return sum
+    }
 
     return (
         <Dialog
             open={props.open}
             onClose={props.onClose}
-            fullWidth={true}
+            fullWidth={false}
+            maxWidth={'lg'}
         >
             <DialogTitle>Transactions for {props.row} {props.month}/{props.year}</DialogTitle>
 
@@ -50,12 +60,35 @@ const BudgetingTransactionsDialog = props => {
             }
             {loaded &&
                 <>
-
-                {data.map((transaction, index) => (
-                    <div>
-                        {transaction.date} {transaction.amount} {transaction.debit} {transaction.credit} {transaction.description}
-                    </div>
-                    ))}
+                <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 700 }} size="small" aria-label="a dense table">
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((column, index) => (
+                                    <TableCell key={index}>{column}</TableCell>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {data.map((transaction, index) => (
+                                <TableRow key={index}>
+                                    <TableCell align="center">{transaction.date}</TableCell>
+                                    <TableCell align="right">{transaction.amount}</TableCell>
+                                    <TableCell align="left" style={{minWidth: "150px"}}>{transaction.debit}</TableCell>
+                                    <TableCell align="left" style={{minWidth: "150px"}}>{transaction.credit}</TableCell>
+                                    <TableCell align="left" style={{minWidth: "150px"}}>{transaction.description}</TableCell>
+                                </TableRow>
+                            ))}
+                            <TableRow key={-1}>
+                                <TableCell align="center" style={{fontWeight: "bold"}}>Total: </TableCell>
+                                <TableCell align="right" style={{fontWeight: "bold"}}>{getTotal()}</TableCell>
+                                <TableCell/>
+                                <TableCell/>
+                                <TableCell/>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
                 </>
             }
         </Dialog>

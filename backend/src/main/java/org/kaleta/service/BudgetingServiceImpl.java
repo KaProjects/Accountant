@@ -11,12 +11,16 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BudgetingServiceImpl implements BudgetingService
 {
     @Autowired
     TransactionService transactionService;
+
+    @Autowired
+    AccountService accountService;
 
     @Autowired
     BudgetingDao budgetingDao;
@@ -71,27 +75,27 @@ public class BudgetingServiceImpl implements BudgetingService
         List<YearTransactionDto> transactions = new ArrayList<>();
         if (schema.getDebit().equals(schema.getCredit())) {
             transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), "", schema.getDescription()));
-            transactions.addAll(transactionService.getTransactionsMatching(year, "", schema.getCredit(), schema.getDescription()));
+            List<YearTransactionDto> creditTransactions = transactionService.getTransactionsMatching(year, "", schema.getCredit(), schema.getDescription());
+            creditTransactions.forEach(transaction -> transaction.setAmount("-" + transaction.getAmount()));
+            transactions.addAll(creditTransactions);
         } else if (schema.getDescription() != null && schema.getDescription().equals("finXasset")) {
             transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), "", ""));
-            transactions.addAll(transactionService.getTransactionsMatching(year, "", schema.getCredit(), "Sale of "));
+            List<YearTransactionDto> creditTransactions = transactionService.getTransactionsMatching(year, "", schema.getCredit(), "Sale of ");
+            creditTransactions.forEach(transaction -> transaction.setAmount("-" + transaction.getAmount()));
+            transactions.addAll(creditTransactions);
         } else {
             transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), schema.getCredit(), schema.getDescription()));
         }
-        return filterTransactionsByMonth(transactions, month);
-    }
 
-    private List<YearTransactionDto> filterTransactionsByMonth(List<YearTransactionDto> input, String month)
-    {
-        List<YearTransactionDto> output = new ArrayList<>();
+        transactions.removeIf(transaction -> !transaction.getDate().endsWith(month.length() == 1 ? "0" + month : month));
 
-        for (YearTransactionDto transaction : input){
-            if (transaction.getDate().endsWith(month.length() == 1 ? "0" + month : month)) {
-                output.add(transaction);
-            }
-        }
+        Map<String, String> accountNames = accountService.getAccountNamesMap(year);
+        transactions.forEach(transaction -> {
+            transaction.setDebit(accountNames.get(transaction.getDebit()));
+            transaction.setCredit(accountNames.get(transaction.getCredit()));
+        });
 
-        return output;
+        return transactions;
     }
 
     private Integer[] parsePlanning(String planning)
