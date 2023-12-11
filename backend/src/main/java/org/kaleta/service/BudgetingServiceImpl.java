@@ -2,11 +2,13 @@ package org.kaleta.service;
 
 import org.kaleta.Utils;
 import org.kaleta.dao.BudgetingDao;
+import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Budgeting;
 import org.kaleta.model.BudgetComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class BudgetingServiceImpl implements BudgetingService
             if (!schemaRow.getYearId().getId().contains(".")){
                 BudgetComponent.Row row = new BudgetComponent.Row();
                 row.setName(schemaRow.getName());
+                row.setId(schemaRow.getYearId().getId());
 
                 if (schemaRow.getDebit() == null && schemaRow.getCredit() == null){
                     // find sub rows
@@ -38,6 +41,7 @@ public class BudgetingServiceImpl implements BudgetingService
                         if (schemaSubRow.getYearId().getId().startsWith(schemaRow.getYearId().getId()+".")){
                             BudgetComponent.Row subRow = new BudgetComponent.Row();
                             subRow.setName(schemaSubRow.getName());
+                            subRow.setId(schemaSubRow.getYearId().getId());
                             subRow.setMonthsActual(getMonthlyBalanceForBudgetingRow(year, schemaSubRow));
                             subRow.setMonthsPlanned(parsePlanning(schemaSubRow.getPlanning()));
                             row.getSubRows().add(subRow);
@@ -53,6 +57,41 @@ public class BudgetingServiceImpl implements BudgetingService
             }
         }
         return budgetComponent;
+    }
+
+    @Override
+    public List<YearTransactionDto> getBudgetTransactions(String year, String budgetId, String month)
+    {
+        Budgeting schema = budgetingDao.getSchemaById(year, budgetId);
+
+        if (schema.getDebit() == null && schema.getCredit() == null){
+            throw new IllegalArgumentException("Budget schema specified by budgetId='" + budgetId + "' doesn't have debit/credit accounts specified.");
+        }
+
+        List<YearTransactionDto> transactions = new ArrayList<>();
+        if (schema.getDebit().equals(schema.getCredit())) {
+            transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), "", schema.getDescription()));
+            transactions.addAll(transactionService.getTransactionsMatching(year, "", schema.getCredit(), schema.getDescription()));
+        } else if (schema.getDescription() != null && schema.getDescription().equals("finXasset")) {
+            transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), "", ""));
+            transactions.addAll(transactionService.getTransactionsMatching(year, "", schema.getCredit(), "Sale of "));
+        } else {
+            transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), schema.getCredit(), schema.getDescription()));
+        }
+        return filterTransactionsByMonth(transactions, month);
+    }
+
+    private List<YearTransactionDto> filterTransactionsByMonth(List<YearTransactionDto> input, String month)
+    {
+        List<YearTransactionDto> output = new ArrayList<>();
+
+        for (YearTransactionDto transaction : input){
+            if (transaction.getDate().endsWith(month.length() == 1 ? "0" + month : month)) {
+                output.add(transaction);
+            }
+        }
+
+        return output;
     }
 
     private Integer[] parsePlanning(String planning)

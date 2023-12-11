@@ -4,8 +4,10 @@ import Paper from '@mui/material/Paper';
 import {IconButton} from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import Loader from "../components/Loader";
 import {useData} from "../fetch";
+import BudgetingTransactionsDialog from "../components/BudgetingTransactionsDialog";
 
 
 const Budgeting = props => {
@@ -15,6 +17,28 @@ const Budgeting = props => {
     useEffect(() => {
         props.setYearly(true)
     }, []);
+
+    const [showTransactions, setShowTransactions] = React.useState(false);
+    const [showTransactionsRowName, setShowTransactionsRowName] = React.useState(null);
+    const [showTransactionsRowId, setShowTransactionsRowId] = React.useState(null);
+    const [showTransactionsMonth, setShowTransactionsMonth] = React.useState(-1);
+    const [showSubRow, setShowSubRow] = React.useState([]);
+    const [showDeltas, setShowDeltas] = React.useState([]);
+
+    const handleTransactionDialogClose = () => {
+        setShowTransactions(false)
+        setShowTransactionsValues(null, null, -1)
+    }
+
+    const setShowTransactionsValues = (rowName, rowId, month) => {
+        if (rowId === "i" || rowId === "me" || rowId === "e" || rowId === "ntme" || rowId === "bcf" || rowId === "dcf") {
+            setShowTransactionsValues(null, null, -1)
+        } else {
+            setShowTransactionsRowName(rowName)
+            setShowTransactionsRowId(rowId)
+            setShowTransactionsMonth(month)
+        }
+    }
 
     function getRowStyle(type, hasLeftBorder, hasRightBorder){
         const borderLeft = hasLeftBorder ? "2px solid" : "0px";
@@ -116,9 +140,21 @@ const Budgeting = props => {
     }
 
     function Row(props) {
-        const { row } = props;
-        const [subRowOpened, setSubRowOpened] = React.useState(false);
-        const [deltasOpened, setDeltasOpened] = React.useState(false);
+        const { row, id } = props;
+
+        const handleShowDeltas = (id) => {
+            const newFlag = !showDeltas[id]
+            const newFlags =showDeltas.slice()
+            newFlags[id] = newFlag
+            setShowDeltas(newFlags)
+        }
+
+        const handleShowSubrow = (id) => {
+            const newFlag = !showSubRow[id]
+            const newFlags =showSubRow.slice()
+            newFlags[id] = newFlag
+            setShowSubRow(newFlags)
+        }
 
         return (
             <React.Fragment>
@@ -127,22 +163,36 @@ const Budgeting = props => {
                         <IconButton
                             aria-label="expand row"
                             style={{height: "2px", width: "10px"}}
-                            onClick={() => setDeltasOpened(!deltasOpened)}
+                            onClick={() => handleShowDeltas(id)}
                         >
-                            {deltasOpened ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                            {showDeltas[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                         </IconButton>
                         {" " + row.name}
                         {(row.subRows.length !== 0) && <IconButton
                             aria-label="expand row"
                             style={{height: "2px", width: "25px"}}
-                            onClick={() => setSubRowOpened(!subRowOpened)}
+                            onClick={() => handleShowSubrow(id)}
                         >
-                            {subRowOpened ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                            {showSubRow[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                         </IconButton>}
                     </TableCell>
                     {row.actual.map((month, index) => (
                         (index < row.lastFilledMonth)
-                            ? <TableCell style={getRowStyle(row.type, false, false)} align="right">{month}</TableCell>
+                            ? <TableCell
+                                style={getRowStyle(row.type, false, false)} align="right"
+                                onClick={() => {if (row.subRows.length === 0) setShowTransactionsValues(row.name, row.id, index + 1)}}
+                                onMouseLeave={() => setShowTransactionsValues(null, null, -1)}
+                              >
+                                {month}
+                                {row.id === showTransactionsRowId && index + 1 === showTransactionsMonth &&
+                                    <IconButton
+                                        style={{height: "2px", width: "25px"}}
+                                        onClick={(event) => {setShowTransactions(true);event.stopPropagation();}}
+                                    >
+                                        <ReceiptLongIcon sx={{width: 18}}/>
+                                    </IconButton>
+                                }
+                              </TableCell>
                             : <TableCell style={getPlannedRowStyle(row.type)} align="right">{row.planned[index]}</TableCell>
 
                     ))}
@@ -151,14 +201,28 @@ const Budgeting = props => {
                     <TableCell style={getPlannedRowStyle(row.type)} align="right">{row.plannedAvgToFilledMonth}</TableCell>
                     <TableCell style={getPlannedRowStyle(row.type, false, row.deltaAvg)} align="right">{row.deltaAvg}</TableCell>
                 </TableRow>
-                {subRowOpened && row.subRows.map((subrow) => (
+                {showSubRow[id] && row.subRows.map((subrow) => (
                     <TableRow>
                         <TableCell component="th" scope="row">
                             {subrow.name}
                         </TableCell>
                         {subrow.actual.map((month, index) => (
                             (index < row.lastFilledMonth)
-                                ? <TableCell align="right">{month}</TableCell>
+                                ? <TableCell
+                                    align="right"
+                                    onClick={() => setShowTransactionsValues(subrow.name, subrow.id, index + 1)}
+                                    onMouseLeave={() => setShowTransactionsValues(null, null, -1)}
+                                  >
+                                    {month}
+                                    {subrow.id === showTransactionsRowId && index + 1 === showTransactionsMonth &&
+                                        <IconButton
+                                            style={{height: "2px", width: "25px"}}
+                                            onClick={(event) => {setShowTransactions(true);event.stopPropagation();}}
+                                        >
+                                            <ReceiptLongIcon sx={{width: 18}}/>
+                                        </IconButton>
+                                    }
+                                  </TableCell>
                                 : <TableCell align="right">{subrow.planned[index]}</TableCell>
                         ))}
                         <TableCell align="right">{subrow.actualSum}</TableCell>
@@ -167,7 +231,7 @@ const Budgeting = props => {
                         <TableCell align="right">{subrow.deltaAvg}</TableCell>
                     </TableRow>
                 ))}
-                {deltasOpened &&
+                {showDeltas[id] &&
                     <>
                     <TableRow>
                         <TableCell style={getPlannedRowStyle(row.type)} component="th" scope="row">Planned</TableCell>
@@ -205,6 +269,7 @@ const Budgeting = props => {
         <Loader error ={error}/>
     }
     {loaded &&
+        <>
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                 <TableHead>
@@ -216,11 +281,20 @@ const Budgeting = props => {
                 </TableHead>
                 <TableBody>
                     {data.rows.map((row, index) => (
-                        <Row key={index} row={row}/>
+                        <Row key={index} row={row} id={index}/>
                     ))}
                 </TableBody>
             </Table>
         </TableContainer>
+        <BudgetingTransactionsDialog
+            open={showTransactions}
+            onClose={handleTransactionDialogClose}
+            year={props.year}
+            row={showTransactionsRowName}
+            rowId={showTransactionsRowId}
+            month={showTransactionsMonth}
+        />
+        </>
     }
     </>
     )

@@ -27,11 +27,12 @@ public class BudgetDto
         columns.add("delta/"+lastFilledMonth);
     }
 
-    public BudgetDto.Row addRow(BudgetDto.Row.Type type, String name, Integer[] monthlyActual, Integer[] monthlyPlanned)
+    public BudgetDto.Row addRow(BudgetDto.Row.Type type, String name, String id, Integer[] monthlyActual, Integer[] monthlyPlanned)
     {
         BudgetDto.Row row = new BudgetDto.Row(lastFilledMonth);
         row.setType(type);
         row.setName(name);
+        row.setId(id);
         row.setActual(List.of(monthlyActual));
         row.setActualSum(Arrays.stream(monthlyActual).mapToInt(Integer::intValue).sum());
         row.setActualAvg((lastFilledMonth != 0) ? row.getActualSum()/lastFilledMonth : 0);
@@ -55,6 +56,7 @@ public class BudgetDto
     {
         private Type type;
         private String name;
+        private String id;
         private List<Integer> actual = new ArrayList<>();
         private List<Integer> planned = new ArrayList<>();
         private Integer actualSum;
@@ -72,11 +74,12 @@ public class BudgetDto
             this.lastFilledMonth = lastFilledMonth;
         }
 
-        public void addSubRow(String name, Integer[] monthlyActual, Integer[] monthlyPlanned)
+        public void addSubRow(String name, String id, Integer[] monthlyActual, Integer[] monthlyPlanned)
         {
             BudgetDto.Row row = new BudgetDto.Row(lastFilledMonth);
             row.setType(Type.SUB_ROW);
             row.setName(name);
+            row.setId(id);
             row.setActual(List.of(monthlyActual));
             row.setActualSum(Arrays.stream(monthlyActual).mapToInt(Integer::intValue).sum());
             row.setActualAvg((lastFilledMonth != 0) ? row.getActualSum()/lastFilledMonth : 0);

@@ -41,6 +41,7 @@ public class BudgetComponent
     {
         private final List<Row> subRows = new ArrayList<>();
         private String name;
+        private String id;
         private Integer[] monthsPlanned = new Integer[]{};
         private Integer[] monthsActual = new Integer[]{};
 

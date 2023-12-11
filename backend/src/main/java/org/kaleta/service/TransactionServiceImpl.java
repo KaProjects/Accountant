@@ -27,6 +27,12 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
+    public List<YearTransactionDto> getTransactionsMatching(String year, String debit, String credit, String description)
+    {
+        return mapYearTransactions(transactionDao.listByAccounts(year, debit, credit, description));
+    }
+
+    @Override
     public Integer[] monthlyBalanceByAccounts(String year, String debit, String credit)
     {
         return monthlyBalanceByAccounts(year, debit, credit, "");
