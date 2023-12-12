@@ -8,7 +8,8 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import Loader from "../components/Loader";
 import {useData} from "../fetch";
 import BudgetingTransactionsDialog from "../components/BudgetingTransactionsDialog";
-
+import BudgetChartDialog from "../components/BudgetChartDialog";
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 const Budgeting = props => {
 
@@ -18,25 +19,74 @@ const Budgeting = props => {
         props.setYearly(true)
     }, []);
 
-    const [showTransactions, setShowTransactions] = React.useState(false);
-    const [showTransactionsRowName, setShowTransactionsRowName] = React.useState(null);
-    const [showTransactionsRowId, setShowTransactionsRowId] = React.useState(null);
-    const [showTransactionsMonth, setShowTransactionsMonth] = React.useState(-1);
     const [showSubRow, setShowSubRow] = React.useState([]);
     const [showDeltas, setShowDeltas] = React.useState([]);
 
-    const handleTransactionDialogClose = () => {
-        setShowTransactions(false)
-        setShowTransactionsValues(null, null, -1)
+    const [showTransactionsDialog, setShowTransactionsDialog] = React.useState(false);
+    const [transactionsDialogRowName, setTransactionsDialogRowName] = React.useState(null);
+    const [transactionsDialogRowId, setTransactionsDialogRowId] = React.useState(null);
+    const [transactionsDialogMonth, setTransactionsDialogMonth] = React.useState(-1);
+
+    const handleTransactionsDialogClose = () => {
+        setShowTransactionsDialog(false)
+        setTransactionsDialogProps(null, null, -1)
     }
 
-    const setShowTransactionsValues = (rowName, rowId, month) => {
+    const setTransactionsDialogProps = (rowName, rowId, month) => {
         if (rowId === "i" || rowId === "me" || rowId === "e" || rowId === "ntme" || rowId === "bcf" || rowId === "dcf") {
-            setShowTransactionsValues(null, null, -1)
+            setTransactionsDialogProps(null, null, -1)
         } else {
-            setShowTransactionsRowName(rowName)
-            setShowTransactionsRowId(rowId)
-            setShowTransactionsMonth(month)
+            setTransactionsDialogRowName(rowName)
+            setTransactionsDialogRowId(rowId)
+            setTransactionsDialogMonth(month)
+        }
+    }
+
+    const [showBudgetChartDialog, setShowBudgetChartDialog] = React.useState(false);
+    const [budgetChartDialogData, setBudgetChartDialogData] = React.useState(null);
+    const [budgetChartDialogName, setBudgetChartDialogName] = React.useState("");
+    const [budgetChartDialogIsExpense, setBudgetChartDialogIsExpense] = React.useState(false);
+
+    const handleBudgetChartDialogClose = () => {
+        setShowBudgetChartDialog(false)
+        computeBudgetChartDialogProps(null)
+    }
+
+    const computeBudgetChartDialogProps = (row) => {
+        if (row === null) {
+            setBudgetChartDialogData(null)
+            setBudgetChartDialogName("")
+        } else {
+            setBudgetChartDialogName(row.name)
+            setBudgetChartDialogIsExpense(row.type === 'EXPENSE_SUM' || row.type === 'EXPENSE')
+
+            let data = [12]
+            for (let i=0; i < 12; i++){
+                let base = 0
+                let deficit = 0
+                let surplus = 0
+
+                if (i < row.lastFilledMonth){
+                    if (row.actual[i] > row.planned[i]) {
+                        base = row.planned[i]
+                        if (row.type === 'EXPENSE_SUM' || row.type === 'EXPENSE'){
+                            deficit = row.actual[i] - row.planned[i]
+                        } else {
+                            surplus = row.actual[i] - row.planned[i]
+                        }
+                    } else {
+                        base = row.actual[i]
+                        if (row.type === 'EXPENSE_SUM' || row.type === 'EXPENSE'){
+                            surplus = row.planned[i] - row.actual[i]
+                        } else {
+                            deficit = row.planned[i] - row.actual[i]
+                        }
+                    }
+                }
+
+                data[i] =  {name: i + 1, planned: row.planned[i], base: base, deficit: deficit, surplus: surplus}
+            }
+            setBudgetChartDialogData(data)
         }
     }
 
@@ -180,14 +230,14 @@ const Budgeting = props => {
                         (index < row.lastFilledMonth)
                             ? <TableCell
                                 style={getRowStyle(row.type, false, false)} align="right" key={index}
-                                onClick={() => {if (row.subRows.length === 0) setShowTransactionsValues(row.name, row.id, index + 1)}}
-                                onMouseLeave={() => setShowTransactionsValues(null, null, -1)}
+                                onClick={() => {if (row.subRows.length === 0) setTransactionsDialogProps(row.name, row.id, index + 1)}}
+                                onMouseLeave={() => setTransactionsDialogProps(null, null, -1)}
                               >
                                 {month}
-                                {row.id === showTransactionsRowId && index + 1 === showTransactionsMonth &&
+                                {row.id === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
                                     <IconButton
                                         style={{height: "2px", width: "25px"}}
-                                        onClick={(event) => {setShowTransactions(true);event.stopPropagation();}}
+                                        onClick={() => setShowTransactionsDialog(true)}
                                     >
                                         <ReceiptLongIcon sx={{width: 18}}/>
                                     </IconButton>
@@ -210,14 +260,14 @@ const Budgeting = props => {
                             (index < row.lastFilledMonth)
                                 ? <TableCell
                                     align="right" key={index}
-                                    onClick={() => setShowTransactionsValues(subrow.name, subrow.id, index + 1)}
-                                    onMouseLeave={() => setShowTransactionsValues(null, null, -1)}
+                                    onClick={() => setTransactionsDialogProps(subrow.name, subrow.id, index + 1)}
+                                    onMouseLeave={() => setTransactionsDialogProps(null, null, -1)}
                                 >
                                     {month}
-                                    {subrow.id === showTransactionsRowId && index + 1 === showTransactionsMonth &&
+                                    {subrow.id === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
                                         <IconButton
                                             style={{height: "2px", width: "25px"}}
-                                            onClick={(event) => {setShowTransactions(true);event.stopPropagation();}}
+                                            onClick={() => setShowTransactionsDialog(true)}
                                         >
                                             <ReceiptLongIcon sx={{width: 18}}/>
                                         </IconButton>
@@ -246,7 +296,20 @@ const Budgeting = props => {
                             <TableCell style={getPlannedRowStyle(row.type)} align="right" key={15}>-</TableCell>
                         </TableRow>
                         <TableRow key={id + "dd"}>
-                            <TableCell style={getPlannedRowStyle(row.type, true)} component="th" scope="row" key={-1}>Difference</TableCell>
+                            <TableCell style={getPlannedRowStyle(row.type, true)} component="th" scope="row" key={-1}
+                                       onMouseEnter={() => computeBudgetChartDialogProps(row)}
+                                       onMouseLeave={() => computeBudgetChartDialogProps(null)}
+                            >
+                                Difference
+                                {budgetChartDialogData !== null && budgetChartDialogName === row.name &&
+                                    <IconButton
+                                        style={{height: "2px", width: "25px"}}
+                                        onClick={() => setShowBudgetChartDialog(true)}
+                                    >
+                                        <BarChartIcon sx={{width: 18}}/>
+                                    </IconButton>
+                                }
+                            </TableCell>
                             {row.planned.map((month, index) => (
                                 (index < row.lastFilledMonth)
                                     ? <TableCell style={getPlannedRowStyle(row.type, true, row.actual[index] - month)} align="right" key={index}>{row.actual[index] - month}</TableCell>
@@ -287,12 +350,19 @@ const Budgeting = props => {
             </Table>
         </TableContainer>
         <BudgetingTransactionsDialog
-            open={showTransactions}
-            onClose={handleTransactionDialogClose}
+            open={showTransactionsDialog}
+            onClose={handleTransactionsDialogClose}
             year={props.year}
-            row={showTransactionsRowName}
-            rowId={showTransactionsRowId}
-            month={showTransactionsMonth}
+            row={transactionsDialogRowName}
+            rowId={transactionsDialogRowId}
+            month={transactionsDialogMonth}
+        />
+        <BudgetChartDialog
+            open={showBudgetChartDialog}
+            onClose={handleBudgetChartDialogClose}
+            data={budgetChartDialogData}
+            name={budgetChartDialogName}
+            isExpense={budgetChartDialogIsExpense}
         />
         </>
     }
