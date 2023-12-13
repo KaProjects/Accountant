@@ -104,7 +104,7 @@ const FinancialAssets = props => {
                 <List key={gIndex}
                     subheader={
                         <ListSubheader component="div" id="nested-list-subheader"
-                                       style={{fontWeight: "bold", boxShadow: "0 0 8px 0", fontSize: "18px"}}>
+                                       style={{fontWeight: "bold", boxShadow: "0 0 8px 0", fontSize: "18px", fontFamily: "Copperplate"}}>
                             {group.name}
                         </ListSubheader>
                     }
@@ -113,7 +113,7 @@ const FinancialAssets = props => {
                 {group.accounts.map((account, aIndex) => (
                     <div key={aIndex}>
                         <ListItem  button onClick={() => toggleChart(gIndex, aIndex)} style={getTitleStyle(gIndex, aIndex)}>
-                            <ListItemText primary={account.name} primaryTypographyProps={{ style: {fontWeight: "bold"} }}/>
+                            <ListItemText primary={account.name} primaryTypographyProps={{ style: {fontWeight: "bold", fontFamily: "Copperplate"} }}/>
                             {getChartFlag(gIndex, aIndex) ? <ExpandLess /> : <ExpandMore />}
                         </ListItem>
 

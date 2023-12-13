@@ -87,13 +87,20 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
+    public Integer[] cumulativeMonthlyBalanceByAccount(Account account)
+    {
+        Integer[] monthlyBalance = monthlyBalanceByAccount(account);
+        monthlyBalance[0] += getInitialValue(account);
+        return Utils.toCumulativeArray(monthlyBalance);
+    }
+
+    @Override
     public Integer[] monthlyBalanceByAccount(Account account)
     {
         String year = account.getAccountId().getYear();
-        String type = schemaService.getAccountType(year, account.getAccountId().getSchemaId());
-        boolean isDebit = type.equals("A") || type.equals("E");
+        boolean isDebit = schemaService.isDebitType(year, account.getAccountId().getSchemaId());
 
-        Integer[] monthlySums = new Integer[]{getInitialValue(account), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Integer[] monthlySums = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         for (Transaction tr : transactionDao.listByAccount(year, account.getFullId())) {
             int month = Integer.parseInt(tr.getDate().substring(2, 4));
@@ -105,8 +112,7 @@ public class TransactionServiceImpl implements TransactionService
 
             }
         }
-
-        return Utils.toCumulativeArray(monthlySums);
+        return monthlySums;
     }
 
     private List<YearTransactionDto> mapYearTransactions(List<Transaction> transactions)

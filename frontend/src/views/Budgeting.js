@@ -7,7 +7,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import Loader from "../components/Loader";
 import {useData} from "../fetch";
-import BudgetingTransactionsDialog from "../components/BudgetingTransactionsDialog";
+import TransactionsDialog from "../components/TransactionsDialog";
 import BudgetChartDialog from "../components/BudgetChartDialog";
 import BarChartIcon from '@mui/icons-material/BarChart';
 
@@ -133,7 +133,8 @@ const Budgeting = props => {
             borderBottom = "0px";
         }
 
-        return {fontWeight: "bold", border: "0px", boxShadow: boxShadow, background: background, color: color, borderTop: borderTop, borderBottom: borderBottom, borderLeft: borderLeft, borderRight: borderRight};
+        return {fontWeight: "bold", background: background, color: color,
+            border: "0px", boxShadow: boxShadow, borderTop: borderTop, borderBottom: borderBottom, borderLeft: borderLeft, borderRight: borderRight};
     }
 
     function getPlannedRowStyle(type, hasBottomPadding, delta){
@@ -174,12 +175,8 @@ const Budgeting = props => {
             color = "#000";
             background = "#fff";
         }
-
-        if (hasBottomPadding){
-            return {fontWeight: fontWeight, background: background, color: color, border: "0px", boxShadow: boxShadow, paddingBottom: "10px"}
-        } else {
-            return {fontWeight: fontWeight, background: background, color: color, border: "0px", boxShadow: boxShadow}
-        }
+        let paddingBottom = hasBottomPadding ? "10px" : null
+        return {fontWeight: fontWeight, background: background, color: color, border: "0px", boxShadow: boxShadow, paddingBottom: paddingBottom}
     }
 
     function getHeaderStyle(index) {
@@ -349,13 +346,14 @@ const Budgeting = props => {
                 </TableBody>
             </Table>
         </TableContainer>
-        <BudgetingTransactionsDialog
+        <TransactionsDialog
             open={showTransactionsDialog}
             onClose={handleTransactionsDialogClose}
             year={props.year}
             row={transactionsDialogRowName}
             rowId={transactionsDialogRowId}
             month={transactionsDialogMonth}
+            type="BUDGET"
         />
         <BudgetChartDialog
             open={showBudgetChartDialog}

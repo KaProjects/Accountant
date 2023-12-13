@@ -7,14 +7,26 @@ import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "
 import Paper from "@mui/material/Paper";
 
 
-const BudgetingTransactionsDialog = props => {
+const TransactionsDialog = props => {
 
     const [data, setData] = useState(null);
     const [loaded, setLoaded] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const path = "/budget/" + props.year + "/transaction/" + props.rowId + "/month/" + props.month
+        let path;
+        if (props.type === "BUDGET") {
+            path = "/budget/" + props.year + "/transaction/" + props.rowId + "/month/" + props.month
+        } else if (props.type === "PROFIT") {
+            path = "/profit/" + props.year + "/transaction/" + props.rowId + "/month/" + props.month
+        } else {
+            const error = {message: "INVALID TRANSACTION DIALOG TYPE"}
+            console.error(error)
+            setError(error)
+            setLoaded(false)
+            setData(null)
+            return;
+        }
 
         const dataFetch = async () => {
             const url = properties.protocol + "://" + properties.host + ":" + properties.port + path;
@@ -95,4 +107,4 @@ const BudgetingTransactionsDialog = props => {
     )
 }
 
-export default BudgetingTransactionsDialog;
+export default TransactionsDialog;

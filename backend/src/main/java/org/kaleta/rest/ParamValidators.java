@@ -49,4 +49,13 @@ public class ParamValidators
         if (!budgetId.startsWith("i") && !budgetId.startsWith("me") && !budgetId.startsWith("e") && !budgetId.startsWith("of"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Budget ID Parameter: '" + budgetId + "'");
     }
+
+    public static void validateSchemaAccountId(String accountId)
+    {
+        if (accountId == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Schema Account ID Parameter is NULL");
+        }
+        if (!accountId.matches("\\d\\d\\d"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Schema Account ID Parameter: '" + accountId + "'");
+    }
 }

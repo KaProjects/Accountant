@@ -44,6 +44,10 @@ const Vacation = props => {
         return {boxShadow: boxShadow, background: background, color: color};
     }
 
+    function formatTitle(title) {
+        return title.split(/(?=[A-Z]|[0-9])/).join(" ")
+    }
+
     return (
         <>
         {!loaded &&
@@ -58,7 +62,7 @@ const Vacation = props => {
                 <div key={index}>
                 <ListItem button onClick={() => toggleTransactions(index)}
                             style={getTitleStyle(index)}>
-                    <ListItemText primary={vacation.name} primaryTypographyProps={{ style: {fontWeight: "bold"} }}/>
+                    <ListItemText primary={formatTitle(vacation.name)} primaryTypographyProps={{ style: {fontWeight: "bold", fontFamily: "Copperplate", marginLeft: "10px"} }}/>
                     {transactionFlags[index] ? <ExpandLess /> : <ExpandMore />}
                 </ListItem>
                 <Collapse in={transactionFlags[index]} timeout="auto" unmountOnExit>

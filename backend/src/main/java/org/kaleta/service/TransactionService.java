@@ -59,6 +59,11 @@ public interface TransactionService
     Integer getInitialValue(Account account);
 
     /**
+     * @return cumulative monthly balance for specified account
+     */
+    Integer[] cumulativeMonthlyBalanceByAccount(Account account);
+
+    /**
      * @return monthly balance for specified account
      */
     Integer[] monthlyBalanceByAccount(Account account);

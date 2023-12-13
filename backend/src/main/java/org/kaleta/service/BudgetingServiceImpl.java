@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class BudgetingServiceImpl implements BudgetingService
@@ -89,13 +90,16 @@ public class BudgetingServiceImpl implements BudgetingService
 
         transactions.removeIf(transaction -> !transaction.getDate().endsWith(month.length() == 1 ? "0" + month : month));
 
+        // filter correcting transactions between same schema account
+        transactions.removeIf(transaction -> transaction.getDebit().substring(0,3).equals(transaction.getCredit().substring(0,3)));
+
         Map<String, String> accountNames = accountService.getAccountNamesMap(year);
         transactions.forEach(transaction -> {
             transaction.setDebit(accountNames.get(transaction.getDebit()));
             transaction.setCredit(accountNames.get(transaction.getCredit()));
         });
 
-        return transactions;
+        return transactions.stream().sorted().collect(Collectors.toList());
     }
 
     private Integer[] parsePlanning(String planning)

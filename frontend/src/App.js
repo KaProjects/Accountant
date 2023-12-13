@@ -6,6 +6,7 @@ import Vacation from "./views/Vacation";
 import FinancialAssets from "./views/FinancialAssets";
 import Login from "./components/Login";
 import MainBar from "./components/MainBar";
+import IncomeStatement from "./views/IncomeStatement";
 
 class App extends Component {
     constructor(props) {
@@ -13,7 +14,7 @@ class App extends Component {
         this.state = {
             token: null,
             year: new Date().getFullYear(),
-            isYearly: true,
+            isYearly: true, // toggles year's switch in MainBar
             setYearly: this.setYearly.bind(this)
         }
 
@@ -63,7 +64,7 @@ class App extends Component {
                         <Route exact path="/view/vacation" element={<Vacation {...this.state}/> }/>
                         <Route exact path="/financial/assets/:all" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/financial/assets" element={<FinancialAssets {...this.state}/> }/>
-
+                        <Route exact path="/profit" element={<IncomeStatement {...this.state}/> }/>
                     </Routes>
                 </BrowserRouter>
 

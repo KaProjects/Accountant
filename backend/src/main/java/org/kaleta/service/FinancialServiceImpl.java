@@ -53,7 +53,7 @@ public class FinancialServiceImpl implements FinancialService
                 revaluationsNegative
         ));
 
-        model.setBalances(transactionService.monthlyBalanceByAccount(account));
+        model.setBalances(transactionService.cumulativeMonthlyBalanceByAccount(account));
 
         model.setLabels(constructLabels(year));
 
