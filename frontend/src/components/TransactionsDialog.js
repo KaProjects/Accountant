@@ -17,8 +17,8 @@ const TransactionsDialog = props => {
         let path;
         if (props.type === "BUDGET") {
             path = "/budget/" + props.year + "/transaction/" + props.rowId + "/month/" + props.month
-        } else if (props.type === "PROFIT") {
-            path = "/profit/" + props.year + "/transaction/" + props.rowId + "/month/" + props.month
+        } else if (props.type === "ACCOUNTING") {
+            path = "/accounting/" + props.year + "/transaction/" + props.rowId + "/month/" + props.month
         } else {
             const error = {message: "INVALID TRANSACTION DIALOG TYPE"}
             console.error(error)

@@ -8,16 +8,25 @@ import java.util.List;
 import java.util.Locale;
 
 @Data
-public class ProfitDto
+public class AccountingDto
 {
     private List<String> columns = new ArrayList<>();
     private List<Row> rows = new ArrayList<>();
 
-    public ProfitDto(String year)
+    public AccountingDto(String year, Type type)
     {
-        columns.add("Income Statement " + year);
-        columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
-        columns.remove(13);
+        if (type == Type.PROFIT_SUMMARY) {
+            columns.add("Income Statement " + year);
+            columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
+            columns.remove(13);
+        }
+        if (type == Type.CASH_FLOW_SUMMARY) {
+            columns.add("Cash Flow Statement " + year);
+            columns.add("Initial");
+            columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
+            columns.remove(14);
+        }
+
         columns.add("Total");
     }
 
@@ -27,6 +36,7 @@ public class ProfitDto
         private Type type;
         private String name;
         private String schemaId;
+        private Integer initial = null;
         private Integer[] monthlyValues;
         private Integer total;
         private List<Row> accounts = new ArrayList<>();
@@ -41,10 +51,13 @@ public class ProfitDto
 
     public enum Type
     {
-        SUMMARY,
+        PROFIT_SUMMARY,
         INCOME_GROUP,
         EXPENSE_GROUP,
         INCOME_ACCOUNT,
-        EXPENSE_ACCOUNT
+        EXPENSE_ACCOUNT,
+        CASH_FLOW_SUMMARY,
+        CASH_FLOW_GROUP,
+        CASH_FLOW_ACCOUNT
     }
 }

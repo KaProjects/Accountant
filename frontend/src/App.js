@@ -6,7 +6,7 @@ import Vacation from "./views/Vacation";
 import FinancialAssets from "./views/FinancialAssets";
 import Login from "./components/Login";
 import MainBar from "./components/MainBar";
-import IncomeStatement from "./views/IncomeStatement";
+import AccountingStatement from "./views/AccountingStatement";
 
 class App extends Component {
     constructor(props) {
@@ -64,7 +64,7 @@ class App extends Component {
                         <Route exact path="/view/vacation" element={<Vacation {...this.state}/> }/>
                         <Route exact path="/financial/assets/:all" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/financial/assets" element={<FinancialAssets {...this.state}/> }/>
-                        <Route exact path="/profit" element={<IncomeStatement {...this.state}/> }/>
+                        <Route exact path="/accounting/:type" element={<AccountingStatement {...this.state}/> }/>
                     </Routes>
                 </BrowserRouter>
 

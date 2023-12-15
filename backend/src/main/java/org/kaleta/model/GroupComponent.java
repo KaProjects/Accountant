@@ -40,6 +40,15 @@ public class GroupComponent
         return balance;
     }
 
+    public GroupComponent inverted()
+    {
+       for (AccountComponent accountComponent : accounts) {
+           accountComponent.setInitialValue(-accountComponent.getInitialValue());
+           accountComponent.setMonthlyBalance(Utils.subtractIntegerArrays(new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0}, accountComponent.getMonthlyBalance()));
+       }
+        return this;
+    }
+
     @Data
     public static class AccountComponent {
         private String name;

@@ -6,11 +6,13 @@ import Paper from "@mui/material/Paper";
 import {IconButton} from "@mui/material";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import TransactionsDialog from "../components/TransactionsDialog";
+import {useParams} from "react-router-dom";
 
 
-const IncomeStatement = props => {
+const AccountingStatement = props => {
+    let { type } = useParams();
 
-    const {data, loaded, error} = useData("/profit/" + props.year)
+    const {data, loaded, error} = useData("/accounting/" + props.year + "/" + type)
 
     useEffect(() => {
         props.setYearly(true)
@@ -29,13 +31,9 @@ const IncomeStatement = props => {
     }
 
     const setTransactionsDialogProps = (rowName, rowId, month) => {
-        if (rowId === "i" || rowId === "me" || rowId === "e" || rowId === "ntme" || rowId === "bcf" || rowId === "dcf") {
-            setTransactionsDialogProps(null, null, -1)
-        } else {
-            setTransactionsDialogRowName(rowName)
-            setTransactionsDialogRowId(rowId)
-            setTransactionsDialogMonth(month)
-        }
+        setTransactionsDialogRowName(rowName)
+        setTransactionsDialogRowId(rowId)
+        setTransactionsDialogMonth(month)
     }
 
     function getHeaderStyle(index) {
@@ -69,15 +67,27 @@ const IncomeStatement = props => {
             background = "#fc9e9e";
             color = "#a62d2d";
         }
-        if (type === 'SUMMARY'){
+        if (type === 'PROFIT_SUMMARY'){
             background = "#8bbefa";
             color = "#22468d";
+        }
+        if (type === 'CASH_FLOW_ACCOUNT'){
+            background = "#ffffff";
+            color = "#721c67";
+        }
+        if (type === 'CASH_FLOW_GROUP'){
+            background = "#ab75a5";
+            color = "#620155";
+        }
+        if (type === 'CASH_FLOW_SUMMARY'){
+            background = "#983f8d";
+            color = "#3a0032";
         }
 
         let borderTop;
         let borderBottom;
         let fontWeight;
-        if (type === 'INCOME_GROUP' || type === 'EXPENSE_GROUP' || type === 'SUMMARY'){
+        if (type === 'INCOME_GROUP' || type === 'EXPENSE_GROUP' || type === 'PROFIT_SUMMARY' || type === 'CASH_FLOW_SUMMARY' || type === 'CASH_FLOW_GROUP'){
             borderTop = "2px solid";
             borderBottom = "2px solid";
             fontWeight = "bold";
@@ -103,17 +113,18 @@ const IncomeStatement = props => {
         return (
             <React.Fragment>
                 <TableRow key={id} onClick={() => handleShowAccounts(id)}>
-                    <TableCell key={-1}
-                               style={getRowStyle(row.type, false, true)}
-                               >
+                    <TableCell key={-1} style={getRowStyle(row.type, true, true)}>
                         {" " + row.name}
                     </TableCell>
+                    {row.type.startsWith("CASH_FLOW_") &&
+                        <TableCell key={-2} align="right" style={getRowStyle(row.type, false, true)}>
+                            {row.initial}
+                        </TableCell>
+                    }
                     {row.monthlyValues.map((month, index) => (
                         <TableCell
                             align="right" key={index}
                             style={getRowStyle(row.type, false, false)}
-                            onClick={() => {if (row.type === 'ACCOUNT') setTransactionsDialogProps(row.name, row.schemaId, index + 1)}}
-                            onMouseLeave={() => setTransactionsDialogProps(null, null, -1)}
                         >
                             {month}
                             {row.schemaId === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
@@ -138,6 +149,11 @@ const IncomeStatement = props => {
                         <TableCell component="th" scope="row" key={-1} style={getRowStyle(account.type, false, true)}>
                             {account.name}
                         </TableCell>
+                        {account.type.startsWith("CASH_FLOW_") &&
+                            <TableCell key={-2} align="right" style={getRowStyle(account.type, false, true)}>
+                                {account.initial}
+                            </TableCell>
+                        }
                         {account.monthlyValues.map((month, index) => (
                             <TableCell
                                 align="right" key={index}
@@ -193,7 +209,7 @@ const IncomeStatement = props => {
                     row={transactionsDialogRowName}
                     rowId={transactionsDialogRowId}
                     month={transactionsDialogMonth}
-                    type="PROFIT"
+                    type="ACCOUNTING"
                 />
                 </>
             }
@@ -201,4 +217,4 @@ const IncomeStatement = props => {
     )
 }
 
-export default IncomeStatement;
+export default AccountingStatement;
