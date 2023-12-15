@@ -20,6 +20,7 @@ export const useData = (path) => {
                 }).catch((error) => {
                     console.error(error)
                     setError(error)
+                    setLoaded(false)
             })
         };
 
