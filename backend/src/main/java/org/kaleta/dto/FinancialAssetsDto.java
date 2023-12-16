@@ -2,6 +2,7 @@ package org.kaleta.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,10 @@ public class FinancialAssetsDto
             private String name;
 
             private Integer initialValue;
+            private Integer depositsSum;
+            private Integer withdrawalsSum;
+            private Integer currentValue;
+            private BigDecimal currentReturn;
 
             private Integer[] deposits;
             private Integer[] withdrawals;

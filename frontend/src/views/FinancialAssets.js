@@ -2,7 +2,17 @@ import {useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import Loader from "../components/Loader";
 import FinancialChart from "../components/FinancialChart";
-import {Checkbox, Collapse, FormControlLabel, List, ListItem, ListItemText, ListSubheader} from "@mui/material";
+import {
+    Card,
+    CardContent,
+    Checkbox,
+    Collapse,
+    FormControlLabel,
+    List,
+    ListItem,
+    ListItemText,
+    ListSubheader, Typography
+} from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
 import {useData} from "../fetch";
 
@@ -119,13 +129,52 @@ const FinancialAssets = props => {
 
                         <Collapse in={getChartFlag(gIndex,aIndex)} timeout="auto" unmountOnExit>
 
-                            <div style={{marginLeft: "50px"}}>
-                                <FormControlLabel control={<Checkbox checked={chartOptions[0]} onChange={() => toggleChartOption(0)}/>} label="Decompose Funding" />
-                            </div>
+                            <Card sx={{ width: 150 }} style={{backgroundColor:"white", display:"inline-block", verticalAlign: "middle", marginLeft: 10}}>
+                                <CardContent>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
+                                        Current Return
+                                    </Typography>
+                                    <Typography variant="h5" component="div" align={"center"}
+                                                style={{color: account.currentReturn > 0 ? "#158615" : account.currentReturn < 0 ? "#b93333" : "black"}}>
+                                        {account.currentReturn > 0 ? "+" : ""}{account.currentReturn}%
+                                    </Typography>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
+                                        Current Value
+                                    </Typography>
+                                    <Typography color="text.secondary" align={"center"}>
+                                        {account.currentValue}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
+                                        Initial Value
+                                    </Typography>
+                                    <Typography color="text.secondary" align={"center"}>
+                                        {account.initialValue}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
+                                        Withdrawals
+                                    </Typography>
+                                    <Typography color="text.secondary" align={"center"}>
+                                        {account.withdrawalsSum}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
+                                        Deposits
+                                    </Typography>
+                                    <Typography color="text.secondary" align={"center"}>
+                                        {account.depositsSum}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
 
-                            <FinancialChart data={constructChartData(account)}
-                                            decomposedFunding={chartOptions[0]}
-                                            width={all === undefined ? 700 : "98%"}/>
+                            <div style={{display:"inline-block", verticalAlign: "middle", width: "85%", marginLeft: 10}}>
+                                <FormControlLabel control={<Checkbox checked={chartOptions[0]} onChange={() => toggleChartOption(0)}/>}
+                                                  label="Decompose Funding"
+                                                  style={{marginLeft: "50px"}}
+                                />
+                                <FinancialChart data={constructChartData(account)}
+                                                decomposedFunding={chartOptions[0]}
+                                                width={all === undefined ? 700 : "100%"}
+                                />
+                            </div>
 
                          </Collapse>
                      </div>

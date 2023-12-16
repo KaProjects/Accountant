@@ -101,6 +101,10 @@ public class FinancialResource
         FinancialAssetsDto.Group.Account accountDto = new FinancialAssetsDto.Group.Account();
         accountDto.setName(asset.getName());
         accountDto.setInitialValue(asset.getInitialValue());
+        accountDto.setWithdrawalsSum(asset.getWithdrawalsSum());
+        accountDto.setDepositsSum(asset.getDepositsSum());
+        accountDto.setCurrentValue(asset.getCurrentValue());
+        accountDto.setCurrentReturn(asset.getCurrentReturn());
         accountDto.setFunding(asset.getMonthlyCumulativeFunding());
         accountDto.setDeposits(asset.getDeposits());
         accountDto.setRevaluations(asset.getRevaluations());
