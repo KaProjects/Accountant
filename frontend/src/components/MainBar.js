@@ -10,7 +10,8 @@ const MainBar = props => {
         <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
             <Toolbar variant="dense">
-                <IconButton size="large" edge="start" color="inherit" aria-label="open drawer" sx={{ mr: 2 }}>
+                <IconButton size="large" edge="start" color="inherit" aria-label="open drawer" sx={{ mr: 2 }}
+                            onClick={event =>  window.location.href='/'}>
                     <MenuIcon />
                 </IconButton>
                 <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
