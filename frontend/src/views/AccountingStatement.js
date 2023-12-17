@@ -15,6 +15,7 @@ const AccountingStatement = props => {
 
     useEffect(() => {
         props.setYearly(true)
+        // eslint-disable-next-line
     }, []);
 
     const [showAccounts, setShowAccounts] = React.useState([]);

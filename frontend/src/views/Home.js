@@ -13,6 +13,7 @@ const Home = props => {
 
     useEffect(() => {
         props.setYearly(false)
+        // eslint-disable-next-line
     }, []);
 
     return (

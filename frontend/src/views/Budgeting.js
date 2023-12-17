@@ -16,6 +16,7 @@ const Budgeting = props => {
 
     useEffect(() => {
         props.setYearly(true)
+        // eslint-disable-next-line
     }, []);
 
     const [showSubRow, setShowSubRow] = React.useState([]);

@@ -10,7 +10,7 @@ import {
     TableCell,
     TableContainer,
     TableHead,
-    TableRow
+    TableRow, Typography
 } from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
 import Paper from "@mui/material/Paper";
@@ -27,6 +27,7 @@ const Vacation = props => {
 
     useEffect(() => {
         props.setYearly(true)
+        // eslint-disable-next-line
     }, []);
 
     function toggleTransactions(index){
@@ -100,13 +101,9 @@ const Vacation = props => {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-                            <TableRow>
-                                <TableCell style={{fontWeight: "bold"}}>Expenses:</TableCell>
-                                <TableCell style={{textAlign: "right", fontWeight: "bold"}}>{vacation.expenses}</TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                            </TableRow>
+                            <Typography style={{fontWeight: "bold", margin: 15}}>
+                                Total Expenses: {vacation.expenses}
+                            </Typography>
                         </div>
                         <div className={"chartBottom"}>
                             <VacationChart data={vacation.chartData} isBottom={true}/>

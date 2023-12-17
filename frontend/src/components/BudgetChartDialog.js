@@ -36,7 +36,7 @@ const BudgetChartDialog = props => {
     };
 
     const BarLabel = (props) => {
-        const {value, fill, x, y, width, height, offset, sign} = props;
+        const {value, fill, x, y, width, offset, sign} = props;
         if (value > 0) {
             return (
                 <text x={x + width / 2} y={y - 10} textAnchor="middle" dominantBaseline="middle" fill={fill} offset={offset} fontSize={13}>

@@ -46,7 +46,7 @@ const TransactionsDialog = props => {
         if (props.open){
             dataFetch()
         }
-
+        // eslint-disable-next-line
     }, [props.open]);
 
     const columns = ["Date", "Amount", "Debit", "Credit", "Description"]

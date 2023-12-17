@@ -27,6 +27,7 @@ const FinancialAssets = props => {
 
     useEffect(() => {
         props.setYearly(all === undefined)
+        // eslint-disable-next-line
     }, []);
 
     function constructInitialFlags(data)
