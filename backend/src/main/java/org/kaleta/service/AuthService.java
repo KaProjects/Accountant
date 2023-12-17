@@ -13,10 +13,10 @@ public interface AuthService
     boolean authenticateUser(String username, String password);
 
     /**
-     * sets the security token for the authenticated user
-     * @param token
+     * generate and store token for authorized user
+     * @return generated token
      */
-    void setToken(String token);
+    String generateToken(String username, String password);
 
     /**
      * checks the validity of provided token

@@ -12,7 +12,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.UUID;
 
 @Path("/authenticate")
 public class AuthResource
@@ -34,8 +33,7 @@ public class AuthResource
         } else if (!authService.authenticateUser(credentialsDto.getUsername(), credentialsDto.getPassword())) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Credentials doesn't match!").build();
         } else {
-            String token = UUID.randomUUID().toString();
-            authService.setToken(token);
+            String token = authService.generateToken(credentialsDto.getUsername(), credentialsDto.getPassword());
             return Response.status(Response.Status.OK).entity(token).build();
         }
     }

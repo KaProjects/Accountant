@@ -1,12 +1,15 @@
 package org.kaleta.service;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import io.quarkus.security.UnauthorizedException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.kaleta.model.UsersConfig;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.kaleta.Utils.inputStreamToString;
 
@@ -14,6 +17,7 @@ import static org.kaleta.Utils.inputStreamToString;
 public class AuthServiceImpl implements AuthService
 {
     private String token = null;
+    private long expiration;
 
     @Override
     public boolean userExists(String username)
@@ -55,15 +59,23 @@ public class AuthServiceImpl implements AuthService
     }
 
     @Override
-    public void setToken(String token)
+    public String generateToken(String username, String password)
     {
-        this.token = token;
+        if (!authenticateUser(username, password)) {
+            throw new UnauthorizedException("User '" + username + "' has to be authorized to generate the token!");
+        }
+        if (token == null || expiration < new Date().getTime()){
+            token = UUID.randomUUID().toString();
+            expiration = new Date().getTime() + 3600000;
+        }
+        return this.token;
     }
 
     @Override
     public boolean validateToken(String token)
     {
         if (this.token == null) return false;
+        if (this.expiration < new Date().getTime()) return false;
         return Objects.equals(this.token, token);
     }
 }

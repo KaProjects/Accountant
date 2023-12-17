@@ -114,7 +114,7 @@ const Home = props => {
         </Typography>
         <Stack direction="row" justifyContent="center" alignItems="flex-start" spacing={0.5}>
             <Card sx={{ width: 300 }} raised style={{backgroundColor:"#ffc107"}}>
-                <ButtonBase onClick={event => window.location.href=properties.protocol + "://" + properties.host + ":" + properties.port + '/api/docs'}>
+                <ButtonBase onClick={() => window.open(properties.protocol + "://" + properties.host + ":" + properties.port + '/api/docs', '_blank')}>
                     <CardContent>
                         <Typography variant="h5" component="div" align={"center"}>
                             API
