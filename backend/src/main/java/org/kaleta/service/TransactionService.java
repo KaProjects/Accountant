@@ -14,6 +14,19 @@ public interface TransactionService
     List<YearTransactionDto> getTransactionsMatching(String year, String debitPrefix, String creditPrefix);
 
     /**
+     * @return list of transactions DTO matching conditions
+     * <p>
+     * debit, credit inputs: exact account (e.g. 500.1 - this one account)
+     *                       account prefix with % (e.g. 50% all accounts that id starts with 50)
+     *                       null or empty string - all accounts
+     * <p>
+     * description inputs: a value that must be present in the description of transaction
+     *                     a value prefixed with '!' that can't be in description
+     *                     null or empty string - all descriptions
+     */
+    List<YearTransactionDto> getTransactionsMatching(String year, String debit, String credit, String description);
+
+    /**
      * @return monthly balance of transactions matching conditions
      * <p>
      * debit, credit inputs: exact account (e.g. 500.1 - this one account)
@@ -44,6 +57,11 @@ public interface TransactionService
      * @return initial value of specified account
      */
     Integer getInitialValue(Account account);
+
+    /**
+     * @return cumulative monthly balance for specified account
+     */
+    Integer[] cumulativeMonthlyBalanceByAccount(Account account);
 
     /**
      * @return monthly balance for specified account

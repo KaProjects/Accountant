@@ -1,8 +1,7 @@
 package org.kaleta.rest;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.kaleta.Constants;
 import org.kaleta.dto.FinancialAssetsDto;
@@ -36,8 +35,9 @@ public class FinancialResource
     AccountService accountService;
 
     @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
-    @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/assets/{year}")
     public FinancialAssetsDto getFinancialAssetsProgress(@PathParam String year)
     {
@@ -63,8 +63,9 @@ public class FinancialResource
     }
 
     @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
-    @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/assets")
     public FinancialAssetsDto getFinancialAssetsProgress() throws IOException
     {
@@ -96,6 +97,10 @@ public class FinancialResource
         FinancialAssetsDto.Group.Account accountDto = new FinancialAssetsDto.Group.Account();
         accountDto.setName(asset.getName());
         accountDto.setInitialValue(asset.getInitialValue());
+        accountDto.setWithdrawalsSum(asset.getWithdrawalsSum());
+        accountDto.setDepositsSum(asset.getDepositsSum());
+        accountDto.setCurrentValue(asset.getCurrentValue());
+        accountDto.setCurrentReturn(asset.getCurrentReturn());
         accountDto.setFunding(asset.getMonthlyCumulativeFunding());
         accountDto.setDeposits(asset.getDeposits());
         accountDto.setRevaluations(asset.getRevaluations());

@@ -1,12 +1,14 @@
 import React, {useEffect} from "react";
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Paper from '@mui/material/Paper';
-import {IconButton} from "@mui/material";
+import {IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import Loader from "../components/Loader";
 import {useData} from "../fetch";
-
+import TransactionsDialog from "../components/TransactionsDialog";
+import BudgetChartDialog from "../components/BudgetChartDialog";
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 const Budgeting = props => {
 
@@ -14,7 +16,79 @@ const Budgeting = props => {
 
     useEffect(() => {
         props.setYearly(true)
+        // eslint-disable-next-line
     }, []);
+
+    const [showSubRow, setShowSubRow] = React.useState([]);
+    const [showDeltas, setShowDeltas] = React.useState([]);
+
+    const [showTransactionsDialog, setShowTransactionsDialog] = React.useState(false);
+    const [transactionsDialogRowName, setTransactionsDialogRowName] = React.useState(null);
+    const [transactionsDialogRowId, setTransactionsDialogRowId] = React.useState(null);
+    const [transactionsDialogMonth, setTransactionsDialogMonth] = React.useState(-1);
+
+    const handleTransactionsDialogClose = () => {
+        setShowTransactionsDialog(false)
+        setTransactionsDialogProps(null, null, -1)
+    }
+
+    const setTransactionsDialogProps = (rowName, rowId, month) => {
+        if (rowId === "i" || rowId === "me" || rowId === "e" || rowId === "ntme" || rowId === "bcf" || rowId === "dcf") {
+            setTransactionsDialogProps(null, null, -1)
+        } else {
+            setTransactionsDialogRowName(rowName)
+            setTransactionsDialogRowId(rowId)
+            setTransactionsDialogMonth(month)
+        }
+    }
+
+    const [showBudgetChartDialog, setShowBudgetChartDialog] = React.useState(false);
+    const [budgetChartDialogData, setBudgetChartDialogData] = React.useState(null);
+    const [budgetChartDialogName, setBudgetChartDialogName] = React.useState("");
+    const [budgetChartDialogIsExpense, setBudgetChartDialogIsExpense] = React.useState(false);
+
+    const handleBudgetChartDialogClose = () => {
+        setShowBudgetChartDialog(false)
+        computeBudgetChartDialogProps(null)
+    }
+
+    const computeBudgetChartDialogProps = (row) => {
+        if (row === null) {
+            setBudgetChartDialogData(null)
+            setBudgetChartDialogName("")
+        } else {
+            setBudgetChartDialogName(row.name)
+            setBudgetChartDialogIsExpense(row.type === 'EXPENSE_SUM' || row.type === 'EXPENSE')
+
+            let data = [12]
+            for (let i=0; i < 12; i++){
+                let base = 0
+                let deficit = 0
+                let surplus = 0
+
+                if (i < row.lastFilledMonth){
+                    if (row.actual[i] > row.planned[i]) {
+                        base = row.planned[i]
+                        if (row.type === 'EXPENSE_SUM' || row.type === 'EXPENSE'){
+                            deficit = row.actual[i] - row.planned[i]
+                        } else {
+                            surplus = row.actual[i] - row.planned[i]
+                        }
+                    } else {
+                        base = row.actual[i]
+                        if (row.type === 'EXPENSE_SUM' || row.type === 'EXPENSE'){
+                            surplus = row.planned[i] - row.actual[i]
+                        } else {
+                            deficit = row.planned[i] - row.actual[i]
+                        }
+                    }
+                }
+
+                data[i] =  {name: i + 1, planned: row.planned[i], base: base, deficit: deficit, surplus: surplus}
+            }
+            setBudgetChartDialogData(data)
+        }
+    }
 
     function getRowStyle(type, hasLeftBorder, hasRightBorder){
         const borderLeft = hasLeftBorder ? "2px solid" : "0px";
@@ -59,7 +133,8 @@ const Budgeting = props => {
             borderBottom = "0px";
         }
 
-        return {fontWeight: "bold", border: "0px", boxShadow: boxShadow, background: background, color: color, borderTop: borderTop, borderBottom: borderBottom, borderLeft: borderLeft, borderRight: borderRight};
+        return {fontWeight: "bold", background: background, color: color,
+            border: "0px", boxShadow: boxShadow, borderTop: borderTop, borderBottom: borderBottom, borderLeft: borderLeft, borderRight: borderRight};
     }
 
     function getPlannedRowStyle(type, hasBottomPadding, delta){
@@ -100,12 +175,8 @@ const Budgeting = props => {
             color = "#000";
             background = "#fff";
         }
-
-        if (hasBottomPadding){
-            return {fontWeight: fontWeight, background: background, color: color, border: "0px", boxShadow: boxShadow, paddingBottom: "10px"}
-        } else {
-            return {fontWeight: fontWeight, background: background, color: color, border: "0px", boxShadow: boxShadow}
-        }
+        let paddingBottom = hasBottomPadding ? "10px" : null
+        return {fontWeight: fontWeight, background: background, color: color, border: "0px", boxShadow: boxShadow, paddingBottom: paddingBottom}
     }
 
     function getHeaderStyle(index) {
@@ -116,83 +187,136 @@ const Budgeting = props => {
     }
 
     function Row(props) {
-        const { row } = props;
-        const [subRowOpened, setSubRowOpened] = React.useState(false);
-        const [deltasOpened, setDeltasOpened] = React.useState(false);
+        const {row, id } = props;
+
+        const handleShowDeltas = (id) => {
+            const newFlag = !showDeltas[id]
+            const newFlags =showDeltas.slice()
+            newFlags[id] = newFlag
+            setShowDeltas(newFlags)
+        }
+
+        const handleShowSubrow = (id) => {
+            const newFlag = !showSubRow[id]
+            const newFlags =showSubRow.slice()
+            newFlags[id] = newFlag
+            setShowSubRow(newFlags)
+        }
 
         return (
             <React.Fragment>
-                <TableRow>
-                    <TableCell style={getRowStyle(row.type, false, true)}>
+                <TableRow key={id}>
+                    <TableCell style={getRowStyle(row.type, false, true)} key={-1}>
                         <IconButton
                             aria-label="expand row"
                             style={{height: "2px", width: "10px"}}
-                            onClick={() => setDeltasOpened(!deltasOpened)}
+                            onClick={() => handleShowDeltas(id)}
                         >
-                            {deltasOpened ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                            {showDeltas[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                         </IconButton>
                         {" " + row.name}
                         {(row.subRows.length !== 0) && <IconButton
                             aria-label="expand row"
                             style={{height: "2px", width: "25px"}}
-                            onClick={() => setSubRowOpened(!subRowOpened)}
+                            onClick={() => handleShowSubrow(id)}
                         >
-                            {subRowOpened ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                            {showSubRow[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                         </IconButton>}
                     </TableCell>
                     {row.actual.map((month, index) => (
                         (index < row.lastFilledMonth)
-                            ? <TableCell style={getRowStyle(row.type, false, false)} align="right">{month}</TableCell>
-                            : <TableCell style={getPlannedRowStyle(row.type)} align="right">{row.planned[index]}</TableCell>
+                            ? <TableCell
+                                style={getRowStyle(row.type, false, false)} align="right" key={index}
+                                onClick={() => {if (row.subRows.length === 0) setTransactionsDialogProps(row.name, row.id, index + 1)}}
+                                onMouseLeave={() => setTransactionsDialogProps(null, null, -1)}
+                              >
+                                {month}
+                                {row.id === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
+                                    <IconButton
+                                        style={{height: "2px", width: "25px"}}
+                                        onClick={() => setShowTransactionsDialog(true)}
+                                    >
+                                        <ReceiptLongIcon sx={{width: 18}}/>
+                                    </IconButton>
+                                }
+                              </TableCell>
+                            : <TableCell style={getPlannedRowStyle(row.type)} align="right" key={index}>{row.planned[index]}</TableCell>
 
                     ))}
-                    <TableCell style={getRowStyle(row.type, true, false)} align="right">{row.actualSum}</TableCell>
-                    <TableCell style={getRowStyle(row.type, true, true)} align="right">{row.actualAvg}</TableCell>
-                    <TableCell style={getPlannedRowStyle(row.type)} align="right">{row.plannedAvgToFilledMonth}</TableCell>
-                    <TableCell style={getPlannedRowStyle(row.type, false, row.deltaAvg)} align="right">{row.deltaAvg}</TableCell>
+                    <TableCell style={getRowStyle(row.type, true, false)} align="right" key={12}>{row.actualSum}</TableCell>
+                    <TableCell style={getRowStyle(row.type, true, true)} align="right" key={13}>{row.actualAvg}</TableCell>
+                    <TableCell style={getPlannedRowStyle(row.type)} align="right" key={14}>{row.plannedAvgToFilledMonth}</TableCell>
+                    <TableCell style={getPlannedRowStyle(row.type, false, row.deltaAvg)} align="right" key={15}>{row.deltaAvg}</TableCell>
                 </TableRow>
-                {subRowOpened && row.subRows.map((subrow) => (
-                    <TableRow>
-                        <TableCell component="th" scope="row">
+                {showSubRow[id] && row.subRows.map((subrow, index) => (
+                    <TableRow key={id + "s" + index}>
+                        <TableCell component="th" scope="row" key={-1}>
                             {subrow.name}
                         </TableCell>
                         {subrow.actual.map((month, index) => (
                             (index < row.lastFilledMonth)
-                                ? <TableCell align="right">{month}</TableCell>
-                                : <TableCell align="right">{subrow.planned[index]}</TableCell>
+                                ? <TableCell
+                                    align="right" key={index}
+                                    onClick={() => setTransactionsDialogProps(subrow.name, subrow.id, index + 1)}
+                                    onMouseLeave={() => setTransactionsDialogProps(null, null, -1)}
+                                >
+                                    {month}
+                                    {subrow.id === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
+                                        <IconButton
+                                            style={{height: "2px", width: "25px"}}
+                                            onClick={() => setShowTransactionsDialog(true)}
+                                        >
+                                            <ReceiptLongIcon sx={{width: 18}}/>
+                                        </IconButton>
+                                    }
+                                </TableCell>
+                                : <TableCell align="right" key={index}>{subrow.planned[index]}</TableCell>
                         ))}
-                        <TableCell align="right">{subrow.actualSum}</TableCell>
-                        <TableCell align="right">{subrow.actualAvg}</TableCell>
-                        <TableCell align="right">{subrow.plannedAvgToFilledMonth}</TableCell>
-                        <TableCell align="right">{subrow.deltaAvg}</TableCell>
+                        <TableCell align="right" key={12}>{subrow.actualSum}</TableCell>
+                        <TableCell align="right" key={13}>{subrow.actualAvg}</TableCell>
+                        <TableCell align="right" key={14}>{subrow.plannedAvgToFilledMonth}</TableCell>
+                        <TableCell align="right" key={15}>{subrow.deltaAvg}</TableCell>
                     </TableRow>
                 ))}
-                {deltasOpened &&
+                {showDeltas[id] &&
                     <>
-                    <TableRow>
-                        <TableCell style={getPlannedRowStyle(row.type)} component="th" scope="row">Planned</TableCell>
-                        {row.planned.map((month, index) => (
-                            (index < row.lastFilledMonth)
-                            ? <TableCell style={getPlannedRowStyle(row.type)} align="right">{month}</TableCell>
-                            : <TableCell style={getPlannedRowStyle(row.type)} align="right">-</TableCell>
-                        ))}
-                        <TableCell style={getPlannedRowStyle(row.type)} align="right">{row.plannedSumToFilledMonth}</TableCell>
-                        <TableCell style={getPlannedRowStyle(row.type)} align="right">{row.plannedAvgToFilledMonth}</TableCell>
-                        <TableCell style={getPlannedRowStyle(row.type)} align="right">-</TableCell>
-                        <TableCell style={getPlannedRowStyle(row.type)} align="right">-</TableCell>
-                    </TableRow>
-                    <TableRow>
-                    <TableCell style={getPlannedRowStyle(row.type, true)} component="th" scope="row">Difference</TableCell>
-                {row.planned.map((month, index) => (
-                    (index < row.lastFilledMonth)
-                    ? <TableCell style={getPlannedRowStyle(row.type, true, row.actual[index] - month)} align="right">{row.actual[index] - month}</TableCell>
-                    : <TableCell style={getPlannedRowStyle(row.type, true)} align="right">-</TableCell>
-                    ))}
-                    <TableCell style={getPlannedRowStyle(row.type, true, row.actualSum - row.plannedSumToFilledMonth)} align="right">{row.actualSum - row.plannedSumToFilledMonth}</TableCell>
-                    <TableCell style={getPlannedRowStyle(row.type, true, row.actualAvg - row.plannedAvgToFilledMonth)} align="right">{row.actualAvg - row.plannedAvgToFilledMonth}</TableCell>
-                    <TableCell style={getPlannedRowStyle(row.type, true)} align="right">-</TableCell>
-                    <TableCell style={getPlannedRowStyle(row.type, true)} align="right">-</TableCell>
-                    </TableRow>
+                        <TableRow key={id + "dp"}>
+                            <TableCell style={getPlannedRowStyle(row.type)} component="th" scope="row" key={-1}>Planned</TableCell>
+                            {row.planned.map((month, index) => (
+                                (index < row.lastFilledMonth)
+                                    ? <TableCell style={getPlannedRowStyle(row.type)} align="right" key={index}>{month}</TableCell>
+                                    : <TableCell style={getPlannedRowStyle(row.type)} align="right" key={index}>-</TableCell>
+                            ))}
+                            <TableCell style={getPlannedRowStyle(row.type)} align="right" key={12}>{row.plannedSumToFilledMonth}</TableCell>
+                            <TableCell style={getPlannedRowStyle(row.type)} align="right" key={13}>{row.plannedAvgToFilledMonth}</TableCell>
+                            <TableCell style={getPlannedRowStyle(row.type)} align="right" key={14}>-</TableCell>
+                            <TableCell style={getPlannedRowStyle(row.type)} align="right" key={15}>-</TableCell>
+                        </TableRow>
+                        <TableRow key={id + "dd"}>
+                            <TableCell style={getPlannedRowStyle(row.type, true)} component="th" scope="row" key={-1}
+                                       onMouseEnter={() => computeBudgetChartDialogProps(row)}
+                                       onMouseLeave={() => computeBudgetChartDialogProps(null)}
+                            >
+                                Difference
+                                {budgetChartDialogData !== null && budgetChartDialogName === row.name &&
+                                    <IconButton
+                                        style={{height: "2px", width: "25px"}}
+                                        onClick={() => setShowBudgetChartDialog(true)}
+                                    >
+                                        <BarChartIcon sx={{width: 18}}/>
+                                    </IconButton>
+                                }
+                            </TableCell>
+                            {row.planned.map((month, index) => (
+                                (index < row.lastFilledMonth)
+                                    ? <TableCell style={getPlannedRowStyle(row.type, true, row.actual[index] - month)} align="right" key={index}>{row.actual[index] - month}</TableCell>
+                                    : <TableCell style={getPlannedRowStyle(row.type, true)} align="right" key={index}>-</TableCell>
+                            ))}
+                            <TableCell style={getPlannedRowStyle(row.type, true, row.actualSum - row.plannedSumToFilledMonth)} align="right" key={12}>{row.actualSum - row.plannedSumToFilledMonth}</TableCell>
+                            <TableCell style={getPlannedRowStyle(row.type, true, row.actualAvg - row.plannedAvgToFilledMonth)} align="right" key={13}>{row.actualAvg - row.plannedAvgToFilledMonth}</TableCell>
+                            <TableCell style={getPlannedRowStyle(row.type, true)} align="right" key={14}>-</TableCell>
+                            <TableCell style={getPlannedRowStyle(row.type, true)} align="right" key={15}>-</TableCell>
+                        </TableRow>
                     </>
                 }
             </React.Fragment>
@@ -205,10 +329,11 @@ const Budgeting = props => {
         <Loader error ={error}/>
     }
     {loaded &&
+        <>
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                 <TableHead>
-                    <TableRow>
+                    <TableRow key={-1}>
                         {data.columns.map((column, index) => (
                             <TableCell key={index} style={getHeaderStyle(index)}>{column}</TableCell>
                         ))}
@@ -216,11 +341,28 @@ const Budgeting = props => {
                 </TableHead>
                 <TableBody>
                     {data.rows.map((row, index) => (
-                        <Row key={index} row={row}/>
+                        <Row key={index} row={row} id={index}/>
                     ))}
                 </TableBody>
             </Table>
         </TableContainer>
+        <TransactionsDialog
+            open={showTransactionsDialog}
+            onClose={handleTransactionsDialogClose}
+            year={props.year}
+            row={transactionsDialogRowName}
+            rowId={transactionsDialogRowId}
+            month={transactionsDialogMonth}
+            type="BUDGET"
+        />
+        <BudgetChartDialog
+            open={showBudgetChartDialog}
+            onClose={handleBudgetChartDialogClose}
+            data={budgetChartDialogData}
+            name={budgetChartDialogName}
+            isExpense={budgetChartDialogIsExpense}
+        />
+        </>
     }
     </>
     )

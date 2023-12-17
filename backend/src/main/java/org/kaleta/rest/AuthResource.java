@@ -1,7 +1,5 @@
 package org.kaleta.rest;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import org.kaleta.dto.CredentialsDto;
 import org.kaleta.service.AuthService;
 
@@ -12,7 +10,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.UUID;
 
 @Path("/authenticate")
 public class AuthResource
@@ -22,8 +19,7 @@ public class AuthResource
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
+    @Produces(MediaType.TEXT_PLAIN)
     @Path("/")
     public Response authenticate(CredentialsDto credentialsDto)
     {
@@ -34,7 +30,8 @@ public class AuthResource
         } else if (!authService.authenticateUser(credentialsDto.getUsername(), credentialsDto.getPassword())) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Credentials doesn't match!").build();
         } else {
-            return Response.status(Response.Status.OK).entity(UUID.randomUUID().toString()).build();
+            String token = authService.generateToken(credentialsDto.getUsername(), credentialsDto.getPassword());
+            return Response.status(Response.Status.OK).entity(token).build();
         }
     }
 }

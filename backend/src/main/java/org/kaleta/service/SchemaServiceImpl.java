@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SchemaServiceImpl implements SchemaService
@@ -52,6 +53,20 @@ public class SchemaServiceImpl implements SchemaService
     public List<Schema> list(String year)
     {
         return schemaDao.list(year);
+    }
+
+    @Override
+    public boolean isDebitType(String year, String accountId)
+    {
+        validateIdLength(accountId, 3);
+        return Objects.equals(getAccountType(year, accountId), "A") || Objects.equals(getAccountType(year, accountId), "E");
+    }
+
+    @Override
+    public boolean isCreditType(String year, String accountId)
+    {
+        validateIdLength(accountId, 3);
+        return Objects.equals(getAccountType(year, accountId), "L") || Objects.equals(getAccountType(year, accountId), "R");
     }
 
     private void validateIdLength(String id, Integer expected)

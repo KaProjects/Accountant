@@ -6,6 +6,8 @@ import Vacation from "./views/Vacation";
 import FinancialAssets from "./views/FinancialAssets";
 import Login from "./components/Login";
 import MainBar from "./components/MainBar";
+import AccountingStatement from "./views/AccountingStatement";
+import Home from "./views/Home";
 
 class App extends Component {
     constructor(props) {
@@ -13,7 +15,7 @@ class App extends Component {
         this.state = {
             token: null,
             year: new Date().getFullYear(),
-            isYearly: true,
+            isYearly: true, // toggles year's switch in MainBar
             setYearly: this.setYearly.bind(this)
         }
 
@@ -47,6 +49,14 @@ class App extends Component {
         this.setState({isYearly: yearly})
     }
 
+    PageNotFound() {
+        return (
+            <div style={{position: "absolute", top: "25%", left: "50%", transform: "translate(-50%, -50%)"}}>
+                <h2>404 Page not found</h2>
+            </div>
+        );
+    }
+
     render() {
 
         if (!this.getToken()) {
@@ -58,18 +68,15 @@ class App extends Component {
                 <MainBar setYear={this.setYear} setToken={this.setToken} {...this.state} />
                 <BrowserRouter>
                     <Routes>
-                        {/*<Route exact path="/" element={<Menu {...this.state}/> }/>*/}
+                        <Route exact path="/" element={<Home {...this.state}/> }/>
                         <Route exact path="/budgeting" element={<Budgeting {...this.state}/> }/>
                         <Route exact path="/view/vacation" element={<Vacation {...this.state}/> }/>
                         <Route exact path="/financial/assets/:all" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/financial/assets" element={<FinancialAssets {...this.state}/> }/>
-
+                        <Route exact path="/accounting/:type" element={<AccountingStatement {...this.state}/> }/>
+                        <Route path="*" element={this.PageNotFound()} />
                     </Routes>
                 </BrowserRouter>
-
-                {/*<div style={{width: '100%', position: 'fixed', bottom: 0, justifyContent: "center"}}>*/}
-                {/*    Copyright © {new Date().getFullYear()} Stanislav Kaleta*/}
-                {/*</div>*/}
             </div>
         )
     }

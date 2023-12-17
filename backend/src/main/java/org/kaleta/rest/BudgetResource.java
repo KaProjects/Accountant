@@ -1,10 +1,10 @@
 package org.kaleta.rest;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.kaleta.Utils;
 import org.kaleta.dto.BudgetDto;
+import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.model.BudgetComponent;
 import org.kaleta.service.BudgetingService;
 
@@ -15,7 +15,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-import static org.kaleta.dto.BudgetDto.Row.Type.*;
+import static org.kaleta.dto.BudgetDto.Row.Type.BALANCE;
+import static org.kaleta.dto.BudgetDto.Row.Type.EXPENSE;
+import static org.kaleta.dto.BudgetDto.Row.Type.EXPENSE_SUM;
+import static org.kaleta.dto.BudgetDto.Row.Type.INCOME;
+import static org.kaleta.dto.BudgetDto.Row.Type.INCOME_SUM;
+import static org.kaleta.dto.BudgetDto.Row.Type.OF_BUDGET;
+import static org.kaleta.dto.BudgetDto.Row.Type.OF_BUDGET_BALANCE;
 
 @Path("/budget")
 public class BudgetResource
@@ -24,8 +30,9 @@ public class BudgetResource
     BudgetingService service;
 
     @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
-    @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}")
     public BudgetDto getBudget(@PathParam String year)
     {
@@ -39,27 +46,42 @@ public class BudgetResource
 
         constructBudgetComponentDtoRows(incomeComponent, budgetDto, INCOME);
 
-        budgetDto.addRow(INCOME_SUM, incomeComponent.getName(), incomeComponent.getActualMonths(), incomeComponent.getPlannedMonths());
+        budgetDto.addRow(INCOME_SUM, incomeComponent.getName(), "i", incomeComponent.getActualMonths(), incomeComponent.getPlannedMonths());
 
         constructBudgetComponentDtoRows(mandatoryExpensesComponent, budgetDto, EXPENSE);
 
-        budgetDto.addRow(EXPENSE_SUM, mandatoryExpensesComponent.getName(), mandatoryExpensesComponent.getActualMonths(), mandatoryExpensesComponent.getPlannedMonths());
+        budgetDto.addRow(EXPENSE_SUM, mandatoryExpensesComponent.getName(), "me", mandatoryExpensesComponent.getActualMonths(), mandatoryExpensesComponent.getPlannedMonths());
 
         Integer[] netAfterTme = Utils.subtractIntegerArrays(incomeComponent.getActualMonths(), mandatoryExpensesComponent.getActualMonths());
         Integer[] netAfterTmePlanned = Utils.subtractIntegerArrays(incomeComponent.getPlannedMonths(), mandatoryExpensesComponent.getPlannedMonths());
-        budgetDto.addRow(BALANCE, "Net after TME", netAfterTme, netAfterTmePlanned);
+        budgetDto.addRow(BALANCE, "Net after TME", "ntme", netAfterTme, netAfterTmePlanned);
 
         constructBudgetComponentDtoRows(expensesComponent, budgetDto, EXPENSE);
 
         Integer[] budgetCf = Utils.subtractIntegerArrays(netAfterTme, expensesComponent.getActualMonths());
         Integer[] budgetCfPlanned = Utils.subtractIntegerArrays(netAfterTmePlanned, expensesComponent.getPlannedMonths());
-        budgetDto.addRow(BALANCE, "Budget CF", budgetCf, budgetCfPlanned);
+        budgetDto.addRow(BALANCE, "Budget CF", "bcf", budgetCf, budgetCfPlanned);
 
         BudgetComponent ofBudgetComponent = service.getBudgetComponent(year, "Desired CF", "of");
         constructBudgetComponentDtoRows(ofBudgetComponent, budgetDto, OF_BUDGET);
-        budgetDto.addRow(OF_BUDGET_BALANCE, ofBudgetComponent.getName(), ofBudgetComponent.getActualMonths(), ofBudgetComponent.getPlannedMonths());
+        budgetDto.addRow(OF_BUDGET_BALANCE, ofBudgetComponent.getName(), "dcf", ofBudgetComponent.getActualMonths(), ofBudgetComponent.getPlannedMonths());
 
         return budgetDto;
+    }
+
+
+    @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{year}/transaction/{budgetId}/month/{month}")
+    public List<YearTransactionDto> getTransactions(@PathParam String year, @PathParam String budgetId, @PathParam String month)
+    {
+        ParamValidators.validateYear(year);
+        ParamValidators.validateBudgetId(budgetId);
+        ParamValidators.validateMonth(month);
+
+        return service.getBudgetTransactions(year, budgetId, month);
     }
 
     private Integer computeLastFilledMonth(List<BudgetComponent> components)
@@ -85,9 +107,9 @@ public class BudgetResource
     private void constructBudgetComponentDtoRows(BudgetComponent component, BudgetDto dto, BudgetDto.Row.Type type)
     {
         for (BudgetComponent.Row row : component.getRows()){
-            BudgetDto.Row rowDto = dto.addRow(type, row.getName(), row.getActualMonths(), row.getPlannedMonths());
+            BudgetDto.Row rowDto = dto.addRow(type, row.getName(), row.getId(), row.getActualMonths(), row.getPlannedMonths());
             for (BudgetComponent.Row subRows : row.getSubRows()){
-                rowDto.addSubRow(subRows.getName(), subRows.getActualMonths(), subRows.getMonthsPlanned());
+                rowDto.addSubRow(subRows.getName(), subRows.getId(), subRows.getActualMonths(), subRows.getMonthsPlanned());
             }
         }
     }

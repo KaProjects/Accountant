@@ -1,0 +1,26 @@
+.parent {
+    display: unset;
+    margin-top: 3px;
+}
+.chartBottom {
+    visibility: visible;
+}
+.chartRight {
+    visibility: hidden;
+    display: none;
+}
+
+@media (min-width: 800px) {
+.parent {
+    display: flex;
+    margin-top: 3px;
+}
+.chartBottom {
+    visibility: hidden;
+    display: none;
+}
+.chartRight {
+    visibility: visible;
+    display: block;
+}
+}

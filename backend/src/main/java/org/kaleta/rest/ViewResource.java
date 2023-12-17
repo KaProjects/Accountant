@@ -1,11 +1,11 @@
 package org.kaleta.rest;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.kaleta.dto.VacationDto;
 import org.kaleta.entity.Transaction;
 import org.kaleta.service.AccountService;
+import org.kaleta.service.SchemaService;
 import org.kaleta.service.TransactionService;
 import org.kaleta.service.ViewService;
 
@@ -29,9 +29,13 @@ public class ViewResource
     @Inject
     AccountService accountService;
 
+    @Inject
+    SchemaService schemaService;
+
     @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
-    @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/{year}/vacation")
     public VacationDto getBudget(@PathParam String year)
     {
@@ -62,7 +66,21 @@ public class ViewResource
                 vacTr.setAmount(amountPrefix + transaction.getAmount());
 
                 vacation.getTransactions().add(vacTr);
+
+                if (transaction.getDebit().startsWith("5")){
+                    if (!transaction.getCredit().startsWith("5")){
+                        String schemaName = schemaService.getAccountName(year, transaction.getDebit().substring(0,3));
+                        Integer value = transaction.getAmount();
+                        vacation.addChartData(schemaName, value);
+                    }
+                }
+                if (transaction.getCredit().startsWith("5")){
+                    String schemaName = schemaService.getAccountName(year, transaction.getCredit().substring(0,3));
+                    Integer value = transaction.getAmount();
+                    vacation.addChartData(schemaName, -value);
+                }
             }
+
             dto.getVacations().add(vacation);
         }
 

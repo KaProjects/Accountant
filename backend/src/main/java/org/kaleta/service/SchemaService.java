@@ -35,4 +35,14 @@ public interface SchemaService
      * @return list of all schema objects (classes, groups, schema accounts) for specified year
      */
     List<Schema> list(String year);
+
+    /**
+     * @return true if specified schema account is of type Asset or Expense
+     */
+    boolean isDebitType(String year, String accountId);
+
+    /**
+     * @return true if specified schema account is of type Liability or Revenue
+     */
+    boolean isCreditType(String year, String accountId);
 }

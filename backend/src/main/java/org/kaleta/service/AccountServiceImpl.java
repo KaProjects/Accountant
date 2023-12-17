@@ -25,7 +25,7 @@ public class AccountServiceImpl implements AccountService
         Map<String, String> map = new HashMap<>();
         for (Account account : accountDao.list(year)){
             String fullId = account.getAccountId().getSchemaId() + "." + account.getAccountId().getSemanticId();
-            String name = account.getName().equals("general")
+            String name = account.getName().contains("general")
                     ? schemaService.getAccountName(year, account.getAccountId().getSchemaId())
                     : account.getName();
 
