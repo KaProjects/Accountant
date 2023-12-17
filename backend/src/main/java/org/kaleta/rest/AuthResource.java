@@ -1,7 +1,5 @@
 package org.kaleta.rest;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import org.kaleta.dto.CredentialsDto;
 import org.kaleta.service.AuthService;
 
@@ -22,7 +20,6 @@ public class AuthResource
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @JacksonFeatures(serializationEnable = {SerializationFeature.INDENT_OUTPUT})
     @Path("/")
     public Response authenticate(CredentialsDto credentialsDto)
     {

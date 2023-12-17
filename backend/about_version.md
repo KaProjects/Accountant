@@ -9,7 +9,7 @@
 Released: 17.12.2023
 
     fixed/resolved budgeting issues + created budget for 2024
-    switched back to http + added protected backend calls
+    switched back to http + secured backend calls
     endpoints + services for new frontend views
     computing of current return for financial assets
     home view with redirects to other views
