@@ -1,9 +1,8 @@
 import React, {useEffect, useState} from "react";
 import Loader from "./Loader";
-import {Dialog, DialogTitle} from "@mui/material";
+import {Dialog, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import {properties} from "../properties";
 import axios from "axios";
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Paper from "@mui/material/Paper";
 
 

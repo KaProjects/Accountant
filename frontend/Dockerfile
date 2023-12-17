@@ -1,20 +1,11 @@
-FROM node:17-alpine
-
-# set working directory
+FROM node:lts-alpine as build-stage
 WORKDIR /app
+COPY . /app
+RUN npm install
+RUN npm run build
 
-# add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-
-# install app dependencies
-COPY package.json ./
-COPY package-lock.json ./
-RUN npm install --force
-RUN npm install react-scripts@5.0.1 -g --silent
-
-# add app
-COPY . ./
-
-# start app
-CMD ["npm", "start"]
+FROM nginx:stable-alpine as production-stage
+COPY --from=build-stage /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+CMD ["nginx", "-g", "daemon off;"]
 

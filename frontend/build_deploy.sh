@@ -1,7 +1,5 @@
-docker build -t accountant-frontend:v1.3 .
+chmod 777 -R .
 
-docker run -d -p 3301:3000 \
-    -v ${pwd}:/app \
-    -v /app/node_modules \
-    -e CHOKIDAR_USEPOLLING=true \
-    accountant-frontend:v1.3
+docker build -t accountant-frontend:v2-dev .  || { echo 'ERROR: docker build failed' ; exit 1; }
+
+docker run -d -p 3301:80 accountant-frontend:v2-dev

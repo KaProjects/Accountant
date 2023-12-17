@@ -1,8 +1,18 @@
 import React, {useEffect, useState} from "react";
 import '../vacationContainer.css';
-import {Collapse, List, ListItem, ListItemText, TableFooter} from "@mui/material";
+import {
+    Collapse,
+    List,
+    ListItem,
+    ListItemText,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow
+} from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Paper from "@mui/material/Paper";
 import Loader from "../components/Loader";
 import {useData} from "../fetch";
