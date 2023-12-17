@@ -3,7 +3,16 @@
      rest/web same versioning
      check appliaction.properties 
      bump pom.xml version
-     bump build deploy sh versions 
+     bump build_deploy.sh versions 
+
+## 2.0
+Released: 17.12.2023
+
+    fixed/resolved budgeting issues + created budget for 2024
+    switched back to http + added protected backend calls
+    endpoints + services for new frontend views
+    computing of current return for financial assets
+    home view with redirects to other views
 
 ## 1.3
 Released: 24.1.2023
