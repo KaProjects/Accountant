@@ -81,6 +81,8 @@ public class ViewResource
                 }
             }
 
+            vacation.getTransactions().sort(VacationDto.Vacation::compare);
+
             dto.getVacations().add(vacation);
         }
 

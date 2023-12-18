@@ -113,4 +113,14 @@ public class Utils
         }
         return sum;
     }
+
+    public static int compareDates(String dateA, String dateB) {
+        Integer monthA = Integer.parseInt(dateA.substring(2));
+        Integer monthB = Integer.parseInt(dateB.substring(2));
+        if (!monthA.equals(monthB)) {
+            return monthA - monthB;
+        } else {
+            return Integer.parseInt(dateA.substring(0, 2)) - Integer.parseInt(dateB.substring(0, 2));
+        }
+    }
 }

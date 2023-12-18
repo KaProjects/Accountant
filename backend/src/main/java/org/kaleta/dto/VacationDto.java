@@ -1,6 +1,7 @@
 package org.kaleta.dto;
 
 import lombok.Data;
+import org.kaleta.Utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,20 +17,7 @@ public class VacationDto
 
     public static int compare(Vacation vacation1, Vacation vacation2)
     {
-        String date1 = vacation1.getTransactions().get(0).getDate();
-        String date2 = vacation2.getTransactions().get(0).getDate();
-
-        String m1 = date1.substring(2);
-        String m2 = date2.substring(2);
-
-        if (m1.equals(m2)){
-            String d1 = date1.substring(0,2);
-            String d2 = date2.substring(0,2);
-
-            return Integer.parseInt(d1) - Integer.parseInt(d2);
-        } else {
-            return Integer.parseInt(m1) - Integer.parseInt(m2);
-        }
+        return Utils.compareDates(vacation1.getTransactions().get(0).getDate(), vacation2.getTransactions().get(0).getDate());
     }
 
     @Data
@@ -38,8 +26,12 @@ public class VacationDto
         private String name;
         private String expenses;
         private List<Transaction> transactions = new ArrayList<>();
-
         private Set<ChartData> chartData = new HashSet<>();
+
+        public static int compare(Transaction transaction1, Transaction transaction2)
+        {
+            return Utils.compareDates(transaction1.getDate(), transaction2.getDate());
+        }
 
         public void addChartData(String name, Integer amount){
             for (ChartData data : chartData){
