@@ -31,7 +31,7 @@ public interface TransactionRepository
      *                       account prefix with % (e.g. 50% all accounts that id starts with 50)
      *                       null or empty string - all accounts
      * <p>
-     * description inputs: a value that must be present in the description of transaction
+     * description input: a value that must be present in the description of transaction
      *                     a value prefixed with '!' that can't be in description
      *                     null or empty string - all descriptions
      *
@@ -66,4 +66,19 @@ public interface TransactionRepository
      * @return initial transaction for specified account ID
      */
     Transaction getInitialTransaction(String year, String accountId, boolean isDebit);
+
+    /**
+     * @param year - year condition
+     * @param schemaId- schemaId condition
+     * @param month - month condition
+     * <p>
+     * schemaId input: exact schema ID (e.g. 2, 21, 210) for both debit/credit sides
+     * <p>
+     * month input: month number (e.g. 1, 2, ..., 12), use "" for all months
+     *
+     * @return transactions matching conditions
+     *
+     * Note: off-balance transactions excluded
+     */
+    List<Transaction> listBySchema(String year, String schemaId, String month);
 }

@@ -21,9 +21,9 @@ public class AuthenticationFilter implements ContainerRequestFilter
     private static final String SCHEME = "Bearer";
 
     @Value("${environment}")
-    private String environment;
+    String environment;
     @Value("${auth.bypass:false}")
-    private boolean bypassAuth;
+    boolean bypassAuth;
 
     @Inject
     AuthService authService;
@@ -31,7 +31,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
     @Override
     public void filter(ContainerRequestContext requestContext)
     {
-        if (Objects.equals(environment, "DEVEL") && bypassAuth) return;
+        if (!Objects.equals(environment, "PRODUCTION") && bypassAuth) return;
 
         String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 

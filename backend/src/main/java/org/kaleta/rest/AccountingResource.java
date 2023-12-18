@@ -5,6 +5,7 @@ import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.kaleta.Utils;
 import org.kaleta.dto.AccountingDto;
 import org.kaleta.dto.YearTransactionDto;
+import org.kaleta.entity.Transaction;
 import org.kaleta.model.GroupComponent;
 import org.kaleta.service.AccountingService;
 
@@ -14,6 +15,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/accounting")
 public class AccountingResource
@@ -126,7 +128,8 @@ public class AccountingResource
         ParamValidators.validateSchemaAccountId(accountId);
         ParamValidators.validateMonth(month);
 
-        return service.getSchemaTransactions(year, accountId, month);
+        List<Transaction> transactions = service.getSchemaTransactions(year, accountId, month);
+        return YearTransactionDto.from(transactions).stream().sorted().collect(Collectors.toList());
     }
 
     private AccountingDto.Row from(GroupComponent groupComponent, AccountingDto.Type type){

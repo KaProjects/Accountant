@@ -1,8 +1,8 @@
 package org.kaleta.service;
 
-import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Account;
 import org.kaleta.entity.Schema;
+import org.kaleta.entity.Transaction;
 import org.kaleta.model.GroupComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class AccountingServiceImpl implements AccountingService
@@ -57,28 +56,20 @@ public class AccountingServiceImpl implements AccountingService
     }
 
     @Override
-    public List<YearTransactionDto> getSchemaTransactions(String year, String schemaId, String month)
+    public List<Transaction> getSchemaTransactions(String year, String schemaId, String month)
     {
-        List<YearTransactionDto> transactions = new ArrayList<>();
-
-        List<YearTransactionDto> debitTransactions = transactionService.getTransactionsMatching(year, schemaId, "");
-        List<YearTransactionDto> creditTransactions = transactionService.getTransactionsMatching(year, "", schemaId);
-
-        if (schemaService.isDebitType(year, schemaId))
-        {
-            creditTransactions.forEach(transaction -> transaction.setAmount("-" + transaction.getAmount()));
-        }
-        if (schemaService.isCreditType(year, schemaId)) {
-            debitTransactions.forEach(transaction -> transaction.setAmount("-" + transaction.getAmount()));
-        }
-
-        transactions.addAll(debitTransactions);
-        transactions.addAll(creditTransactions);
-
-        transactions.removeIf(transaction -> !transaction.getDate().endsWith(month.length() == 1 ? "0" + month : month));
+        List<Transaction> transactions = transactionService.getSchemaTransactions(year, schemaId, month);
 
         // filter correcting transactions between same schema account
         transactions.removeIf(transaction -> transaction.getDebit().substring(0,3).equals(transaction.getCredit().substring(0,3)));
+
+        transactions.forEach(transaction -> {
+            if ((transaction.getCredit().startsWith(schemaId) && schemaService.isDebitType(year, schemaId))
+                || (transaction.getDebit().startsWith(schemaId) && schemaService.isCreditType(year, schemaId)))
+            {
+                transaction.setAmount(-transaction.getAmount());
+            }
+        });
 
         Map<String, String> accountNames = accountService.getAccountNamesMap(year);
         transactions.forEach(transaction -> {
@@ -86,6 +77,6 @@ public class AccountingServiceImpl implements AccountingService
             transaction.setCredit(accountNames.get(transaction.getCredit()));
         });
 
-        return transactions.stream().sorted().collect(Collectors.toList());
+        return transactions;
     }
 }

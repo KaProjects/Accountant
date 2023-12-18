@@ -67,4 +67,19 @@ public interface TransactionService
      * @return monthly balance for specified account
      */
     Integer[] monthlyBalanceByAccount(Account account);
+
+    /**
+     * @param year - year condition
+     * @param schemaId- schemaId condition
+     * @param month - month condition
+     * <p>
+     * schemaId input: exact schema ID (e.g. 2, 21, 210) for both debit/credit sides
+     * <p>
+     * month input: month number (e.g. 1, 2, ..., 12), use "" for all months
+     *
+     * @return transactions matching conditions
+     *
+     * Note: off-balance transactions excluded
+     */
+    List<Transaction> getSchemaTransactions(String year, String schemaId, String month);
 }

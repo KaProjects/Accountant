@@ -115,6 +115,12 @@ public class TransactionServiceImpl implements TransactionService
         return monthlySums;
     }
 
+    @Override
+    public List<Transaction> getSchemaTransactions(String year, String schemaId, String month)
+    {
+        return transactionDao.listBySchema(year, schemaId, month);
+    }
+
     private List<YearTransactionDto> mapYearTransactions(List<Transaction> transactions)
     {
         List<YearTransactionDto> output = new ArrayList<>();

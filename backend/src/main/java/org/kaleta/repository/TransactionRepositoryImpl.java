@@ -136,4 +136,19 @@ public class TransactionRepositoryImpl implements TransactionRepository
                 .setParameter("initialId", Constants.Account.INIT_ACC_ID)
                 .getSingleResult();
     }
+
+    @Override
+    public List<Transaction> listBySchema(String year, String schemaId, String month)
+    {
+        String formattedMonth = month.length() == 1 ? "0" + month : month;
+
+        return entityManager.createQuery(selectYearly
+                        + " AND (t.debit LIKE :schemaId OR t.credit LIKE :schemaId)"
+                        + " AND t.date LIKE :month"
+                        + excludeOffBalanceTransactions, Transaction.class)
+                .setParameter("year", year)
+                .setParameter("schemaId", schemaId + "%")
+                .setParameter("month", "%" + formattedMonth)
+                .getResultList();
+    }
 }
