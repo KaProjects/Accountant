@@ -2,6 +2,7 @@ package org.kaleta.service;
 
 import org.kaleta.dao.SchemaDao;
 import org.kaleta.entity.Schema;
+import org.kaleta.model.SchemaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,32 @@ public class SchemaServiceImpl implements SchemaService
     public List<Schema> list(String year)
     {
         return schemaDao.list(year);
+    }
+
+    @Override
+    public SchemaClass getClass(String year, String classId)
+    {
+        validateIdLength(classId, 1);
+
+        SchemaClass clazz = new SchemaClass();
+        List<Schema> schemas = schemaDao.list(year, classId);
+
+        for (Schema schema : schemas){
+            if (schema.getYearId().getId().length() == 1){
+                clazz.setId(schema.getYearId().getId());
+                clazz.setName(schema.getName());
+            }
+            if (schema.getYearId().getId().length() == 2){
+                clazz.getGroups().put(schema.getYearId().getId(), new SchemaClass.Group(schema.getYearId().getId(), schema.getName()));
+            }
+        }
+        for (Schema schema : schemas){
+            if (schema.getYearId().getId().length() == 3){
+                clazz.getGroups().get(schema.getYearId().getId().substring(0,2))
+                        .getAccounts().put(schema.getYearId().getId(), new SchemaClass.Group.Account(schema.getYearId().getId(), schema.getName(), schema.getType()));
+            }
+        }
+        return clazz;
     }
 
     @Override

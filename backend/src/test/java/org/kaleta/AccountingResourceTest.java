@@ -24,7 +24,7 @@ public class AccountingResourceTest
         String month = "5";
 
         List<YearTransactionDto> transactions =
-                List.of(given().when()
+                given().when()
                         .get("/accounting/" + year + "/transaction/" + accountId + "/month/" + month)
                         .then()
                         .statusCode(200)
@@ -34,12 +34,23 @@ public class AccountingResourceTest
                         .body("[1].date", is("1005"))
                         .body("[2].date", is("1505"))
                         .body("[3].date", is("2005"))
-                        .extract().as(YearTransactionDto[].class));
+                        .extract().response().jsonPath().getList("", YearTransactionDto.class);
 
         assertThat(transactions, hasItem(yearTransactionDto("2005", "500", "account000", "account003", "month5 000")));
         assertThat(transactions, hasItem(yearTransactionDto("0505", "600", "account000", "account001", "month5 000")));
         assertThat(transactions, hasItem(yearTransactionDto("1505", "-700", "account001", "account000", "month5 000 -amount")));
         assertThat(transactions, hasItem(yearTransactionDto("1005", "800", "account000.2", "account001.2", "month5 000")));
+    }
+
+    @Test
+    public void getCashFlowTest()
+    {
+        String year = "2023";
+
+        given().when()
+                .get("/accounting/" + year + "/cashflow")
+                .then()
+                .statusCode(500);
     }
 
     private YearTransactionDto yearTransactionDto(String date, String amount, String debit, String credit, String description)

@@ -18,9 +18,9 @@ public interface AccountRepository
     List<Account> list(String year);
 
     /**
-     * @return list of all account for specified year with schema prefix
+     * @return list of accounts matching schema prefix and year
      */
-    List<Account> list(String year, String schemaIdPrefix);
+    List<Account> list(String year, String schemaPrefix);
 
     /**
      * @return get account specified by schema ID, semantic ID and year

@@ -9,9 +9,14 @@ import java.util.List;
 public interface TransactionService
 {
     /**
-     * @return list of transactions DTO matching debit and credit prefixes for specified year
+     * @return list of transactions matching debit and credit prefixes for specified year
      */
-    List<YearTransactionDto> getTransactionsMatching(String year, String debitPrefix, String creditPrefix);
+    List<Transaction> getTransactionsMatching(String year, String debitPrefix, String creditPrefix);
+
+    /**
+     * @return list of transactions matching schema prefix (debit or credit) for specified year
+     */
+    List<Transaction> getTransactionsMatching(String year, String schemaPrefix);
 
     /**
      * @return list of transactions DTO matching conditions

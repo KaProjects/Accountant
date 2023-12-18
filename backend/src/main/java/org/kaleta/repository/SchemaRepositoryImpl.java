@@ -84,4 +84,13 @@ public class SchemaRepositoryImpl implements SchemaRepository
                 .setParameter("year", year)
                 .getResultList();
     }
+
+    @Override
+    public List<Schema> list(String year, String idPrefix)
+    {
+        return entityManager.createQuery(selectYearly + " AND s.yearId.id LIKE :id", Schema.class)
+                .setParameter("year", year)
+                .setParameter("id", idPrefix + "%")
+                .getResultList();
+    }
 }

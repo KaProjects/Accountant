@@ -30,4 +30,9 @@ public interface SchemaRepository
      * @return list of all schema objects for specified year
      */
     List<Schema> list(String year);
+
+    /**
+     * @return list of all schema objects matching id prefix and year
+     */
+    List<Schema> list(String year, String idPrefix);
 }

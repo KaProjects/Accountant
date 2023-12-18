@@ -39,13 +39,23 @@ public class TransactionRepositoryImpl implements TransactionRepository
     }
 
     @Override
-    public List<Transaction> listMatching(String year, String debitPrefix, String creditPrefix)
+    public List<Transaction> list(String year, String debitPrefix, String creditPrefix)
     {
         return entityManager.createQuery(selectYearly
                         + " AND t.debit LIKE :debit AND t.credit LIKE :credit", Transaction.class)
                 .setParameter("year", year)
                 .setParameter("debit", debitPrefix + "%")
                 .setParameter("credit", creditPrefix + "%")
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> list(String year, String schemaPrefix)
+    {
+        return entityManager.createQuery(selectYearly
+                        + " AND (t.debit LIKE :schema OR t.credit LIKE :schema)", Transaction.class)
+                .setParameter("year", year)
+                .setParameter("schema", schemaPrefix + "%")
                 .getResultList();
     }
 

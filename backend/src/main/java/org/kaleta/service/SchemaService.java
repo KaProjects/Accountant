@@ -1,6 +1,7 @@
 package org.kaleta.service;
 
 import org.kaleta.entity.Schema;
+import org.kaleta.model.SchemaClass;
 
 import java.util.List;
 
@@ -35,6 +36,11 @@ public interface SchemaService
      * @return list of all schema objects (classes, groups, schema accounts) for specified year
      */
     List<Schema> list(String year);
+
+    /**
+     * @return class model specified by class ID and year
+     */
+    SchemaClass getClass(String year, String classId);
 
     /**
      * @return true if specified schema account is of type Asset or Expense

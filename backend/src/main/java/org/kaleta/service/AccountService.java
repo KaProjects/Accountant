@@ -18,9 +18,9 @@ public interface AccountService
     List<Account> list(String year);
 
     /**
-     * @return list of accounts for specified year which schema ID matches specified prefix
+     * @return list of accounts matching schema prefix and year
      */
-    List<Account> listBySchemaId(String year, String schemaIdPrefix);
+    List<Account> listBySchema(String year, String schemaPrefix);
 
     /**
      * @return financial creation account ID of specified finance asset account

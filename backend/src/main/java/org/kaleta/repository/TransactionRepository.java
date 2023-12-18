@@ -19,7 +19,15 @@ public interface TransactionRepository
      *
      * @return transactions matching parameters
      */
-    List<Transaction> listMatching(String year, String debitPrefix, String creditPrefix);
+    List<Transaction> list(String year, String debitPrefix, String creditPrefix);
+
+    /**
+     * @param year
+     * @param schemaPrefix
+     *
+     * @return transactions matching schema prefix for both debit or credit and year
+     */
+    List<Transaction> list(String year, String schemaPrefix);
 
     /**
      * @param year - year condition

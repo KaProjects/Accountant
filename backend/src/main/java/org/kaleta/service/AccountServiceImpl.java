@@ -41,9 +41,9 @@ public class AccountServiceImpl implements AccountService
     }
 
     @Override
-    public List<Account> listBySchemaId(String year, String schemaIdPrefix)
+    public List<Account> listBySchema(String year, String schemaPrefix)
     {
-        return accountDao.list(year, schemaIdPrefix);
+        return accountDao.list(year, schemaPrefix);
     }
 
     @Override

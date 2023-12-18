@@ -21,9 +21,15 @@ public class TransactionServiceImpl implements TransactionService
     SchemaService schemaService;
 
     @Override
-    public List<YearTransactionDto> getTransactionsMatching(String year, String debitPrefix, String creditPrefix)
+    public List<Transaction> getTransactionsMatching(String year, String debitPrefix, String creditPrefix)
     {
-        return mapYearTransactions(transactionDao.listMatching(year, debitPrefix, creditPrefix));
+        return transactionDao.list(year, debitPrefix, creditPrefix);
+    }
+
+    @Override
+    public List<Transaction> getTransactionsMatching(String year, String schemaPrefix)
+    {
+        return transactionDao.list(year, schemaPrefix);
     }
 
     @Override

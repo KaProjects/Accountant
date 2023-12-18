@@ -6,6 +6,7 @@ import org.kaleta.Utils;
 import org.kaleta.dto.AccountingDto;
 import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Transaction;
+import org.kaleta.model.AccountingData;
 import org.kaleta.model.GroupComponent;
 import org.kaleta.service.AccountingService;
 
@@ -96,12 +97,16 @@ public class AccountingResource
     @Path("/{year}/cashflow")
     public AccountingDto getCashFlow(@PathParam String year)
     {
-        AccountingDto cashFlowDto = new AccountingDto(year, AccountingDto.Type.CASH_FLOW_SUMMARY);
+        ParamValidators.validateYear(year);
 
-        GroupComponent group20 = service.getGroupComponent(year, "20");
-        GroupComponent group21 = service.getGroupComponent(year, "21");
-        GroupComponent group23 = service.getGroupComponent(year, "23");
-        GroupComponent group22 = service.getGroupComponent(year, "22").inverted();
+        AccountingData cashFlowData = service.getCashFlowData(year);
+
+        GroupComponent group20 = cashFlowData.getGroupComponent(year, "20");
+        GroupComponent group21 = cashFlowData.getGroupComponent(year, "21");
+        GroupComponent group23 = cashFlowData.getGroupComponent(year, "23");
+        GroupComponent group22 = cashFlowData.getGroupComponent(year, "22").inverted();
+
+        AccountingDto cashFlowDto = new AccountingDto(year, AccountingDto.Type.CASH_FLOW_SUMMARY);
 
         cashFlowDto.getRows().add(from(group20, AccountingDto.Type.CASH_FLOW_GROUP));
         cashFlowDto.getRows().add(from(group21, AccountingDto.Type.CASH_FLOW_GROUP));

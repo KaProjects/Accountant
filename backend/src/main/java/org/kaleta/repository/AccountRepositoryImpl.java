@@ -42,11 +42,11 @@ public class AccountRepositoryImpl implements AccountRepository
     }
 
     @Override
-    public List<Account> list(String year, String schemaIdPrefix)
+    public List<Account> list(String year, String schemaPrefix)
     {
-        return entityManager.createQuery(selectYearly + " AND a.accountId.schemaId LIKE :schemaId", Account.class)
+        return entityManager.createQuery(selectYearly + " AND a.accountId.schemaId LIKE :schema", Account.class)
                 .setParameter("year", year)
-                .setParameter("schemaId", schemaIdPrefix + "%")
+                .setParameter("schema", schemaPrefix + "%")
                 .getResultList();
     }
 

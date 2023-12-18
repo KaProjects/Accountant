@@ -50,7 +50,7 @@ public class FinancialResource
             FinancialAssetsDto.Group groupDto = new FinancialAssetsDto.Group();
             groupDto.setName(schemaAcc.getName().toUpperCase());
 
-            for (Account account : accountService.listBySchemaId(year, schemaAcc.getYearId().getId()))
+            for (Account account : accountService.listBySchema(year, schemaAcc.getYearId().getId()))
             {
                 FinancialAsset asset = financialService.getFinancialAsset(account);
                 groupDto.getAccounts().add(constructAccountDto(asset));

@@ -3,7 +3,9 @@ package org.kaleta.service;
 import org.kaleta.entity.Account;
 import org.kaleta.entity.Schema;
 import org.kaleta.entity.Transaction;
+import org.kaleta.model.AccountingData;
 import org.kaleta.model.GroupComponent;
+import org.kaleta.model.SchemaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +46,7 @@ public class AccountingServiceImpl implements AccountingService
             accountComponent.setSchemaId(accountId);
             accountComponent.setName(schemaService.getAccountName(year, accountId));
 
-            for (Account account : accountService.listBySchemaId(year, accountId)){
+            for (Account account : accountService.listBySchema(year, accountId)){
                 if (!groupId.startsWith("5") && !groupId.startsWith("6")) {
                     accountComponent.addInitialValue(transactionService.getInitialValue(account));
                 }
@@ -53,6 +55,15 @@ public class AccountingServiceImpl implements AccountingService
             groupComponent.getAccounts().add(accountComponent);
         }
         return groupComponent;
+    }
+
+    @Override
+    public AccountingData getCashFlowData(String year)
+    {
+        List<Transaction> transactions = transactionService.getTransactionsMatching(year, "2");
+        List<Account> accounts = accountService.listBySchema(year, "2");
+        SchemaClass schemaClass = schemaService.getClass(year, "2");
+        return new AccountingData(transactions, accounts, schemaClass);
     }
 
     @Override

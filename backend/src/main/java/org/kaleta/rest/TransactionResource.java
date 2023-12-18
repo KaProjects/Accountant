@@ -29,7 +29,7 @@ public class TransactionResource
         ParamValidators.validateDebitPrefix(debitPrefix);
         ParamValidators.validateCreditPrefix(creditPrefix);
 
-        return service.getTransactionsMatching(year, debitPrefix, creditPrefix);
+        return YearTransactionDto.from(service.getTransactionsMatching(year, debitPrefix, creditPrefix));
     }
 
     @GET
@@ -41,6 +41,6 @@ public class TransactionResource
     {
         ParamValidators.validateYear(year);
 
-        return service.getTransactionsMatching(year, "", "");
+        return YearTransactionDto.from(service.getTransactionsMatching(year, "", ""));
     }
 }
