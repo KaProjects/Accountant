@@ -205,12 +205,12 @@ const Budgeting = props => {
 
         return (
             <React.Fragment>
-                <TableRow key={id}>
+                <TableRow key={id} onClick={() =>  {if (row.subRows.length !== 0) handleShowSubrow(id)}}>
                     <TableCell style={getRowStyle(row.type, false, true)} key={-1}>
                         <IconButton
                             aria-label="expand row"
                             style={{height: "2px", width: "10px"}}
-                            onClick={() => handleShowDeltas(id)}
+                            onClick={(e) => {handleShowDeltas(id);e.stopPropagation();}}
                         >
                             {showDeltas[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                         </IconButton>
@@ -218,7 +218,7 @@ const Budgeting = props => {
                         {(row.subRows.length !== 0) && <IconButton
                             aria-label="expand row"
                             style={{height: "2px", width: "25px"}}
-                            onClick={() => handleShowSubrow(id)}
+                            onClick={(e) => {handleShowSubrow(id);e.stopPropagation();}}
                         >
                             {showSubRow[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                         </IconButton>}
