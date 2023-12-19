@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
+<semantic xsi:noNamespaceSchemaLocation="schema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <account schemaId="700" id="0" name="string" description="string" />
+  <account schemaId="200" id="0" name="string" description="string" />
+  <account schemaId="210" id="0" name="string" description="string" />
+  <account schemaId="220" id="0" name="string" description="string" />
+  <account schemaId="510" id="0" name="string" description="string" />
+  <account schemaId="600" id="0" name="string" description="string" />
+</semantic>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
+<journal xsi:noNamespaceSchemaLocation="schema.xsd" year="2016" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <transaction id="1" date="0101" description="pocitocny stav" amount="10" debit="200.0" credit="700.0" />
+    <transaction id="2" date="0101" description="pocitocny stav" amount="20" debit="210.0" credit="700.0" />
+    <transaction id="3" date="0101" description="pocitocny stav" amount="30" debit="700.0" credit="220.0" />
+  <transaction id="4" date="0105" description="string" amount="100" debit="200.0" credit="210.0" />
+  <transaction id="5" date="0507" description="string" amount="200" debit="210.0" credit="220.0" />
+  <transaction id="6" date="1211" description="string" amount="300" debit="220.0" credit="200.0" />
+  <transaction id="7" date="0307" description="string" amount="10" debit="510.0" credit="200.0" />
+  <transaction id="8" date="0803" description="string" amount="20" debit="200.0" credit="600.0" />
+</journal>

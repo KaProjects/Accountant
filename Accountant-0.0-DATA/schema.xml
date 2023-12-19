@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<schema>
+    <class id="0" name="Long-term Assets"/>
+    <class id="1" name="Current Assets"/>
+    <class id="2" name="Finance">
+        <group id="0" name="string">
+            <account id="0" name="string" type="A" />
+        </group>
+        <group id="1" name="string">
+            <account id="0" name="string" type="A" />
+        </group>
+        <group id="2" name="string">
+            <account id="0" name="string" type="L" />
+        </group>
+    </class>
+    <class id="4" name="Relations"/>
+    <class id="4" name="Funding"/>
+  <class id="5" name="Expenses">
+    <group id="0" name="string">
+      <account id="0" name="string" type="E" />
+    </group>
+    <group id="1" name="string">
+      <account id="0" name="string" type="E" />
+    </group>
+  </class>
+  <class id="6" name="Revenues">
+    <group id="0" name="string">
+      <account id="0" name="string" type="R" />
+    </group>
+  </class>
+  <class id="7" name="Off Balance">
+    <group id="0" name="Rozvahove">
+      <account id="0" name="Pociatocny ucet rozvazny" type="X" />
+      <account id="1" name="Konecny ucet rozvazny" type="X" />
+    </group>
+    <group id="1" name="Vysledkove">
+      <account id="0" name="Vykaz zisku a strat" type="X" />
+    </group>
+  </class>
+</schema>

@@ -1,0 +1,151 @@
+######### Application started #########
+starting time: Tue Dec 19 14:40:25 CET 2023
+Tue Dec 19 14:40:25 CET 2023 | INFO | File "%DATA%/config.xml" created!
+Tue Dec 19 14:40:25 CET 2023 | INFO | File "%DATA%/schema.xml" created!
+Tue Dec 19 14:40:25 CET 2023 | INFO | File "%DATA%/semantic.xml" created!
+Tue Dec 19 14:40:25 CET 2023 | INFO | File "%DATA%/procedures.xml" created!
+######### Application ended #########
+######### Application started #########
+starting time: Tue Dec 19 14:41:23 CET 2023
+######### Application ended #########
+######### Application started #########
+starting time: Tue Dec 19 14:42:17 CET 2023
+Tue Dec 19 14:42:17 CET 2023 | SEVERE | org.kaleta.accountant.backend.manager.ManagerException: Error while retrieving journal data: 
+	at org.kaleta.accountant.backend.manager.jaxb.JournalManager.retrieve(JournalManager.java:59)
+	at org.kaleta.accountant.service.JournalService.getJournal(JournalService.java:76)
+	at org.kaleta.accountant.frontend.action.configuration.JournalTableTransactionsUpdated.actionPerformed(JournalTableTransactionsUpdated.java:22)
+	at org.kaleta.accountant.frontend.action.configuration.ConfigurationAction$1.runInBackground(ConfigurationAction.java:27)
+	at org.kaleta.accountant.frontend.common.SwingWorkerHandler$1.doInBackground(SwingWorkerHandler.java:20)
+	at org.kaleta.accountant.frontend.common.SwingWorkerHandler$1.doInBackground(SwingWorkerHandler.java:16)
+	at javax.swing.SwingWorker$1.call(SwingWorker.java:295)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at javax.swing.SwingWorker.run(SwingWorker.java:334)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: javax.xml.bind.UnmarshalException
+ - with linked exception:
+[java.io.FileNotFoundException: /Users/skaleta/s/temp/Accountant/target/Accountant-0.0-DATA/journal/j2016.xml (No such file or directory)]
+	at com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl.unmarshal0(UnmarshallerImpl.java:246)
+	at com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl.unmarshal(UnmarshallerImpl.java:214)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:157)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:162)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:171)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:189)
+	at org.kaleta.accountant.backend.manager.jaxb.JournalManager.retrieve(JournalManager.java:57)
+	... 11 more
+Caused by: java.io.FileNotFoundException: /Users/skaleta/s/temp/Accountant/target/Accountant-0.0-DATA/journal/j2016.xml (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at java.io.FileInputStream.<init>(FileInputStream.java:93)
+	at sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:90)
+	at sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:188)
+	at com.sun.org.apache.xerces.internal.impl.XMLEntityManager.setupCurrentEntity(XMLEntityManager.java:623)
+	at com.sun.org.apache.xerces.internal.impl.XMLVersionDetector.determineDocVersion(XMLVersionDetector.java:148)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:806)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
+	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
+	at com.sun.org.apache.xerces.internal.parsers.AbstractSAXParser.parse(AbstractSAXParser.java:1213)
+	at com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser.parse(SAXParserImpl.java:643)
+	at com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl.unmarshal0(UnmarshallerImpl.java:243)
+	... 17 more
+
+Tue Dec 19 14:42:17 CET 2023 | SEVERE | org.kaleta.accountant.backend.manager.ManagerException: Error while retrieving journal data: 
+	at org.kaleta.accountant.backend.manager.jaxb.JournalManager.retrieve(JournalManager.java:59)
+	at org.kaleta.accountant.service.JournalService.getJournal(JournalService.java:76)
+	at org.kaleta.accountant.frontend.action.configuration.ProfitTableTransactionsUpdated.actionPerformed(ProfitTableTransactionsUpdated.java:25)
+	at org.kaleta.accountant.frontend.action.configuration.ConfigurationAction$1.runInBackground(ConfigurationAction.java:27)
+	at org.kaleta.accountant.frontend.common.SwingWorkerHandler$1.doInBackground(SwingWorkerHandler.java:20)
+	at org.kaleta.accountant.frontend.common.SwingWorkerHandler$1.doInBackground(SwingWorkerHandler.java:16)
+	at javax.swing.SwingWorker$1.call(SwingWorker.java:295)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at javax.swing.SwingWorker.run(SwingWorker.java:334)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: javax.xml.bind.UnmarshalException
+ - with linked exception:
+[java.io.FileNotFoundException: /Users/skaleta/s/temp/Accountant/target/Accountant-0.0-DATA/journal/j2016.xml (No such file or directory)]
+	at com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl.unmarshal0(UnmarshallerImpl.java:246)
+	at com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl.unmarshal(UnmarshallerImpl.java:214)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:157)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:162)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:171)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:189)
+	at org.kaleta.accountant.backend.manager.jaxb.JournalManager.retrieve(JournalManager.java:57)
+	... 11 more
+Caused by: java.io.FileNotFoundException: /Users/skaleta/s/temp/Accountant/target/Accountant-0.0-DATA/journal/j2016.xml (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at java.io.FileInputStream.<init>(FileInputStream.java:93)
+	at sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:90)
+	at sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:188)
+	at com.sun.org.apache.xerces.internal.impl.XMLEntityManager.setupCurrentEntity(XMLEntityManager.java:623)
+	at com.sun.org.apache.xerces.internal.impl.XMLVersionDetector.determineDocVersion(XMLVersionDetector.java:148)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:806)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
+	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
+	at com.sun.org.apache.xerces.internal.parsers.AbstractSAXParser.parse(AbstractSAXParser.java:1213)
+	at com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser.parse(SAXParserImpl.java:643)
+	at com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl.unmarshal0(UnmarshallerImpl.java:243)
+	... 17 more
+
+Tue Dec 19 14:42:17 CET 2023 | SEVERE | org.kaleta.accountant.backend.manager.ManagerException: Error while retrieving journal data: 
+	at org.kaleta.accountant.backend.manager.jaxb.JournalManager.retrieve(JournalManager.java:59)
+	at org.kaleta.accountant.service.JournalService.getJournal(JournalService.java:76)
+	at org.kaleta.accountant.frontend.action.configuration.BalanceTableTransactionsUpdated.actionPerformed(BalanceTableTransactionsUpdated.java:25)
+	at org.kaleta.accountant.frontend.action.configuration.ConfigurationAction$1.runInBackground(ConfigurationAction.java:27)
+	at org.kaleta.accountant.frontend.common.SwingWorkerHandler$1.doInBackground(SwingWorkerHandler.java:20)
+	at org.kaleta.accountant.frontend.common.SwingWorkerHandler$1.doInBackground(SwingWorkerHandler.java:16)
+	at javax.swing.SwingWorker$1.call(SwingWorker.java:295)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at javax.swing.SwingWorker.run(SwingWorker.java:334)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: javax.xml.bind.UnmarshalException
+ - with linked exception:
+[java.io.FileNotFoundException: /Users/skaleta/s/temp/Accountant/target/Accountant-0.0-DATA/journal/j2016.xml (No such file or directory)]
+	at com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl.unmarshal0(UnmarshallerImpl.java:246)
+	at com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl.unmarshal(UnmarshallerImpl.java:214)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:157)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:162)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:171)
+	at javax.xml.bind.helpers.AbstractUnmarshallerImpl.unmarshal(AbstractUnmarshallerImpl.java:189)
+	at org.kaleta.accountant.backend.manager.jaxb.JournalManager.retrieve(JournalManager.java:57)
+	... 11 more
+Caused by: java.io.FileNotFoundException: /Users/skaleta/s/temp/Accountant/target/Accountant-0.0-DATA/journal/j2016.xml (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at java.io.FileInputStream.<init>(FileInputStream.java:93)
+	at sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:90)
+	at sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:188)
+	at com.sun.org.apache.xerces.internal.impl.XMLEntityManager.setupCurrentEntity(XMLEntityManager.java:623)
+	at com.sun.org.apache.xerces.internal.impl.XMLVersionDetector.determineDocVersion(XMLVersionDetector.java:148)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:806)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:771)
+	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:141)
+	at com.sun.org.apache.xerces.internal.parsers.AbstractSAXParser.parse(AbstractSAXParser.java:1213)
+	at com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser.parse(SAXParserImpl.java:643)
+	at com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallerImpl.unmarshal0(UnmarshallerImpl.java:243)
+	... 17 more
+
+######### Application ended #########
+######### Application started #########
+starting time: Tue Dec 19 14:53:26 CET 2023
+######### Application ended #########
+######### Application started #########
+starting time: Tue Dec 19 14:55:00 CET 2023
+######### Application ended #########
+######### Application started #########
+starting time: Tue Dec 19 14:58:54 CET 2023
+######### Application ended #########
+######### Application started #########
+starting time: Tue Dec 19 15:02:56 CET 2023
+######### Application ended #########
+######### Application started #########
+starting time: Tue Dec 19 15:04:35 CET 2023
+######### Application ended #########
