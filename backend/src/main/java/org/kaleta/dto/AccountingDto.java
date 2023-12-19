@@ -13,6 +13,7 @@ public class AccountingDto
     private List<String> columns = new ArrayList<>();
     private List<Row> rows = new ArrayList<>();
 
+    public AccountingDto() {}
     public AccountingDto(String year, Type type)
     {
         if (type == Type.PROFIT_SUMMARY) {
@@ -41,6 +42,7 @@ public class AccountingDto
         private Integer total;
         private List<Row> accounts = new ArrayList<>();
 
+        public Row() {}
         public Row(Type type, String name, String schemaId)
         {
             this.type = type;

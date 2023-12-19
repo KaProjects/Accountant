@@ -94,6 +94,36 @@ public class AccountingResource
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/inefficient/{year}/cashflow")
+    public AccountingDto getCashFlowInefficient(@PathParam String year)
+    {
+        ParamValidators.validateYear(year);
+
+        GroupComponent group20 = service.getGroupComponent(year, "20");
+        GroupComponent group21 = service.getGroupComponent(year, "21");
+        GroupComponent group23 = service.getGroupComponent(year, "23");
+        GroupComponent group22 = service.getGroupComponent(year, "22").inverted();
+
+        AccountingDto cashFlowDto = new AccountingDto(year, AccountingDto.Type.CASH_FLOW_SUMMARY);
+
+        cashFlowDto.getRows().add(from(group20, AccountingDto.Type.CASH_FLOW_GROUP));
+        cashFlowDto.getRows().add(from(group21, AccountingDto.Type.CASH_FLOW_GROUP));
+        cashFlowDto.getRows().add(from(group23, AccountingDto.Type.CASH_FLOW_GROUP));
+        cashFlowDto.getRows().add(from(group22, AccountingDto.Type.CASH_FLOW_GROUP));
+
+        AccountingDto.Row cashFlowRow = new AccountingDto.Row(AccountingDto.Type.CASH_FLOW_SUMMARY, "Cash Flow", "cf");
+        cashFlowRow.setInitial(group20.getInitialValue() + group21.getInitialValue() + group23.getInitialValue() + group22.getInitialValue());
+        cashFlowRow.setMonthlyValues(Utils.mergeIntegerArrays(group20.getMonthlyBalance(), group21.getMonthlyBalance(), group23.getMonthlyBalance(), group22.getMonthlyBalance()));
+        cashFlowRow.setTotal(group20.getBalance() + group21.getBalance() + group23.getBalance() + group22.getBalance());
+        cashFlowDto.getRows().add(cashFlowRow);
+
+        return cashFlowDto;
+    }
+
+    @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/cashflow")
     public AccountingDto getCashFlow(@PathParam String year)
     {
