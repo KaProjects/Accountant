@@ -2,7 +2,9 @@ package org.kaleta.model;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -26,6 +28,16 @@ public class SchemaClass
         {
             this.id = id;
             this.name = name;
+        }
+
+        public Account getAccount(String accountIdSuffix) {
+            return accounts.get(id + accountIdSuffix);
+        }
+
+        public List<String> getAccountSuffixes() {
+            List<String> suffixes = new ArrayList<>();
+            accounts.keySet().forEach(id -> suffixes.add(id.substring(2,3)));
+            return suffixes;
         }
 
         @Data

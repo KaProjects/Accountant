@@ -19,13 +19,15 @@ public class AccountingData
         this.schemaClass = schemaClass;
     }
 
-    public GroupComponent getGroupComponent(String year, String groupId){
+    public GroupComponent getGroupComponent(String year, String groupId, String... accountIdSuffixes){
         GroupComponent groupComponent = new GroupComponent();
         groupComponent.setSchemaId(groupId);
         groupComponent.setName(schemaClass.getGroup(groupId).getName());
 
-        for (SchemaClass.Group.Account schemaAccount : schemaClass.getGroup(groupId).getAccounts().values())
+        for (String schemaAccountSuffix : accountIdSuffixes)
         {
+            SchemaClass.Group.Account schemaAccount = schemaClass.getGroup(groupId).getAccount(schemaAccountSuffix);
+
             GroupComponent.AccountComponent accountComponent = new GroupComponent.AccountComponent();
             accountComponent.setSchemaId(schemaAccount.getId());
             accountComponent.setName(schemaAccount.getName());
@@ -43,6 +45,9 @@ public class AccountingData
         }
 
         return groupComponent;
+    }
+    public GroupComponent getGroupComponent(String year, String groupId){
+        return getGroupComponent(year, groupId, schemaClass.getGroup(groupId).getAccountSuffixes().toArray(new String[]{}));
     }
 
     private Integer getInitialValue(Account account, boolean isAsset){

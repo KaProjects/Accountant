@@ -29,14 +29,12 @@ public class AccountingResource
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{year}/profit")
-    public Response getProfit(@PathParam String year)
+    @Path("/inefficient/{year}/profit")
+    public Response getProfitInefficient(@PathParam String year)
     {
         return Endpoint.process(() -> {
             ParamValidators.validateYear(year);
         }, () -> {
-            AccountingDto profitDto = new AccountingDto(year, AccountingDto.Type.PROFIT_SUMMARY);
-
             GroupComponent group60 = service.getGroupComponent(year, "60");
             GroupComponent group55a = service.getGroupComponent(year, "55", "0", "1", "2");
             GroupComponent group63a = service.getGroupComponent(year, "63", "1", "2", "3");
@@ -53,43 +51,40 @@ public class AccountingResource
             GroupComponent group63b = service.getGroupComponent(year, "63", "0");
             GroupComponent group55b = service.getGroupComponent(year, "55", "3", "4", "5");
 
-            profitDto.getRows().add(from(group60, AccountingDto.Type.INCOME_GROUP));
-            profitDto.getRows().add(from(group55a, AccountingDto.Type.EXPENSE_GROUP));
-            profitDto.getRows().add(from(group63a, AccountingDto.Type.INCOME_GROUP));
+            return constructDto(year, group60, group55a, group63a, group51, group52, group53, group50, group61, group55, group62, group54, group63b, group55b);
+        });
+    }
 
-            AccountingDto.Row netIncomeRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Income", "ni");
-            netIncomeRow.setMonthlyValues(Utils.addIntegerArrays(Utils.subtractIntegerArrays(group60.getMonthlyBalance(), group55a.getMonthlyBalance()), group63a.getMonthlyBalance()));
-            netIncomeRow.setTotal(group60.getBalance() - group55a.getBalance() + group63a.getBalance());
-            profitDto.getRows().add(netIncomeRow);
+    @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{year}/profit")
+    public Response getProfit(@PathParam String year)
+    {
+        return Endpoint.process(() -> {
+            ParamValidators.validateYear(year);
+        }, () -> {
+            AccountingData profitExpensesData = service.getProfitExpensesData(year);
+            AccountingData profitRevenuesData = service.getProfitRevenuesData(year);
 
-            profitDto.getRows().add(from(group51, AccountingDto.Type.EXPENSE_GROUP));
-            profitDto.getRows().add(from(group52, AccountingDto.Type.EXPENSE_GROUP));
-            profitDto.getRows().add(from(group53, AccountingDto.Type.EXPENSE_GROUP));
+            GroupComponent group60 = profitRevenuesData.getGroupComponent(year, "60");
+            GroupComponent group55a = profitExpensesData.getGroupComponent(year, "55", "0", "1", "2");
+            GroupComponent group63a = profitRevenuesData.getGroupComponent(year, "63", "1", "2", "3");
 
-            AccountingDto.Row operatingProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Operating Profit", "op");
-            operatingProfitRow.setMonthlyValues(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(netIncomeRow.getMonthlyValues(), group51.getMonthlyBalance()), group52.getMonthlyBalance()), group53.getMonthlyBalance()));
-            operatingProfitRow.setTotal(netIncomeRow.getTotal() - group51.getBalance() - group52.getBalance() - group53.getBalance());
-            profitDto.getRows().add(operatingProfitRow);
+            GroupComponent group51 = profitExpensesData.getGroupComponent(year, "51");
+            GroupComponent group52 = profitExpensesData.getGroupComponent(year, "52");
+            GroupComponent group53 = profitExpensesData.getGroupComponent(year, "53");
 
-            profitDto.getRows().add(from(group50, AccountingDto.Type.EXPENSE_GROUP));
-            profitDto.getRows().add(from(group61, AccountingDto.Type.INCOME_GROUP));
-            profitDto.getRows().add(from(group55, AccountingDto.Type.EXPENSE_GROUP));
-            profitDto.getRows().add(from(group62, AccountingDto.Type.INCOME_GROUP));
-            profitDto.getRows().add(from(group54, AccountingDto.Type.EXPENSE_GROUP));
-            profitDto.getRows().add(from(group63b, AccountingDto.Type.INCOME_GROUP));
-            profitDto.getRows().add(from(group55b, AccountingDto.Type.EXPENSE_GROUP));
+            GroupComponent group50 = profitExpensesData.getGroupComponent(year, "50");
+            GroupComponent group61 = profitRevenuesData.getGroupComponent(year, "61");
+            GroupComponent group55 = profitExpensesData.getGroupComponent(year, "56");
+            GroupComponent group62 = profitRevenuesData.getGroupComponent(year, "62");
+            GroupComponent group54 = profitExpensesData.getGroupComponent(year, "54");
+            GroupComponent group63b = profitRevenuesData.getGroupComponent(year, "63", "0");
+            GroupComponent group55b = profitExpensesData.getGroupComponent(year, "55", "3", "4", "5");
 
-            AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Profit", "np");
-            Integer[] np1 = Utils.subtractIntegerArrays(operatingProfitRow.getMonthlyValues(), group50.getMonthlyBalance());
-            Integer[] np2 = Utils.subtractIntegerArrays(group61.getMonthlyBalance(), group55.getMonthlyBalance());
-            Integer[] np3 = Utils.subtractIntegerArrays(group62.getMonthlyBalance(), group54.getMonthlyBalance());
-            Integer[] np4 = Utils.subtractIntegerArrays(group63b.getMonthlyBalance(), group55b.getMonthlyBalance());
-            netProfitRow.setMonthlyValues(Utils.mergeIntegerArrays(np1, np2, np3, np4));
-            netProfitRow.setTotal(operatingProfitRow.getTotal() - group50.getBalance() + group61.getBalance() - group55.getBalance()
-                    + group62.getBalance() - group54.getBalance() + group63b.getBalance() - group55b.getBalance());
-            profitDto.getRows().add(netProfitRow);
-
-            return profitDto;
+            return constructDto(year, group60, group55a, group63a, group51, group52, group53, group50, group61, group55, group62, group54, group63b, group55b);
         });
     }
 
@@ -108,20 +103,7 @@ public class AccountingResource
             GroupComponent group23 = service.getGroupComponent(year, "23");
             GroupComponent group22 = service.getGroupComponent(year, "22").inverted();
 
-            AccountingDto cashFlowDto = new AccountingDto(year, AccountingDto.Type.CASH_FLOW_SUMMARY);
-
-            cashFlowDto.getRows().add(from(group20, AccountingDto.Type.CASH_FLOW_GROUP));
-            cashFlowDto.getRows().add(from(group21, AccountingDto.Type.CASH_FLOW_GROUP));
-            cashFlowDto.getRows().add(from(group23, AccountingDto.Type.CASH_FLOW_GROUP));
-            cashFlowDto.getRows().add(from(group22, AccountingDto.Type.CASH_FLOW_GROUP));
-
-            AccountingDto.Row cashFlowRow = new AccountingDto.Row(AccountingDto.Type.CASH_FLOW_SUMMARY, "Cash Flow", "cf");
-            cashFlowRow.setInitial(group20.getInitialValue() + group21.getInitialValue() + group23.getInitialValue() + group22.getInitialValue());
-            cashFlowRow.setMonthlyValues(Utils.mergeIntegerArrays(group20.getMonthlyBalance(), group21.getMonthlyBalance(), group23.getMonthlyBalance(), group22.getMonthlyBalance()));
-            cashFlowRow.setTotal(group20.getBalance() + group21.getBalance() + group23.getBalance() + group22.getBalance());
-            cashFlowDto.getRows().add(cashFlowRow);
-
-            return cashFlowDto;
+            return constructDto(year, group20, group21, group23, group22);
         });
     }
 
@@ -142,20 +124,7 @@ public class AccountingResource
             GroupComponent group23 = cashFlowData.getGroupComponent(year, "23");
             GroupComponent group22 = cashFlowData.getGroupComponent(year, "22").inverted();
 
-            AccountingDto cashFlowDto = new AccountingDto(year, AccountingDto.Type.CASH_FLOW_SUMMARY);
-
-            cashFlowDto.getRows().add(from(group20, AccountingDto.Type.CASH_FLOW_GROUP));
-            cashFlowDto.getRows().add(from(group21, AccountingDto.Type.CASH_FLOW_GROUP));
-            cashFlowDto.getRows().add(from(group23, AccountingDto.Type.CASH_FLOW_GROUP));
-            cashFlowDto.getRows().add(from(group22, AccountingDto.Type.CASH_FLOW_GROUP));
-
-            AccountingDto.Row cashFlowRow = new AccountingDto.Row(AccountingDto.Type.CASH_FLOW_SUMMARY, "Cash Flow", "cf");
-            cashFlowRow.setInitial(group20.getInitialValue() + group21.getInitialValue() + group23.getInitialValue() + group22.getInitialValue());
-            cashFlowRow.setMonthlyValues(Utils.mergeIntegerArrays(group20.getMonthlyBalance(), group21.getMonthlyBalance(), group23.getMonthlyBalance(), group22.getMonthlyBalance()));
-            cashFlowRow.setTotal(group20.getBalance() + group21.getBalance() + group23.getBalance() + group22.getBalance());
-            cashFlowDto.getRows().add(cashFlowRow);
-
-            return cashFlowDto;
+            return constructDto(year, group20, group21, group23, group22);
         });
     }
 
@@ -176,7 +145,69 @@ public class AccountingResource
         });
     }
 
-    private AccountingDto.Row from(GroupComponent groupComponent, AccountingDto.Type type){
+    private AccountingDto constructDto(String year, GroupComponent group60, GroupComponent group55a, GroupComponent group63a, GroupComponent group51, GroupComponent group52, GroupComponent group53, GroupComponent group50, GroupComponent group61, GroupComponent group55, GroupComponent group62, GroupComponent group54, GroupComponent group63b, GroupComponent group55b)
+    {
+        AccountingDto profitDto = new AccountingDto(year, AccountingDto.Type.PROFIT_SUMMARY);
+
+        profitDto.getRows().add(from(group60, AccountingDto.Type.INCOME_GROUP));
+        profitDto.getRows().add(from(group55a, AccountingDto.Type.EXPENSE_GROUP));
+        profitDto.getRows().add(from(group63a, AccountingDto.Type.INCOME_GROUP));
+
+        AccountingDto.Row netIncomeRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Income", "ni");
+        netIncomeRow.setMonthlyValues(Utils.addIntegerArrays(Utils.subtractIntegerArrays(group60.getMonthlyBalance(), group55a.getMonthlyBalance()), group63a.getMonthlyBalance()));
+        netIncomeRow.setTotal(group60.getBalance() - group55a.getBalance() + group63a.getBalance());
+        profitDto.getRows().add(netIncomeRow);
+
+        profitDto.getRows().add(from(group51, AccountingDto.Type.EXPENSE_GROUP));
+        profitDto.getRows().add(from(group52, AccountingDto.Type.EXPENSE_GROUP));
+        profitDto.getRows().add(from(group53, AccountingDto.Type.EXPENSE_GROUP));
+
+        AccountingDto.Row operatingProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Operating Profit", "op");
+        operatingProfitRow.setMonthlyValues(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(netIncomeRow.getMonthlyValues(), group51.getMonthlyBalance()), group52.getMonthlyBalance()), group53.getMonthlyBalance()));
+        operatingProfitRow.setTotal(netIncomeRow.getTotal() - group51.getBalance() - group52.getBalance() - group53.getBalance());
+        profitDto.getRows().add(operatingProfitRow);
+
+        profitDto.getRows().add(from(group50, AccountingDto.Type.EXPENSE_GROUP));
+        profitDto.getRows().add(from(group61, AccountingDto.Type.INCOME_GROUP));
+        profitDto.getRows().add(from(group55, AccountingDto.Type.EXPENSE_GROUP));
+        profitDto.getRows().add(from(group62, AccountingDto.Type.INCOME_GROUP));
+        profitDto.getRows().add(from(group54, AccountingDto.Type.EXPENSE_GROUP));
+        profitDto.getRows().add(from(group63b, AccountingDto.Type.INCOME_GROUP));
+        profitDto.getRows().add(from(group55b, AccountingDto.Type.EXPENSE_GROUP));
+
+        AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Profit", "np");
+        Integer[] np1 = Utils.subtractIntegerArrays(operatingProfitRow.getMonthlyValues(), group50.getMonthlyBalance());
+        Integer[] np2 = Utils.subtractIntegerArrays(group61.getMonthlyBalance(), group55.getMonthlyBalance());
+        Integer[] np3 = Utils.subtractIntegerArrays(group62.getMonthlyBalance(), group54.getMonthlyBalance());
+        Integer[] np4 = Utils.subtractIntegerArrays(group63b.getMonthlyBalance(), group55b.getMonthlyBalance());
+        netProfitRow.setMonthlyValues(Utils.mergeIntegerArrays(np1, np2, np3, np4));
+        netProfitRow.setTotal(operatingProfitRow.getTotal() - group50.getBalance() + group61.getBalance() - group55.getBalance()
+                + group62.getBalance() - group54.getBalance() + group63b.getBalance() - group55b.getBalance());
+        profitDto.getRows().add(netProfitRow);
+
+        return profitDto;
+    }
+
+    private AccountingDto constructDto(String year, GroupComponent group20, GroupComponent group21, GroupComponent group23, GroupComponent group22)
+    {
+        AccountingDto cashFlowDto = new AccountingDto(year, AccountingDto.Type.CASH_FLOW_SUMMARY);
+
+        cashFlowDto.getRows().add(from(group20, AccountingDto.Type.CASH_FLOW_GROUP));
+        cashFlowDto.getRows().add(from(group21, AccountingDto.Type.CASH_FLOW_GROUP));
+        cashFlowDto.getRows().add(from(group23, AccountingDto.Type.CASH_FLOW_GROUP));
+        cashFlowDto.getRows().add(from(group22, AccountingDto.Type.CASH_FLOW_GROUP));
+
+        AccountingDto.Row cashFlowRow = new AccountingDto.Row(AccountingDto.Type.CASH_FLOW_SUMMARY, "Cash Flow", "cf");
+        cashFlowRow.setInitial(group20.getInitialValue() + group21.getInitialValue() + group23.getInitialValue() + group22.getInitialValue());
+        cashFlowRow.setMonthlyValues(Utils.mergeIntegerArrays(group20.getMonthlyBalance(), group21.getMonthlyBalance(), group23.getMonthlyBalance(), group22.getMonthlyBalance()));
+        cashFlowRow.setTotal(group20.getBalance() + group21.getBalance() + group23.getBalance() + group22.getBalance());
+        cashFlowDto.getRows().add(cashFlowRow);
+
+        return cashFlowDto;
+    }
+
+    private AccountingDto.Row from(GroupComponent groupComponent, AccountingDto.Type type)
+    {
         AccountingDto.Row groupRow = new AccountingDto.Row(type, groupComponent.getName(), groupComponent.getSchemaId());
         if (type == AccountingDto.Type.CASH_FLOW_GROUP) groupRow.setInitial(groupComponent.getInitialValue());
         groupRow.setMonthlyValues(groupComponent.getMonthlyBalance());

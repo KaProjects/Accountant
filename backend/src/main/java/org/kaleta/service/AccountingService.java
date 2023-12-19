@@ -12,8 +12,8 @@ public interface AccountingService
     GroupComponent getGroupComponent(String year, String groupId);
     @Deprecated
     GroupComponent getGroupComponent(String year, String groupId, String... accountId);
-
     AccountingData getCashFlowData(String year);
-
+    AccountingData getProfitExpensesData(String year);
+    AccountingData getProfitRevenuesData(String year);
     List<Transaction> getSchemaTransactions(String year, String schemaId, String month);
 }

@@ -67,6 +67,24 @@ public class AccountingServiceImpl implements AccountingService
     }
 
     @Override
+    public AccountingData getProfitExpensesData(String year)
+    {
+        List<Transaction> transactions = transactionService.getTransactionsMatching(year, "5");
+        List<Account> accounts = accountService.listBySchema(year, "5");
+        SchemaClass schemaClass = schemaService.getClass(year, "5");
+        return new AccountingData(transactions, accounts, schemaClass);
+    }
+
+    @Override
+    public AccountingData getProfitRevenuesData(String year)
+    {
+        List<Transaction> transactions = transactionService.getTransactionsMatching(year, "6");
+        List<Account> accounts = accountService.listBySchema(year, "6");
+        SchemaClass schemaClass = schemaService.getClass(year, "6");
+        return new AccountingData(transactions, accounts, schemaClass);
+    }
+
+    @Override
     public List<Transaction> getSchemaTransactions(String year, String schemaId, String month)
     {
         List<Transaction> transactions = transactionService.getSchemaTransactions(year, schemaId, month);
