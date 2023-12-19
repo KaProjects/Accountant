@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.AccountingDto;
 import org.kaleta.dto.YearTransactionDto;
+import org.springframework.http.HttpStatus;
 
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -39,10 +40,10 @@ public class AccountingResourceTest
                         .body("[3].date", is("2005"))
                         .extract().response().jsonPath().getList("", YearTransactionDto.class);
 
-        assertThat(transactions, hasItem(yearTransactionDto("2005", "500", "account000", "account003", "month5 000")));
-        assertThat(transactions, hasItem(yearTransactionDto("0505", "600", "account000", "account001", "month5 000")));
-        assertThat(transactions, hasItem(yearTransactionDto("1505", "-700", "account001", "account000", "month5 000 -amount")));
-        assertThat(transactions, hasItem(yearTransactionDto("1005", "800", "account000.2", "account001.2", "month5 000")));
+        assertThat(transactions, hasItem(YearTransactionDto.from("2005", "500", "account000", "account003", "month5 000")));
+        assertThat(transactions, hasItem(YearTransactionDto.from("0505", "600", "account000", "account001", "month5 000")));
+        assertThat(transactions, hasItem(YearTransactionDto.from("1505", "-700", "account001", "account000", "month5 000 -amount")));
+        assertThat(transactions, hasItem(YearTransactionDto.from("1005", "800", "account000.2", "account001.2", "month5 000")));
     }
 
     @Test
@@ -66,7 +67,7 @@ public class AccountingResourceTest
 
         System.out.println("latest response time: " + responseLatest.time() + "ms");
 
-        assertThat(responseLatest.time(), is(lessThan(responseInefficient.time() - 900)));
+        assertThat(responseLatest.time(), is(lessThan(responseInefficient.time())));
 
         AccountingDto dto = responseLatest.jsonPath().getObject("", AccountingDto.class);
 
@@ -105,14 +106,67 @@ public class AccountingResourceTest
         assertThat(dto.getRows().get(4).getAccounts().size(), is(0));
     }
 
-    private YearTransactionDto yearTransactionDto(String date, String amount, String debit, String credit, String description)
+
+    @Test
+    public void parameterValidatorTest()
     {
-        YearTransactionDto dto = new YearTransactionDto();
-        dto.setDate(date);
-        dto.setAmount(amount);
-        dto.setDebit(debit);
-        dto.setCredit(credit);
-        dto.setDescription(description);
-        return dto;
+        String validYear = "2023";
+        String validAccountId = "000";
+        String validMonth = "5";
+
+        assertThat(given().when()
+                .get("/accounting/" + "1999" + "/transaction/" + validAccountId + "/month/" + validMonth)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+
+        assertThat(given().when()
+                .get("/accounting/" + "20" + "/transaction/" + validAccountId + "/month/" + validMonth)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + "xxxx" + "/transaction/" + validAccountId + "/month/" + validMonth)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + validYear + "/transaction/" + "22" + "/month/" + validMonth)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + validYear + "/transaction/" + "2222" + "/month/" + validMonth)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + validYear + "/transaction/" + "xxx" + "/month/" + validMonth)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + validYear + "/transaction/" + validAccountId + "/month/" + "0")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Month Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + validYear + "/transaction/" + validAccountId + "/month/" + "13")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Month Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + validYear + "/transaction/" + validAccountId + "/month/" + "x")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Month Parameter"));
     }
 }

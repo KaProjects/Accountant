@@ -25,13 +25,24 @@ public class YearTransactionDto implements Comparable<YearTransactionDto>
 
     public static YearTransactionDto from(Transaction transaction)
     {
-        YearTransactionDto dtoTransaction = new YearTransactionDto();
-        dtoTransaction.setDate(transaction.getDate());
-        dtoTransaction.setAmount(String.valueOf(transaction.getAmount()));
-        dtoTransaction.setDebit(transaction.getDebit());
-        dtoTransaction.setCredit(transaction.getCredit());
-        dtoTransaction.setDescription(transaction.getDescription());
-        return dtoTransaction;
+        YearTransactionDto dto = new YearTransactionDto();
+        dto.setDate(transaction.getDate());
+        dto.setAmount(String.valueOf(transaction.getAmount()));
+        dto.setDebit(transaction.getDebit());
+        dto.setCredit(transaction.getCredit());
+        dto.setDescription(transaction.getDescription());
+        return dto;
+    }
+
+    public static YearTransactionDto from(String date, String amount, String debit, String credit, String description)
+    {
+        YearTransactionDto dto = new YearTransactionDto();
+        dto.setDate(date);
+        dto.setAmount(amount);
+        dto.setDebit(debit);
+        dto.setCredit(credit);
+        dto.setDescription(description);
+        return dto;
     }
 
     @Override
