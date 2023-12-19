@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.lessThan;
 public class AccountingResourceTest
 {
     @Test
-    public void getTransactionsEndpointTest()
+    public void getTransactionsTest()
     {
         String year = "2023";
         String accountId = "000";
@@ -275,5 +275,43 @@ public class AccountingResourceTest
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().body().asString(), containsString("Invalid Month Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + "1999" + "/cashflow")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+
+        assertThat(given().when()
+                .get("/accounting/" + "20" + "/cashflow")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + "xxxx" + "/cashflow")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + "1999" + "/profit")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+
+        assertThat(given().when()
+                .get("/accounting/" + "20" + "/profit")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/" + "xxxx" + "/profit")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
     }
 }

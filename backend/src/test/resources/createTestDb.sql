@@ -247,13 +247,16 @@ INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VAL
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '1008', '100', '202.10', '630.0', '19x36', 'profit');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '1008', '100', '202.10', '630.0', '19x37', 'profit');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '1008', '100', '520.0', '202.10', '19x38', 'profit');
-INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '1009', '10', '553.0', '554.0', '19x41', 'same group');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '1509', '10', '553.0', '554.0', '19x41', 'same group');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '1009', '10', '553.0', '554.0', '19x42', 'same group');
-INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '1009', '10', '553.0', '554.0', '19x43', 'same group');
-INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '1009', '10', '553.0', '554.0', '19x44', 'same group');
-INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '1009', '10', '553.0', '554.0', '19x45', 'same group');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '0909', '10', '553.0', '554.0', '19x43', 'same group');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '2009', '10', '553.0', '554.0', '19x44', 'same group');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '2109', '10', '553.0', '554.0', '19x45', 'same group');
 
-
+INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'i1', 'xxx', 'all=1000');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'i1.1', 'yyy', '202.10', '630.0');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'i1.2', 'zzz', '520.0', '600.1');
+INSERT INTO Budgeting (year, id, name, debit, credit, planning) VALUES ('2019', 'i2', 'aaa', '553.0', '554.0', '50|50|50|50|50|50|100|100|100|100|100|100');
 
 
 
