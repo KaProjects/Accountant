@@ -34,48 +34,6 @@ public class BudgetResource
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/inefficient/{year}")
-    public Response getBudgetInefficient(@PathParam String year)
-    {
-        return Endpoint.process(() -> {
-            ParamValidators.validateYear(year);
-        }, () -> {
-            BudgetComponent incomeComponent = service.getBudgetComponent(year, "Income", "i");
-            BudgetComponent mandatoryExpensesComponent = service.getBudgetComponent(year, "Total Mandatory Expenses", "me");
-            BudgetComponent expensesComponent = service.getBudgetComponent(year, "Total Expenses", "e");
-
-            BudgetDto budgetDto = new BudgetDto(year, computeLastFilledMonth(List.of(incomeComponent, mandatoryExpensesComponent, expensesComponent)));
-
-            constructBudgetComponentDtoRows(incomeComponent, budgetDto, INCOME);
-
-            budgetDto.addRow(INCOME_SUM, incomeComponent.getName(), "i", incomeComponent.getActualMonths(), incomeComponent.getPlannedMonths());
-
-            constructBudgetComponentDtoRows(mandatoryExpensesComponent, budgetDto, EXPENSE);
-
-            budgetDto.addRow(EXPENSE_SUM, mandatoryExpensesComponent.getName(), "me", mandatoryExpensesComponent.getActualMonths(), mandatoryExpensesComponent.getPlannedMonths());
-
-            Integer[] netAfterTme = Utils.subtractIntegerArrays(incomeComponent.getActualMonths(), mandatoryExpensesComponent.getActualMonths());
-            Integer[] netAfterTmePlanned = Utils.subtractIntegerArrays(incomeComponent.getPlannedMonths(), mandatoryExpensesComponent.getPlannedMonths());
-            budgetDto.addRow(BALANCE, "Net after TME", "ntme", netAfterTme, netAfterTmePlanned);
-
-            constructBudgetComponentDtoRows(expensesComponent, budgetDto, EXPENSE);
-
-            Integer[] budgetCf = Utils.subtractIntegerArrays(netAfterTme, expensesComponent.getActualMonths());
-            Integer[] budgetCfPlanned = Utils.subtractIntegerArrays(netAfterTmePlanned, expensesComponent.getPlannedMonths());
-            budgetDto.addRow(BALANCE, "Budget CF", "bcf", budgetCf, budgetCfPlanned);
-
-            BudgetComponent ofBudgetComponent = service.getBudgetComponent(year, "Desired CF", "of");
-            constructBudgetComponentDtoRows(ofBudgetComponent, budgetDto, OF_BUDGET);
-            budgetDto.addRow(OF_BUDGET_BALANCE, ofBudgetComponent.getName(), "dcf", ofBudgetComponent.getActualMonths(), ofBudgetComponent.getPlannedMonths());
-
-            return budgetDto;
-        });
-    }
-
-    @GET
-    @Secured
-    @SecurityRequirement(name = "AccountantSecurity")
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}")
     public Response getBudget(@PathParam String year)
     {
@@ -87,6 +45,7 @@ public class BudgetResource
             BudgetComponent incomeComponent = budgetData.getBudgetComponent("i", "Income");
             BudgetComponent mandatoryExpensesComponent = budgetData.getBudgetComponent("me", "Total Mandatory Expenses");
             BudgetComponent expensesComponent = budgetData.getBudgetComponent("e", "Total Expenses");
+            BudgetComponent ofBudgetComponent = budgetData.getBudgetComponent("of", "Desired CF");
 
             BudgetDto budgetDto = new BudgetDto(year, computeLastFilledMonth(List.of(incomeComponent, mandatoryExpensesComponent, expensesComponent)));
 
@@ -108,7 +67,6 @@ public class BudgetResource
             Integer[] budgetCfPlanned = Utils.subtractIntegerArrays(netAfterTmePlanned, expensesComponent.getPlannedMonths());
             budgetDto.addRow(BALANCE, "Budget CF", "bcf", budgetCf, budgetCfPlanned);
 
-            BudgetComponent ofBudgetComponent = service.getBudgetComponent(year, "Desired CF", "of");
             constructBudgetComponentDtoRows(ofBudgetComponent, budgetDto, OF_BUDGET);
             budgetDto.addRow(OF_BUDGET_BALANCE, ofBudgetComponent.getName(), "dcf", ofBudgetComponent.getActualMonths(), ofBudgetComponent.getPlannedMonths());
 

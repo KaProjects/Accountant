@@ -15,34 +15,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
 
 @QuarkusTest
 public class BudgetResourceTest
 {
     @Test
     public void getBudgetTest(){
-        String year = "2019";
-
-        Response responseInefficient = given().when()
-                .get("/budget/inefficient/" + year)
+        Response response = given().when()
+                .get("/budget/2019")
                 .then()
                 .statusCode(200)
                 .extract().response();
 
-        System.out.println("inefficient response time: " + responseInefficient.time() + "ms");
+        System.out.println("response time: " + response.time() + "ms");
 
-        Response responseLatest = given().when()
-                .get("/budget/" + year)
-                .then()
-                .statusCode(200)
-                .extract().response();
-
-        System.out.println("latest response time: " + responseLatest.time() + "ms");
-
-        assertThat(responseLatest.time(), is(lessThan(responseInefficient.time())));
-
-        BudgetDto dto = responseLatest.jsonPath().getObject("", BudgetDto.class);
+        BudgetDto dto = response.jsonPath().getObject("", BudgetDto.class);
 
         assertThat(dto.getColumns().size(), is(17));
         assertThat(dto.getColumns().get(0), is("Budget 2019"));
@@ -331,7 +318,6 @@ public class BudgetResourceTest
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().body().asString(), containsString("Invalid Year Parameter"));
 
-
         assertThat(given().when()
                 .get("/budget/" + "20" + "/transaction/" + validBudgetId + "/month/" + validMonth)
                 .then()
@@ -373,7 +359,6 @@ public class BudgetResourceTest
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().body().asString(), containsString("Invalid Year Parameter"));
-
 
         assertThat(given().when()
                 .get("/budget/" + "20")

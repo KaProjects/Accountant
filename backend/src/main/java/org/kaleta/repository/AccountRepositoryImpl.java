@@ -29,7 +29,6 @@ public class AccountRepositoryImpl implements AccountRepository
                     .setParameter(4, account.getName())
                     .setParameter(5, account.getMetadata())
                     .executeUpdate();
-
         }
     }
 

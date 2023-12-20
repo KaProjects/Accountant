@@ -15,7 +15,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
 
 @QuarkusTest
 public class AccountingResourceTest
@@ -49,27 +48,15 @@ public class AccountingResourceTest
     @Test
     public void getCashFlowTest()
     {
-        String year = "2020";
-
-        Response responseInefficient = given().when()
-                .get("/accounting/inefficient/" + year + "/cashflow")
+        Response response = given().when()
+                .get("/accounting/2020/cashflow")
                 .then()
                 .statusCode(200)
                 .extract().response();
 
-        System.out.println("inefficient response time: " + responseInefficient.time() + "ms");
+        System.out.println("response time: " + response.time() + "ms");
 
-        Response responseLatest = given().when()
-                .get("/accounting/" + year + "/cashflow")
-                .then()
-                .statusCode(200)
-                .extract().response();
-
-        System.out.println("latest response time: " + responseLatest.time() + "ms");
-
-        assertThat(responseLatest.time(), is(lessThan(responseInefficient.time())));
-
-        AccountingDto dto = responseLatest.jsonPath().getObject("", AccountingDto.class);
+        AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
 
         assertThat(dto.getColumns().size(), is(15));
         assertThat(dto.getColumns().get(0), is("Cash Flow Statement 2020"));
@@ -109,27 +96,15 @@ public class AccountingResourceTest
     @Test
     public void getProfitTest()
     {
-        String year = "2019";
-
-        Response responseInefficient = given().when()
-                .get("/accounting/inefficient/" + year + "/profit")
+        Response response = given().when()
+                .get("/accounting/2019/profit")
                 .then()
                 .statusCode(200)
                 .extract().response();
 
-        System.out.println("inefficient response time: " + responseInefficient.time() + "ms");
+        System.out.println("response time: " + response.time() + "ms");
 
-        Response responseLatest = given().when()
-                .get("/accounting/" + year + "/profit")
-                .then()
-                .statusCode(200)
-                .extract().response();
-
-        System.out.println("latest response time: " + responseLatest.time() + "ms");
-
-        assertThat(responseLatest.time(), is(lessThan(responseInefficient.time())));
-
-        AccountingDto dto = responseLatest.jsonPath().getObject("", AccountingDto.class);
+        AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
 
         assertThat(dto.getColumns().size(), is(14));
         assertThat(dto.getColumns().get(0), is("Income Statement 2019"));

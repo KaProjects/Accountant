@@ -1,15 +1,12 @@
 package org.kaleta.service;
 
 import org.kaleta.entity.Account;
-import org.kaleta.entity.Schema;
 import org.kaleta.entity.Transaction;
 import org.kaleta.model.AccountingData;
-import org.kaleta.model.GroupComponent;
 import org.kaleta.model.SchemaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,40 +19,6 @@ public class AccountingServiceImpl implements AccountingService
     SchemaService schemaService;
     @Autowired
     AccountService accountService;
-
-    @Override
-    public GroupComponent getGroupComponent(String year, String groupId)
-    {
-        List<String> accountIdSuffixes = new ArrayList<>();
-        for (Schema schemaAccount : schemaService.getSchemaAccountsByGroup(year, groupId)) {
-            accountIdSuffixes.add(schemaAccount.getYearId().getId().substring(2,3));
-        }
-        return getGroupComponent(year, groupId, accountIdSuffixes.toArray(new String[]{}));
-    }
-
-    @Override
-    public GroupComponent getGroupComponent(String year, String groupId, String... accountIdSuffixes)
-    {
-        GroupComponent groupComponent = new GroupComponent();
-        groupComponent.setSchemaId(groupId);
-        groupComponent.setName(schemaService.getGroupName(year, groupId));
-
-        for (String accountIdSuffix : accountIdSuffixes) {
-            String accountId = groupId + accountIdSuffix;
-            GroupComponent.AccountComponent accountComponent = new GroupComponent.AccountComponent();
-            accountComponent.setSchemaId(accountId);
-            accountComponent.setName(schemaService.getAccountName(year, accountId));
-
-            for (Account account : accountService.listBySchema(year, accountId)){
-                if (!groupId.startsWith("5") && !groupId.startsWith("6")) {
-                    accountComponent.addInitialValue(transactionService.getInitialValue(account));
-                }
-                accountComponent.addMonthlyBalance(transactionService.monthlyBalanceByAccount(account));
-            }
-            groupComponent.getAccounts().add(accountComponent);
-        }
-        return groupComponent;
-    }
 
     @Override
     public AccountingData getCashFlowData(String year)
