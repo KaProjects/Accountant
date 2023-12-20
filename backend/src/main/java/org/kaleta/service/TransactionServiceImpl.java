@@ -127,6 +127,12 @@ public class TransactionServiceImpl implements TransactionService
         return transactionDao.listBySchema(year, schemaId, month);
     }
 
+    @Override
+    public List<Transaction> getBudgetTransactions(String year)
+    {
+        return transactionDao.listForClasses2456(year);
+    }
+
     private List<YearTransactionDto> mapYearTransactions(List<Transaction> transactions)
     {
         List<YearTransactionDto> output = new ArrayList<>();

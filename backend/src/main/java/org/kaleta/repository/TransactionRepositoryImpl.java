@@ -161,4 +161,14 @@ public class TransactionRepositoryImpl implements TransactionRepository
                 .setParameter("month", "%" + formattedMonth)
                 .getResultList();
     }
+
+    @Override
+    public List<Transaction> listForClasses2456(String year)
+    {
+        return entityManager.createQuery(selectYearly
+                        + " AND (t.debit LIKE '2%' OR t.debit LIKE '4%' OR t.debit LIKE '5%' OR t.debit LIKE '6%' OR t.credit LIKE '2%' OR t.credit LIKE '4%' OR t.credit LIKE '5%' OR t.credit LIKE '6%')"
+                        + excludeOffBalanceTransactions, Transaction.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
 }

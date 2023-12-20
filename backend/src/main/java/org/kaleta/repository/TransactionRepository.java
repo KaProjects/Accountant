@@ -89,4 +89,11 @@ public interface TransactionRepository
      * Note: off-balance transactions excluded
      */
     List<Transaction> listBySchema(String year, String schemaId, String month);
+
+    /**
+     * @return list of transactions that have debit or credit of classes 2, 4, 5 or 6.
+     *
+     * Note: off-balance transactions excluded
+     */
+    List<Transaction> listForClasses2456(String year);
 }

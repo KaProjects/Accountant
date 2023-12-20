@@ -200,7 +200,10 @@ INSERT INTO ASchema (year, id, name, type) VALUES ('2019', '70', 'group70', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2019', '701', 'account701', 'X');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2019', '2', 'class2', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2019', '20', 'group20', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2019', '201', 'account201', 'A');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2019', '202', 'account202', 'A');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2019', '21', 'group21', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2019', '210', 'account210', 'A');
 
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '600', '0', 'general', '');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '600', '1', 'second', '');
@@ -212,6 +215,12 @@ INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '630', '0', 'general', '');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '701', '0', 'general', '');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '202', '10', 'general', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '202', '20', 'general', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '201', '0', 'general', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '201', '1', 'general', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '210', '0', 'general', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '210', '1', 'general', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2019', '210', '2', 'general', '');
 
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '0502', '100', '550.0', '600.0', '19x1', 'same summary');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '0502', '100', '550.0', '600.0', '19x2', 'same summary');
@@ -253,10 +262,26 @@ INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VAL
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '2009', '10', '553.0', '554.0', '19x44', 'same group');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '2109', '10', '553.0', '554.0', '19x45', 'same group');
 
-INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'i1', 'xxx', 'all=1000');
-INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'i1.1', 'yyy', '202.10', '630.0');
-INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'i1.2', 'zzz', '520.0', '600.1');
-INSERT INTO Budgeting (year, id, name, debit, credit, planning) VALUES ('2019', 'i2', 'aaa', '553.0', '554.0', '50|50|50|50|50|50|100|100|100|100|100|100');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '2109', '10000', '202.10', '201.1', '19x51', 'vac=xxx');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '2104', '6000', '210.0', '210.2', '19x52', '');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '2104', '5000', '210.2', '210.1', '19x53', 'Sale of asds');
+
+INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'i1', 'i1', 'all=1000');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'i1.1', 'i1.1', '202.10', '630.0');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'i1.2', 'i1.2', '520.0', '600.1');
+INSERT INTO Budgeting (year, id, name, debit, credit, planning) VALUES ('2019', 'i2', 'i2', '553.0', '554.0', '50|50|50|50|50|50|100|100|100|100|100|100');
+
+INSERT INTO Budgeting (year, id, name, debit, credit, planning) VALUES ('2019', 'me1', 'me1', '550.0', '600.0', 'all=100');
+INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'me2', 'me2', 'all=2000');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'me2.1', 'me2.1', '553.0', '631.0');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'me2.2', 'me2.2', '520.0', '600.1');
+
+INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'e1', 'e1', 'all=500');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'e1.1', 'e1.1', '20%', '20%', '!vac=');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'e1.2', 'e1.2', '55%', '55%');
 
 
-
+INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2019', 'of1', 'of1', 'all=1000', '202%', '201%', 'vac=');
+INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'of2', 'of2', '1000|1000|1000|1000|1000|1000|1000|1000|0|0|0|0');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.1', 'of2.1', '210.0', '210.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'of2.2', 'of2.2', '202.10', '202.10');

@@ -28,4 +28,11 @@ public class BudgetingRepositoryImpl implements BudgetingRepository
                 .setParameter("id", id)
                 .getSingleResult();
     }
+
+    @Override
+    public List<Budgeting> getSchema(String year){
+        return entityManager.createQuery("SELECT b FROM Budgeting b WHERE b.yearId.year=:year", Budgeting.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
 }

@@ -15,6 +15,7 @@ public class BudgetDto
     private List<Row> rows = new ArrayList<>();
     private Integer lastFilledMonth;
 
+    public BudgetDto(){}
     public BudgetDto(String year, Integer lastFilledMonth)
     {
         this.lastFilledMonth = lastFilledMonth;
@@ -69,6 +70,8 @@ public class BudgetDto
         private Integer deltaAvg;
         private List<Row> subRows = new ArrayList<>();
         private Integer lastFilledMonth;
+
+        public Row(){}
         public Row(Integer lastFilledMonth)
         {
             this.lastFilledMonth = lastFilledMonth;

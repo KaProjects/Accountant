@@ -87,4 +87,9 @@ public interface TransactionService
      * Note: off-balance transactions excluded
      */
     List<Transaction> getSchemaTransactions(String year, String schemaId, String month);
+
+    /**
+     * @return list of transactions for specified year filtered to contain only transactions that are interesting for budgeting (e.i. of classes 2, 4, 5, 6)
+     */
+    List<Transaction> getBudgetTransactions(String year);
 }

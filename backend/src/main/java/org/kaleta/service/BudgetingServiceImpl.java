@@ -4,7 +4,9 @@ import org.kaleta.Utils;
 import org.kaleta.dao.BudgetingDao;
 import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Budgeting;
+import org.kaleta.entity.Transaction;
 import org.kaleta.model.BudgetComponent;
+import org.kaleta.model.BudgetingData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +64,14 @@ public class BudgetingServiceImpl implements BudgetingService
             }
         }
         return budgetComponent;
+    }
+
+    @Override
+    public BudgetingData getBudgetData(String year)
+    {
+        List<Budgeting> schema = budgetingDao.getSchema(year);
+        List<Transaction> transactions = transactionService.getBudgetTransactions(year);
+        return new BudgetingData(schema, transactions);
     }
 
     @Override
