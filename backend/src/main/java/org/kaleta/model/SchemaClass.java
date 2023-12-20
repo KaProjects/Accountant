@@ -14,6 +14,15 @@ public class SchemaClass
     private String name;
     private Map<String, Group> groups = new HashMap<>();
 
+    public SchemaClass(){}
+    public SchemaClass(String id, String name){
+        this.id = id;
+        this.name = name;
+    }
+
+    public void addGroup(Group group){
+        groups.put(group.getId(), group);
+    }
     public Group getGroup(String groupId) {
         return groups.get(groupId);
     }
@@ -30,7 +39,15 @@ public class SchemaClass
             this.name = name;
         }
 
-        public Account getAccount(String accountIdSuffix) {
+        public void addAccount(Account account){
+            accounts.put(account.getId(), account);
+        }
+
+        public Account getAccount(String accountId) {
+            return accounts.get(accountId);
+        }
+
+        public Account getAccountBySuffix(String accountIdSuffix) {
             return accounts.get(id + accountIdSuffix);
         }
 

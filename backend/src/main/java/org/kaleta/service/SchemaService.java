@@ -4,6 +4,7 @@ import org.kaleta.entity.Schema;
 import org.kaleta.model.SchemaClass;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SchemaService
 {
@@ -43,6 +44,11 @@ public interface SchemaService
     SchemaClass getClass(String year, String classId);
 
     /**
+     * @return models of all classes for specified year
+     */
+    Map<String, SchemaClass> getSchema(String year);
+
+    /**
      * @return true if specified schema account is of type Asset or Expense
      */
     boolean isDebitType(String year, String accountId);
@@ -51,4 +57,5 @@ public interface SchemaService
      * @return true if specified schema account is of type Liability or Revenue
      */
     boolean isCreditType(String year, String accountId);
+
 }

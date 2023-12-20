@@ -26,7 +26,7 @@ public class AccountingData
 
         for (String schemaAccountSuffix : accountIdSuffixes)
         {
-            SchemaClass.Group.Account schemaAccount = schemaClass.getGroup(groupId).getAccount(schemaAccountSuffix);
+            SchemaClass.Group.Account schemaAccount = schemaClass.getGroup(groupId).getAccountBySuffix(schemaAccountSuffix);
 
             GroupComponent.AccountComponent accountComponent = new GroupComponent.AccountComponent();
             accountComponent.setSchemaId(schemaAccount.getId());

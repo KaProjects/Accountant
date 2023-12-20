@@ -6,7 +6,9 @@ import org.kaleta.model.SchemaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -80,6 +82,33 @@ public class SchemaServiceImpl implements SchemaService
             }
         }
         return clazz;
+    }
+
+    @Override
+    public Map<String, SchemaClass> getSchema(String year)
+    {
+        Map<String, SchemaClass> classMap = new HashMap<>();
+        List<Schema> schemas = schemaDao.list(year);
+
+        for (Schema schema : schemas){
+            String schemaId = schema.getYearId().getId();
+            if (schemaId.length() == 1){
+                classMap.put(schemaId, new SchemaClass(schemaId, schema.getName()));
+            }
+        }
+        for (Schema schema : schemas){
+            String schemaId = schema.getYearId().getId();
+            if (schemaId.length() == 2){
+                classMap.get(schemaId.substring(0,1)).addGroup(new SchemaClass.Group(schemaId, schema.getName()));
+            }
+        }
+        for (Schema schema : schemas){
+            String schemaId = schema.getYearId().getId();
+            if (schemaId.length() == 3){
+                classMap.get(schemaId.substring(0,1)).getGroup(schemaId.substring(0,2)).addAccount(new SchemaClass.Group.Account(schemaId, schema.getName(), schema.getType()));
+            }
+        }
+        return classMap;
     }
 
     @Override

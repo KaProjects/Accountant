@@ -22,13 +22,9 @@ public class AccountingResourceTest
     @Test
     public void getTransactionsTest()
     {
-        String year = "2023";
-        String accountId = "000";
-        String month = "5";
-
         List<YearTransactionDto> transactions =
                 given().when()
-                        .get("/accounting/" + year + "/transaction/" + accountId + "/month/" + month)
+                        .get("/accounting/2023/transaction/000/month/5")
                         .then()
                         .statusCode(200)
                         .header("Content-Type", containsString(MediaType.APPLICATION_JSON))
@@ -275,7 +271,6 @@ public class AccountingResourceTest
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().body().asString(), containsString("Invalid Year Parameter"));
-
 
         assertThat(given().when()
                 .get("/accounting/" + "20" + "/profit")

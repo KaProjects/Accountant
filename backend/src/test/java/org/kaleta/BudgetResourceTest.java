@@ -280,13 +280,9 @@ public class BudgetResourceTest
     @Test
     public void getTransactionsTest()
     {
-        String year = "2019";
-        String budgetId = "i2";
-        String month = "9";
-
-        List<YearTransactionDto> transactions =
+       List<YearTransactionDto> transactions =
                 given().when()
-                        .get("/budget/" + year + "/transaction/" + budgetId + "/month/" + month)
+                        .get("/budget/2019/transaction/i2/month/9")
                         .then()
                         .statusCode(200)
                         .header("Content-Type", containsString(MediaType.APPLICATION_JSON))
@@ -298,11 +294,11 @@ public class BudgetResourceTest
                         .body("[4].date", is("2109"))
                         .extract().response().jsonPath().getList("", YearTransactionDto.class);
 
-        assertThat(transactions, hasItem(YearTransactionDto.from("1509", "10", "account553", "account554", "same group")));
-        assertThat(transactions, hasItem(YearTransactionDto.from("1009", "10", "account553", "account554", "same group")));
-        assertThat(transactions, hasItem(YearTransactionDto.from("0909", "10", "account553", "account554", "same group")));
-        assertThat(transactions, hasItem(YearTransactionDto.from("2009", "10", "account553", "account554", "same group")));
-        assertThat(transactions, hasItem(YearTransactionDto.from("2109", "10", "account553", "account554", "same group")));
+        assertThat(transactions, hasItem(YearTransactionDto.from("1509", "10", "account553", "sda ad", "same group")));
+        assertThat(transactions, hasItem(YearTransactionDto.from("1009", "10", "account553", "sda ad", "same group")));
+        assertThat(transactions, hasItem(YearTransactionDto.from("0909", "10", "account553", "sda ad", "same group")));
+        assertThat(transactions, hasItem(YearTransactionDto.from("2009", "10", "account553", "sda ad", "same group")));
+        assertThat(transactions, hasItem(YearTransactionDto.from("2109", "10", "account553", "sda ad", "same group")));
     }
 
     @Test
