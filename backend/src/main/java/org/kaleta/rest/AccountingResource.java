@@ -49,7 +49,7 @@ public class AccountingResource
 
             GroupComponent group50 = profitExpensesData.getGroupComponent(year, "50");
             GroupComponent group61 = profitRevenuesData.getGroupComponent(year, "61");
-            GroupComponent group55 = profitExpensesData.getGroupComponent(year, "56");
+            GroupComponent group56 = profitExpensesData.getGroupComponent(year, "56");
             GroupComponent group62 = profitRevenuesData.getGroupComponent(year, "62");
             GroupComponent group54 = profitExpensesData.getGroupComponent(year, "54");
             GroupComponent group63b = profitRevenuesData.getGroupComponent(year, "63", "0");
@@ -77,7 +77,7 @@ public class AccountingResource
 
             profitDto.getRows().add(from(group50, AccountingDto.Type.EXPENSE_GROUP));
             profitDto.getRows().add(from(group61, AccountingDto.Type.INCOME_GROUP));
-            profitDto.getRows().add(from(group55, AccountingDto.Type.EXPENSE_GROUP));
+            profitDto.getRows().add(from(group56, AccountingDto.Type.EXPENSE_GROUP));
             profitDto.getRows().add(from(group62, AccountingDto.Type.INCOME_GROUP));
             profitDto.getRows().add(from(group54, AccountingDto.Type.EXPENSE_GROUP));
             profitDto.getRows().add(from(group63b, AccountingDto.Type.INCOME_GROUP));
@@ -85,12 +85,98 @@ public class AccountingResource
 
             AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Profit", "np");
             Integer[] np1 = Utils.subtractIntegerArrays(operatingProfitRow.getMonthlyValues(), group50.getMonthlyBalance());
-            Integer[] np2 = Utils.subtractIntegerArrays(group61.getMonthlyBalance(), group55.getMonthlyBalance());
+            Integer[] np2 = Utils.subtractIntegerArrays(group61.getMonthlyBalance(), group56.getMonthlyBalance());
             Integer[] np3 = Utils.subtractIntegerArrays(group62.getMonthlyBalance(), group54.getMonthlyBalance());
             Integer[] np4 = Utils.subtractIntegerArrays(group63b.getMonthlyBalance(), group55b.getMonthlyBalance());
             netProfitRow.setMonthlyValues(Utils.mergeIntegerArrays(np1, np2, np3, np4));
-            netProfitRow.setTotal(operatingProfitRow.getTotal() - group50.getBalance() + group61.getBalance() - group55.getBalance()
+            netProfitRow.setTotal(operatingProfitRow.getTotal() - group50.getBalance() + group61.getBalance() - group56.getBalance()
                     + group62.getBalance() - group54.getBalance() + group63b.getBalance() - group55b.getBalance());
+            profitDto.getRows().add(netProfitRow);
+
+            return profitDto;
+        });
+    }
+
+    @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/profit")
+    public Response getOverallProfit()
+    {
+        return Endpoint.process(() -> {}, () ->
+        {
+            AccountingYearlyData yearlyData = service.getYearlyData();
+
+            String[] years = yearlyData.getYears();
+
+            AccountingData profitExpensesData = service.getProfitExpensesData(years[years.length - 1]);
+            AccountingData profitRevenuesData = service.getProfitRevenuesData(years[years.length - 1]);
+
+            GroupComponent group60 = profitRevenuesData.getGroupComponent(years[years.length - 1], "60");
+            GroupComponent group55a = profitExpensesData.getGroupComponent(years[years.length - 1], "55", "0", "1", "2");
+            GroupComponent group63a = profitRevenuesData.getGroupComponent(years[years.length - 1], "63", "1", "2", "3");
+
+            GroupComponent group51 = profitExpensesData.getGroupComponent(years[years.length - 1], "51");
+            GroupComponent group52 = profitExpensesData.getGroupComponent(years[years.length - 1], "52");
+            GroupComponent group53 = profitExpensesData.getGroupComponent(years[years.length - 1], "53");
+
+            GroupComponent group50 = profitExpensesData.getGroupComponent(years[years.length - 1], "50");
+            GroupComponent group61 = profitRevenuesData.getGroupComponent(years[years.length - 1], "61");
+            GroupComponent group56 = profitExpensesData.getGroupComponent(years[years.length - 1], "56");
+            GroupComponent group62 = profitRevenuesData.getGroupComponent(years[years.length - 1], "62");
+            GroupComponent group54 = profitExpensesData.getGroupComponent(years[years.length - 1], "54");
+            GroupComponent group63b = profitRevenuesData.getGroupComponent(years[years.length - 1], "63", "0");
+            GroupComponent group55b = profitExpensesData.getGroupComponent(years[years.length - 1], "55", "3", "4", "5");
+
+            AccountingDto profitDto = new AccountingDto(yearlyData.getYears(), AccountingDto.Type.PROFIT_SUMMARY);
+
+            AccountingDto.Row row60 = from(group60, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("60"));
+            profitDto.getRows().add(row60);
+            AccountingDto.Row row55a = from(group55a, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("55", "0", "1", "2"));
+            profitDto.getRows().add(row55a);
+            AccountingDto.Row row63a = from(group63a, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("63", "1", "2", "3"));
+            profitDto.getRows().add(row63a);
+
+            AccountingDto.Row netIncomeRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Income", "ni");
+            netIncomeRow.setYearlyValues(Utils.addIntegerArrays(Utils.subtractIntegerArrays(row60.getYearlyValues(), row55a.getYearlyValues()), row63a.getYearlyValues()));
+            netIncomeRow.setTotal(Utils.sumArray(netIncomeRow.getYearlyValues()));
+            profitDto.getRows().add(netIncomeRow);
+
+            AccountingDto.Row row51 = from(group51, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("51"));
+            profitDto.getRows().add(row51);
+            AccountingDto.Row row52 = from(group52, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("52"));
+            profitDto.getRows().add(row52);
+            AccountingDto.Row row53 = from(group53, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("53"));
+            profitDto.getRows().add(row53);
+
+            AccountingDto.Row operatingProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Operating Profit", "op");
+            operatingProfitRow.setYearlyValues(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(netIncomeRow.getYearlyValues(), row51.getYearlyValues()), row52.getYearlyValues()), row53.getYearlyValues()));
+            operatingProfitRow.setTotal(Utils.sumArray(operatingProfitRow.getYearlyValues()));
+            profitDto.getRows().add(operatingProfitRow);
+
+            AccountingDto.Row row50 = from(group50, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("50"));
+            profitDto.getRows().add(row50);
+            AccountingDto.Row row61 = from(group61, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("61"));
+            profitDto.getRows().add(row61);
+            AccountingDto.Row row56 = from(group56, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("56"));
+            profitDto.getRows().add(row56);
+            AccountingDto.Row row62 = from(group62, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("62"));
+            profitDto.getRows().add(row62);
+            AccountingDto.Row row54 = from(group54, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("54"));
+            profitDto.getRows().add(row54);
+            AccountingDto.Row row63b = from(group63b, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("63", "0"));
+            profitDto.getRows().add(row63b);
+            AccountingDto.Row row55b = from(group55b, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("55", "3", "4", "5"));
+            profitDto.getRows().add(row55b);
+
+            AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Profit", "np");
+            Integer[] np1 = Utils.subtractIntegerArrays(operatingProfitRow.getYearlyValues(), row50.getYearlyValues());
+            Integer[] np2 = Utils.subtractIntegerArrays(row61.getYearlyValues(), row56.getYearlyValues());
+            Integer[] np3 = Utils.subtractIntegerArrays(row62.getYearlyValues(), row54.getYearlyValues());
+            Integer[] np4 = Utils.subtractIntegerArrays(row63b.getYearlyValues(), row55b.getYearlyValues());
+            netProfitRow.setYearlyValues(Utils.mergeIntegerArrays(np1, np2, np3, np4));
+            netProfitRow.setTotal(Utils.sumArray(netProfitRow.getYearlyValues()));
             profitDto.getRows().add(netProfitRow);
 
             return profitDto;
