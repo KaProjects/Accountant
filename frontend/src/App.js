@@ -15,7 +15,7 @@ class App extends Component {
         this.state = {
             token: null,
             year: new Date().getFullYear(),
-            isYearly: true, // toggles year's switch in MainBar
+            isYearly: false, // toggles year's switch in MainBar
             setYearly: this.setYearly.bind(this)
         }
 
@@ -74,6 +74,7 @@ class App extends Component {
                         <Route exact path="/financial/assets/:all" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/financial/assets" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/accounting/:type" element={<AccountingStatement {...this.state}/> }/>
+                        <Route exact path="/accounting/:type/:year" element={<AccountingStatement setYear={this.setYear} {...this.state}/> }/>
                         <Route path="*" element={this.PageNotFound()} />
                     </Routes>
                 </BrowserRouter>

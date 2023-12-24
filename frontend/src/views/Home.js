@@ -22,7 +22,7 @@ const Home = props => {
             Accounting
         </Typography>
         <Stack direction="row" justifyContent="center" alignItems="flex-start" spacing={0.5}>
-            <Card sx={{ width: 300, height: 200}} raised style={{backgroundColor:"#ffc107"}}>
+            <Card sx={{ width: 300, height: 230}} raised style={{backgroundColor:"#ffc107"}}>
                 <ButtonBase onClick={event => window.location.href='/accounting/profit'}>
                     <CardContent>
                         <Typography variant="h5" component="div" align={"center"}>
@@ -37,20 +37,22 @@ const Home = props => {
                     </CardContent>
                 </ButtonBase>
             </Card>
-            <Card sx={{ width: 300, height: 200 }} raised style={{backgroundColor:"#ffc107"}}>
-                <ButtonBase onClick={event => window.location.href='/accounting/cashflow'}>
-                    <CardContent>
-                        <Typography variant="h5" component="div" align={"center"}>
-                            Cash Flow Statement
-                        </Typography>
-                        <Typography align={"center"}>
-                            <CurrencyExchangeIcon/>
-                        </Typography>
-                        <Typography variant="caption">
-                            The cash flow statement (CFS) measures how well a company generates cash to pay its debt obligations, fund its operating expenses, and fund investments.
-                        </Typography>
-                    </CardContent>
-                </ButtonBase>
+            <Card sx={{ width: 300, height: 230 }} raised style={{backgroundColor:"#ffc107"}}>
+                <CardContent>
+                    <Typography variant="h5" component="div" align={"center"}>
+                        Cash Flow Statement
+                    </Typography>
+                    <Typography align={"center"}>
+                        <CurrencyExchangeIcon/>
+                    </Typography>
+                    <Typography variant="caption">
+                        The cash flow statement (CFS) measures how well a company generates cash to pay its debt obligations, fund its operating expenses, and fund investments.
+                    </Typography>
+                </CardContent>
+                <CardActions style={{justifyContent: 'center'}}>
+                    <Button size="small" onClick={event => window.location.href='/accounting/cashflow'}>Yearly</Button>
+                    <Button size="small" onClick={event => window.location.href='/accounting/cashflow/overall'}>Overall</Button>
+                </CardActions>
             </Card>
 
             {/*import AccountBalanceIcon from '@mui/icons-material/AccountBalance';*/}

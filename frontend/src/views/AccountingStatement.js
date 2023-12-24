@@ -6,15 +6,17 @@ import {IconButton, Table, TableBody, TableCell, TableContainer, TableHead, Tabl
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import TransactionsDialog from "../components/TransactionsDialog";
 import {useParams} from "react-router-dom";
-
+import LaunchIcon from '@mui/icons-material/Launch';
 
 const AccountingStatement = props => {
     let { type } = useParams();
+    let { year } = useParams();
 
-    const {data, loaded, error} = useData("/accounting/" + type + "/" + props.year)
+    const {data, loaded, error} = useData("/accounting/" + type + "/" + (year === 'overall' ? "" : year === undefined ? props.year : year))
 
     useEffect(() => {
-        props.setYearly(true)
+        if (year !== undefined && year !== 'overall') props.setYear(year);
+        props.setYearly(year === undefined)
         // eslint-disable-next-line
     }, []);
 
@@ -34,6 +36,12 @@ const AccountingStatement = props => {
         setTransactionsDialogRowName(rowName)
         setTransactionsDialogRowId(rowId)
         setTransactionsDialogMonth(month)
+    }
+
+    const [redirectYearIndex, setRedirectYearIndex] = React.useState(-1);
+
+    const redirectToYear = () => {
+        window.location.href='/accounting/' + type + "/" + data.columns[redirectYearIndex]
     }
 
     function getHeaderStyle(index) {
@@ -116,33 +124,35 @@ const AccountingStatement = props => {
                     <TableCell key={-1} style={getRowStyle(row.type, true, true)}>
                         {" " + row.name}
                     </TableCell>
-                    {row.type.startsWith("CASH_FLOW_") &&
+                    {year !== 'overall' && row.type.startsWith("CASH_FLOW_") &&
                         <TableCell key={-2} align="right" style={getRowStyle(row.type, false, true)}>
                             {row.initial}
                         </TableCell>
                     }
-                    {row.monthlyValues.map((month, index) => (
+                    {year !== 'overall' && row.monthlyValues.map((month, index) => (
                         <TableCell
                             align="right" key={index}
                             style={getRowStyle(row.type, false, false)}
                         >
                             {month}
-                            {row.schemaId === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
-                                <IconButton
-                                    style={{height: "2px", width: "25px"}}
-                                    onClick={() => setShowTransactionsDialog(true)}
-                                >
-                                    <ReceiptLongIcon sx={{width: 18}}/>
-                                </IconButton>
-                            }
                         </TableCell>
                     ))}
-                    <TableCell
-                        align="right" key={12}
-                        style={getRowStyle(row.type, true, true)}
-                    >
-                        {row.total}
-                    </TableCell>
+                    {year === 'overall' && row.yearlyValues.map((year, index) => (
+                        <TableCell
+                            align="right" key={index}
+                            style={getRowStyle(row.type, false, false)}
+                        >
+                            {year}
+                        </TableCell>
+                    ))}
+                    {(year !== 'overall' || row.type === "profit") &&
+                        <TableCell
+                            align="right" key={12}
+                            style={getRowStyle(row.type, true, true)}
+                        >
+                            {row.total}
+                        </TableCell>
+                    }
                 </TableRow>
                 {showAccounts[id] && row.accounts.map((account, index) => (
                     <TableRow key={id + "a" + index}>
@@ -191,7 +201,21 @@ const AccountingStatement = props => {
                         <TableHead>
                             <TableRow key={-1}>
                                 {data.columns.map((column, index) => (
-                                    <TableCell key={index} style={getHeaderStyle(index)}>{column}</TableCell>
+                                    <TableCell key={index}
+                                               style={getHeaderStyle(index)}
+                                               onClick={() => {if (index !== 0) setRedirectYearIndex(index)}}
+                                               onMouseLeave={() => setRedirectYearIndex(-1)}
+                                    >
+                                        {column}
+                                        {year === 'overall' && index === redirectYearIndex &&
+                                            <IconButton
+                                                style={{height: "2px", width: "25px"}}
+                                                onClick={() => redirectToYear()}
+                                            >
+                                                <LaunchIcon sx={{width: 18}}/>
+                                            </IconButton>
+                                        }
+                                    </TableCell>
                                 ))}
                             </TableRow>
                         </TableHead>
