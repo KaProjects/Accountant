@@ -51,21 +51,15 @@ public class AccountResourceTest
     public void parameterValidatorTest()
     {
         assertThat(given().when()
-                .get("/account/1999")
+                .get("/account/2x20")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().body().asString(), containsString("Invalid Year Parameter"));
 
         assertThat(given().when()
-                .get("/account/20")
+                .get("/account/2014")
                 .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
-
-        assertThat(given().when()
-                .get("/account/xxx")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
     }
 }

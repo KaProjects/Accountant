@@ -309,22 +309,16 @@ public class BudgetResourceTest
         String validMonth = "9";
 
         assertThat(given().when()
-                .get("/budget/" + "1999" + "/transaction/" + validBudgetId + "/month/" + validMonth)
+                .get("/budget/" + "2x20" + "/transaction/" + validBudgetId + "/month/" + validMonth)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().body().asString(), containsString("Invalid Year Parameter"));
 
         assertThat(given().when()
-                .get("/budget/" + "20" + "/transaction/" + validBudgetId + "/month/" + validMonth)
+                .get("/budget/" + "2014" + "/transaction/" + validBudgetId + "/month/" + validMonth)
                 .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
-
-        assertThat(given().when()
-                .get("/budget/" + "xxxx" + "/transaction/" + validBudgetId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
 
         assertThat(given().when()
                 .get("/budget/" + validYear + "/transaction/" + "x1" + "/month/" + validMonth)
@@ -351,21 +345,15 @@ public class BudgetResourceTest
                 .extract().body().asString(), containsString("Invalid Month Parameter"));
 
         assertThat(given().when()
-                .get("/budget/" + "1999")
+                .get("/budget/" + "2x20")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().body().asString(), containsString("Invalid Year Parameter"));
 
         assertThat(given().when()
-                .get("/budget/" + "20")
+                .get("/budget/" + "2014")
                 .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
-
-        assertThat(given().when()
-                .get("/budget/" + "xxxx")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
     }
 }

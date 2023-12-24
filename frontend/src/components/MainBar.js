@@ -22,10 +22,11 @@ const MainBar = props => {
 
                     {props.isYearly &&
                     <>
-                        <Button color="inherit" onClick={() => props.setYear(props.year - 1)}>
-                            <ArrowLeftIcon/>
-                        </Button>
-
+                        {2015 < props.year &&
+                            <Button color="inherit" onClick={() => props.setYear(props.year - 1)}>
+                                <ArrowLeftIcon/>
+                            </Button>
+                        }
                         <Typography variant="h6" noWrap component="div">
                             {props.year}
                         </Typography>

@@ -10,8 +10,12 @@ public class ParamValidators
         if (year == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Year Parameter is NULL");
         }
-        if (!year.matches("20\\d\\d"))
+        if (!year.matches("\\d\\d\\d\\d")){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter: '" + year + "'");
+        }
+        if (Integer.parseInt(year) < 2015){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Year '" + year + "' not found");
+        }
     }
 
     public static void validateDebitPrefix(String debitPrefix)
