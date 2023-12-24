@@ -10,13 +10,12 @@ import LaunchIcon from '@mui/icons-material/Launch';
 
 const AccountingStatement = props => {
     let { type } = useParams();
-    let { year } = useParams();
+    let { overall } = useParams();
 
-    const {data, loaded, error} = useData("/accounting/" + type + "/" + (year === 'overall' ? "" : year === undefined ? props.year : year))
+    const {data, loaded, error} = useData("/accounting/" + type + "/" + (overall === undefined ? props.year : ""))
 
     useEffect(() => {
-        if (year !== undefined && year !== 'overall') props.setYear(year);
-        props.setYearly(year === undefined)
+        props.setYearly(overall === undefined)
         // eslint-disable-next-line
     }, []);
 
@@ -41,7 +40,8 @@ const AccountingStatement = props => {
     const [redirectYearIndex, setRedirectYearIndex] = React.useState(-1);
 
     const redirectToYear = () => {
-        window.location.href='/accounting/' + type + "/" + data.columns[redirectYearIndex]
+        sessionStorage.setItem('year', data.columns[redirectYearIndex])
+        window.location.href='/accounting/' + type
     }
 
     function getHeaderStyle(index) {
@@ -124,12 +124,12 @@ const AccountingStatement = props => {
                     <TableCell key={-1} style={getRowStyle(row.type, true, true)}>
                         {" " + row.name}
                     </TableCell>
-                    {year !== 'overall' && row.type.startsWith("CASH_FLOW_") &&
+                    {overall === undefined && row.type.startsWith("CASH_FLOW_") &&
                         <TableCell key={-2} align="right" style={getRowStyle(row.type, false, true)}>
                             {row.initial}
                         </TableCell>
                     }
-                    {year !== 'overall' && row.monthlyValues.map((month, index) => (
+                    {overall === undefined && row.monthlyValues.map((month, index) => (
                         <TableCell
                             align="right" key={index}
                             style={getRowStyle(row.type, false, false)}
@@ -137,7 +137,7 @@ const AccountingStatement = props => {
                             {month}
                         </TableCell>
                     ))}
-                    {year === 'overall' && row.yearlyValues.map((year, index) => (
+                    {overall !== undefined && row.yearlyValues.map((year, index) => (
                         <TableCell
                             align="right" key={index}
                             style={getRowStyle(row.type, false, false)}
@@ -145,7 +145,7 @@ const AccountingStatement = props => {
                             {year}
                         </TableCell>
                     ))}
-                    {(year !== 'overall' || row.type === "profit") &&
+                    {(overall === undefined || row.type === "profit") &&
                         <TableCell
                             align="right" key={12}
                             style={getRowStyle(row.type, true, true)}
@@ -207,7 +207,7 @@ const AccountingStatement = props => {
                                                onMouseLeave={() => setRedirectYearIndex(-1)}
                                     >
                                         {column}
-                                        {year === 'overall' && index === redirectYearIndex &&
+                                        {overall !== undefined && index === redirectYearIndex &&
                                             <IconButton
                                                 style={{height: "2px", width: "25px"}}
                                                 onClick={() => redirectToYear()}

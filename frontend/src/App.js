@@ -12,9 +12,19 @@ import Home from "./views/Home";
 class App extends Component {
     constructor(props) {
         super(props);
+
+        function retrieveYear() {
+            let sessionYear = sessionStorage.getItem('year')
+            if (sessionYear !== null){
+                return parseInt(sessionYear);
+            } else {
+                return new Date().getFullYear()
+            }
+        }
+
         this.state = {
             token: null,
-            year: new Date().getFullYear(),
+            year: retrieveYear(),
             isYearly: false, // toggles year's switch in MainBar
             setYearly: this.setYearly.bind(this)
         }
@@ -42,6 +52,7 @@ class App extends Component {
     }
 
     setYear(year){
+        sessionStorage.setItem('year', year);
         this.setState({year: year})
     }
 
@@ -74,7 +85,7 @@ class App extends Component {
                         <Route exact path="/financial/assets/:all" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/financial/assets" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/accounting/:type" element={<AccountingStatement {...this.state}/> }/>
-                        <Route exact path="/accounting/:type/:year" element={<AccountingStatement setYear={this.setYear} {...this.state}/> }/>
+                        <Route exact path="/accounting/:type/:overall" element={<AccountingStatement {...this.state}/> }/>
                         <Route path="*" element={this.PageNotFound()} />
                     </Routes>
                 </BrowserRouter>
