@@ -40,10 +40,10 @@ public class AccountResource
             accounts.forEach(account -> {
                 String schemaId = account.getSchemaId();
                 SchemaClass clazz = schema.get(schemaId.substring(0,1));
-                account.setSchemaClassName(clazz.getName());
+                account.setClazz(clazz.getName());
                 SchemaClass.Group group = clazz.getGroup(schemaId.substring(0,2));
-                account.setSchemaGroupName(group.getName());
-                account.setSchemaAccountName(group.getAccount(schemaId).getName());
+                account.setGroup(group.getName());
+                account.setAccount(group.getAccount(schemaId).getName());
             });
             return accounts;
         });

@@ -14,9 +14,9 @@ public class YearAccountDto
     private String name;
     private String metadata;
 
-    private String schemaAccountName;
-    private String schemaGroupName;
-    private String schemaClassName;
+    private String account;
+    private String group;
+    private String clazz;
 
     public static YearAccountDto from(Account account)
     {
@@ -42,9 +42,9 @@ public class YearAccountDto
         dto.setSemanticId(semanticId);
         dto.setName(name);
         dto.setMetadata(metadata);
-        dto.setSchemaClassName(schemaClassName);
-        dto.setSchemaGroupName(schemaGroupName);
-        dto.setSchemaAccountName(schemaAccountName);
+        dto.setClazz(schemaClassName);
+        dto.setGroup(schemaGroupName);
+        dto.setAccount(schemaAccountName);
         return dto;
     }
 }
