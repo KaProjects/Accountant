@@ -7,6 +7,7 @@ import org.kaleta.dto.AccountingDto;
 import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Transaction;
 import org.kaleta.model.AccountingData;
+import org.kaleta.model.AccountingYearlyData;
 import org.kaleta.model.GroupComponent;
 import org.kaleta.service.AccountingService;
 
@@ -29,7 +30,7 @@ public class AccountingResource
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{year}/profit")
+    @Path("/profit/{year}")
     public Response getProfit(@PathParam String year)
     {
         return Endpoint.process(() -> {
@@ -100,7 +101,7 @@ public class AccountingResource
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{year}/cashflow")
+    @Path("/cashflow/{year}")
     public Response getCashFlow(@PathParam String year)
     {
         return Endpoint.process(() -> {
@@ -134,6 +135,48 @@ public class AccountingResource
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/cashflow")
+    public Response getOverallCashFlow()
+    {
+        return Endpoint.process(() -> {}, () -> {
+            AccountingYearlyData yearlyData = service.getYearlyData();
+
+            String[] years = yearlyData.getYears();
+
+            AccountingData cashFlowData = service.getCashFlowData(years[years.length - 1]);
+            GroupComponent group20 = cashFlowData.getGroupComponent(years[years.length - 1], "20");
+            GroupComponent group21 = cashFlowData.getGroupComponent(years[years.length - 1], "21");
+            GroupComponent group23 = cashFlowData.getGroupComponent(years[years.length - 1], "23");
+            GroupComponent group22 = cashFlowData.getGroupComponent(years[years.length - 1], "22").inverted();
+
+            AccountingDto cashFlowDto = new AccountingDto(yearlyData.getYears(), AccountingDto.Type.CASH_FLOW_SUMMARY);
+
+            AccountingDto.Row row20 = from(group20, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyValuesFor("20"));
+            cashFlowDto.getRows().add(row20);
+
+            AccountingDto.Row row21 = from(group21, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyValuesFor("21"));
+            cashFlowDto.getRows().add(row21);
+
+            AccountingDto.Row row23 = from(group23, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyValuesFor("23"));
+            cashFlowDto.getRows().add(row23);
+
+            Integer[] group22Yearly = yearlyData.getYearlyValuesFor("22");
+            for (int i=0;i<group22Yearly.length;i++) group22Yearly[i] = -group22Yearly[i];
+            AccountingDto.Row row22 = from(group22, AccountingDto.Type.CASH_FLOW_GROUP, group22Yearly);
+            cashFlowDto.getRows().add(row22);
+
+            AccountingDto.Row cashFlowRow = new AccountingDto.Row(AccountingDto.Type.CASH_FLOW_SUMMARY, "Cash Flow", "cf");
+            cashFlowRow.setYearlyValues(Utils.mergeIntegerArrays(row20.getYearlyValues(), row21.getYearlyValues(), row23.getYearlyValues(), row22.getYearlyValues()));
+            cashFlowDto.getRows().add(cashFlowRow);
+
+           return cashFlowDto;
+        });
+    }
+
+    @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/transaction/{accountId}/month/{month}")
     public Response getTransactions(@PathParam String year, @PathParam String accountId, @PathParam String month)
     {
@@ -145,6 +188,15 @@ public class AccountingResource
             List<Transaction> transactions = service.getSchemaTransactions(year, accountId, month);
             return YearTransactionDto.from(transactions).stream().sorted().collect(Collectors.toList());
         });
+    }
+
+    private AccountingDto.Row from(GroupComponent groupComponent, AccountingDto.Type type, Integer[] yearly)
+    {
+        AccountingDto.Row row = new AccountingDto.Row(type, groupComponent.getName(), groupComponent.getSchemaId());
+        yearly[yearly.length - 1] = groupComponent.getBalance();
+        row.setYearlyValues(yearly);
+        row.setTotal(Utils.sumArray(yearly));
+        return row;
     }
 
     private AccountingDto.Row from(GroupComponent groupComponent, AccountingDto.Type type)

@@ -96,4 +96,9 @@ public interface TransactionRepository
      * Note: off-balance transactions excluded
      */
     List<Transaction> listForClasses2456(String year);
+
+    /**
+     * @return list of transactions that have debit or credit of closing account ID.
+     */
+    List<Transaction> listClosingTransactions();
 }

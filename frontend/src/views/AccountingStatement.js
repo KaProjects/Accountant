@@ -11,7 +11,7 @@ import {useParams} from "react-router-dom";
 const AccountingStatement = props => {
     let { type } = useParams();
 
-    const {data, loaded, error} = useData("/accounting/" + props.year + "/" + type)
+    const {data, loaded, error} = useData("/accounting/" + type + "/" + props.year)
 
     useEffect(() => {
         props.setYearly(true)

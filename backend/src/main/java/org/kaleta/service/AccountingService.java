@@ -2,6 +2,7 @@ package org.kaleta.service;
 
 import org.kaleta.entity.Transaction;
 import org.kaleta.model.AccountingData;
+import org.kaleta.model.AccountingYearlyData;
 
 import java.util.List;
 
@@ -26,4 +27,9 @@ public interface AccountingService
      * @return list of transactions for specified ID, year and month
      */
     List<Transaction> getSchemaTransactions(String year, String schemaId, String month);
+
+    /**
+     * @return closing data for all but active years
+     */
+    AccountingYearlyData getYearlyData();
 }

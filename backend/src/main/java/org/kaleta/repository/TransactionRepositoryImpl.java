@@ -171,4 +171,13 @@ public class TransactionRepositoryImpl implements TransactionRepository
                 .setParameter("year", year)
                 .getResultList();
     }
+
+    @Override
+    public List<Transaction> listClosingTransactions()
+    {
+        return entityManager.createQuery("SELECT t FROM Transaction t WHERE"
+                        + " t.debit=:closing OR t.credit=:closing", Transaction.class)
+                .setParameter("closing", Constants.Account.CLOSING_ACC_ID)
+                .getResultList();
+    }
 }

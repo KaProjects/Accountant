@@ -92,4 +92,9 @@ public interface TransactionService
      * @return list of transactions for specified year filtered to contain only transactions that are interesting for budgeting (e.i. of classes 2, 4, 5, 6)
      */
     List<Transaction> getBudgetTransactions(String year);
+
+    /**
+     * @return list of closing transactions for all years
+     */
+    List<Transaction> getClosingTransactions();
 }

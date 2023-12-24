@@ -133,6 +133,12 @@ public class TransactionServiceImpl implements TransactionService
         return transactionDao.listForClasses2456(year);
     }
 
+    @Override
+    public List<Transaction> getClosingTransactions()
+    {
+        return transactionDao.listClosingTransactions();
+    }
+
     private List<YearTransactionDto> mapYearTransactions(List<Transaction> transactions)
     {
         List<YearTransactionDto> output = new ArrayList<>();

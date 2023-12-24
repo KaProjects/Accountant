@@ -280,8 +280,21 @@ INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'e1', 'e1', 'al
 INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'e1.1', 'e1.1', '20%', '20%', '!vac=');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'e1.2', 'e1.2', '55%', '55%');
 
-
 INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2019', 'of1', 'of1', 'all=1000', '202%', '201%', 'vac=');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'of2', 'of2', '1000|1000|1000|1000|1000|1000|1000|1000|0|0|0|0');
 INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.1', 'of2.1', '210.0', '210.1', 'finXasset');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'of2.2', 'of2.2', '202.10', '202.10');
+
+
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2017', '3112', '1000', '200.0', '701.0', 'cx1', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2017', '3112', '2000', '210.0', '701.0', 'cx2', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2017', '3112', '3000', '220.0', '701.0', 'cx3', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2017', '3112', '4000', '230.0', '701.0', 'cx4', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '3112', '1100', '200.0', '701.0', 'cx5', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '3112', '2200', '210.0', '701.0', 'cx6', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '3112', '3300', '220.0', '701.0', 'cx7', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '3112', '4400', '230.0', '701.0', 'cx8', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '3112', '1500', '200.0', '701.0', 'cx9', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '3112', '2500', '210.0', '701.0', 'cx10', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '3112', '3500', '220.0', '701.0', 'cx11', 'closing');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '3112', '4500', '230.0', '701.0', 'cx12', 'closing');

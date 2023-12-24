@@ -3,6 +3,7 @@ package org.kaleta.service;
 import org.kaleta.entity.Account;
 import org.kaleta.entity.Transaction;
 import org.kaleta.model.AccountingData;
+import org.kaleta.model.AccountingYearlyData;
 import org.kaleta.model.SchemaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,5 +71,12 @@ public class AccountingServiceImpl implements AccountingService
         });
 
         return transactions;
+    }
+
+    @Override
+    public AccountingYearlyData getYearlyData()
+    {
+        List<Transaction> transactions = transactionService.getClosingTransactions();
+        return new AccountingYearlyData(transactions);
     }
 }

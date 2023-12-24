@@ -31,6 +31,19 @@ public class AccountingDto
         columns.add("Total");
     }
 
+    public AccountingDto(String[] years, Type type)
+    {
+        if (type == Type.PROFIT_SUMMARY) {
+            columns.add("Yearly Income Statement");
+            columns.addAll(List.of(years));
+            columns.add("Total");
+        }
+        if (type == Type.CASH_FLOW_SUMMARY) {
+            columns.add("Yearly Cash Flow Statement");
+            columns.addAll(List.of(years));
+        }
+    }
+
     @Data
     public static class Row
     {
@@ -39,6 +52,7 @@ public class AccountingDto
         private String schemaId;
         private Integer initial = null;
         private Integer[] monthlyValues;
+        private Integer[] yearlyValues;
         private Integer total;
         private List<Row> accounts = new ArrayList<>();
 
