@@ -31,5 +31,10 @@ public interface AccountingService
     /**
      * @return closing data for all but active years
      */
-    AccountingYearlyData getYearlyData();
+    AccountingYearlyData getYearlyClosingData();
+
+    /**
+     * @return profit data for all but active years
+     */
+    AccountingYearlyData getYearlyProfitData();
 }

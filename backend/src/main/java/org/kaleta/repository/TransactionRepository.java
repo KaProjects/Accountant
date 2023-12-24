@@ -98,7 +98,12 @@ public interface TransactionRepository
     List<Transaction> listForClasses2456(String year);
 
     /**
-     * @return list of transactions that have debit or credit of closing account ID.
+     * @return list of transactions that have debit or credit of closing account ID (701.0).
      */
     List<Transaction> listClosingTransactions();
+
+    /**
+     * @return list of transactions that have debit or credit of profit account ID (710.0).
+     */
+    List<Transaction> listProfitTransactions();
 }

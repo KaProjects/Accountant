@@ -145,7 +145,7 @@ const AccountingStatement = props => {
                             {year}
                         </TableCell>
                     ))}
-                    {(overall === undefined || row.type === "profit") &&
+                    {(overall === undefined || type === "profit") &&
                         <TableCell
                             align="right" key={12}
                             style={getRowStyle(row.type, true, true)}

@@ -180,4 +180,13 @@ public class TransactionRepositoryImpl implements TransactionRepository
                 .setParameter("closing", Constants.Account.CLOSING_ACC_ID)
                 .getResultList();
     }
+
+    @Override
+    public List<Transaction> listProfitTransactions()
+    {
+        return entityManager.createQuery("SELECT t FROM Transaction t WHERE"
+                        + " t.debit=:closing OR t.credit=:closing", Transaction.class)
+                .setParameter("closing", Constants.Account.PROFIT_ACC_ID)
+                .getResultList();
+    }
 }

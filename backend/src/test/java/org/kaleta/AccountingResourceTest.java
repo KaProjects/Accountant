@@ -251,13 +251,13 @@ public class AccountingResourceTest
 
         assertThat(dto.getRows().get(0).getSchemaId(), is("60"));
         assertThat(dto.getRows().get(0).getType(), is(AccountingDto.Type.INCOME_GROUP));
-        assertThat(dto.getRows().get(0).getYearlyValues(), is(new Integer[]{1000, 100, 10000, 1000}));
-        assertThat(dto.getRows().get(0).getTotal(), is(12100));
+        assertThat(dto.getRows().get(0).getYearlyValues(), is(new Integer[]{1000, 100, 10, 1000}));
+        assertThat(dto.getRows().get(0).getTotal(), is(2110));
 
         assertThat(dto.getRows().get(1).getSchemaId(), is("55"));
         assertThat(dto.getRows().get(1).getType(), is(AccountingDto.Type.EXPENSE_GROUP));
-        assertThat(dto.getRows().get(1).getYearlyValues(), is(new Integer[]{2000, 200, 10000, 1000}));
-        assertThat(dto.getRows().get(1).getTotal(), is(13200));
+        assertThat(dto.getRows().get(1).getYearlyValues(), is(new Integer[]{2000, 200, 20, 1000}));
+        assertThat(dto.getRows().get(1).getTotal(), is(3220));
 
         assertThat(dto.getRows().get(2).getSchemaId(), is("63"));
         assertThat(dto.getRows().get(2).getType(), is(AccountingDto.Type.INCOME_GROUP));
@@ -266,8 +266,8 @@ public class AccountingResourceTest
 
         assertThat(dto.getRows().get(3).getSchemaId(), is("ni"));
         assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.PROFIT_SUMMARY));
-        assertThat(dto.getRows().get(3).getYearlyValues(), is(new Integer[]{2000, 200, 30, 0}));
-        assertThat(dto.getRows().get(3).getTotal(), is(2230));
+        assertThat(dto.getRows().get(3).getYearlyValues(), is(new Integer[]{2000, 200, 20, 0}));
+        assertThat(dto.getRows().get(3).getTotal(), is(2220));
 
         assertThat(dto.getRows().get(4).getSchemaId(), is("51"));
         assertThat(dto.getRows().get(4).getType(), is(AccountingDto.Type.EXPENSE_GROUP));
@@ -286,8 +286,8 @@ public class AccountingResourceTest
 
         assertThat(dto.getRows().get(7).getSchemaId(), is("op"));
         assertThat(dto.getRows().get(7).getType(), is(AccountingDto.Type.PROFIT_SUMMARY));
-        assertThat(dto.getRows().get(7).getYearlyValues(), is(new Integer[]{-13000, -1300, -120, 0}));
-        assertThat(dto.getRows().get(7).getTotal(), is(-14420));
+        assertThat(dto.getRows().get(7).getYearlyValues(), is(new Integer[]{-13000, -1300, -130, 0}));
+        assertThat(dto.getRows().get(7).getTotal(), is(-14430));
 
         assertThat(dto.getRows().get(10).getSchemaId(), is("56"));
         assertThat(dto.getRows().get(10).getType(), is(AccountingDto.Type.EXPENSE_GROUP));
@@ -306,8 +306,8 @@ public class AccountingResourceTest
 
         assertThat(dto.getRows().get(15).getSchemaId(), is("np"));
         assertThat(dto.getRows().get(15).getType(), is(AccountingDto.Type.PROFIT_SUMMARY));
-        assertThat(dto.getRows().get(15).getYearlyValues(), is(new Integer[]{-14000, -1400, -130, 1000}));
-        assertThat(dto.getRows().get(15).getTotal(), is(-14530));
+        assertThat(dto.getRows().get(15).getYearlyValues(), is(new Integer[]{-14000, -1400, -140, 1000}));
+        assertThat(dto.getRows().get(15).getTotal(), is(-14540));
     }
 
     @Test

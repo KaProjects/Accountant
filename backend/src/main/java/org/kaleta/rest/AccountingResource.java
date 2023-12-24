@@ -106,7 +106,7 @@ public class AccountingResource
     {
         return Endpoint.process(() -> {}, () ->
         {
-            AccountingYearlyData yearlyData = service.getYearlyData();
+            AccountingYearlyData yearlyData = service.getYearlyProfitData();
 
             String[] years = yearlyData.getYears();
 
@@ -225,7 +225,7 @@ public class AccountingResource
     public Response getOverallCashFlow()
     {
         return Endpoint.process(() -> {}, () -> {
-            AccountingYearlyData yearlyData = service.getYearlyData();
+            AccountingYearlyData yearlyData = service.getYearlyClosingData();
 
             String[] years = yearlyData.getYears();
 

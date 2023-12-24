@@ -97,4 +97,9 @@ public interface TransactionService
      * @return list of closing transactions for all years
      */
     List<Transaction> getClosingTransactions();
+
+    /**
+     * @return list of profit transactions for all years
+     */
+    List<Transaction> getProfitTransactions();
 }

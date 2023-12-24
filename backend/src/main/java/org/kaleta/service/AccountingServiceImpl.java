@@ -74,9 +74,16 @@ public class AccountingServiceImpl implements AccountingService
     }
 
     @Override
-    public AccountingYearlyData getYearlyData()
+    public AccountingYearlyData getYearlyClosingData()
     {
         List<Transaction> transactions = transactionService.getClosingTransactions();
+        return new AccountingYearlyData(transactions);
+    }
+
+    @Override
+    public AccountingYearlyData getYearlyProfitData()
+    {
+        List<Transaction> transactions = transactionService.getProfitTransactions();
         return new AccountingYearlyData(transactions);
     }
 }

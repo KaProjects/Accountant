@@ -22,21 +22,22 @@ const Home = props => {
             Accounting
         </Typography>
         <Stack direction="row" justifyContent="center" alignItems="flex-start" spacing={0.5}>
-            <Card sx={{ width: 300, height: 230}} raised style={{backgroundColor:"#ffc107"}}>
-                <ButtonBase onClick={event => window.location.href='/accounting/profit'}>
-                    <CardContent>
-                        <Typography variant="h5" component="div" align={"center"}>
-                            Income Statement
-                        </Typography>
-                        <Typography align={"center"}>
-                            <PostAddIcon/>
-                        </Typography>
-                        <Typography variant="caption">
-                            The income statement provides an overview of revenues, expenses, net income, operating profit and net profit.
-                        </Typography>
-                    </CardContent>
-                </ButtonBase>
-            </Card>
+            <Card sx={{ width: 300, height: 230}} raised style={{backgroundColor:"#ffc107",   display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
+                <CardContent>
+                    <Typography variant="h5" component="div" align={"center"}>
+                        Income Statement
+                    </Typography>
+                    <Typography align={"center"}>
+                        <PostAddIcon/>
+                    </Typography>
+                    <Typography variant="caption">
+                        The income statement provides an overview of revenues, expenses, net income, operating profit and net profit.
+                    </Typography>
+                </CardContent>
+                <CardActions style={{justifyContent: 'center'}}>
+                    <Button size="small" onClick={event => window.location.href='/accounting/profit'}>Yearly</Button>
+                    <Button size="small" onClick={event => window.location.href='/accounting/profit/overall'}>Overall</Button>
+                </CardActions>            </Card>
             <Card sx={{ width: 300, height: 230 }} raised style={{backgroundColor:"#ffc107"}}>
                 <CardContent>
                     <Typography variant="h5" component="div" align={"center"}>
@@ -133,7 +134,7 @@ const Home = props => {
             </Card>
         </Stack>
 
-        <Typography style={{width: '100%', position: 'fixed', bottom: 0}} component="footer" align={"center"}>
+        <Typography style={{width: '100%', position: 'fixed', bottom: 0, marginLeft: 5}} component="footer" align={"left"}>
             Copyright © {new Date().getFullYear()} Stanislav Kaleta
         </Typography>
         </>
