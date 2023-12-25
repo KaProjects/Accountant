@@ -3,6 +3,7 @@ package org.kaleta.rest;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.kaleta.dto.VacationDto;
+import org.kaleta.dto.ViewDto;
 import org.kaleta.entity.Transaction;
 import org.kaleta.service.AccountService;
 import org.kaleta.service.SchemaService;
@@ -33,8 +34,8 @@ public class ViewResource
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/vacation/{year}")
-    public Response getVacation(@PathParam String year)
+    @Path("/{year}/vacation")
+    public Response getVacations(@PathParam String year)
     {
         return Endpoint.process(() -> {
             ParamValidators.validateYear(year);
@@ -62,7 +63,6 @@ public class ViewResource
                     String amountPrefix = transaction.getDebit().startsWith("5")
                             ? transaction.getCredit().startsWith("5") ? "~" : ""
                             : "-";
-
                     vacTr.setAmount(amountPrefix + transaction.getAmount());
 
                     vacation.getTransactions().add(vacTr);
@@ -95,6 +95,45 @@ public class ViewResource
                 dto.getVacations().add(vacation);
             }
             dto.getVacations().sort(VacationDto::compare);
+            return dto;
+        });
+    }
+
+    @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{year}")
+    public Response getViews(@PathParam String year)
+    {
+        return Endpoint.process(() -> {
+            ParamValidators.validateYear(year);
+        }, () -> {
+            ViewDto dto = new ViewDto();
+
+            Map<String, List<Transaction>> views = viewService.getViewMap(year);
+            Map<String, String> accountNames = accountService.getAccountNamesMap(year);
+
+            for (String key : views.keySet())
+            {
+                ViewDto.View view = new ViewDto.View();
+                view.setName(key);
+
+                for (Transaction transaction : views.get(key))
+                {
+                    ViewDto.View.Transaction trDto = new ViewDto.View.Transaction();
+                    trDto.setDate(transaction.getDate());
+                    trDto.setDescription(transaction.getDescription().replace("view="+key, ""));
+                    trDto.setDebit(accountNames.get(transaction.getDebit()));
+                    trDto.setCredit(accountNames.get(transaction.getCredit()));
+                    trDto.setAmount(String.valueOf(transaction.getAmount()));
+
+                    view.getTransactions().add(trDto);
+                }
+                view.getTransactions().sort(ViewDto::compare);
+                dto.getViews().add(view);
+            }
+            dto.getViews().sort(ViewDto::compare);
             return dto;
         });
     }

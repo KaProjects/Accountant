@@ -41,4 +41,9 @@ public interface AccountService
      * @return account with specified ID for specified year
      */
     Account getAccount(String year, String fullId);
+
+    /**
+     * @return list of accounts matching metadata for specified year
+     */
+    List<Account> listMatchingMetadata(String year, String metadata);
 }

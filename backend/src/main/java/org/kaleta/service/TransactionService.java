@@ -9,9 +9,19 @@ import java.util.List;
 public interface TransactionService
 {
     /**
+     * @return list of balance (excluding off-balance) transactions for specified year
+     */
+    List<Transaction> getBalanceTransactions(String year);
+
+    /**
      * @return list of transactions matching debit and credit prefixes for specified year
      */
     List<Transaction> getTransactionsMatching(String year, String debitPrefix, String creditPrefix);
+
+    /**
+     * @return list of transactions matching description for specified year
+     */
+    List<Transaction> getTransactionsMatchingDescription(String year, String description);
 
     /**
      * @return list of transactions matching schema prefix (debit or credit) for specified year

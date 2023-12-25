@@ -90,6 +90,12 @@ public class AccountServiceImpl implements AccountService
         return accountDao.get(year, split[0], split[1]);
     }
 
+    @Override
+    public List<Account> listMatchingMetadata(String year, String metadata)
+    {
+        return accountDao.listByMetadata(year, metadata);
+    }
+
     public static void validateFinAssetAccount(String fullId)
     {
         if (!fullId.startsWith("23")){

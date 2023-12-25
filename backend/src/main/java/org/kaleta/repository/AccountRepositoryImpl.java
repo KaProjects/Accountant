@@ -60,4 +60,13 @@ public class AccountRepositoryImpl implements AccountRepository
                 .setParameter("semanticId", semanticId)
                 .getSingleResult();
     }
+
+    @Override
+    public List<Account> listByMetadata(String year, String metadata)
+    {
+        return entityManager.createQuery(selectYearly + " AND a.metadata LIKE :metadata", Account.class)
+                .setParameter("year", year)
+                .setParameter("metadata", "%" + metadata + "%")
+                .getResultList();
+    }
 }

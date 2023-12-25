@@ -372,7 +372,7 @@ INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '20', 'group20', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '200', 'account200', 'L');
 
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2018', '500', '0', 'general', '');
-INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2018', '510', '0', 'doprava', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2018', '510', '0', 'doprava', 'view=zzz');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2018', '520', '0', 'dolava', '');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2018', '200', '0', 'cash', '');
 
@@ -383,4 +383,7 @@ INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VAL
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0503', '3000', '510.0', '200.0', '18x5', 'vac=yyy');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0603', '1000', '520.0', '510.0', '18x6', 'vac=yyy');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0703', '1000', '200.0', '500.0', '18x7', 'vac=yyy');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0905', '100', '520.0', '200.0', '18x8', 'view=zzz');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0704', '100', '200.0', '520.0', '18x9', 'view=zzz');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0707', '1', '200.0', '200.0', '18x10', 'view=ww');
 

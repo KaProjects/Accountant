@@ -26,4 +26,9 @@ public interface AccountRepository
      * @return get account specified by schema ID, semantic ID and year
      */
     Account get(String year, String schemaId, String semanticId);
+
+    /**
+     * @return list of account matching metadata for specified year
+     */
+    List<Account> listByMetadata(String year, String metadata);
 }
