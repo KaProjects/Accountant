@@ -6,6 +6,7 @@ import org.kaleta.model.SchemaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,10 +19,14 @@ public class SchemaServiceImpl implements SchemaService
     SchemaDao schemaDao;
 
     @Override
-    public String getAccountName(String year, String accountId)
+    public Map<String, String> getSchemaNames(String year)
     {
-        validateIdLength(accountId, 3);
-        return schemaDao.getNameById(year, accountId);
+        Map<String, String> map = new HashMap<>();
+        for (Schema schema : schemaDao.list(year))
+        {
+            map.put(schema.getYearId().getId(), schema.getName());
+        }
+        return map;
     }
 
     @Override

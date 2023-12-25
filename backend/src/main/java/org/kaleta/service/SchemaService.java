@@ -9,9 +9,9 @@ import java.util.Map;
 public interface SchemaService
 {
     /**
-     * @return account name for specified ID and year
+     * @return names of all schema elements for specified year
      */
-    String getAccountName(String year, String accountId);
+    Map<String, String> getSchemaNames(String year);
 
     /**
      * @return list of accounts for specified group

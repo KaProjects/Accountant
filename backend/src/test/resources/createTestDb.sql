@@ -358,3 +358,29 @@ INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '1209', '1000', '550.0', '600.0', 'px91', '');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '1209', '1000', '510.0', '520.0', 'px92', '');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '1209', '1000', '444.4', '630.0', 'px93', '');
+
+
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '5', 'class5', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '50', 'group50', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '500', 'account500', 'E');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '51', 'group51', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '510', 'account510', 'E');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '52', 'group52', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '520', 'account520', 'E');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '2', 'class2', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '20', 'group20', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '200', 'account200', 'L');
+
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2018', '500', '0', 'general', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2018', '510', '0', 'doprava', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2018', '520', '0', 'dolava', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2018', '200', '0', 'cash', '');
+
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '2001', '1000', '500.0', '200.0', '18x1', 'vac=xxx');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '1102', '2000', '510.0', '200.0', '18x2', 'vac=xxx');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0402', '3000', '500.0', '200.0', '18x3', 'vac=xxx');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0403', '3000', '500.0', '200.0', '18x4', 'vac=yyy');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0503', '3000', '510.0', '200.0', '18x5', 'vac=yyy');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0603', '1000', '520.0', '510.0', '18x6', 'vac=yyy');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0703', '1000', '200.0', '500.0', '18x7', 'vac=yyy');
+

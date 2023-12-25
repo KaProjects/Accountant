@@ -58,26 +58,6 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
-    public Integer sumExpensesOf(List<Transaction> transactions)
-    {
-        Integer sum = 0;
-        for (Transaction transaction : transactions) {
-            if (transaction.getDebit().startsWith("5")){
-                if (!transaction.getCredit().startsWith("5")){
-                    sum += transaction.getAmount();
-                }
-                // else: no action - it's just change of expense
-            } else if (transaction.getCredit().startsWith("5")) {
-                sum -= transaction.getAmount();
-            } else {
-                throw new IllegalArgumentException("Transaction doesn't contain expense: debit=" +
-                        transaction.getDebit() + " credit=" + transaction.getCredit());
-            }
-        }
-        return sum;
-    }
-
-    @Override
     public Integer getInitialValue(Account account)
     {
         String type = schemaService.getAccountType(account.getAccountId().getYear(), account.getAccountId().getSchemaId());

@@ -59,6 +59,7 @@ public class VacationDto
             private String name;
             private Integer value;
 
+            public ChartData(){}
             public ChartData(String name, Integer value)
             {
                 this.name = name;

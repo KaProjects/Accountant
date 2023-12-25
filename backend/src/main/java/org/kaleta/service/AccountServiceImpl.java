@@ -22,11 +22,12 @@ public class AccountServiceImpl implements AccountService
     @Override
     public Map<String, String> getAccountNamesMap(String year)
     {
+        Map<String, String> schemaNames = schemaService.getSchemaNames(year);
         Map<String, String> map = new HashMap<>();
         for (Account account : accountDao.list(year)){
             String fullId = account.getAccountId().getSchemaId() + "." + account.getAccountId().getSemanticId();
             String name = account.getName().contains("general")
-                    ? schemaService.getAccountName(year, account.getAccountId().getSchemaId())
+                    ? schemaNames.get(account.getAccountId().getSchemaId())
                     : account.getName();
 
             map.put(fullId, name);

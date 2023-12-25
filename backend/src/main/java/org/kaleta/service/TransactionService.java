@@ -54,11 +54,6 @@ public interface TransactionService
     Integer[] monthlyBalanceByAccounts(String year, String debit, String credit, String description);
 
     /**
-     * @return sum of expense transactions
-     */
-    Integer sumExpensesOf(List<Transaction> transactions);
-
-    /**
      * @return initial value of specified account
      */
     Integer getInitialValue(Account account);
