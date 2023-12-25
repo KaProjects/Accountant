@@ -6,6 +6,8 @@ import org.kaleta.dto.YearAccountDto;
 import org.springframework.http.HttpStatus;
 
 import javax.ws.rs.core.MediaType;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -58,6 +60,12 @@ public class AccountResourceTest
 
         assertThat(given().when()
                 .get("/account/2014")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
+
+        assertThat(given().when()
+                .get("/account/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract().body().asString(), containsString(" not found"));

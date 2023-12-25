@@ -8,6 +8,8 @@ import org.kaleta.dto.YearTransactionDto;
 import org.springframework.http.HttpStatus;
 
 import javax.ws.rs.core.MediaType;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -330,6 +332,12 @@ public class AccountingResourceTest
                 .extract().body().asString(), containsString(" not found"));
 
         assertThat(given().when()
+                .get("/accounting/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/transaction/" + validAccountId + "/month/" + validMonth)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
+
+        assertThat(given().when()
                 .get("/accounting/" + validYear + "/transaction/" + "22" + "/month/" + validMonth)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -378,6 +386,12 @@ public class AccountingResourceTest
                 .extract().body().asString(), containsString(" not found"));
 
         assertThat(given().when()
+                .get("/accounting/cashflow/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
+
+        assertThat(given().when()
                 .get("/accounting/profit/" + "2x20")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -385,6 +399,12 @@ public class AccountingResourceTest
 
         assertThat(given().when()
                 .get("/accounting/profit/" + "2014")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
+
+        assertThat(given().when()
+                .get("/accounting/profit/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract().body().asString(), containsString(" not found"));

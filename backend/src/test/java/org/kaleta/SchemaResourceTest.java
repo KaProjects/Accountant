@@ -6,6 +6,8 @@ import org.kaleta.dto.YearSchemaDto;
 import org.springframework.http.HttpStatus;
 
 import javax.ws.rs.core.MediaType;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -160,6 +162,12 @@ public class SchemaResourceTest
 
         assertThat(given().when()
                 .get("/schema/2014")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
+
+        assertThat(given().when()
+                .get("/schema/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract().body().asString(), containsString(" not found"));

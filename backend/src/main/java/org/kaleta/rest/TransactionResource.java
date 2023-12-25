@@ -10,7 +10,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
+import javax.ws.rs.core.Response;
 
 @Path("/transaction")
 public class TransactionResource
@@ -23,13 +23,13 @@ public class TransactionResource
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/{debitPrefix}/{creditPrefix}")
-    public List<YearTransactionDto> getTransactionsMatching(@PathParam String year, @PathParam String debitPrefix, @PathParam String creditPrefix)
+    public Response getTransactionsMatching(@PathParam String year, @PathParam String debitPrefix, @PathParam String creditPrefix)
     {
-        ParamValidators.validateYear(year);
-        ParamValidators.validateDebitPrefix(debitPrefix);
-        ParamValidators.validateCreditPrefix(creditPrefix);
-
-        return YearTransactionDto.from(service.getTransactionsMatching(year, debitPrefix, creditPrefix));
+        return Endpoint.process(() -> {
+            ParamValidators.validateYear(year);
+            ParamValidators.validateDebitPrefix(debitPrefix);
+            ParamValidators.validateCreditPrefix(creditPrefix);
+        }, () -> YearTransactionDto.from(service.getTransactionsMatching(year, debitPrefix, creditPrefix)));
     }
 
     @GET
@@ -37,10 +37,10 @@ public class TransactionResource
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}")
-    public List<YearTransactionDto> getTransactionsMatching(@PathParam String year)
+    public Response getTransactions(@PathParam String year)
     {
-        ParamValidators.validateYear(year);
-
-        return YearTransactionDto.from(service.getTransactionsMatching(year, "", ""));
+        return Endpoint.process(() -> {
+            ParamValidators.validateYear(year);
+        }, () -> YearTransactionDto.from(service.getTransactionsMatching(year, "", "")));
     }
 }

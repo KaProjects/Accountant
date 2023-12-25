@@ -3,6 +3,9 @@ package org.kaleta.rest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 public class ParamValidators
 {
     public static void validateYear(String year)
@@ -14,6 +17,9 @@ public class ParamValidators
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter: '" + year + "'");
         }
         if (Integer.parseInt(year) < 2015){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Year '" + year + "' not found");
+        }
+        if (Integer.parseInt(year) > new GregorianCalendar().get(Calendar.YEAR)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Year '" + year + "' not found");
         }
     }
