@@ -385,5 +385,5 @@ INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VAL
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0703', '1000', '200.0', '500.0', '18x7', 'vac=yyy');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0905', '100', '520.0', '200.0', '18x8', 'view=zzz');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0704', '100', '200.0', '520.0', '18x9', 'view=zzz');
-INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0707', '1', '200.0', '200.0', '18x10', 'view=ww');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0707', '1', '200.0', '500.0', '18x10', 'view=ww');
 

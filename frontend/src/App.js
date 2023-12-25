@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import './App.css';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Budgeting from "./views/Budgeting";
-import Vacation from "./views/Vacation";
+import Views from "./views/Views";
 import FinancialAssets from "./views/FinancialAssets";
 import Login from "./components/Login";
 import MainBar from "./components/MainBar";
@@ -81,7 +81,8 @@ class App extends Component {
                     <Routes>
                         <Route exact path="/" element={<Home {...this.state}/> }/>
                         <Route exact path="/budgeting" element={<Budgeting {...this.state}/> }/>
-                        <Route exact path="/view/vacation" element={<Vacation {...this.state}/> }/>
+                        <Route exact path="/view/:vacation" element={<Views {...this.state}/> }/>
+                        <Route exact path="/view" element={<Views {...this.state}/> }/>
                         <Route exact path="/financial/assets/:all" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/financial/assets" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/accounting/:type" element={<AccountingStatement {...this.state}/> }/>

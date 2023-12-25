@@ -2,7 +2,6 @@ package org.kaleta;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
-import org.kaleta.dto.VacationDto;
 import org.kaleta.dto.ViewDto;
 import org.springframework.http.HttpStatus;
 
@@ -21,40 +20,40 @@ public class ViewResourceTest
     @Test
     public void getVacationsTest()
     {
-        VacationDto dto =
+        ViewDto dto =
                 given().when()
                         .get("/view/2018/vacation")
                         .then()
                         .statusCode(200)
-                        .extract().response().jsonPath().getObject("", VacationDto.class);
+                        .extract().response().jsonPath().getObject("", ViewDto.class);
 
         assertThat(dto.getColumns().size(), is(5));
         assertThat(dto.getColumns().get(2), is("Debit"));
 
-        assertThat(dto.getVacations().size(), is(2));
-        assertThat(dto.getVacations().get(0).getName(), is("xxx"));
-        assertThat(dto.getVacations().get(0).getExpenses(), is("6000"));
-        assertThat(dto.getVacations().get(0).getTransactions().size(), is(3));
-        assertThat(dto.getVacations().get(0).getTransactions().get(0).getDate(), is("2001"));
-        assertThat(dto.getVacations().get(0).getTransactions().get(1).getDate(), is("0402"));
-        assertThat(dto.getVacations().get(0).getTransactions().get(2).getDate(), is("1102"));
-        assertThat(dto.getVacations().get(0).getChartData().size(), is(2));
-        assertThat(dto.getVacations().get(0).getChartData(), hasItem(new VacationDto.Vacation.ChartData("account500", 4000)));
-        assertThat(dto.getVacations().get(0).getChartData(), hasItem(new VacationDto.Vacation.ChartData("account510", 2000)));
+        assertThat(dto.getViews().size(), is(2));
+        assertThat(dto.getViews().get(0).getName(), is("xxx"));
+        assertThat(dto.getViews().get(0).getExpenses(), is("6000"));
+        assertThat(dto.getViews().get(0).getTransactions().size(), is(3));
+        assertThat(dto.getViews().get(0).getTransactions().get(0).getDate(), is("2001"));
+        assertThat(dto.getViews().get(0).getTransactions().get(1).getDate(), is("0402"));
+        assertThat(dto.getViews().get(0).getTransactions().get(2).getDate(), is("1102"));
+        assertThat(dto.getViews().get(0).getChartData().size(), is(2));
+        assertThat(dto.getViews().get(0).getChartData(), hasItem(new ViewDto.View.ChartData("account500", 4000)));
+        assertThat(dto.getViews().get(0).getChartData(), hasItem(new ViewDto.View.ChartData("account510", 2000)));
 
-        assertThat(dto.getVacations().get(1).getName(), is("yyy"));
-        assertThat(dto.getVacations().get(1).getExpenses(), is("5000"));
-        assertThat(dto.getVacations().get(1).getTransactions().size(), is(4));
-        assertThat(dto.getVacations().get(1).getTransactions().get(0).getAmount(), is("3000"));
-        assertThat(dto.getVacations().get(1).getTransactions().get(0).getDebit(), is("account500"));
-        assertThat(dto.getVacations().get(1).getTransactions().get(1).getAmount(), is("3000"));
-        assertThat(dto.getVacations().get(1).getTransactions().get(1).getDebit(), is("doprava"));
-        assertThat(dto.getVacations().get(1).getTransactions().get(2).getAmount(), is("~1000"));
-        assertThat(dto.getVacations().get(1).getTransactions().get(3).getAmount(), is("-1000"));
-        assertThat(dto.getVacations().get(1).getChartData().size(), is(3));
-        assertThat(dto.getVacations().get(1).getChartData(), hasItem(new VacationDto.Vacation.ChartData("account500", 2000)));
-        assertThat(dto.getVacations().get(1).getChartData(), hasItem(new VacationDto.Vacation.ChartData("account510", 2000)));
-        assertThat(dto.getVacations().get(1).getChartData(), hasItem(new VacationDto.Vacation.ChartData("account520", 1000)));
+        assertThat(dto.getViews().get(1).getName(), is("yyy"));
+        assertThat(dto.getViews().get(1).getExpenses(), is("5000"));
+        assertThat(dto.getViews().get(1).getTransactions().size(), is(4));
+        assertThat(dto.getViews().get(1).getTransactions().get(0).getAmount(), is("3000"));
+        assertThat(dto.getViews().get(1).getTransactions().get(0).getDebit(), is("account500"));
+        assertThat(dto.getViews().get(1).getTransactions().get(1).getAmount(), is("3000"));
+        assertThat(dto.getViews().get(1).getTransactions().get(1).getDebit(), is("doprava"));
+        assertThat(dto.getViews().get(1).getTransactions().get(2).getAmount(), is("~1000"));
+        assertThat(dto.getViews().get(1).getTransactions().get(3).getAmount(), is("-1000"));
+        assertThat(dto.getViews().get(1).getChartData().size(), is(3));
+        assertThat(dto.getViews().get(1).getChartData(), hasItem(new ViewDto.View.ChartData("account500", 2000)));
+        assertThat(dto.getViews().get(1).getChartData(), hasItem(new ViewDto.View.ChartData("account510", 2000)));
+        assertThat(dto.getViews().get(1).getChartData(), hasItem(new ViewDto.View.ChartData("account520", 1000)));
     }
 
     @Test
@@ -72,6 +71,7 @@ public class ViewResourceTest
 
         assertThat(dto.getViews().size(), is(2));
         assertThat(dto.getViews().get(0).getName(), is("zzz"));
+        assertThat(dto.getViews().get(0).getExpenses(), is("5000"));
         assertThat(dto.getViews().get(0).getTransactions().size(), is(5));
         assertThat(dto.getViews().get(0).getTransactions().get(0).getDate(), is("1102"));
         assertThat(dto.getViews().get(0).getTransactions().get(0).getDebit(), is("doprava"));
@@ -80,12 +80,19 @@ public class ViewResourceTest
         assertThat(dto.getViews().get(0).getTransactions().get(2).getDate(), is("0603"));
         assertThat(dto.getViews().get(0).getTransactions().get(2).getCredit(), is("doprava"));
         assertThat(dto.getViews().get(0).getTransactions().get(3).getDate(), is("0704"));
-        assertThat(dto.getViews().get(0).getTransactions().get(3).getAmount(), is("100"));
+        assertThat(dto.getViews().get(0).getTransactions().get(3).getAmount(), is("-100"));
         assertThat(dto.getViews().get(0).getTransactions().get(4).getDate(), is("0905"));
         assertThat(dto.getViews().get(0).getTransactions().get(4).getAmount(), is("100"));
+        assertThat(dto.getViews().get(0).getChartData().size(), is(2));
+        assertThat(dto.getViews().get(0).getChartData(), hasItem(new ViewDto.View.ChartData("account510", 4000)));
+        assertThat(dto.getViews().get(0).getChartData(), hasItem(new ViewDto.View.ChartData("account520", 1000)));
+
         assertThat(dto.getViews().get(1).getName(), is("ww"));
+        assertThat(dto.getViews().get(1).getExpenses(), is("-1"));
         assertThat(dto.getViews().get(1).getTransactions().size(), is(1));
-        assertThat(dto.getViews().get(1).getTransactions().get(0).getAmount(), is("1"));
+        assertThat(dto.getViews().get(1).getTransactions().get(0).getAmount(), is("-1"));
+        assertThat(dto.getViews().get(1).getChartData().size(), is(1));
+        assertThat(dto.getViews().get(1).getChartData(), hasItem(new ViewDto.View.ChartData("account500", -1)));
     }
 
     @Test

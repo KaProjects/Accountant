@@ -7,6 +7,7 @@ import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {properties} from "../properties";
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
 
 
 const Home = props => {
@@ -90,6 +91,21 @@ const Home = props => {
                         </Typography>
                         <Typography variant="caption">
                             The action of leaving something one previously occupied. A period of time set aside for festivals or recreation.
+                        </Typography>
+                    </CardContent>
+                </ButtonBase>
+            </Card>
+            <Card sx={{ width: 300, height: 250 }} raised style={{backgroundColor:"#ffc107"}}>
+                <ButtonBase onClick={event => window.location.href='/view'}>
+                    <CardContent>
+                        <Typography variant="h5" component="div" align={"center"}>
+                            Views
+                        </Typography>
+                        <Typography align={"center"}>
+                            <TroubleshootIcon/>
+                        </Typography>
+                        <Typography variant="caption">
+                            A view groups various transactions and accounts together for better visualization of specific interests.
                         </Typography>
                     </CardContent>
                 </ButtonBase>
