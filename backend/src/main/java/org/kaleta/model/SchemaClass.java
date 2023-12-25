@@ -3,16 +3,16 @@ package org.kaleta.model;
 import lombok.Data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Data
 public class SchemaClass
 {
     private String id;
     private String name;
-    private Map<String, Group> groups = new HashMap<>();
+    private Map<String, Group> groups = new TreeMap<>();
 
     public SchemaClass(){}
     public SchemaClass(String id, String name){
@@ -31,7 +31,7 @@ public class SchemaClass
     public static class Group {
         private String id;
         private String name;
-        private Map<String, Account> accounts = new HashMap<>();
+        private Map<String, Account> accounts = new TreeMap<>();
 
         public Group(String id, String name)
         {

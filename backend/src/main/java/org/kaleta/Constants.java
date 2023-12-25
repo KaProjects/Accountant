@@ -16,4 +16,9 @@ public class Constants
         public static final String CLOSING_ACC_ID = "701.0";
         public static final String PROFIT_ACC_ID = "710.0";
     }
+
+    public enum AccountType
+    {
+        A, L, R, E, X
+    }
 }

@@ -6,10 +6,10 @@ import org.kaleta.model.SchemaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 @Service
 public class SchemaServiceImpl implements SchemaService
@@ -25,20 +25,6 @@ public class SchemaServiceImpl implements SchemaService
     }
 
     @Override
-    public String getGroupName(String year, String groupId)
-    {
-        validateIdLength(groupId, 2);
-        return schemaDao.getNameById(year, groupId);
-    }
-
-    @Override
-    public String getClassName(String year, String classId)
-    {
-        validateIdLength(classId, 1);
-        return schemaDao.getNameById(year, classId);
-    }
-
-    @Override
     public List<Schema> getSchemaAccountsByGroup(String year, String groupId)
     {
         validateIdLength(groupId, 2);
@@ -50,12 +36,6 @@ public class SchemaServiceImpl implements SchemaService
     {
         validateIdLength(accountId, 3);
         return schemaDao.getAccountById(year, accountId).getType();
-    }
-
-    @Override
-    public List<Schema> list(String year)
-    {
-        return schemaDao.list(year);
     }
 
     @Override
@@ -87,7 +67,7 @@ public class SchemaServiceImpl implements SchemaService
     @Override
     public Map<String, SchemaClass> getSchema(String year)
     {
-        Map<String, SchemaClass> classMap = new HashMap<>();
+        Map<String, SchemaClass> classMap = new TreeMap<>();
         List<Schema> schemas = schemaDao.list(year);
 
         for (Schema schema : schemas){

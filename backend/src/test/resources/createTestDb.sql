@@ -347,9 +347,9 @@ INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VAL
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '3112', '70', '630.0', '710.0', 'px73', 'closing');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2019', '3112', '80', '553.0', '710.0', 'px83', 'closing');
 
-INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '600', 'account600', '');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '510', 'account550', 'E');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '520', 'account550', 'E');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '600', 'account600', 'R');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '510', 'account510', 'E');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '520', 'account520', 'E');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020', '550', '0', 'general', '');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020', '600', '0', 'general', '');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020', '510', '0', 'general', '');
