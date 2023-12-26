@@ -23,14 +23,17 @@ import static org.kaleta.Utils.inputStreamToString;
 @Service
 public class SyncServiceImpl implements SyncService
 {
-    @Autowired
-    TransactionDao transactionDao;
+    private final TransactionDao transactionDao;
+    private final SchemaDao schemaDao;
+    private final AccountDao accountDao;
 
     @Autowired
-    SchemaDao schemaDao;
-
-    @Autowired
-    AccountDao accountDao;
+    public SyncServiceImpl(TransactionDao transactionDao, SchemaDao schemaDao, AccountDao accountDao)
+    {
+        this.transactionDao = transactionDao;
+        this.schemaDao = schemaDao;
+        this.accountDao = accountDao;
+    }
 
     @Override
     @Transactional

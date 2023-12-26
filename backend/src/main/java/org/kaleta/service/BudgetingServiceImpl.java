@@ -16,14 +16,17 @@ import java.util.stream.Collectors;
 @Service
 public class BudgetingServiceImpl implements BudgetingService
 {
-    @Autowired
-    TransactionService transactionService;
+    private final TransactionService transactionService;
+    private final AccountService accountService;
+    private final BudgetingDao budgetingDao;
 
     @Autowired
-    AccountService accountService;
-
-    @Autowired
-    BudgetingDao budgetingDao;
+    public BudgetingServiceImpl(TransactionService transactionService, AccountService accountService, BudgetingDao budgetingDao)
+    {
+        this.transactionService = transactionService;
+        this.accountService = accountService;
+        this.budgetingDao = budgetingDao;
+    }
 
     @Override
     public BudgetingData getBudgetData(String year)

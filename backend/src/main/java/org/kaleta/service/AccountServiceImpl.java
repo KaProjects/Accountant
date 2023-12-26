@@ -13,11 +13,15 @@ import java.util.Map;
 @Service
 public class AccountServiceImpl implements AccountService
 {
-    @Autowired
-    AccountDao accountDao;
+    private final AccountDao accountDao;
+    private final SchemaService schemaService;
 
     @Autowired
-    SchemaService schemaService;
+    public AccountServiceImpl(AccountDao accountDao, SchemaService schemaService)
+    {
+        this.accountDao = accountDao;
+        this.schemaService = schemaService;
+    }
 
     @Override
     public Map<String, String> getAccountNamesMap(String year)

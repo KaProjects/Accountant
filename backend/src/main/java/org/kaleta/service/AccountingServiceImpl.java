@@ -14,12 +14,17 @@ import java.util.Map;
 @Service
 public class AccountingServiceImpl implements AccountingService
 {
+    private final TransactionService transactionService;
+    private final SchemaService schemaService;
+    private final AccountService accountService;
+
     @Autowired
-    TransactionService transactionService;
-    @Autowired
-    SchemaService schemaService;
-    @Autowired
-    AccountService accountService;
+    public AccountingServiceImpl(TransactionService transactionService, SchemaService schemaService, AccountService accountService)
+    {
+        this.transactionService = transactionService;
+        this.schemaService = schemaService;
+        this.accountService = accountService;
+    }
 
     @Override
     public AccountingData getCashFlowData(String year)

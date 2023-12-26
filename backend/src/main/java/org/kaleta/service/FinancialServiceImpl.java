@@ -12,11 +12,15 @@ import static org.kaleta.service.AccountServiceImpl.validateFinAssetAccount;
 @Service
 public class FinancialServiceImpl implements FinancialService
 {
-    @Autowired
-    TransactionService transactionService;
+    private final TransactionService transactionService;
+    private final AccountService accountService;
 
     @Autowired
-    AccountService accountService;
+    public FinancialServiceImpl(TransactionService transactionService, AccountService accountService)
+    {
+        this.transactionService = transactionService;
+        this.accountService = accountService;
+    }
 
     @Override
     public FinancialAsset getFinancialAsset(Account account)

@@ -15,8 +15,13 @@ import java.util.TreeMap;
 @Service
 public class SchemaServiceImpl implements SchemaService
 {
+    private final SchemaDao schemaDao;
+
     @Autowired
-    SchemaDao schemaDao;
+    public SchemaServiceImpl(SchemaDao schemaDao)
+    {
+        this.schemaDao = schemaDao;
+    }
 
     @Override
     public Map<String, String> getSchemaNames(String year)

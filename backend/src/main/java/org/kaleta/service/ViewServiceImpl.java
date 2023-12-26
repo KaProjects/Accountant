@@ -13,11 +13,15 @@ import java.util.Map;
 @Service
 public class ViewServiceImpl implements ViewService
 {
-    @Autowired
-    TransactionService transactionService;
+    private final TransactionService transactionService;
+    private final AccountService accountService;
 
     @Autowired
-    AccountService accountService;
+    public ViewServiceImpl(TransactionService transactionService, AccountService accountService)
+    {
+        this.transactionService = transactionService;
+        this.accountService = accountService;
+    }
 
     @Override
     public Map<String, List<Transaction>> getVacationMap(String year)

@@ -14,11 +14,15 @@ import java.util.List;
 @Service
 public class TransactionServiceImpl implements TransactionService
 {
-    @Autowired
-    TransactionDao transactionDao;
+    private final TransactionDao transactionDao;
+    private final SchemaService schemaService;
 
     @Autowired
-    SchemaService schemaService;
+    public TransactionServiceImpl(TransactionDao transactionDao, SchemaService schemaService)
+    {
+        this.transactionDao = transactionDao;
+        this.schemaService = schemaService;
+    }
 
     @Override
     public List<Transaction> getBalanceTransactions(String year)
