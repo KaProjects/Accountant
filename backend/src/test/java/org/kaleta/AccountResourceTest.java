@@ -1,11 +1,11 @@
 package org.kaleta;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.YearAccountDto;
 import org.springframework.http.HttpStatus;
 
-import javax.ws.rs.core.MediaType;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -22,14 +22,13 @@ public class AccountResourceTest
     @Test
     public void getAllAccountsTest()
     {
-        List<YearAccountDto> accounts =
-                given().when()
-                        .get("/account/2019")
-                        .then()
-                        .statusCode(200)
-                        .header("Content-Type", containsString(MediaType.APPLICATION_JSON))
-                        .body("size()", is(16))
-                        .extract().response().jsonPath().getList("", YearAccountDto.class);
+        List<YearAccountDto> accounts = given().when()
+                .get("/account/2019")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("size()", is(16))
+                .extract().response().jsonPath().getList("", YearAccountDto.class);
 
         assertThat(accounts, hasItem(YearAccountDto.from("600", "0", "general", "", "account600", "group60", "class6")));
         assertThat(accounts, hasItem(YearAccountDto.from("600", "1", "second", "aaaa", "account600", "group60", "class6")));

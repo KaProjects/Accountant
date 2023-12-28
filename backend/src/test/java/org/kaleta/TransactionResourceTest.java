@@ -1,6 +1,7 @@
 package org.kaleta;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.YearTransactionDto;
 import org.springframework.http.HttpStatus;
@@ -22,11 +23,11 @@ public class TransactionResourceTest
     @Test
     public void getTransactionsMatchingTest()
     {
-        List<YearTransactionDto> transactions =
-            given().when()
+        List<YearTransactionDto> transactions = given().when()
                 .get("/transaction/2020/2/7")
                 .then()
                 .statusCode(200)
+                .contentType(ContentType.JSON)
                 .body("size()", is(4))
                 .extract().response().jsonPath().getList("", YearTransactionDto.class);
 
@@ -39,11 +40,11 @@ public class TransactionResourceTest
     @Test
     public void getTransactionsTest()
     {
-        List<YearTransactionDto> transactions =
-            given().when()
+        List<YearTransactionDto> transactions = given().when()
                 .get("/transaction/2020")
                 .then()
                 .statusCode(200)
+                .contentType(ContentType.JSON)
                 .body("size()", is(32))
                 .extract().response().jsonPath().getList("", YearTransactionDto.class);
 

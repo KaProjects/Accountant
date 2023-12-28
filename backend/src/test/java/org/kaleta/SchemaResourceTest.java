@@ -1,11 +1,11 @@
 package org.kaleta;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.YearSchemaDto;
 import org.springframework.http.HttpStatus;
 
-import javax.ws.rs.core.MediaType;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -20,13 +20,12 @@ public class SchemaResourceTest
     @Test
     public void getSchemaTest()
     {
-        YearSchemaDto schema =
-                given().when()
-                        .get("/schema/2020")
-                        .then()
-                        .statusCode(200)
-                        .header("Content-Type", containsString(MediaType.APPLICATION_JSON))
-                        .extract().response().jsonPath().getObject("", YearSchemaDto.class);
+        YearSchemaDto schema = given().when()
+                .get("/schema/2020")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().response().jsonPath().getObject("", YearSchemaDto.class);
 
         assertThat(schema.getClasses().size(), is(4));
         assertThat(schema.getClasses().get(0).getId(), is("2"));

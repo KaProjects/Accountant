@@ -1,6 +1,7 @@
 package org.kaleta;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.ViewDto;
 import org.springframework.http.HttpStatus;
@@ -20,12 +21,12 @@ public class ViewResourceTest
     @Test
     public void getVacationsTest()
     {
-        ViewDto dto =
-                given().when()
-                        .get("/view/2018/vacation")
-                        .then()
-                        .statusCode(200)
-                        .extract().response().jsonPath().getObject("", ViewDto.class);
+        ViewDto dto = given().when()
+                .get("/view/2018/vacation")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().response().jsonPath().getObject("", ViewDto.class);
 
         assertThat(dto.getColumns().size(), is(5));
         assertThat(dto.getColumns().get(2), is("Debit"));
@@ -59,12 +60,12 @@ public class ViewResourceTest
     @Test
     public void getViewsTest()
     {
-        ViewDto dto =
-                given().when()
-                        .get("/view/2018")
-                        .then()
-                        .statusCode(200)
-                        .extract().response().jsonPath().getObject("", ViewDto.class);
+        ViewDto dto = given().when()
+                .get("/view/2018")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().response().jsonPath().getObject("", ViewDto.class);
 
         assertThat(dto.getColumns().size(), is(5));
         assertThat(dto.getColumns().get(2), is("Debit"));

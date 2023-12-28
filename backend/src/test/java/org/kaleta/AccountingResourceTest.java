@@ -1,13 +1,13 @@
 package org.kaleta;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.AccountingDto;
 import org.kaleta.dto.YearTransactionDto;
 import org.springframework.http.HttpStatus;
 
-import javax.ws.rs.core.MediaType;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -24,18 +24,17 @@ public class AccountingResourceTest
     @Test
     public void getTransactionsTest()
     {
-        List<YearTransactionDto> transactions =
-                given().when()
-                        .get("/accounting/2023/transaction/000/month/5")
-                        .then()
-                        .statusCode(200)
-                        .header("Content-Type", containsString(MediaType.APPLICATION_JSON))
-                        .body("size()", is(4))
-                        .body("[0].date", is("0505"))
-                        .body("[1].date", is("1005"))
-                        .body("[2].date", is("1505"))
-                        .body("[3].date", is("2005"))
-                        .extract().response().jsonPath().getList("", YearTransactionDto.class);
+        List<YearTransactionDto> transactions = given().when()
+                .get("/accounting/2023/transaction/000/month/5")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("size()", is(4))
+                .body("[0].date", is("0505"))
+                .body("[1].date", is("1005"))
+                .body("[2].date", is("1505"))
+                .body("[3].date", is("2005"))
+                .extract().response().jsonPath().getList("", YearTransactionDto.class);
 
         assertThat(transactions, hasItem(YearTransactionDto.from("2005", "500", "account000", "account003", "month5 000")));
         assertThat(transactions, hasItem(YearTransactionDto.from("0505", "600", "account000", "account001", "month5 000")));
@@ -50,6 +49,7 @@ public class AccountingResourceTest
                 .get("/accounting/cashflow/2020")
                 .then()
                 .statusCode(200)
+                .contentType(ContentType.JSON)
                 .extract().response();
 
         System.out.println("response time: " + response.time() + "ms");
@@ -98,6 +98,7 @@ public class AccountingResourceTest
                 .get("/accounting/cashflow")
                 .then()
                 .statusCode(200)
+                .contentType(ContentType.JSON)
                 .extract().response();
 
         System.out.println("response time: " + response.time() + "ms");
@@ -140,6 +141,7 @@ public class AccountingResourceTest
                 .get("/accounting/profit/2019")
                 .then()
                 .statusCode(200)
+                .contentType(ContentType.JSON)
                 .extract().response();
 
         System.out.println("response time: " + response.time() + "ms");
@@ -236,6 +238,7 @@ public class AccountingResourceTest
                 .get("/accounting/profit")
                 .then()
                 .statusCode(200)
+                .contentType(ContentType.JSON)
                 .extract().response();
 
         System.out.println("response time: " + response.time() + "ms");

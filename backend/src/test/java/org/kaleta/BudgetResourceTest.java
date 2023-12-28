@@ -1,13 +1,13 @@
 package org.kaleta;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.BudgetDto;
 import org.kaleta.dto.YearTransactionDto;
 import org.springframework.http.HttpStatus;
 
-import javax.ws.rs.core.MediaType;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -27,6 +27,7 @@ public class BudgetResourceTest
                 .get("/budget/2019")
                 .then()
                 .statusCode(200)
+                .contentType(ContentType.JSON)
                 .extract().response();
 
         System.out.println("response time: " + response.time() + "ms");
@@ -282,19 +283,18 @@ public class BudgetResourceTest
     @Test
     public void getTransactionsTest()
     {
-       List<YearTransactionDto> transactions =
-                given().when()
-                        .get("/budget/2019/transaction/i2/month/9")
-                        .then()
-                        .statusCode(200)
-                        .header("Content-Type", containsString(MediaType.APPLICATION_JSON))
-                        .body("size()", is(5))
-                        .body("[0].date", is("0909"))
-                        .body("[1].date", is("1009"))
-                        .body("[2].date", is("1509"))
-                        .body("[3].date", is("2009"))
-                        .body("[4].date", is("2109"))
-                        .extract().response().jsonPath().getList("", YearTransactionDto.class);
+       List<YearTransactionDto> transactions = given().when()
+               .get("/budget/2019/transaction/i2/month/9")
+               .then()
+               .statusCode(200)
+               .contentType(ContentType.JSON)
+               .body("size()", is(5))
+               .body("[0].date", is("0909"))
+               .body("[1].date", is("1009"))
+               .body("[2].date", is("1509"))
+               .body("[3].date", is("2009"))
+               .body("[4].date", is("2109"))
+               .extract().response().jsonPath().getList("", YearTransactionDto.class);
 
         assertThat(transactions, hasItem(YearTransactionDto.from("1509", "10", "account553", "sda ad", "same group")));
         assertThat(transactions, hasItem(YearTransactionDto.from("1009", "10", "account553", "sda ad", "same group")));

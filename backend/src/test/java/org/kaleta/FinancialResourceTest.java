@@ -1,6 +1,7 @@
 package org.kaleta;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.FinancialAssetsDto;
@@ -25,6 +26,7 @@ public class FinancialResourceTest
                 .get("/financial/assets/2021")
                 .then()
                 .statusCode(200)
+                .contentType(ContentType.JSON)
                 .extract().response();
 
         System.out.println("response time: " + response.time() + "ms");
@@ -92,6 +94,7 @@ public class FinancialResourceTest
                 .get("/financial/assets")
                 .then()
                 .statusCode(200)
+                .contentType(ContentType.JSON)
                 .extract().response();
 
         System.out.println("response time: " + response.time() + "ms");
