@@ -35,13 +35,6 @@ public class SchemaServiceImpl implements SchemaService
     }
 
     @Override
-    public List<Schema> getSchemaAccountsByGroup(String year, String groupId)
-    {
-        validateIdLength(groupId, 2);
-        return schemaDao.getAccountByGroup(year, groupId);
-    }
-
-    @Override
     public String getAccountType(String year, String accountId)
     {
         validateIdLength(accountId, 3);

@@ -1,6 +1,7 @@
 package org.kaleta.dto;
 
 import lombok.Data;
+import org.kaleta.model.FinancialAsset;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -40,5 +41,25 @@ public class FinancialAssetsDto
             private Integer[] cumulativeDeposits;
             private Integer[] cumulativeWithdrawals;
         }
+    }
+
+    public static FinancialAssetsDto.Group.Account from(FinancialAsset asset)
+    {
+        FinancialAssetsDto.Group.Account accountDto = new FinancialAssetsDto.Group.Account();
+        accountDto.setName(asset.getName());
+        accountDto.setInitialValue(asset.getInitialValue());
+        accountDto.setWithdrawalsSum(asset.getWithdrawalsSum());
+        accountDto.setDepositsSum(asset.getDepositsSum());
+        accountDto.setCurrentValue(asset.getCurrentValue());
+        accountDto.setCurrentReturn(asset.getCurrentReturn());
+        accountDto.setFunding(asset.getMonthlyCumulativeFunding());
+        accountDto.setDeposits(asset.getDeposits());
+        accountDto.setRevaluations(asset.getRevaluations());
+        accountDto.setWithdrawals(asset.getWithdrawals());
+        accountDto.setLabels(asset.getLabels());
+        accountDto.setBalances(asset.getBalances());
+        accountDto.setCumulativeDeposits(asset.getMonthlyCumulativeDeposits());
+        accountDto.setCumulativeWithdrawals(asset.getMonthlyCumulativeWithdrawals());
+        return accountDto;
     }
 }

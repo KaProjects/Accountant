@@ -9,6 +9,8 @@ public interface AccountService
 {
     /**
      * @return map of names of all accounts with full account IDs as keys
+     *
+     * Note: schema account names are used instead of 'general' or 'general of...' account names
      */
     Map<String, String> getAccountNamesMap(String year);
 
@@ -23,27 +25,12 @@ public interface AccountService
     List<Account> listBySchema(String year, String schemaPrefix);
 
     /**
-     * @return financial creation account ID of specified finance asset account
-     */
-    String getFinCreationAccountId(Account account);
-
-    /**
-     * @return financial revenue revaluation account ID of specified finance asset account
-     */
-    String getFinRevRevaluationAccountId(Account account);
-
-    /**
-     * @return financial expense revaluation account ID of specified finance asset account
-     */
-    String getFinExpRevaluationAccountId(Account account);
-
-    /**
-     * @return account with specified ID for specified year
-     */
-    Account getAccount(String year, String fullId);
-
-    /**
      * @return list of accounts matching metadata for specified year
      */
     List<Account> listMatchingMetadata(String year, String metadata);
+
+    /**
+     * @return map of financial asset accounts grouped by schema name for specified year
+     */
+    Map<String, List<Account>> getFinancialAssetAccounts(String year);
 }

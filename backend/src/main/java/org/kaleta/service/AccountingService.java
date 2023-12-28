@@ -29,12 +29,12 @@ public interface AccountingService
     List<Transaction> getSchemaTransactions(String year, String schemaId, String month);
 
     /**
-     * @return closing data for all but active years
+     * @return closing data for all but active years (e.i. data from account 701.0 transactions)
      */
     AccountingYearlyData getYearlyClosingData();
 
     /**
-     * @return profit data for all but active years
+     * @return profit data for all but active years (e.i. data from account 710.0 transactions)
      */
     AccountingYearlyData getYearlyProfitData();
 }

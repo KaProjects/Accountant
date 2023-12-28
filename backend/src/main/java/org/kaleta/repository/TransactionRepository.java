@@ -106,4 +106,9 @@ public interface TransactionRepository
      * @return list of transactions that have debit or credit of profit account ID (710.0).
      */
     List<Transaction> listProfitTransactions();
+
+    /**
+     * @return list of financial asset transactions for specified year (e.i. schema 23x and 546)
+     */
+    List<Transaction> listFinancialAssetTransactions(String year);
 }

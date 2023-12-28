@@ -189,4 +189,13 @@ public class TransactionRepositoryImpl implements TransactionRepository
                 .setParameter("closing", Constants.Account.PROFIT_ACC_ID)
                 .getResultList();
     }
+
+    @Override
+    public List<Transaction> listFinancialAssetTransactions(String year)
+    {
+        return entityManager.createQuery(selectYearly
+                        + " AND (t.debit LIKE '23%' OR t.debit LIKE '546%' OR t.credit LIKE '23%' OR t.credit LIKE '546%')", Transaction.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
 }

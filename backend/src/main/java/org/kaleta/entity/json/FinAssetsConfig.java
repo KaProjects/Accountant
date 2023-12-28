@@ -4,11 +4,26 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 public class FinAssetsConfig
 {
     private List<Group> groups = new ArrayList<>();
+
+    public Set<String> getYears()
+    {
+        Set<String> years = new TreeSet<>();
+        for (Group group : groups){
+            for (Group.Account account : group.getAccounts()){
+                for (Group.Account.Record record : account.getRecords()){
+                    years.add(record.getYear());
+                }
+            }
+        }
+        return years;
+    }
 
     @Data
     public static class Group

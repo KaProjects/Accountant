@@ -1,9 +1,7 @@
 package org.kaleta.service;
 
-import org.kaleta.entity.Schema;
 import org.kaleta.model.SchemaClass;
 
-import java.util.List;
 import java.util.Map;
 
 public interface SchemaService
@@ -12,11 +10,6 @@ public interface SchemaService
      * @return names of all schema elements for specified year
      */
     Map<String, String> getSchemaNames(String year);
-
-    /**
-     * @return list of accounts for specified group
-     */
-    List<Schema> getSchemaAccountsByGroup(String year, String groupId);
 
     /**
      * @return account type for specified account ID and year

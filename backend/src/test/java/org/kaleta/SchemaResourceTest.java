@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.is;
 public class SchemaResourceTest
 {
     @Test
-    public void getAllAccountsTest()
+    public void getSchemaTest()
     {
         YearSchemaDto schema =
                 given().when()

@@ -123,4 +123,9 @@ public class Utils
             return Integer.parseInt(dateA.substring(0, 2)) - Integer.parseInt(dateB.substring(0, 2));
         }
     }
+
+    public static Integer[] initialMonthlyBalance()
+    {
+        return new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    }
 }

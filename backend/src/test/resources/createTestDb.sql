@@ -36,25 +36,6 @@ CREATE TABLE Budgeting (
                            planning TINYTEXT,
                            PRIMARY KEY(year, id)
 );
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '0', 'class0', '');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '00', 'group00', '');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '000', 'account000', 'A');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '001', 'account001', 'L');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '002', 'account002', 'E');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '003', 'account003', 'R');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '01', 'group01', '');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '010', 'account010', 'A');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '7', 'class7', '');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '70', 'group70', '');
-INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '700', 'account700', 'X');
-
-INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '000', '0', 'general', '');
-INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '001', '0', 'general', '');
-INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '700', '0', 'general', '');
-
-INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0101', '1000', '000.0', '700.0', '22x1', '22tr init');
-INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0101', '1000', '700.0', '001.0', '22x2', '22tr init');
-INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0505', '500', '001.0', '000.0', '22x3', '22tr 1');
 
 INSERT INTO ASchema (year, id, name, type) VALUES ('2023', '0', 'class0', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2023', '00', 'group00', '');
@@ -387,3 +368,92 @@ INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VAL
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0704', '100', '200.0', '520.0', '18x9', 'view=zzz');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2018', '0707', '1', '200.0', '500.0', '18x10', 'view=ww');
 
+
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '7', 'class7', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '70', 'group70', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '700', 'account700', 'X');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '2', 'class2', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '20', 'group20', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '200', 'account200', 'A');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '23', 'group23', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '230', 'account230', 'A');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '231', 'account231', 'A');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '5', 'class5', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '54', 'group54', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '546', 'account546', 'E');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '544', 'account544', 'E');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '6', 'class6', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '62', 'group62', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2021', '624', 'account624', 'R');
+
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '700', '0', 'inits', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '200', '0', 'cash', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '230', '0', 'fin0-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '230', '1', 'fin0-1', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '231', '0', 'fin1-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '546', '0-0', 'cre0-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '546', '0-1', 'cre0-1', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '546', '1-0', 'cre1-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '544', '0-0', 'erev0-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '544', '0-1', 'erev0-1', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '544', '1-0', 'erev1-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '624', '0-0', 'rrev0-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '624', '0-1', 'rrev0-1', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2021', '624', '1-0', 'rrev1-0', '');
+
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0101', '1000', '230.0', '700.0', '21x1', 'init');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0101', '2000', '230.1', '700.0', '21x2', 'init');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0101', '3000', '231.0', '700.0', '21x3', 'init');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0102', '1000', '546.0-1', '200.0', '21x4', 'cre02');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0103', '1000', '546.0-1', '200.0', '21x5', 'cre03');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0104', '1000', '544.0-1', '230.1', '21x6', 'nrev04');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0106', '1000', '230.1', '624.0-1', '21x7', 'rrev06');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0108', '1000', '200.0', '230.1', '21x8', 'with08');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0109', '1000', '230.1', '624.0-1', '21x9', 'rrev09');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0110', '1000', '546.0-1', '200.0', '21x10', 'cre10');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0111', '1000', '544.0-1', '230.1', '21x11', 'nrev11');
+
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '7', 'class7', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '70', 'group70', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '700', 'account700', 'X');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '2', 'class2', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '20', 'group20', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '200', 'account200', 'A');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '23', 'group23', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '230', 'account230', 'A');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '231', 'account231', 'A');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '5', 'class5', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '54', 'group54', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '546', 'account546', 'E');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '544', 'account544', 'E');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '6', 'class6', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '62', 'group62', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '624', 'account624', 'R');
+
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '700', '0', 'inits', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '200', '0', 'cash', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '230', '0', 'fin0-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '230', '1', 'fin0-1', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '231', '0', 'fin1-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '546', '0-0', 'cre0-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '546', '0-1', 'cre0-1', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '546', '1-0', 'cre1-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '544', '0-0', 'erev0-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '544', '0-1', 'erev0-1', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '544', '1-0', 'erev1-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '624', '0-0', 'rrev0-0', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '624', '0-1', 'rrev0-1', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2022', '624', '1-0', 'rrev1-0', '');
+
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0101', '1000', '230.0', '700.0', '22x1', 'init');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0101', '1000', '230.1', '700.0', '22x2', 'init');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0101', '3000', '231.0', '700.0', '22x3', 'init');
+
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0102', '1000', '546.1-0', '200.0', '22x4', 'cre02');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0103', '1000', '546.1-0', '200.0', '22x5', 'cre03');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '1503', '1500', '231.0', '624.1-0', '22x6', 'rrev03');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0104', '500', '544.1-0', '231.0', '22x7', 'nrev04');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0106', '1000', '546.1-0', '200.0', '22x8', 'cre06');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '1506', '1000', '231.0', '624.1-0', '22x9', 'rrev06');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0108', '1000', '200.0', '231.0', '22x10', 'with08');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2022', '0111', '1000', '544.1-0', '231.0', '22x11', 'nrev11');
