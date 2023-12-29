@@ -8,6 +8,7 @@ import org.kaleta.model.SchemaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,20 @@ public class AccountingServiceImpl implements AccountingService
         this.transactionService = transactionService;
         this.schemaService = schemaService;
         this.accountService = accountService;
+    }
+
+    @Override
+    public Map<String, AccountingData> getBalanceData(String year)
+    {
+        Map<String, AccountingData> map = new HashMap<>();
+        for (String classId : new String[]{"0", "1", "2", "3", "4"})
+        {
+            List<Transaction> transactions = transactionService.getTransactionsMatching(year, classId);
+            List<Account> accounts = accountService.listBySchema(year, classId);
+            SchemaClass schemaClass = schemaService.getClass(year, classId);
+            map.put(classId, new AccountingData(transactions, accounts, schemaClass));
+        }
+        return map;
     }
 
     @Override

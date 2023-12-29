@@ -65,30 +65,183 @@ public class AccountingResourceTest
         assertThat(dto.getRows().get(0).getInitial(), is(1000));
         assertThat(dto.getRows().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 1000, 200, 0, -600, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(0).getTotal(), is(1600));
-        assertThat(dto.getRows().get(0).getAccounts().size(), is(2));
-        assertThat(dto.getRows().get(0).getAccounts().get(0).getSchemaId(), is("200"));
-        assertThat(dto.getRows().get(0).getAccounts().get(0).getType(), is(AccountingDto.Type.CASH_FLOW_ACCOUNT));
-        assertThat(dto.getRows().get(0).getAccounts().get(0).getInitial(), is(1000));
-        assertThat(dto.getRows().get(0).getAccounts().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, -200, 1000, 200, 0, -600, 0, 0, 0, 0}));
-        assertThat(dto.getRows().get(0).getAccounts().get(0).getTotal(), is(1400));
-        assertThat(dto.getRows().get(0).getAccounts().get(1).getSchemaId(), is("201"));
-        assertThat(dto.getRows().get(0).getAccounts().get(1).getType(), is(AccountingDto.Type.CASH_FLOW_ACCOUNT));
-        assertThat(dto.getRows().get(0).getAccounts().get(1).getInitial(), is(0));
-        assertThat(dto.getRows().get(0).getAccounts().get(1).getMonthlyValues(), is(new Integer[]{0, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 0}));
-        assertThat(dto.getRows().get(0).getAccounts().get(1).getTotal(), is(200));
+        assertThat(dto.getRows().get(0).getChildren().size(), is(2));
+        assertThat(dto.getRows().get(0).getChildren().get(0).getSchemaId(), is("200"));
+        assertThat(dto.getRows().get(0).getChildren().get(0).getType(), is(AccountingDto.Type.CASH_FLOW_ACCOUNT));
+        assertThat(dto.getRows().get(0).getChildren().get(0).getInitial(), is(1000));
+        assertThat(dto.getRows().get(0).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, -200, 1000, 200, 0, -600, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(0).getChildren().get(0).getTotal(), is(1400));
+        assertThat(dto.getRows().get(0).getChildren().get(1).getSchemaId(), is("201"));
+        assertThat(dto.getRows().get(0).getChildren().get(1).getType(), is(AccountingDto.Type.CASH_FLOW_ACCOUNT));
+        assertThat(dto.getRows().get(0).getChildren().get(1).getInitial(), is(0));
+        assertThat(dto.getRows().get(0).getChildren().get(1).getMonthlyValues(), is(new Integer[]{0, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(0).getChildren().get(1).getTotal(), is(200));
 
         assertThat(dto.getRows().get(3).getSchemaId(), is("22"));
         assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
         assertThat(dto.getRows().get(3).getInitial(), is(-3000));
         assertThat(dto.getRows().get(3).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, -1000, -400, 0, 0, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(3).getTotal(), is(-4400));
-        assertThat(dto.getRows().get(3).getAccounts().size(), is(1));
+        assertThat(dto.getRows().get(3).getChildren().size(), is(1));
 
         assertThat(dto.getRows().get(4).getType(), is(AccountingDto.Type.CASH_FLOW_SUMMARY));
         assertThat(dto.getRows().get(4).getInitial(), is(4000));
         assertThat(dto.getRows().get(4).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(4).getTotal(), is(4000));
-        assertThat(dto.getRows().get(4).getAccounts().size(), is(0));
+        assertThat(dto.getRows().get(4).getChildren().size(), is(0));
+    }
+
+    @Test
+    public void getBalanceSheetTest()
+    {
+        Response response = given().when()
+                .get("/accounting/balance/2020")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().response();
+
+        System.out.println("response time: " + response.time() + "ms");
+
+        AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
+
+        assertThat(dto.getColumns().size(), is(15));
+        assertThat(dto.getColumns().get(0), is("Balance Sheet 2020"));
+        assertThat(dto.getRows().size(), is(10));
+
+        assertThat(dto.getRows().get(0).getSchemaId(), is("a"));
+        assertThat(dto.getRows().get(0).getName(), is("ASSETS"));
+        assertThat(dto.getRows().get(0).getType(), is(AccountingDto.Type.BALANCE_SUMMARY));
+        assertThat(dto.getRows().get(0).getInitial(), is(7000));
+        assertThat(dto.getRows().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(0).getTotal(), is(8400));
+        assertThat(dto.getRows().get(0).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(1).getSchemaId(), is("0"));
+        assertThat(dto.getRows().get(1).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(1).getInitial(), is(0));
+        assertThat(dto.getRows().get(1).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(1).getTotal(), is(0));
+        assertThat(dto.getRows().get(1).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(2).getSchemaId(), is("1"));
+        assertThat(dto.getRows().get(2).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(2).getInitial(), is(0));
+        assertThat(dto.getRows().get(2).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(2).getTotal(), is(0));
+        assertThat(dto.getRows().get(2).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(3).getSchemaId(), is("2"));
+        assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(3).getInitial(), is(7000));
+        assertThat(dto.getRows().get(3).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(3).getTotal(), is(8400));
+        assertThat(dto.getRows().get(3).getChildren().size(), is(3));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getSchemaId(), is("20"));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_GROUP));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getInitial(), is(1000));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 1000, 200, 0, -600, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getTotal(), is(1600));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().size(), is(2));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getSchemaId(), is("200"));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_ACCOUNT));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getInitial(), is(1000));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, -200, 1000, 200, 0, -600, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getTotal(), is(1400));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(1).getSchemaId(), is("201"));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(1).getType(), is(AccountingDto.Type.BALANCE_ACCOUNT));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(1).getInitial(), is(0));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(1).getMonthlyValues(), is(new Integer[]{0, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(1).getTotal(), is(200));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(1).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getSchemaId(), is("21"));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getType(), is(AccountingDto.Type.BALANCE_GROUP));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getInitial(), is(2000));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 200, 0, 600, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getTotal(), is(2800));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().get(0).getSchemaId(), is("210"));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_ACCOUNT));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().get(0).getInitial(), is(2000));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 200, 0, 600, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().get(0).getTotal(), is(2800));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().get(0).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getSchemaId(), is("23"));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getType(), is(AccountingDto.Type.BALANCE_GROUP));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getInitial(), is(4000));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getTotal(), is(4000));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().get(0).getSchemaId(), is("230"));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_ACCOUNT));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().get(0).getInitial(), is(4000));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().get(0).getTotal(), is(4000));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().get(0).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(4).getSchemaId(), is("3"));
+        assertThat(dto.getRows().get(4).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(4).getInitial(), is(0));
+        assertThat(dto.getRows().get(4).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(4).getTotal(), is(0));
+        assertThat(dto.getRows().get(4).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(4).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_GROUP));
+
+        assertThat(dto.getRows().get(5).getSchemaId(), is("l"));
+        assertThat(dto.getRows().get(5).getType(), is(AccountingDto.Type.BALANCE_SUMMARY));
+        assertThat(dto.getRows().get(5).getName(), is("LIABILITIES"));
+        assertThat(dto.getRows().get(5).getInitial(), is(7000));
+        assertThat(dto.getRows().get(5).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(5).getTotal(), is(8400));
+        assertThat(dto.getRows().get(5).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(6).getSchemaId(), is("2"));
+        assertThat(dto.getRows().get(6).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(6).getInitial(), is(3000));
+        assertThat(dto.getRows().get(6).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(6).getTotal(), is(4400));
+        assertThat(dto.getRows().get(6).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getSchemaId(), is("22"));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_GROUP));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getInitial(), is(3000));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getTotal(), is(4400));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().get(0).getSchemaId(), is("220"));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_ACCOUNT));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().get(0).getInitial(), is(3000));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().get(0).getTotal(), is(4400));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().get(0).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(7).getSchemaId(), is("3"));
+        assertThat(dto.getRows().get(7).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(7).getInitial(), is(0));
+        assertThat(dto.getRows().get(7).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(7).getTotal(), is(0));
+        assertThat(dto.getRows().get(7).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(7).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_GROUP));
+        assertThat(dto.getRows().get(8).getSchemaId(), is("4"));
+        assertThat(dto.getRows().get(8).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(8).getInitial(), is(4000));
+        assertThat(dto.getRows().get(8).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, -1000, 0, 0, 0}));
+        assertThat(dto.getRows().get(8).getTotal(), is(3000));
+        assertThat(dto.getRows().get(8).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getSchemaId(), is("40"));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_GROUP));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getInitial(), is(4000));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, -1000, 0, 0, 0}));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getTotal(), is(3000));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().get(0).getSchemaId(), is("400"));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_ACCOUNT));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().get(0).getInitial(), is(4000));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, -1000, 0, 0, 0}));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().get(0).getTotal(), is(3000));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().get(0).getChildren().size(), is(0));
+
+        assertThat(dto.getRows().get(9).getSchemaId(), is("p"));
+        assertThat(dto.getRows().get(9).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(9).getName(), is("Profit"));
+        assertThat(dto.getRows().get(9).getInitial(), is(0));
+        assertThat(dto.getRows().get(9).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 1000, 0, 0, 0}));
+        assertThat(dto.getRows().get(9).getTotal(), is(1000));
+        assertThat(dto.getRows().get(9).getChildren().size(), is(0));
     }
 
     @Test
@@ -156,79 +309,79 @@ public class AccountingResourceTest
         assertThat(dto.getRows().get(0).getType(), is(AccountingDto.Type.INCOME_GROUP));
         assertThat(dto.getRows().get(0).getMonthlyValues(), is(new Integer[]{0, 800, 0, 0, 7000, 0, 0, 0, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(0).getTotal(), is(7800));
-        assertThat(dto.getRows().get(0).getAccounts().size(), is(1));
+        assertThat(dto.getRows().get(0).getChildren().size(), is(1));
 
         assertThat(dto.getRows().get(1).getSchemaId(), is("55"));
         assertThat(dto.getRows().get(1).getType(), is(AccountingDto.Type.EXPENSE_GROUP));
         assertThat(dto.getRows().get(1).getMonthlyValues(), is(new Integer[]{0, 800, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(1).getTotal(), is(800));
-        assertThat(dto.getRows().get(1).getAccounts().size(), is(3));
-        assertThat(dto.getRows().get(1).getAccounts().get(0).getSchemaId(), is("550"));
-        assertThat(dto.getRows().get(1).getAccounts().get(0).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
-        assertThat(dto.getRows().get(1).getAccounts().get(0).getMonthlyValues(), is(new Integer[]{0, 800, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
-        assertThat(dto.getRows().get(1).getAccounts().get(0).getTotal(), is(800));
-        assertThat(dto.getRows().get(1).getAccounts().get(1).getSchemaId(), is("551"));
-        assertThat(dto.getRows().get(1).getAccounts().get(1).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
-        assertThat(dto.getRows().get(1).getAccounts().get(1).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
-        assertThat(dto.getRows().get(1).getAccounts().get(1).getTotal(), is(0));
-        assertThat(dto.getRows().get(1).getAccounts().get(2).getSchemaId(), is("552"));
-        assertThat(dto.getRows().get(1).getAccounts().get(2).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
-        assertThat(dto.getRows().get(1).getAccounts().get(2).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
-        assertThat(dto.getRows().get(1).getAccounts().get(2).getTotal(), is(0));
+        assertThat(dto.getRows().get(1).getChildren().size(), is(3));
+        assertThat(dto.getRows().get(1).getChildren().get(0).getSchemaId(), is("550"));
+        assertThat(dto.getRows().get(1).getChildren().get(0).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
+        assertThat(dto.getRows().get(1).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 800, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(1).getChildren().get(0).getTotal(), is(800));
+        assertThat(dto.getRows().get(1).getChildren().get(1).getSchemaId(), is("551"));
+        assertThat(dto.getRows().get(1).getChildren().get(1).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
+        assertThat(dto.getRows().get(1).getChildren().get(1).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(1).getChildren().get(1).getTotal(), is(0));
+        assertThat(dto.getRows().get(1).getChildren().get(2).getSchemaId(), is("552"));
+        assertThat(dto.getRows().get(1).getChildren().get(2).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
+        assertThat(dto.getRows().get(1).getChildren().get(2).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(1).getChildren().get(2).getTotal(), is(0));
 
         assertThat(dto.getRows().get(2).getSchemaId(), is("63"));
         assertThat(dto.getRows().get(2).getType(), is(AccountingDto.Type.INCOME_GROUP));
         assertThat(dto.getRows().get(2).getMonthlyValues(), is(new Integer[]{0, 0, 900, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(2).getTotal(), is(900));
-        assertThat(dto.getRows().get(2).getAccounts().size(), is(3));
+        assertThat(dto.getRows().get(2).getChildren().size(), is(3));
 
         assertThat(dto.getRows().get(3).getSchemaId(), is("ni"));
         assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.PROFIT_SUMMARY));
         assertThat(dto.getRows().get(3).getMonthlyValues(), is(new Integer[]{0, 0, 900, 0, 7000, 0, 0, 0, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(3).getTotal(), is(7900));
-        assertThat(dto.getRows().get(3).getAccounts().size(), is(0));
+        assertThat(dto.getRows().get(3).getChildren().size(), is(0));
 
         assertThat(dto.getRows().get(5).getSchemaId(), is("52"));
         assertThat(dto.getRows().get(5).getType(), is(AccountingDto.Type.EXPENSE_GROUP));
         assertThat(dto.getRows().get(5).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 7000, 0, 100, 100, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(5).getTotal(), is(7200));
-        assertThat(dto.getRows().get(5).getAccounts().size(), is(1));
+        assertThat(dto.getRows().get(5).getChildren().size(), is(1));
 
         assertThat(dto.getRows().get(7).getSchemaId(), is("op"));
         assertThat(dto.getRows().get(7).getType(), is(AccountingDto.Type.PROFIT_SUMMARY));
         assertThat(dto.getRows().get(7).getMonthlyValues(), is(new Integer[]{0, 0, 900, 0, 0, 0, -100, -100, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(7).getTotal(), is(700));
-        assertThat(dto.getRows().get(7).getAccounts().size(), is(0));
+        assertThat(dto.getRows().get(7).getChildren().size(), is(0));
 
         assertThat(dto.getRows().get(13).getSchemaId(), is("63"));
         assertThat(dto.getRows().get(13).getType(), is(AccountingDto.Type.INCOME_GROUP));
         assertThat(dto.getRows().get(13).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 300, 300, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(13).getTotal(), is(600));
-        assertThat(dto.getRows().get(13).getAccounts().size(), is(1));
+        assertThat(dto.getRows().get(13).getChildren().size(), is(1));
 
         assertThat(dto.getRows().get(14).getSchemaId(), is("55"));
         assertThat(dto.getRows().get(14).getType(), is(AccountingDto.Type.EXPENSE_GROUP));
         assertThat(dto.getRows().get(14).getMonthlyValues(), is(new Integer[]{0, 0, 900, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(14).getTotal(), is(900));
-        assertThat(dto.getRows().get(14).getAccounts().size(), is(3));
-        assertThat(dto.getRows().get(14).getAccounts().get(0).getSchemaId(), is("553"));
-        assertThat(dto.getRows().get(14).getAccounts().get(0).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
-        assertThat(dto.getRows().get(14).getAccounts().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 900, 0, 0, 0, 0, 0, 50, 0, 0, 0}));
-        assertThat(dto.getRows().get(14).getAccounts().get(0).getTotal(), is(950));
-        assertThat(dto.getRows().get(14).getAccounts().get(1).getSchemaId(), is("554"));
-        assertThat(dto.getRows().get(14).getAccounts().get(1).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
-        assertThat(dto.getRows().get(14).getAccounts().get(1).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, -50, 0, 0, 0}));
-        assertThat(dto.getRows().get(14).getAccounts().get(1).getTotal(), is(-50));
-        assertThat(dto.getRows().get(14).getAccounts().get(2).getSchemaId(), is("555"));
-        assertThat(dto.getRows().get(14).getAccounts().get(2).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
-        assertThat(dto.getRows().get(14).getAccounts().get(2).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
-        assertThat(dto.getRows().get(14).getAccounts().get(2).getTotal(), is(0));
+        assertThat(dto.getRows().get(14).getChildren().size(), is(3));
+        assertThat(dto.getRows().get(14).getChildren().get(0).getSchemaId(), is("553"));
+        assertThat(dto.getRows().get(14).getChildren().get(0).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
+        assertThat(dto.getRows().get(14).getChildren().get(0).getMonthlyValues(), is(new Integer[]{0, 0, 900, 0, 0, 0, 0, 0, 50, 0, 0, 0}));
+        assertThat(dto.getRows().get(14).getChildren().get(0).getTotal(), is(950));
+        assertThat(dto.getRows().get(14).getChildren().get(1).getSchemaId(), is("554"));
+        assertThat(dto.getRows().get(14).getChildren().get(1).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
+        assertThat(dto.getRows().get(14).getChildren().get(1).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, -50, 0, 0, 0}));
+        assertThat(dto.getRows().get(14).getChildren().get(1).getTotal(), is(-50));
+        assertThat(dto.getRows().get(14).getChildren().get(2).getSchemaId(), is("555"));
+        assertThat(dto.getRows().get(14).getChildren().get(2).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
+        assertThat(dto.getRows().get(14).getChildren().get(2).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+        assertThat(dto.getRows().get(14).getChildren().get(2).getTotal(), is(0));
 
         assertThat(dto.getRows().get(15).getSchemaId(), is("np"));
         assertThat(dto.getRows().get(15).getType(), is(AccountingDto.Type.PROFIT_SUMMARY));
         assertThat(dto.getRows().get(15).getMonthlyValues(), is(new Integer[]{0, 0, 0, 0, 0, 0, 200, 200, 0, 0, 0, 0}));
         assertThat(dto.getRows().get(15).getTotal(), is(400));
-        assertThat(dto.getRows().get(15).getAccounts().size(), is(0));
+        assertThat(dto.getRows().get(15).getChildren().size(), is(0));
     }
 
     @Test

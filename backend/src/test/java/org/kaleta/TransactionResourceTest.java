@@ -45,7 +45,7 @@ public class TransactionResourceTest
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("size()", is(32))
+                .body("size()", is(33))
                 .extract().response().jsonPath().getList("", YearTransactionDto.class);
 
         assertThat(transactions, hasItem(YearTransactionDto.from("0101", "1000", "200.0", "700.0", "init")));

@@ -1,6 +1,7 @@
 package org.kaleta.model;
 
 import lombok.Data;
+import org.kaleta.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,12 @@ public class SchemaClass
     }
     public Group getGroup(String groupId) {
         return groups.get(groupId);
+    }
+
+    public List<String> getGroupSuffixes() {
+        List<String> suffixes = new ArrayList<>();
+        groups.keySet().forEach(id -> suffixes.add(id.substring(1,2)));
+        return suffixes;
     }
 
     @Data
@@ -61,9 +68,9 @@ public class SchemaClass
         public static class Account {
             private String id;
             private String name;
-            private String type;
+            private Constants.AccountType type;
 
-            public Account(String id, String name, String type)
+            public Account(String id, String name, Constants.AccountType type)
             {
                 this.id = id;
                 this.name = name;

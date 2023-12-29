@@ -1,5 +1,6 @@
 package org.kaleta.service;
 
+import org.kaleta.Utils;
 import org.kaleta.dao.TransactionDao;
 import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Transaction;
@@ -13,13 +14,11 @@ import java.util.List;
 public class TransactionServiceImpl implements TransactionService
 {
     private final TransactionDao transactionDao;
-    private final SchemaService schemaService;
 
     @Autowired
-    public TransactionServiceImpl(TransactionDao transactionDao, SchemaService schemaService)
+    public TransactionServiceImpl(TransactionDao transactionDao)
     {
         this.transactionDao = transactionDao;
-        this.schemaService = schemaService;
     }
 
     @Override
@@ -67,19 +66,36 @@ public class TransactionServiceImpl implements TransactionService
     @Override
     public List<Transaction> getClosingTransactions()
     {
-        return transactionDao.listClosingTransactions();
+        return transactionDao.listClosingBalanceTransactions();
     }
 
     @Override
     public List<Transaction> getProfitTransactions()
     {
-        return transactionDao.listProfitTransactions();
+        return transactionDao.listClosingProfitTransactions();
     }
 
     @Override
     public List<Transaction> getFinancialAssetTransactions(String year)
     {
         return transactionDao.listFinancialAssetTransactions(year);
+    }
+
+    @Override
+    public Integer[] getMonthlyProfit(String year)
+    {
+        Integer[] monthlyProfit = Utils.initialMonthlyBalance();
+        for (Transaction transaction : transactionDao.listProfitTransactions(year))
+        {
+            int monthIndex = Integer.parseInt(transaction.getDate().substring(2,4)) - 1;
+            if (transaction.getDebit().startsWith("5") || transaction.getDebit().startsWith("6")) {
+                monthlyProfit[monthIndex] -= transaction.getAmount();
+            }
+            if (transaction.getCredit().startsWith("5") || transaction.getCredit().startsWith("6")) {
+                monthlyProfit[monthIndex] += transaction.getAmount();
+            }
+        }
+        return monthlyProfit;
     }
 
     private List<YearTransactionDto> mapYearTransactions(List<Transaction> transactions)

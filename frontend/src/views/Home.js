@@ -8,7 +8,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {properties} from "../properties";
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
-
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 
 const Home = props => {
 
@@ -26,6 +26,22 @@ const Home = props => {
             <Card sx={{ width: 300, height: 230}} raised style={{backgroundColor:"#ffc107",   display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
                 <CardContent>
                     <Typography variant="h5" component="div" align={"center"}>
+                        Balance Sheet
+                    </Typography>
+                    <Typography align={"center"}>
+                        <AccountBalanceIcon/>
+                    </Typography>
+                    <Typography variant="caption">
+                        A balance sheet is a financial statement that contains details of a company's assets or liabilities at a specific point in time.                    </Typography>
+                </CardContent>
+                <CardActions style={{justifyContent: 'center'}}>
+                    <Button size="small" onClick={event => window.location.href='/accounting/balance'}>Yearly</Button>
+                    <Button size="small" onClick={event => window.location.href='/accounting/balance/overall'}>Overall</Button>
+                </CardActions>
+            </Card>
+            <Card sx={{ width: 300, height: 230}} raised style={{backgroundColor:"#ffc107",   display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
+                <CardContent>
+                    <Typography variant="h5" component="div" align={"center"}>
                         Income Statement
                     </Typography>
                     <Typography align={"center"}>
@@ -38,7 +54,8 @@ const Home = props => {
                 <CardActions style={{justifyContent: 'center'}}>
                     <Button size="small" onClick={event => window.location.href='/accounting/profit'}>Yearly</Button>
                     <Button size="small" onClick={event => window.location.href='/accounting/profit/overall'}>Overall</Button>
-                </CardActions>            </Card>
+                </CardActions>
+            </Card>
             <Card sx={{ width: 300, height: 230 }} raised style={{backgroundColor:"#ffc107"}}>
                 <CardContent>
                     <Typography variant="h5" component="div" align={"center"}>
@@ -56,9 +73,6 @@ const Home = props => {
                     <Button size="small" onClick={event => window.location.href='/accounting/cashflow/overall'}>Overall</Button>
                 </CardActions>
             </Card>
-
-            {/*import AccountBalanceIcon from '@mui/icons-material/AccountBalance';*/}
-
         </Stack>
 
         <Typography variant="h4" component="div" align={"center"} margin={2}>

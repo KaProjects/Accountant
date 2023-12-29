@@ -1,5 +1,6 @@
 package org.kaleta.service;
 
+import org.kaleta.Constants;
 import org.kaleta.dao.SchemaDao;
 import org.kaleta.entity.Schema;
 import org.kaleta.model.SchemaClass;
@@ -61,7 +62,7 @@ public class SchemaServiceImpl implements SchemaService
         for (Schema schema : schemas){
             if (schema.getYearId().getId().length() == 3){
                 clazz.getGroups().get(schema.getYearId().getId().substring(0,2))
-                        .getAccounts().put(schema.getYearId().getId(), new SchemaClass.Group.Account(schema.getYearId().getId(), schema.getName(), schema.getType()));
+                        .getAccounts().put(schema.getYearId().getId(), new SchemaClass.Group.Account(schema.getYearId().getId(), schema.getName(), Constants.AccountType.valueOf(schema.getType())));
             }
         }
         return clazz;
@@ -88,7 +89,7 @@ public class SchemaServiceImpl implements SchemaService
         for (Schema schema : schemas){
             String schemaId = schema.getYearId().getId();
             if (schemaId.length() == 3){
-                classMap.get(schemaId.substring(0,1)).getGroup(schemaId.substring(0,2)).addAccount(new SchemaClass.Group.Account(schemaId, schema.getName(), schema.getType()));
+                classMap.get(schemaId.substring(0,1)).getGroup(schemaId.substring(0,2)).addAccount(new SchemaClass.Group.Account(schemaId, schema.getName(), Constants.AccountType.valueOf(schema.getType())));
             }
         }
         return classMap;

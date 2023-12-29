@@ -8,8 +8,10 @@ import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Transaction;
 import org.kaleta.model.AccountingData;
 import org.kaleta.model.AccountingYearlyData;
+import org.kaleta.model.ClassComponent;
 import org.kaleta.model.GroupComponent;
 import org.kaleta.service.AccountingService;
+import org.kaleta.service.TransactionService;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -18,6 +20,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Path("/accounting")
@@ -25,6 +28,9 @@ public class AccountingResource
 {
     @Inject
     AccountingService service;
+
+    @Inject
+    TransactionService transactionService;
 
     @GET
     @Secured
@@ -39,21 +45,21 @@ public class AccountingResource
             AccountingData profitExpensesData = service.getProfitExpensesData(year);
             AccountingData profitRevenuesData = service.getProfitRevenuesData(year);
 
-            GroupComponent group60 = profitRevenuesData.getGroupComponent(year, "60");
-            GroupComponent group55a = profitExpensesData.getGroupComponent(year, "55", "0", "1", "2");
-            GroupComponent group63a = profitRevenuesData.getGroupComponent(year, "63", "1", "2", "3");
+            GroupComponent group60 = profitRevenuesData.getGroupComponent("60");
+            GroupComponent group55a = profitExpensesData.getGroupComponent("55", "0", "1", "2");
+            GroupComponent group63a = profitRevenuesData.getGroupComponent("63", "1", "2", "3");
 
-            GroupComponent group51 = profitExpensesData.getGroupComponent(year, "51");
-            GroupComponent group52 = profitExpensesData.getGroupComponent(year, "52");
-            GroupComponent group53 = profitExpensesData.getGroupComponent(year, "53");
+            GroupComponent group51 = profitExpensesData.getGroupComponent("51");
+            GroupComponent group52 = profitExpensesData.getGroupComponent("52");
+            GroupComponent group53 = profitExpensesData.getGroupComponent("53");
 
-            GroupComponent group50 = profitExpensesData.getGroupComponent(year, "50");
-            GroupComponent group61 = profitRevenuesData.getGroupComponent(year, "61");
-            GroupComponent group56 = profitExpensesData.getGroupComponent(year, "56");
-            GroupComponent group62 = profitRevenuesData.getGroupComponent(year, "62");
-            GroupComponent group54 = profitExpensesData.getGroupComponent(year, "54");
-            GroupComponent group63b = profitRevenuesData.getGroupComponent(year, "63", "0");
-            GroupComponent group55b = profitExpensesData.getGroupComponent(year, "55", "3", "4", "5");
+            GroupComponent group50 = profitExpensesData.getGroupComponent("50");
+            GroupComponent group61 = profitRevenuesData.getGroupComponent("61");
+            GroupComponent group56 = profitExpensesData.getGroupComponent("56");
+            GroupComponent group62 = profitRevenuesData.getGroupComponent("62");
+            GroupComponent group54 = profitExpensesData.getGroupComponent("54");
+            GroupComponent group63b = profitRevenuesData.getGroupComponent("63", "0");
+            GroupComponent group55b = profitExpensesData.getGroupComponent("55", "3", "4", "5");
 
             AccountingDto profitDto = new AccountingDto(year, AccountingDto.Type.PROFIT_SUMMARY);
 
@@ -113,21 +119,21 @@ public class AccountingResource
             AccountingData profitExpensesData = service.getProfitExpensesData(years[years.length - 1]);
             AccountingData profitRevenuesData = service.getProfitRevenuesData(years[years.length - 1]);
 
-            GroupComponent group60 = profitRevenuesData.getGroupComponent(years[years.length - 1], "60");
-            GroupComponent group55a = profitExpensesData.getGroupComponent(years[years.length - 1], "55", "0", "1", "2");
-            GroupComponent group63a = profitRevenuesData.getGroupComponent(years[years.length - 1], "63", "1", "2", "3");
+            GroupComponent group60 = profitRevenuesData.getGroupComponent("60");
+            GroupComponent group55a = profitExpensesData.getGroupComponent("55", "0", "1", "2");
+            GroupComponent group63a = profitRevenuesData.getGroupComponent("63", "1", "2", "3");
 
-            GroupComponent group51 = profitExpensesData.getGroupComponent(years[years.length - 1], "51");
-            GroupComponent group52 = profitExpensesData.getGroupComponent(years[years.length - 1], "52");
-            GroupComponent group53 = profitExpensesData.getGroupComponent(years[years.length - 1], "53");
+            GroupComponent group51 = profitExpensesData.getGroupComponent("51");
+            GroupComponent group52 = profitExpensesData.getGroupComponent("52");
+            GroupComponent group53 = profitExpensesData.getGroupComponent("53");
 
-            GroupComponent group50 = profitExpensesData.getGroupComponent(years[years.length - 1], "50");
-            GroupComponent group61 = profitRevenuesData.getGroupComponent(years[years.length - 1], "61");
-            GroupComponent group56 = profitExpensesData.getGroupComponent(years[years.length - 1], "56");
-            GroupComponent group62 = profitRevenuesData.getGroupComponent(years[years.length - 1], "62");
-            GroupComponent group54 = profitExpensesData.getGroupComponent(years[years.length - 1], "54");
-            GroupComponent group63b = profitRevenuesData.getGroupComponent(years[years.length - 1], "63", "0");
-            GroupComponent group55b = profitExpensesData.getGroupComponent(years[years.length - 1], "55", "3", "4", "5");
+            GroupComponent group50 = profitExpensesData.getGroupComponent("50");
+            GroupComponent group61 = profitRevenuesData.getGroupComponent("61");
+            GroupComponent group56 = profitExpensesData.getGroupComponent("56");
+            GroupComponent group62 = profitRevenuesData.getGroupComponent("62");
+            GroupComponent group54 = profitExpensesData.getGroupComponent("54");
+            GroupComponent group63b = profitRevenuesData.getGroupComponent("63", "0");
+            GroupComponent group55b = profitExpensesData.getGroupComponent("55", "3", "4", "5");
 
             AccountingDto profitDto = new AccountingDto(yearlyData.getYears(), AccountingDto.Type.PROFIT_SUMMARY);
 
@@ -195,10 +201,10 @@ public class AccountingResource
         }, () -> {
             AccountingData cashFlowData = service.getCashFlowData(year);
 
-            GroupComponent group20 = cashFlowData.getGroupComponent(year, "20");
-            GroupComponent group21 = cashFlowData.getGroupComponent(year, "21");
-            GroupComponent group23 = cashFlowData.getGroupComponent(year, "23");
-            GroupComponent group22 = cashFlowData.getGroupComponent(year, "22").inverted();
+            GroupComponent group20 = cashFlowData.getGroupComponent("20");
+            GroupComponent group21 = cashFlowData.getGroupComponent("21");
+            GroupComponent group23 = cashFlowData.getGroupComponent("23");
+            GroupComponent group22 = cashFlowData.getGroupComponent("22").inverted();
 
             AccountingDto cashFlowDto = new AccountingDto(year, AccountingDto.Type.CASH_FLOW_SUMMARY);
 
@@ -230,10 +236,10 @@ public class AccountingResource
             String[] years = yearlyData.getYears();
 
             AccountingData cashFlowData = service.getCashFlowData(years[years.length - 1]);
-            GroupComponent group20 = cashFlowData.getGroupComponent(years[years.length - 1], "20");
-            GroupComponent group21 = cashFlowData.getGroupComponent(years[years.length - 1], "21");
-            GroupComponent group23 = cashFlowData.getGroupComponent(years[years.length - 1], "23");
-            GroupComponent group22 = cashFlowData.getGroupComponent(years[years.length - 1], "22").inverted();
+            GroupComponent group20 = cashFlowData.getGroupComponent("20");
+            GroupComponent group21 = cashFlowData.getGroupComponent("21");
+            GroupComponent group23 = cashFlowData.getGroupComponent("23");
+            GroupComponent group22 = cashFlowData.getGroupComponent("22").inverted();
 
             AccountingDto cashFlowDto = new AccountingDto(yearlyData.getYears(), AccountingDto.Type.CASH_FLOW_SUMMARY);
 
@@ -263,6 +269,68 @@ public class AccountingResource
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/balance/{year}")
+    public Response getBalanceSheet(@PathParam String year)
+    {
+        return Endpoint.process(() -> {
+            ParamValidators.validateYear(year);
+        }, () -> {
+            Map<String, AccountingData> balanceData = service.getBalanceData(year);
+
+            ClassComponent class0 = balanceData.get("0").getClassComponent();
+            ClassComponent class1 = balanceData.get("1").getClassComponent();
+            ClassComponent class2a = balanceData.get("2").getClassComponent("0", "1", "3");
+            ClassComponent class3a = balanceData.get("3").getClassComponent("0");
+
+            ClassComponent class2l = balanceData.get("2").getClassComponent("2");
+            ClassComponent class3l = balanceData.get("3").getClassComponent("1");
+            ClassComponent class4 = balanceData.get("4").getClassComponent();
+
+            AccountingDto balanceSheetDto = new AccountingDto(year, AccountingDto.Type.BALANCE_SUMMARY);
+
+            AccountingDto.Row rowClass0 = from(class0);
+            AccountingDto.Row rowClass1 = from(class1);
+            AccountingDto.Row rowClass2a = from(class2a);
+            AccountingDto.Row rowClass3a = from(class3a);
+
+            AccountingDto.Row assetsRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, "Assets".toUpperCase(), "a");
+            assetsRow.setInitial(rowClass0.getInitial() + rowClass1.getInitial() + rowClass2a.getInitial() + rowClass3a.getInitial());
+            assetsRow.setMonthlyValues(Utils.mergeIntegerArrays(rowClass0.getMonthlyValues(), rowClass1.getMonthlyValues(), rowClass2a.getMonthlyValues(), rowClass3a.getMonthlyValues()));
+            assetsRow.setTotal(rowClass0.getTotal() + rowClass1.getTotal() + rowClass2a.getTotal() + rowClass3a.getTotal());
+            balanceSheetDto.getRows().add(assetsRow);
+
+            balanceSheetDto.getRows().add(rowClass0);
+            balanceSheetDto.getRows().add(rowClass1);
+            balanceSheetDto.getRows().add(rowClass2a);
+            balanceSheetDto.getRows().add(rowClass3a);
+
+            AccountingDto.Row rowClass2l = from(class2l);
+            AccountingDto.Row rowClass3l = from(class3l);
+            AccountingDto.Row rowClass4 = from(class4);
+            AccountingDto.Row rowProfit = new AccountingDto.Row(AccountingDto.Type.BALANCE_CLASS, "Profit", "p");
+            rowProfit.setInitial(0);
+            rowProfit.setMonthlyValues(transactionService.getMonthlyProfit(year));
+            rowProfit.setTotal(Utils.sumArray(rowProfit.getMonthlyValues()));
+
+            AccountingDto.Row liabilitiesRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, "Liabilities".toUpperCase(), "l");
+            liabilitiesRow.setInitial(rowClass2l.getInitial() + rowClass3l.getInitial() + rowClass4.getInitial());
+            liabilitiesRow.setMonthlyValues(Utils.mergeIntegerArrays(rowClass2l.getMonthlyValues(), rowClass3l.getMonthlyValues(), rowClass4.getMonthlyValues(), rowProfit.getMonthlyValues()));
+            liabilitiesRow.setTotal(rowClass2l.getTotal() + rowClass3l.getTotal() + rowClass4.getTotal() + rowProfit.getTotal());
+            balanceSheetDto.getRows().add(liabilitiesRow);
+
+            balanceSheetDto.getRows().add(rowClass2l);
+            balanceSheetDto.getRows().add(rowClass3l);
+            balanceSheetDto.getRows().add(rowClass4);
+            balanceSheetDto.getRows().add(rowProfit);
+
+            return balanceSheetDto;
+        });
+    }
+
+    @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/transaction/{accountId}/month/{month}")
     public Response getTransactions(@PathParam String year, @PathParam String accountId, @PathParam String month)
     {
@@ -285,6 +353,31 @@ public class AccountingResource
         return row;
     }
 
+    private AccountingDto.Row from(ClassComponent classComponent)
+    {
+        AccountingDto.Row classRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_CLASS, classComponent.getName(), classComponent.getSchemaId());
+        classRow.setInitial(classComponent.getInitialValue());
+        classRow.setMonthlyValues(classComponent.getMonthlyBalance());
+        classRow.setTotal(classComponent.getBalance());
+        for (GroupComponent groupComponent : classComponent.getGroups())
+        {
+            AccountingDto.Row groupRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_GROUP, groupComponent.getName(), groupComponent.getSchemaId());
+            groupRow.setInitial(groupComponent.getInitialValue());
+            groupRow.setMonthlyValues(groupComponent.getMonthlyBalance());
+            groupRow.setTotal(groupComponent.getBalance());
+            for (GroupComponent.AccountComponent accountComponent : groupComponent.getAccounts())
+            {
+                AccountingDto.Row accountRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_ACCOUNT, accountComponent.getName(), accountComponent.getSchemaId());
+                accountRow.setInitial(accountComponent.getInitialValue());
+                accountRow.setMonthlyValues(accountComponent.getMonthlyBalance());
+                accountRow.setTotal(accountComponent.getBalance());
+                groupRow.getChildren().add(accountRow);
+            }
+            classRow.getChildren().add(groupRow);
+        }
+        return classRow;
+    }
+
     private AccountingDto.Row from(GroupComponent groupComponent, AccountingDto.Type type)
     {
         AccountingDto.Row groupRow = new AccountingDto.Row(type, groupComponent.getName(), groupComponent.getSchemaId());
@@ -300,7 +393,7 @@ public class AccountingResource
             if (type == AccountingDto.Type.CASH_FLOW_GROUP) accountRow.setInitial(accountComponent.getInitialValue());
             accountRow.setMonthlyValues(accountComponent.getMonthlyBalance());
             accountRow.setTotal(accountComponent.getBalance());
-            groupRow.getAccounts().add(accountRow);
+            groupRow.getChildren().add(accountRow);
         }
         return groupRow;
     }

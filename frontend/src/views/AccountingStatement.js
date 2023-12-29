@@ -19,7 +19,8 @@ const AccountingStatement = props => {
         // eslint-disable-next-line
     }, []);
 
-    const [showAccounts, setShowAccounts] = React.useState([]);
+    const [showChildren, setShowChildren] = React.useState([]);
+    const [showGrandChild, setShowGrandChild] = React.useState(null);
 
     const [showTransactionsDialog, setShowTransactionsDialog] = React.useState(false);
     const [transactionsDialogRowName, setTransactionsDialogRowName] = React.useState(null);
@@ -45,8 +46,8 @@ const AccountingStatement = props => {
     }
 
     function getHeaderStyle(index) {
-        const borderLeft = index === 13 ? "2px solid" : "0px";
-        const borderRight = (index === 0 || index === 13 || index === 14) ? "2px solid" : "0px";
+        const borderLeft = (index === 0 || (index === data.columns.length - 1 && hasTotal())) ? "2px solid" : "0px";
+        const borderRight = (index === 0 || (hasInitial() && index === 1) || index === data.columns.length - 1) ? "2px solid" : "0px";
         const color = "#676767";
         return {boxShadow: "0 0 3px 0", border: "0px", textAlign: "center", borderBottom: "2px solid", borderLeft: borderLeft, borderRight: borderRight, borderColor: color};
     }
@@ -91,11 +92,29 @@ const AccountingStatement = props => {
             background = "#983f8d";
             color = "#3a0032";
         }
+        if (type === 'BALANCE_SUMMARY'){
+            background = "#cdf8f3";
+            color = "#3fab9e";
+        }
+        if (type === 'BALANCE_CLASS'){
+            background = "#f3e2ac";
+            color = "#544209";
+        }
+        if (type === 'BALANCE_GROUP'){
+            background = "#fdfac4";
+            color = "#65612a";
+        }
+        if (type === 'BALANCE_ACCOUNT'){
+            background = "#fdfcf3";
+            color = "#797746";
+        }
 
         let borderTop;
         let borderBottom;
         let fontWeight;
-        if (type === 'INCOME_GROUP' || type === 'EXPENSE_GROUP' || type === 'PROFIT_SUMMARY' || type === 'CASH_FLOW_SUMMARY' || type === 'CASH_FLOW_GROUP'){
+        if (type === 'INCOME_GROUP' || type === 'EXPENSE_GROUP' || type === 'PROFIT_SUMMARY'
+            || type === 'CASH_FLOW_SUMMARY' || type === 'CASH_FLOW_GROUP'
+            || type === 'BALANCE_SUMMARY' || type === 'BALANCE_CLASS'){
             borderTop = "2px solid";
             borderBottom = "2px solid";
             fontWeight = "bold";
@@ -108,23 +127,39 @@ const AccountingStatement = props => {
             border: "0px", boxShadow: boxShadow, borderTop: borderTop, borderBottom: borderBottom, borderLeft: borderLeft, borderRight: borderRight};
     }
 
+    function hasInitial() {
+        return data.columns[1] === "Initial"
+    }
+
+    function hasTotal() {
+        return data.columns[data.columns.length - 1] === "Total"
+    }
+
     function Row(props) {
         const {row, id } = props;
 
-        const handleShowAccounts = (id) => {
-            const newFlag = !showAccounts[id]
-            const newFlags =showAccounts.slice()
+        const handleShowChildren = (id) => {
+            const newFlag = !showChildren[id]
+            const newFlags = showChildren.slice()
             newFlags[id] = newFlag
-            setShowAccounts(newFlags)
+            setShowChildren(newFlags)
+        }
+
+        const handleShowGrandChildren = (id) => {
+            if (showGrandChild === id){
+                setShowGrandChild(null)
+            } else {
+                setShowGrandChild(id)
+            }
         }
 
         return (
             <React.Fragment>
-                <TableRow key={id} onClick={() => handleShowAccounts(id)}>
+                <TableRow key={id} onClick={() => handleShowChildren(id)}>
                     <TableCell key={-1} style={getRowStyle(row.type, true, true)}>
                         {" " + row.name}
                     </TableCell>
-                    {overall === undefined && row.type.startsWith("CASH_FLOW_") &&
+                    {hasInitial() &&
                         <TableCell key={-2} align="right" style={getRowStyle(row.type, false, true)}>
                             {row.initial}
                         </TableCell>
@@ -132,7 +167,7 @@ const AccountingStatement = props => {
                     {overall === undefined && row.monthlyValues.map((month, index) => (
                         <TableCell
                             align="right" key={index}
-                            style={getRowStyle(row.type, false, false)}
+                            style={getRowStyle(row.type, false, row.monthlyValues.length -1 === index)}
                         >
                             {month}
                         </TableCell>
@@ -140,41 +175,42 @@ const AccountingStatement = props => {
                     {overall !== undefined && row.yearlyValues.map((year, index) => (
                         <TableCell
                             align="right" key={index}
-                            style={getRowStyle(row.type, false, false)}
+                            style={getRowStyle(row.type, false, row.yearlyValues.length -1 === index)}
                         >
                             {year}
                         </TableCell>
                     ))}
-                    {(overall === undefined || type === "profit") &&
+                    {hasTotal() &&
                         <TableCell
-                            align="right" key={12}
-                            style={getRowStyle(row.type, true, true)}
+                            align="right" key={-3}
+                            style={getRowStyle(row.type, false, true)}
                         >
                             {row.total}
                         </TableCell>
                     }
                 </TableRow>
-                {showAccounts[id] && row.accounts.map((account, index) => (
-                    <TableRow key={id + "a" + index}>
-                        <TableCell component="th" scope="row" key={-1} style={getRowStyle(account.type, false, true)}>
-                            {account.name}
+                {showChildren[id] && row.children.map((child, index) => (
+                    <React.Fragment key={child.schemaId + "f" + index}>
+                    <TableRow key={child.schemaId + "x" + index} onClick={() => handleShowGrandChildren(child.schemaId)}>
+                        <TableCell component="th" scope="row" key={-1} style={getRowStyle(child.type, true, true)}>
+                            {child.name}
                         </TableCell>
-                        {account.type.startsWith("CASH_FLOW_") &&
-                            <TableCell key={-2} align="right" style={getRowStyle(account.type, false, true)}>
-                                {account.initial}
+                        {hasInitial() &&
+                            <TableCell key={-2} align="right" style={getRowStyle(child.type, false, true)}>
+                                {child.initial}
                             </TableCell>
                         }
-                        {account.monthlyValues.map((month, index) => (
+                        {child.monthlyValues.map((month, index) => (
                             <TableCell
                                 align="right" key={index}
-                                style={getRowStyle(account.type, false, false)}
-                                onClick={() => setTransactionsDialogProps(account.name, account.schemaId, index + 1)}
+                                style={getRowStyle(child.type, false, child.monthlyValues.length -1 === index)}
+                                onClick={() => setTransactionsDialogProps(child.name, child.schemaId, index + 1)}
                                 onMouseLeave={() => setTransactionsDialogProps(null, null, -1)}
                             >
                                 {month}
-                                {account.schemaId === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
+                                {child.children.length === 0 && child.schemaId === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
                                     <IconButton
-                                        style={{height: "2px", width: "25px", color: account.type === 'INCOME_ACCOUNT' ? "#227222" : "#a13c3c"}}
+                                        style={{height: "2px", width: "25px", color: getRowStyle(child.type).color}}
                                         onClick={() => setShowTransactionsDialog(true)}
                                     >
                                         <ReceiptLongIcon sx={{width: 18}}/>
@@ -182,8 +218,40 @@ const AccountingStatement = props => {
                                 }
                             </TableCell>
                         ))}
-                        <TableCell align="right" key={12} style={getRowStyle(account.type, true, true)}>{account.total}</TableCell>
+                        {hasTotal() &&
+                            <TableCell align="right" key={-3} style={getRowStyle(child.type, true, true)}>{child.total}</TableCell>
+                        }
                     </TableRow>
+                    {type === "balance" && (showGrandChild === child.schemaId) && child.children.map((grandchild, index) => (
+                        <TableRow key={grandchild.schemaId + "x" + index}>
+                            <TableCell component="th" scope="row" key={-1} style={getRowStyle(grandchild.type, true, true)}>
+                                {grandchild.name}
+                            </TableCell>
+                            <TableCell key={-2} align="right" style={getRowStyle(grandchild.type, false, true)}>
+                                {grandchild.initial}
+                            </TableCell>
+                            {grandchild.monthlyValues.map((month, index) => (
+                                <TableCell
+                                    align="right" key={index}
+                                    style={getRowStyle(grandchild.type, false, grandchild.monthlyValues.length -1 === index)}
+                                    onClick={() => setTransactionsDialogProps(grandchild.name, grandchild.schemaId, index + 1)}
+                                    onMouseLeave={() => setTransactionsDialogProps(null, null, -1)}
+                                >
+                                    {month}
+                                    {grandchild.children.length === 0 && grandchild.schemaId === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
+                                        <IconButton
+                                            style={{height: "2px", width: "25px", color: getRowStyle(grandchild.type).color}}
+                                            onClick={() => setShowTransactionsDialog(true)}
+                                        >
+                                            <ReceiptLongIcon sx={{width: 18}}/>
+                                        </IconButton>
+                                    }
+                                </TableCell>
+                            ))}
+                            <TableCell align="right" key={-3} style={getRowStyle(grandchild.type, true, true)}>{grandchild.total}</TableCell>
+                        </TableRow>
+                    ))}
+                    </React.Fragment>
                 ))}
             </React.Fragment>
         );

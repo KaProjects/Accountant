@@ -55,7 +55,7 @@ public class YearSchemaDto
                     Class.Group.Account account = new Class.Group.Account();
                     account.setId(schemaAccount.getId());
                     account.setName(schemaAccount.getName());
-                    account.setType(Constants.AccountType.valueOf(schemaAccount.getType()));
+                    account.setType(schemaAccount.getType());
                     group.getAccounts().add(account);
                 }
                 clazz.getGroups().add(group);

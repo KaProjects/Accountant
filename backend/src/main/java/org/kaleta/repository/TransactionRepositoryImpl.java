@@ -173,7 +173,7 @@ public class TransactionRepositoryImpl implements TransactionRepository
     }
 
     @Override
-    public List<Transaction> listClosingTransactions()
+    public List<Transaction> listClosingBalanceTransactions()
     {
         return entityManager.createQuery("SELECT t FROM Transaction t WHERE"
                         + " t.debit=:closing OR t.credit=:closing", Transaction.class)
@@ -182,11 +182,21 @@ public class TransactionRepositoryImpl implements TransactionRepository
     }
 
     @Override
-    public List<Transaction> listProfitTransactions()
+    public List<Transaction> listClosingProfitTransactions()
     {
         return entityManager.createQuery("SELECT t FROM Transaction t WHERE"
                         + " t.debit=:closing OR t.credit=:closing", Transaction.class)
                 .setParameter("closing", Constants.Account.PROFIT_ACC_ID)
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> listProfitTransactions(String year)
+    {
+        return entityManager.createQuery(selectYearly
+                        + " AND (t.debit LIKE '5%' OR t.debit LIKE '6%' OR t.credit LIKE '5%' OR t.credit LIKE '6%')"
+                        + excludeOffBalanceTransactions, Transaction.class)
+                .setParameter("year", year)
                 .getResultList();
     }
 

@@ -74,4 +74,9 @@ public interface TransactionService
      * @return list of financial asset transactions for specified year (e.i. schema 23x and 546)
      */
     List<Transaction> getFinancialAssetTransactions(String year);
+
+    /**
+     * @return monthly profit values for specified year
+     */
+    Integer[] getMonthlyProfit(String year);
 }

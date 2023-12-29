@@ -91,6 +91,8 @@ INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VAL
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2023', '3005', '3000', '000.0', '000.1', '23', 'month5 000correction');
 
 
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '0', 'class0', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '1', 'class1', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '2', 'class2', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '20', 'group20', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '200', 'account200', 'A');
@@ -101,9 +103,15 @@ INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '22', 'group22', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '220', 'account220', 'L');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '23', 'group23', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '230', 'account230', 'A');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '3', 'class3', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '30', 'group30', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '31', 'group31', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '7', 'class7', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '70', 'group70', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '700', 'account700', 'X');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '4', 'class4', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '40', 'group40', '');
+INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '400', 'account400', 'L');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '5', 'class5', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '50', 'group50', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2020', '51', 'group51', '');
@@ -134,12 +142,14 @@ INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020', '210', '0', 'general', '');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020', '220', '0', 'general', '');
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020', '230', '0', 'general', '');
+INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020', '400', '0', 'general', '');
 
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '0101', '1000', '200.0', '700.0', '20xi1', 'init');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '0101', '0', '201.0', '700.0', '20xi0', 'init');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '0101', '2000', '210.0', '700.0', '20xi2', 'init');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '0101', '3000', '700.0', '220.0', '20xi3', 'init');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '0101', '4000', '230.0', '700.0', '20xi4', 'init');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '0101', '4000', '700.0', '400.0', '20xi5', 'init');
 
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '0504', '100', '201.0', '200.0', '20x1', 'same group');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '0504', '100', '201.0', '200.0', '20x2', 'same group');
@@ -338,7 +348,7 @@ INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020
 INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES ('2020', '630', '0', 'general', '');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '1209', '1000', '550.0', '600.0', 'px91', '');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '1209', '1000', '510.0', '520.0', 'px92', '');
-INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '1209', '1000', '444.4', '630.0', 'px93', '');
+INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2020', '1209', '1000', '400.0', '630.0', 'px93', '');
 
 
 INSERT INTO ASchema (year, id, name, type) VALUES ('2018', '5', 'class5', '');

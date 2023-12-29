@@ -5,9 +5,15 @@ import org.kaleta.model.AccountingData;
 import org.kaleta.model.AccountingYearlyData;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AccountingService
 {
+    /**
+     * @return balance sheet data for specified year grouped by classId (e.i. classes 0, 1, 2, 3, 4)
+     */
+    Map<String, AccountingData> getBalanceData(String year);
+
     /**
      * @return cash flow data for specified year
      */

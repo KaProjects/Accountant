@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 public class AccountingData
 {
-    private List<Transaction> transactions;
-    private List<Account> accounts;
-    private SchemaClass schemaClass;
+    private final List<Transaction> transactions;
+    private final List<Account> accounts;
+    private final SchemaClass schemaClass;
 
     public AccountingData(List<Transaction> transactions, List<Account> accounts, SchemaClass schemaClass){
         this.transactions = transactions;
@@ -19,7 +19,7 @@ public class AccountingData
         this.schemaClass = schemaClass;
     }
 
-    public GroupComponent getGroupComponent(String year, String groupId, String... accountIdSuffixes){
+    public GroupComponent getGroupComponent(String groupId, String... accountIdSuffixes){
         GroupComponent groupComponent = new GroupComponent();
         groupComponent.setSchemaId(groupId);
         groupComponent.setName(schemaClass.getGroup(groupId).getName());
@@ -46,17 +46,46 @@ public class AccountingData
 
         return groupComponent;
     }
-    public GroupComponent getGroupComponent(String year, String groupId){
-        return getGroupComponent(year, groupId, schemaClass.getGroup(groupId).getAccountSuffixes().toArray(new String[]{}));
+    public GroupComponent getGroupComponent(String groupId){
+        return getGroupComponent(groupId, schemaClass.getGroup(groupId).getAccountSuffixes().toArray(new String[]{}));
+    }
+
+    public ClassComponent getClassComponent(String... groupIdSuffixes)
+    {
+        ClassComponent classComponent = new ClassComponent();
+        classComponent.setSchemaId(schemaClass.getId());
+        classComponent.setName(schemaClass.getName());
+        classComponent.setSchemaId(schemaClass.getId());
+
+        for (String groupIdSuffix : groupIdSuffixes)
+        {
+            GroupComponent groupComponent = getGroupComponent(schemaClass.getId() + groupIdSuffix);
+            if (schemaClass.getId().equals("0") && groupIdSuffix.equals("9")) groupComponent.inverted();
+            classComponent.getGroups().add(groupComponent);
+        }
+        return classComponent;
+    }
+
+    public ClassComponent getClassComponent()
+    {
+        return getClassComponent(schemaClass.getGroupSuffixes().toArray(new String[]{}));
     }
 
     private Integer getInitialValue(Account account, boolean isAsset){
-        return transactions.stream()
+        List<Transaction> initTransactions = transactions.stream()
                 .filter(transaction ->
                         isAsset ? transaction.getDebit().equals(account.getFullId()) && transaction.getCredit().equals(Constants.Account.INIT_ACC_ID)
-                                : transaction.getDebit().equals(Constants.Account.INIT_ACC_ID) && transaction.getCredit().equals(account.getFullId())
-                )
-                .findFirst().get().getAmount();
+                                : transaction.getDebit().equals(Constants.Account.INIT_ACC_ID) && transaction.getCredit().equals(account.getFullId())).collect(Collectors.toList());
+
+        if (initTransactions.size() == 1){
+            return initTransactions.get(0).getAmount();
+        } else {
+            if (account.getFullId().equals(Constants.Account.ACCUMULATED_EARNINGS_ACC_ID) && initTransactions.size() == 2)
+            {
+                return initTransactions.get(0).getAmount() + initTransactions.get(1).getAmount();
+            }
+            throw new IllegalStateException("Illegal number of initial transactions '" + initTransactions.size() + "' for account '" + account.getFullId() + "'");
+        }
     }
 
     private Integer[] getMonthlyBalance(Account account, boolean isDebit){
@@ -79,16 +108,14 @@ public class AccountingData
     }
 
     private boolean hasInitialValue(SchemaClass.Group.Account schemaAccount){
-        return schemaAccount.getType().equals("A") || schemaAccount.getType().equals("L");
+        return schemaAccount.getType().equals(Constants.AccountType.A) || schemaAccount.getType().equals(Constants.AccountType.L);
     }
 
     private boolean isAsset(SchemaClass.Group.Account schemaAccount){
-        return schemaAccount.getType().equals("A");
+        return schemaAccount.getType().equals(Constants.AccountType.A);
     }
 
     private boolean isDebit(SchemaClass.Group.Account schemaAccount){
-        return schemaAccount.getType().equals("A") || schemaAccount.getType().equals("E");
+        return schemaAccount.getType().equals(Constants.AccountType.A) || schemaAccount.getType().equals(Constants.AccountType.E);
     }
-
-
 }

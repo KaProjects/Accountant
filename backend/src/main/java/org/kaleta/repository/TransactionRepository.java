@@ -98,14 +98,21 @@ public interface TransactionRepository
     List<Transaction> listForClasses2456(String year);
 
     /**
-     * @return list of transactions that have debit or credit of closing account ID (701.0).
+     * @return list of transactions that have debit or credit of closing balance account ID (701.0).
      */
-    List<Transaction> listClosingTransactions();
+    List<Transaction> listClosingBalanceTransactions();
 
     /**
-     * @return list of transactions that have debit or credit of profit account ID (710.0).
+     * @return list of transactions that have debit or credit of closing profit account ID (710.0).
      */
-    List<Transaction> listProfitTransactions();
+    List<Transaction> listClosingProfitTransactions();
+
+    /**
+     * @return list of transactions that have debit or credit of profit account ID (e.i. 5x or 6x).
+     *
+     * Note: off-balance transactions excluded
+     */
+    List<Transaction> listProfitTransactions(String year);
 
     /**
      * @return list of financial asset transactions for specified year (e.i. schema 23x and 546)
