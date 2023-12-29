@@ -198,4 +198,12 @@ public class TransactionRepositoryImpl implements TransactionRepository
                 .setParameter("year", year)
                 .getResultList();
     }
+
+    @Override
+    public List<Transaction> list(String year)
+    {
+        return entityManager.createQuery(selectYearly, Transaction.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
 }

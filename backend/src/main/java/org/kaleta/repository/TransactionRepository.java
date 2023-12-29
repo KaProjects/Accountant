@@ -111,4 +111,9 @@ public interface TransactionRepository
      * @return list of financial asset transactions for specified year (e.i. schema 23x and 546)
      */
     List<Transaction> listFinancialAssetTransactions(String year);
+
+    /**
+     * @return list of all transactions for specified year
+     */
+    List<Transaction> list(String year);
 }
