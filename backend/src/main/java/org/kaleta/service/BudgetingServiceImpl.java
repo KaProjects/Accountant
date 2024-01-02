@@ -1,7 +1,6 @@
 package org.kaleta.service;
 
 import org.kaleta.dao.BudgetingDao;
-import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Budgeting;
 import org.kaleta.entity.Transaction;
 import org.kaleta.model.BudgetingData;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class BudgetingServiceImpl implements BudgetingService
@@ -37,7 +35,7 @@ public class BudgetingServiceImpl implements BudgetingService
     }
 
     @Override
-    public List<YearTransactionDto> getBudgetTransactions(String year, String budgetId, String month)
+    public List<Transaction> getBudgetTransactions(String year, String budgetId, String month)
     {
         Budgeting schema = budgetingDao.getSchemaById(year, budgetId);
 
@@ -45,16 +43,16 @@ public class BudgetingServiceImpl implements BudgetingService
             throw new IllegalArgumentException("Budget schema specified by budgetId='" + budgetId + "' doesn't have debit/credit accounts specified.");
         }
 
-        List<YearTransactionDto> transactions = new ArrayList<>();
+        List<Transaction> transactions = new ArrayList<>();
         if (schema.getDebit().equals(schema.getCredit())) {
             transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), "", schema.getDescription()));
-            List<YearTransactionDto> creditTransactions = transactionService.getTransactionsMatching(year, "", schema.getCredit(), schema.getDescription());
-            creditTransactions.forEach(transaction -> transaction.setAmount("-" + transaction.getAmount()));
+            List<Transaction> creditTransactions = transactionService.getTransactionsMatching(year, "", schema.getCredit(), schema.getDescription());
+            creditTransactions.forEach(transaction -> transaction.setAmount(-transaction.getAmount()));
             transactions.addAll(creditTransactions);
         } else if (schema.getDescription() != null && schema.getDescription().equals("finXasset")) {
             transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), "", ""));
-            List<YearTransactionDto> creditTransactions = transactionService.getTransactionsMatching(year, "", schema.getCredit(), "Sale of ");
-            creditTransactions.forEach(transaction -> transaction.setAmount("-" + transaction.getAmount()));
+            List<Transaction> creditTransactions = transactionService.getTransactionsMatching(year, "", schema.getCredit(), "Sale of ");
+            creditTransactions.forEach(transaction -> transaction.setAmount(-transaction.getAmount()));
             transactions.addAll(creditTransactions);
         } else {
             transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), schema.getCredit(), schema.getDescription()));
@@ -71,6 +69,6 @@ public class BudgetingServiceImpl implements BudgetingService
             transaction.setCredit(accountNames.get(transaction.getCredit()));
         });
 
-        return transactions.stream().sorted().collect(Collectors.toList());
+        return transactions;
     }
 }

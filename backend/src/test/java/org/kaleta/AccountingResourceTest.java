@@ -628,5 +628,23 @@ public class AccountingResourceTest
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract().body().asString(), containsString(" not found"));
+
+        assertThat(given().when()
+                .get("/accounting/balance/" + "2x20")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+        assertThat(given().when()
+                .get("/accounting/balance/" + "2014")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
+
+        assertThat(given().when()
+                .get("/accounting/balance/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
     }
 }

@@ -1,6 +1,5 @@
 package org.kaleta.service;
 
-import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Transaction;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public interface TransactionService
     List<Transaction> getTransactionsMatching(String year, String schemaPrefix);
 
     /**
-     * @return list of transactions DTO matching conditions
+     * @return list of transactions matching conditions
      * <p>
      * debit, credit inputs: exact account (e.g. 500.1 - this one account)
      *                       account prefix with % (e.g. 50% all accounts that id starts with 50)
@@ -38,7 +37,7 @@ public interface TransactionService
      *                     a value prefixed with '!' that can't be in description
      *                     null or empty string - all descriptions
      */
-    List<YearTransactionDto> getTransactionsMatching(String year, String debit, String credit, String description);
+    List<Transaction> getTransactionsMatching(String year, String debit, String credit, String description);
 
     /**
      * @param year - year condition

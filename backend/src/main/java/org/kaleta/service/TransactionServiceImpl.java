@@ -2,12 +2,10 @@ package org.kaleta.service;
 
 import org.kaleta.Utils;
 import org.kaleta.dao.TransactionDao;
-import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.entity.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -46,9 +44,9 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
-    public List<YearTransactionDto> getTransactionsMatching(String year, String debit, String credit, String description)
+    public List<Transaction> getTransactionsMatching(String year, String debit, String credit, String description)
     {
-        return mapYearTransactions(transactionDao.listByAccounts(year, debit, credit, description));
+        return transactionDao.listByAccounts(year, debit, credit, description);
     }
 
     @Override
@@ -96,20 +94,5 @@ public class TransactionServiceImpl implements TransactionService
             }
         }
         return monthlyProfit;
-    }
-
-    private List<YearTransactionDto> mapYearTransactions(List<Transaction> transactions)
-    {
-        List<YearTransactionDto> output = new ArrayList<>();
-        for (Transaction transaction : transactions) {
-            YearTransactionDto dto = new YearTransactionDto();
-            dto.setDate(transaction.getDate());
-            dto.setDescription(transaction.getDescription());
-            dto.setAmount(String.valueOf(transaction.getAmount()));
-            dto.setDebit(transaction.getDebit());
-            dto.setCredit(transaction.getCredit());
-            output.add(dto);
-        }
-        return output;
     }
 }

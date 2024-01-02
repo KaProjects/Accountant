@@ -4,6 +4,7 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.kaleta.Utils;
 import org.kaleta.dto.BudgetDto;
+import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.model.BudgetComponent;
 import org.kaleta.model.BudgetingData;
 import org.kaleta.service.BudgetingService;
@@ -15,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.kaleta.dto.BudgetDto.Row.Type.BALANCE;
 import static org.kaleta.dto.BudgetDto.Row.Type.EXPENSE;
@@ -85,7 +87,7 @@ public class BudgetResource
             ParamValidators.validateYear(year);
             ParamValidators.validateBudgetId(budgetId);
             ParamValidators.validateMonth(month);
-        }, () -> service.getBudgetTransactions(year, budgetId, month));
+        }, () -> YearTransactionDto.from(service.getBudgetTransactions(year, budgetId, month)).stream().sorted().collect(Collectors.toList()));
     }
 
     private Integer computeLastFilledMonth(List<BudgetComponent> components)
