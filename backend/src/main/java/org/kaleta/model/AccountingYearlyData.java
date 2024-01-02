@@ -1,5 +1,6 @@
 package org.kaleta.model;
 
+import org.kaleta.Constants;
 import org.kaleta.entity.Transaction;
 
 import java.util.List;
@@ -31,13 +32,12 @@ public class AccountingYearlyData
         return years;
     }
 
-    public Integer[] getYearlyValuesFor(String groupId, String... accountIdSuffixes)
+    public Integer[] getYearlyGroupValues(String groupId, String... accountIdSuffixes)
     {
         Map<String, Integer> yearlyData = new TreeMap<>();
         for (String year : getYears()){
             yearlyData.put(year, 0);
         }
-
         for (Transaction transaction : transactions){
             if ((transaction.getDebit().startsWith(groupId) && List.of(accountIdSuffixes).contains(transaction.getDebit().substring(2,3)))
                     || (transaction.getCredit().startsWith(groupId) && List.of(accountIdSuffixes).contains(transaction.getCredit().substring(2,3))))
@@ -48,8 +48,50 @@ public class AccountingYearlyData
         return yearlyData.values().toArray(new Integer[]{});
     }
 
-    public Integer[] getYearlyValuesFor(String groupId)
+    public Integer[] getYearlyGroupValues(String groupId)
     {
-        return getYearlyValuesFor(groupId, "0","1","2","3","4","5","6","7","8","9");
+        return getYearlyGroupValues(groupId, "0","1","2","3","4","5","6","7","8","9");
+    }
+
+    public Integer[] getYearlyClassValues(String classId, String... groupIdSuffixes)
+    {
+        Map<String, Integer> yearlyData = new TreeMap<>();
+        for (String year : getYears()){
+            yearlyData.put(year, 0);
+        }
+        for (Transaction transaction : transactions){
+            if ((transaction.getDebit().startsWith(classId) && List.of(groupIdSuffixes).contains(transaction.getDebit().substring(1,2)))
+                    || (transaction.getCredit().startsWith(classId) && List.of(groupIdSuffixes).contains(transaction.getCredit().substring(1,2))))
+            {
+                Integer amount = transaction.getAmount();
+                if (transaction.getDebit().startsWith(Constants.Schema.ACCUMULATED_DEP_GROUP_ID)) amount = -amount;
+                yearlyData.put(transaction.getYear(), yearlyData.get(transaction.getYear()) + amount);
+            }
+        }
+        return yearlyData.values().toArray(new Integer[]{});
+    }
+
+    public Integer[] getYearlyClassValues(String classId)
+    {
+        return getYearlyClassValues(classId, "0","1","2","3","4","5","6","7","8","9");
+    }
+
+    public Integer[] getYearlyOverallValues()
+    {
+        Map<String, Integer> yearlyData = new TreeMap<>();
+        for (String year : getYears()){
+            yearlyData.put(year, 0);
+        }
+        for (Transaction transaction : transactions){
+            if (!transaction.getDebit().startsWith("7"))
+            {
+                yearlyData.put(transaction.getYear(), yearlyData.get(transaction.getYear()) + transaction.getAmount());
+            }
+            if (!transaction.getCredit().startsWith("7"))
+            {
+                yearlyData.put(transaction.getYear(), yearlyData.get(transaction.getYear()) - transaction.getAmount());
+            }
+        }
+        return yearlyData.values().toArray(new Integer[]{});
     }
 }

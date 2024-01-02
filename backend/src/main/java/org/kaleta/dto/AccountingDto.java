@@ -49,6 +49,10 @@ public class AccountingDto
             columns.add("Yearly Cash Flow Statement");
             columns.addAll(List.of(years));
         }
+        if (type == Type.BALANCE_SUMMARY) {
+            columns.add("Yearly Balance Sheet");
+            columns.addAll(List.of(years));
+        }
     }
 
     @Data

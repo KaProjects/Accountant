@@ -92,6 +92,49 @@ public class AccountingResourceTest
     }
 
     @Test
+    public void getOverallCashFlowTest()
+    {
+        Response response = given().when()
+                .get("/accounting/cashflow")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().response();
+
+        System.out.println("response time: " + response.time() + "ms");
+
+        AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
+
+        assertThat(dto.getColumns().size(), is(5));
+        assertThat(dto.getColumns().get(0), is("Yearly Cash Flow Statement"));
+        assertThat(dto.getColumns().get(1), is("2017"));
+        assertThat(dto.getColumns().get(2), is("2018"));
+        assertThat(dto.getColumns().get(3), is("2019"));
+        assertThat(dto.getColumns().get(4), is("2020"));
+        assertThat(dto.getRows().size(), is(5));
+
+        assertThat(dto.getRows().get(0).getSchemaId(), is("20"));
+        assertThat(dto.getRows().get(0).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
+        assertThat(dto.getRows().get(0).getYearlyValues(), is(new Integer[]{1000, 1100, 1500, 1600}));
+
+        assertThat(dto.getRows().get(1).getSchemaId(), is("21"));
+        assertThat(dto.getRows().get(1).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
+        assertThat(dto.getRows().get(1).getYearlyValues(), is(new Integer[]{2000, 2200, 2500, 2800}));
+
+        assertThat(dto.getRows().get(2).getSchemaId(), is("23"));
+        assertThat(dto.getRows().get(2).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
+        assertThat(dto.getRows().get(2).getYearlyValues(), is(new Integer[]{4000, 4400, 4500, 4000}));
+
+        assertThat(dto.getRows().get(3).getSchemaId(), is("22"));
+        assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
+        assertThat(dto.getRows().get(3).getYearlyValues(), is(new Integer[]{-3000, -3300, -3500, -4400}));
+
+        assertThat(dto.getRows().get(4).getSchemaId(), is("cf"));
+        assertThat(dto.getRows().get(4).getType(), is(AccountingDto.Type.CASH_FLOW_SUMMARY));
+        assertThat(dto.getRows().get(4).getYearlyValues(), is(new Integer[]{4000, 4400, 5000, 4000}));
+    }
+
+    @Test
     public void getBalanceSheetTest()
     {
         Response response = given().when()
@@ -245,10 +288,10 @@ public class AccountingResourceTest
     }
 
     @Test
-    public void getYearlyCashFlowTest()
+    public void getOverallBalanceSheetTest()
     {
         Response response = given().when()
-                .get("/accounting/cashflow")
+                .get("/accounting/balance")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -259,32 +302,53 @@ public class AccountingResourceTest
         AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
 
         assertThat(dto.getColumns().size(), is(5));
-        assertThat(dto.getColumns().get(0), is("Yearly Cash Flow Statement"));
+        assertThat(dto.getColumns().get(0), is("Yearly Balance Sheet"));
         assertThat(dto.getColumns().get(1), is("2017"));
         assertThat(dto.getColumns().get(2), is("2018"));
         assertThat(dto.getColumns().get(3), is("2019"));
         assertThat(dto.getColumns().get(4), is("2020"));
-        assertThat(dto.getRows().size(), is(5));
+        assertThat(dto.getRows().size(), is(10));
 
-        assertThat(dto.getRows().get(0).getSchemaId(), is("20"));
-        assertThat(dto.getRows().get(0).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
-        assertThat(dto.getRows().get(0).getYearlyValues(), is(new Integer[]{1000, 1100, 1500, 1600}));
+        assertThat(dto.getRows().get(0).getSchemaId(), is("a"));
+        assertThat(dto.getRows().get(0).getName(), is("ASSETS"));
+        assertThat(dto.getRows().get(0).getType(), is(AccountingDto.Type.BALANCE_SUMMARY));
+        assertThat(dto.getRows().get(0).getYearlyValues(), is(new Integer[]{7000, 7700, 8500, 8400}));
+        assertThat(dto.getRows().get(0).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(1).getSchemaId(), is("0"));
+        assertThat(dto.getRows().get(1).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(1).getYearlyValues(), is(new Integer[]{0, 0, 0, 0}));
+        assertThat(dto.getRows().get(1).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(2).getSchemaId(), is("1"));
+        assertThat(dto.getRows().get(2).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(2).getYearlyValues(), is(new Integer[]{0, 0, 0, 0}));
+        assertThat(dto.getRows().get(2).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(3).getSchemaId(), is("2"));
+        assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(3).getYearlyValues(), is(new Integer[]{7000, 7700, 8500, 8400}));
+        assertThat(dto.getRows().get(3).getChildren().size(), is(0));
 
-        assertThat(dto.getRows().get(1).getSchemaId(), is("21"));
-        assertThat(dto.getRows().get(1).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
-        assertThat(dto.getRows().get(1).getYearlyValues(), is(new Integer[]{2000, 2200, 2500, 2800}));
-
-        assertThat(dto.getRows().get(2).getSchemaId(), is("23"));
-        assertThat(dto.getRows().get(2).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
-        assertThat(dto.getRows().get(2).getYearlyValues(), is(new Integer[]{4000, 4400, 4500, 4000}));
-
-        assertThat(dto.getRows().get(3).getSchemaId(), is("22"));
-        assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
-        assertThat(dto.getRows().get(3).getYearlyValues(), is(new Integer[]{-3000, -3300, -3500, -4400}));
-
-        assertThat(dto.getRows().get(4).getSchemaId(), is("cf"));
-        assertThat(dto.getRows().get(4).getType(), is(AccountingDto.Type.CASH_FLOW_SUMMARY));
-        assertThat(dto.getRows().get(4).getYearlyValues(), is(new Integer[]{4000, 4400, 5000, 4000}));
+        assertThat(dto.getRows().get(5).getSchemaId(), is("l"));
+        assertThat(dto.getRows().get(5).getType(), is(AccountingDto.Type.BALANCE_SUMMARY));
+        assertThat(dto.getRows().get(5).getName(), is("LIABILITIES"));
+        assertThat(dto.getRows().get(5).getYearlyValues(), is(new Integer[]{7000, 7700, 8500, 8400}));
+        assertThat(dto.getRows().get(5).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(6).getSchemaId(), is("2"));
+        assertThat(dto.getRows().get(6).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(6).getYearlyValues(), is(new Integer[]{3000, 3300, 3500, 4400}));
+        assertThat(dto.getRows().get(6).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(7).getSchemaId(), is("3"));
+        assertThat(dto.getRows().get(7).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(7).getYearlyValues(), is(new Integer[]{0, 0, 0, 0}));
+        assertThat(dto.getRows().get(7).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(8).getSchemaId(), is("4"));
+        assertThat(dto.getRows().get(8).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(8).getYearlyValues(), is(new Integer[]{18000, 5800, 5140, 3000}));
+        assertThat(dto.getRows().get(8).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(9).getSchemaId(), is("p"));
+        assertThat(dto.getRows().get(9).getType(), is(AccountingDto.Type.BALANCE_CLASS));
+        assertThat(dto.getRows().get(9).getName(), is("Profit"));
+        assertThat(dto.getRows().get(9).getYearlyValues(), is(new Integer[]{-14000, -1400, -140, 1000}));
+        assertThat(dto.getRows().get(9).getChildren().size(), is(0));
     }
 
     @Test
@@ -385,7 +449,7 @@ public class AccountingResourceTest
     }
 
     @Test
-    public void getYearlyProfitTest()
+    public void getOverallProfitTest()
     {
         Response response = given().when()
                 .get("/accounting/profit")

@@ -137,11 +137,11 @@ public class AccountingResource
 
             AccountingDto profitDto = new AccountingDto(yearlyData.getYears(), AccountingDto.Type.PROFIT_SUMMARY);
 
-            AccountingDto.Row row60 = from(group60, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("60"));
+            AccountingDto.Row row60 = from(group60, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("60"));
             profitDto.getRows().add(row60);
-            AccountingDto.Row row55a = from(group55a, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("55", "0", "1", "2"));
+            AccountingDto.Row row55a = from(group55a, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("55", "0", "1", "2"));
             profitDto.getRows().add(row55a);
-            AccountingDto.Row row63a = from(group63a, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("63", "1", "2", "3"));
+            AccountingDto.Row row63a = from(group63a, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("63", "1", "2", "3"));
             profitDto.getRows().add(row63a);
 
             AccountingDto.Row netIncomeRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Income", "ni");
@@ -149,11 +149,11 @@ public class AccountingResource
             netIncomeRow.setTotal(Utils.sumArray(netIncomeRow.getYearlyValues()));
             profitDto.getRows().add(netIncomeRow);
 
-            AccountingDto.Row row51 = from(group51, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("51"));
+            AccountingDto.Row row51 = from(group51, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("51"));
             profitDto.getRows().add(row51);
-            AccountingDto.Row row52 = from(group52, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("52"));
+            AccountingDto.Row row52 = from(group52, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("52"));
             profitDto.getRows().add(row52);
-            AccountingDto.Row row53 = from(group53, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("53"));
+            AccountingDto.Row row53 = from(group53, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("53"));
             profitDto.getRows().add(row53);
 
             AccountingDto.Row operatingProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Operating Profit", "op");
@@ -161,19 +161,19 @@ public class AccountingResource
             operatingProfitRow.setTotal(Utils.sumArray(operatingProfitRow.getYearlyValues()));
             profitDto.getRows().add(operatingProfitRow);
 
-            AccountingDto.Row row50 = from(group50, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("50"));
+            AccountingDto.Row row50 = from(group50, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("50"));
             profitDto.getRows().add(row50);
-            AccountingDto.Row row61 = from(group61, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("61"));
+            AccountingDto.Row row61 = from(group61, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("61"));
             profitDto.getRows().add(row61);
-            AccountingDto.Row row56 = from(group56, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("56"));
+            AccountingDto.Row row56 = from(group56, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("56"));
             profitDto.getRows().add(row56);
-            AccountingDto.Row row62 = from(group62, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("62"));
+            AccountingDto.Row row62 = from(group62, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("62"));
             profitDto.getRows().add(row62);
-            AccountingDto.Row row54 = from(group54, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("54"));
+            AccountingDto.Row row54 = from(group54, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("54"));
             profitDto.getRows().add(row54);
-            AccountingDto.Row row63b = from(group63b, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyValuesFor("63", "0"));
+            AccountingDto.Row row63b = from(group63b, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("63", "0"));
             profitDto.getRows().add(row63b);
-            AccountingDto.Row row55b = from(group55b, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyValuesFor("55", "3", "4", "5"));
+            AccountingDto.Row row55b = from(group55b, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("55", "3", "4", "5"));
             profitDto.getRows().add(row55b);
 
             AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Profit", "np");
@@ -243,16 +243,16 @@ public class AccountingResource
 
             AccountingDto cashFlowDto = new AccountingDto(yearlyData.getYears(), AccountingDto.Type.CASH_FLOW_SUMMARY);
 
-            AccountingDto.Row row20 = from(group20, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyValuesFor("20"));
+            AccountingDto.Row row20 = from(group20, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyGroupValues("20"));
             cashFlowDto.getRows().add(row20);
 
-            AccountingDto.Row row21 = from(group21, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyValuesFor("21"));
+            AccountingDto.Row row21 = from(group21, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyGroupValues("21"));
             cashFlowDto.getRows().add(row21);
 
-            AccountingDto.Row row23 = from(group23, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyValuesFor("23"));
+            AccountingDto.Row row23 = from(group23, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyGroupValues("23"));
             cashFlowDto.getRows().add(row23);
 
-            Integer[] group22Yearly = yearlyData.getYearlyValuesFor("22");
+            Integer[] group22Yearly = yearlyData.getYearlyGroupValues("22");
             for (int i=0;i<group22Yearly.length;i++) group22Yearly[i] = -group22Yearly[i];
             AccountingDto.Row row22 = from(group22, AccountingDto.Type.CASH_FLOW_GROUP, group22Yearly);
             cashFlowDto.getRows().add(row22);
@@ -331,6 +331,68 @@ public class AccountingResource
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/balance")
+    public Response getOverallBalanceSheet()
+    {
+        return Endpoint.process(() -> {}, () ->
+        {
+            AccountingYearlyData yearlyClosingData = service.getYearlyClosingData();
+            AccountingYearlyData yearlyProfitData = service.getYearlyProfitData();
+
+            String[] years = yearlyClosingData.getYears();
+
+            Map<String, AccountingData> balanceData = service.getBalanceData(years[years.length - 1]);
+
+            ClassComponent class0 = balanceData.get("0").getClassComponent();
+            ClassComponent class1 = balanceData.get("1").getClassComponent();
+            ClassComponent class2a = balanceData.get("2").getClassComponent("0", "1", "3");
+            ClassComponent class3a = balanceData.get("3").getClassComponent("0");
+
+            ClassComponent class2l = balanceData.get("2").getClassComponent("2");
+            ClassComponent class3l = balanceData.get("3").getClassComponent("1");
+            ClassComponent class4 = balanceData.get("4").getClassComponent();
+
+            AccountingDto balanceSheetDto = new AccountingDto(years, AccountingDto.Type.BALANCE_SUMMARY);
+
+            AccountingDto.Row rowClass0 = from(class0, yearlyClosingData.getYearlyClassValues("0"));
+            AccountingDto.Row rowClass1 = from(class1, yearlyClosingData.getYearlyClassValues("1"));
+            AccountingDto.Row rowClass2a = from(class2a, yearlyClosingData.getYearlyClassValues("2", "0", "1", "3"));
+            AccountingDto.Row rowClass3a = from(class3a, yearlyClosingData.getYearlyClassValues("3", "0"));
+
+            AccountingDto.Row assetsRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, "Assets".toUpperCase(), "a");
+            assetsRow.setYearlyValues(Utils.mergeIntegerArrays(rowClass0.getYearlyValues(), rowClass1.getYearlyValues(), rowClass2a.getYearlyValues(), rowClass3a.getYearlyValues()));
+            balanceSheetDto.getRows().add(assetsRow);
+
+            balanceSheetDto.getRows().add(rowClass0);
+            balanceSheetDto.getRows().add(rowClass1);
+            balanceSheetDto.getRows().add(rowClass2a);
+            balanceSheetDto.getRows().add(rowClass3a);
+
+            AccountingDto.Row rowClass2l = from(class2l, yearlyClosingData.getYearlyClassValues("2", "2"));
+            AccountingDto.Row rowClass3l = from(class3l, yearlyClosingData.getYearlyClassValues("3", "1"));
+            AccountingDto.Row rowClass4 = from(class4, yearlyClosingData.getYearlyClassValues("4"));
+            AccountingDto.Row rowProfit = new AccountingDto.Row(AccountingDto.Type.BALANCE_CLASS, "Profit", "p");
+            Integer[] yearlyProfit = yearlyProfitData.getYearlyOverallValues();
+            yearlyProfit[years.length - 1] = Utils.sumArray(transactionService.getMonthlyProfit(years[years.length - 1]));
+            rowProfit.setYearlyValues(yearlyProfit);
+
+            AccountingDto.Row liabilitiesRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, "Liabilities".toUpperCase(), "l");
+            liabilitiesRow.setYearlyValues(Utils.mergeIntegerArrays(rowClass2l.getYearlyValues(), rowClass3l.getYearlyValues(), rowClass4.getYearlyValues(), rowProfit.getYearlyValues()));
+            balanceSheetDto.getRows().add(liabilitiesRow);
+
+            balanceSheetDto.getRows().add(rowClass2l);
+            balanceSheetDto.getRows().add(rowClass3l);
+            balanceSheetDto.getRows().add(rowClass4);
+            balanceSheetDto.getRows().add(rowProfit);
+
+            return balanceSheetDto;
+        });
+    }
+
+    @GET
+    @Secured
+    @SecurityRequirement(name = "AccountantSecurity")
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/transaction/{accountId}/month/{month}")
     public Response getTransactions(@PathParam String year, @PathParam String accountId, @PathParam String month)
     {
@@ -344,12 +406,11 @@ public class AccountingResource
         });
     }
 
-    private AccountingDto.Row from(GroupComponent groupComponent, AccountingDto.Type type, Integer[] yearly)
+    private AccountingDto.Row from(ClassComponent classComponent, Integer[] yearly)
     {
-        AccountingDto.Row row = new AccountingDto.Row(type, groupComponent.getName(), groupComponent.getSchemaId());
-        yearly[yearly.length - 1] = groupComponent.getBalance();
+        AccountingDto.Row row = new AccountingDto.Row(AccountingDto.Type.BALANCE_CLASS, classComponent.getName(), classComponent.getSchemaId());
+        yearly[yearly.length - 1] = classComponent.getBalance();
         row.setYearlyValues(yearly);
-        row.setTotal(Utils.sumArray(yearly));
         return row;
     }
 
@@ -376,6 +437,15 @@ public class AccountingResource
             classRow.getChildren().add(groupRow);
         }
         return classRow;
+    }
+
+    private AccountingDto.Row from(GroupComponent groupComponent, AccountingDto.Type type, Integer[] yearly)
+    {
+        AccountingDto.Row row = new AccountingDto.Row(type, groupComponent.getName(), groupComponent.getSchemaId());
+        yearly[yearly.length - 1] = groupComponent.getBalance();
+        row.setYearlyValues(yearly);
+        row.setTotal(Utils.sumArray(yearly));
+        return row;
     }
 
     private AccountingDto.Row from(GroupComponent groupComponent, AccountingDto.Type type)
