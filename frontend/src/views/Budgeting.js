@@ -233,7 +233,7 @@ const Budgeting = props => {
                                 {month}
                                 {row.id === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
                                     <IconButton
-                                        style={{height: "2px", width: "25px"}}
+                                        style={{height: "2px", width: "25px", color: getRowStyle(row.type).color}}
                                         onClick={() => setShowTransactionsDialog(true)}
                                     >
                                         <ReceiptLongIcon sx={{width: 18}}/>
