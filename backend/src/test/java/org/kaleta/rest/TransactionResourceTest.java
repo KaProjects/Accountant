@@ -1,4 +1,4 @@
-package org.kaleta;
+package org.kaleta.rest;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;

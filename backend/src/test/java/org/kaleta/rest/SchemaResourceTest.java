@@ -1,8 +1,10 @@
-package org.kaleta;
+package org.kaleta.rest;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.kaleta.Constants;
 import org.kaleta.dto.YearSchemaDto;
 import org.springframework.http.HttpStatus;
 
@@ -45,7 +47,7 @@ public class SchemaResourceTest
         assertThat(schema.getClasses().get(2).getGroups().get(0).getAccounts().size(), is(2));
         assertThat(schema.getClasses().get(2).getGroups().get(0).getAccounts().get(0).getId(), is("200"));
         assertThat(schema.getClasses().get(2).getGroups().get(0).getAccounts().get(0).getName(), is("account200"));
-        assertThat(schema.getClasses().get(2).getGroups().get(0).getAccounts().get(0).getType(), is(Constants.AccountType.A));
+        assertThat(schema.getClasses().get(2).getGroups().get(0).getAccounts().get(0).getType(), Matchers.is(Constants.AccountType.A));
         assertThat(schema.getClasses().get(2).getGroups().get(0).getAccounts().get(1).getId(), is("201"));
         assertThat(schema.getClasses().get(2).getGroups().get(0).getAccounts().get(1).getName(), is("account201"));
         assertThat(schema.getClasses().get(2).getGroups().get(0).getAccounts().get(1).getType(), is(Constants.AccountType.A));

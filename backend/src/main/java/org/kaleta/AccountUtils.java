@@ -47,4 +47,15 @@ public class AccountUtils
             return Constants.Schema.FIN_EXP_REVALUATION_ID  + "." + id.split("\\.")[1];
         }
     }
+
+    /**
+     * @return true if specified account type is debit type, false if credit type
+     */
+    public static boolean isDebit(Constants.AccountType type)
+    {
+        if (type.equals(Constants.AccountType.X)) {
+            throw new IllegalArgumentException("Off-balance type is neither debit nor credit!");
+        }
+        return type.equals(Constants.AccountType.A) || type.equals(Constants.AccountType.E);
+    }
 }

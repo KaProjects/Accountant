@@ -1,9 +1,10 @@
-package org.kaleta;
+package org.kaleta.rest;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.YearAccountDto;
+import org.kaleta.dto.YearAccountOverviewDto;
 import org.springframework.http.HttpStatus;
 
 import java.util.Calendar;
@@ -49,6 +50,22 @@ public class AccountResourceTest
     }
 
     @Test
+    void getAccountsOverviewTest()
+    {
+        List<YearAccountOverviewDto> accounts = given().when()
+                .get("/account/2019/210")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("size()", is(3))
+                .extract().response().jsonPath().getList("", YearAccountOverviewDto.class);
+
+        assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.0", "general", 0, 6000, 3500)));
+        assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.1", "generaly", 0, 0, -5000)));
+        assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.2", "generalz", 0, 5000, -1000)));
+    }
+
+    @Test
     public void parameterValidatorTest()
     {
         assertThat(given().when()
@@ -68,5 +85,45 @@ public class AccountResourceTest
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract().body().asString(), containsString(" not found"));
+
+        String validSchemaId = "123";
+
+        assertThat(given().when()
+                .get("/account/2x20/" + validSchemaId)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+        assertThat(given().when()
+                .get("/account/2014/" + validSchemaId)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
+
+        assertThat(given().when()
+                .get("/account/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/" + validSchemaId)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
+
+        String validYear = "2019";
+
+        assertThat(given().when()
+                .get("/account/" + validYear + "/" + "22")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/account/" + validYear + "/" + "2222")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/account/" + validYear + "/" + "xxx")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
     }
 }
