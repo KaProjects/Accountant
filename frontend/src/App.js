@@ -8,6 +8,7 @@ import Login from "./components/Login";
 import MainBar from "./components/MainBar";
 import AccountingStatement from "./views/AccountingStatement";
 import Home from "./views/Home";
+import AccountingData from "./views/AccountingData";
 
 class App extends Component {
     constructor(props) {
@@ -87,6 +88,7 @@ class App extends Component {
                         <Route exact path="/financial/assets" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/accounting/:type" element={<AccountingStatement {...this.state}/> }/>
                         <Route exact path="/accounting/:type/:overall" element={<AccountingStatement {...this.state}/> }/>
+                        <Route exact path="/data" element={<AccountingData {...this.state}/> }/>
                         <Route path="*" element={this.PageNotFound()} />
                     </Routes>
                 </BrowserRouter>
