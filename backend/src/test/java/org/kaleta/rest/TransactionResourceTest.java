@@ -3,6 +3,7 @@ package org.kaleta.rest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
+import org.kaleta.dto.YearAccountTransactionDto;
 import org.kaleta.dto.YearTransactionDto;
 import org.springframework.http.HttpStatus;
 
@@ -55,6 +56,23 @@ public class TransactionResourceTest
     }
 
     @Test
+    public void getAccountTransactions()
+    {
+        List<YearAccountTransactionDto> transactions = given().when()
+                .get("/transaction/2020/200.0")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("size()", is(25))
+                .body("[0].date", is("0101"))
+                .body("[1].date", is("0504"))
+                .extract().response().jsonPath().getList("", YearAccountTransactionDto.class);
+
+        assertThat(transactions, hasItem(YearAccountTransactionDto.from("0101", "1000", null, "700.0 account700", "init")));
+        assertThat(transactions, hasItem(YearAccountTransactionDto.from("0505", "100", null, "220.0 account220", "x")));
+    }
+
+    @Test
     public void parameterValidatorTest()
     {
         assertThat(given().when()
@@ -75,46 +93,106 @@ public class TransactionResourceTest
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract().body().asString(), containsString(" not found"));
 
+        String validSchemaId = "222";
+
         assertThat(given().when()
-                .get("/transaction/2x20/222/222")
+                .get("/transaction/2x20/" + validSchemaId + "/" + validSchemaId)
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().body().asString(), containsString("Invalid Year Parameter"));
 
         assertThat(given().when()
-                .get("/transaction/2014/222/222")
+                .get("/transaction/2014/" + validSchemaId + "/" + validSchemaId)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract().body().asString(), containsString(" not found"));
 
         assertThat(given().when()
-                .get("/transaction/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/222/222")
+                .get("/transaction/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/" + validSchemaId + "/" + validSchemaId)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
+
+        String validYear = "2020";
+
+        assertThat(given().when()
+                .get("/transaction/"+ validYear + "/2222/" + validSchemaId)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Debit Prefix Parameter"));
+
+        assertThat(given().when()
+                .get("/transaction/"+ validYear + "/22x/" + validSchemaId)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Debit Prefix Parameter"));
+
+        assertThat(given().when()
+                .get("/transaction/" + validYear + "/" + validSchemaId + "/2222")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Credit Prefix Parameter"));
+
+        assertThat(given().when()
+                .get("/transaction/" + validYear + "/" + validSchemaId + "/22x")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Credit Prefix Parameter"));
+
+        String validAccountId = "200.11";
+
+        assertThat(given().when()
+                .get("/transaction/2x20/" + validAccountId)
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Year Parameter"));
+
+        assertThat(given().when()
+                .get("/transaction/2014/" + validAccountId)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract().body().asString(), containsString(" not found"));
 
         assertThat(given().when()
-                .get("/transaction/2020/2222/222")
+                .get("/transaction/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/" + validAccountId)
                 .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Debit Prefix Parameter"));
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract().body().asString(), containsString(" not found"));
 
         assertThat(given().when()
-                .get("/transaction/2020/22x/222")
+                .get("/transaction/" + validYear + "/200")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Debit Prefix Parameter"));
+                .extract().body().asString(), containsString("Invalid Account ID Parameter"));
 
         assertThat(given().when()
-                .get("/transaction/2020/222/2222")
+                .get("/transaction/" + validYear + "/200.")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Credit Prefix Parameter"));
+                .extract().body().asString(), containsString("Invalid Account ID Parameter"));
 
         assertThat(given().when()
-                .get("/transaction/2020/222/22x")
+                .get("/transaction/" + validYear + "/200.x")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Credit Prefix Parameter"));
+                .extract().body().asString(), containsString("Invalid Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/transaction/" + validYear + "/20x.10")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/transaction/" + validYear + "/20.10")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/transaction/" + validYear + "/2022.10")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Account ID Parameter"));
     }
 }

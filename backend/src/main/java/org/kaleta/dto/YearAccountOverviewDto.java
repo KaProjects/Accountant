@@ -5,11 +5,11 @@ import lombok.Data;
 @Data
 public class YearAccountOverviewDto
 {
-    String id;
-    String name;
-    Integer initial = 0;
-    Integer turnover = 0;
-    Integer balance = 0;
+    private String id;
+    private String name;
+    private Integer initial = 0;
+    private Integer turnover = 0;
+    private Integer balance = 0;
 
     public static YearAccountOverviewDto from(String id, String name, Integer initial, Integer turnover, Integer balance)
     {
