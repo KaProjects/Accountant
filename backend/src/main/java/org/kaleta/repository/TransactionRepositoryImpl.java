@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class TransactionRepositoryImpl implements TransactionRepository
@@ -215,5 +216,18 @@ public class TransactionRepositoryImpl implements TransactionRepository
         return entityManager.createQuery(selectYearly, Transaction.class)
                 .setParameter("year", year)
                 .getResultList();
+    }
+
+    @Override
+    public List<Transaction> listMatching(Set<String> schemas)
+    {
+        StringBuilder query = new StringBuilder("SELECT t FROM Transaction t");
+        String operand = " WHERE";
+        for (String schema : schemas)
+        {
+            query.append(operand + " t.debit LIKE '" + schema + "%' OR t.credit LIKE '" + schema + "%'");
+            operand = " OR";
+        }
+        return entityManager.createQuery(query.toString(), Transaction.class).getResultList();
     }
 }

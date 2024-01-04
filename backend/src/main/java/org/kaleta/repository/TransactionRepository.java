@@ -4,6 +4,7 @@ import org.kaleta.entity.Transaction;
 import org.kaleta.entity.xml.Transactions;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TransactionRepository
 {
@@ -123,4 +124,9 @@ public interface TransactionRepository
      * @return list of all transactions for specified year
      */
     List<Transaction> list(String year);
+
+    /**
+     * @return all transactions matching schema prefix (e.i. for all years)
+     */
+    List<Transaction> listMatching(Set<String> schemas);
 }

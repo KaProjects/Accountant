@@ -1,10 +1,12 @@
 package org.kaleta.rest;
 
+import org.kaleta.model.ChartData;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 public class ParamValidators
 {
@@ -76,5 +78,17 @@ public class ParamValidators
         }
         if (!accountId.matches("\\d\\d\\d\\.\\d+"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Account ID Parameter: '" + accountId + "'");
+    }
+
+    public static void validateChartId(String chartId)
+    {
+        if (chartId == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chart ID Parameter is NULL");
+        }
+        for (String configId : ChartData.getConfigs(new HashMap<>()).keySet())
+        {
+            if (configId.equals(chartId)) return;
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Chart ID Parameter: '" + chartId + "'");
     }
 }

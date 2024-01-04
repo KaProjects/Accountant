@@ -36,6 +36,17 @@ public class SchemaServiceImpl implements SchemaService
     }
 
     @Override
+    public Map<String, String> getLatestSchemaNames()
+    {
+        Map<String, String> map = new HashMap<>();
+        for (Schema schema : schemaDao.listLatest())
+        {
+            map.put(schema.getYearId().getId(), schema.getName());
+        }
+        return map;
+    }
+
+    @Override
     public String getAccountType(String year, String accountId)
     {
         validateIdLength(accountId, 3);
@@ -107,6 +118,12 @@ public class SchemaServiceImpl implements SchemaService
     {
         validateIdLength(accountId, 3);
         return Objects.equals(getAccountType(year, accountId), "L") || Objects.equals(getAccountType(year, accountId), "R");
+    }
+
+    @Override
+    public List<String> getYears()
+    {
+        return schemaDao.getYears();
     }
 
     private void validateIdLength(String id, Integer expected)

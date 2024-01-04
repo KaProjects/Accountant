@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.kaleta.Constants.Label.NET_INCOME;
+import static org.kaleta.Constants.Label.NET_PROFIT;
+import static org.kaleta.Constants.Label.OPERATING_PROFIT;
+
 @Path("/accounting")
 public class AccountingResource
 {
@@ -67,7 +71,7 @@ public class AccountingResource
             profitDto.getRows().add(from(group55a, AccountingDto.Type.EXPENSE_GROUP));
             profitDto.getRows().add(from(group63a, AccountingDto.Type.INCOME_GROUP));
 
-            AccountingDto.Row netIncomeRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Income", "ni");
+            AccountingDto.Row netIncomeRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, NET_INCOME, "ni");
             netIncomeRow.setMonthlyValues(Utils.addIntegerArrays(Utils.subtractIntegerArrays(group60.getMonthlyBalance(), group55a.getMonthlyBalance()), group63a.getMonthlyBalance()));
             netIncomeRow.setTotal(group60.getBalance() - group55a.getBalance() + group63a.getBalance());
             profitDto.getRows().add(netIncomeRow);
@@ -76,7 +80,7 @@ public class AccountingResource
             profitDto.getRows().add(from(group52, AccountingDto.Type.EXPENSE_GROUP));
             profitDto.getRows().add(from(group53, AccountingDto.Type.EXPENSE_GROUP));
 
-            AccountingDto.Row operatingProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Operating Profit", "op");
+            AccountingDto.Row operatingProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, OPERATING_PROFIT, "op");
             operatingProfitRow.setMonthlyValues(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(netIncomeRow.getMonthlyValues(), group51.getMonthlyBalance()), group52.getMonthlyBalance()), group53.getMonthlyBalance()));
             operatingProfitRow.setTotal(netIncomeRow.getTotal() - group51.getBalance() - group52.getBalance() - group53.getBalance());
             profitDto.getRows().add(operatingProfitRow);
@@ -89,7 +93,7 @@ public class AccountingResource
             profitDto.getRows().add(from(group63b, AccountingDto.Type.INCOME_GROUP));
             profitDto.getRows().add(from(group55b, AccountingDto.Type.EXPENSE_GROUP));
 
-            AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Profit", "np");
+            AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, NET_PROFIT, "np");
             Integer[] np1 = Utils.subtractIntegerArrays(operatingProfitRow.getMonthlyValues(), group50.getMonthlyBalance());
             Integer[] np2 = Utils.subtractIntegerArrays(group61.getMonthlyBalance(), group56.getMonthlyBalance());
             Integer[] np3 = Utils.subtractIntegerArrays(group62.getMonthlyBalance(), group54.getMonthlyBalance());
@@ -135,7 +139,7 @@ public class AccountingResource
             GroupComponent group63b = profitRevenuesData.getGroupComponent("63", "0");
             GroupComponent group55b = profitExpensesData.getGroupComponent("55", "3", "4", "5");
 
-            AccountingDto profitDto = new AccountingDto(yearlyData.getYears(), AccountingDto.Type.PROFIT_SUMMARY);
+            AccountingDto profitDto = new AccountingDto(years, AccountingDto.Type.PROFIT_SUMMARY);
 
             AccountingDto.Row row60 = from(group60, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("60"));
             profitDto.getRows().add(row60);
@@ -144,7 +148,7 @@ public class AccountingResource
             AccountingDto.Row row63a = from(group63a, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("63", "1", "2", "3"));
             profitDto.getRows().add(row63a);
 
-            AccountingDto.Row netIncomeRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Income", "ni");
+            AccountingDto.Row netIncomeRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, NET_INCOME, "ni");
             netIncomeRow.setYearlyValues(Utils.addIntegerArrays(Utils.subtractIntegerArrays(row60.getYearlyValues(), row55a.getYearlyValues()), row63a.getYearlyValues()));
             netIncomeRow.setTotal(Utils.sumArray(netIncomeRow.getYearlyValues()));
             profitDto.getRows().add(netIncomeRow);
@@ -156,7 +160,7 @@ public class AccountingResource
             AccountingDto.Row row53 = from(group53, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("53"));
             profitDto.getRows().add(row53);
 
-            AccountingDto.Row operatingProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Operating Profit", "op");
+            AccountingDto.Row operatingProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, OPERATING_PROFIT, "op");
             operatingProfitRow.setYearlyValues(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(Utils.subtractIntegerArrays(netIncomeRow.getYearlyValues(), row51.getYearlyValues()), row52.getYearlyValues()), row53.getYearlyValues()));
             operatingProfitRow.setTotal(Utils.sumArray(operatingProfitRow.getYearlyValues()));
             profitDto.getRows().add(operatingProfitRow);
@@ -176,7 +180,7 @@ public class AccountingResource
             AccountingDto.Row row55b = from(group55b, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("55", "3", "4", "5"));
             profitDto.getRows().add(row55b);
 
-            AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, "Net Profit", "np");
+            AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, NET_PROFIT, "np");
             Integer[] np1 = Utils.subtractIntegerArrays(operatingProfitRow.getYearlyValues(), row50.getYearlyValues());
             Integer[] np2 = Utils.subtractIntegerArrays(row61.getYearlyValues(), row56.getYearlyValues());
             Integer[] np3 = Utils.subtractIntegerArrays(row62.getYearlyValues(), row54.getYearlyValues());
@@ -241,7 +245,7 @@ public class AccountingResource
             GroupComponent group23 = cashFlowData.getGroupComponent("23");
             GroupComponent group22 = cashFlowData.getGroupComponent("22").inverted();
 
-            AccountingDto cashFlowDto = new AccountingDto(yearlyData.getYears(), AccountingDto.Type.CASH_FLOW_SUMMARY);
+            AccountingDto cashFlowDto = new AccountingDto(years, AccountingDto.Type.CASH_FLOW_SUMMARY);
 
             AccountingDto.Row row20 = from(group20, AccountingDto.Type.CASH_FLOW_GROUP, yearlyData.getYearlyGroupValues("20"));
             cashFlowDto.getRows().add(row20);

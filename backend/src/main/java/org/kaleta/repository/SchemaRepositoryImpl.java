@@ -93,4 +93,18 @@ public class SchemaRepositoryImpl implements SchemaRepository
                 .setParameter("id", idPrefix + "%")
                 .getResultList();
     }
+
+    @Override
+    public List<Schema> listLatest()
+    {
+        return entityManager.createQuery("SELECT s FROM Schema s WHERE s.yearId.year=(SELECT MAX(yearId.year) FROM Schema)", Schema.class)
+                .getResultList();
+    }
+
+    @Override
+    public List<String> getYears()
+    {
+        return entityManager.createQuery("SELECT DISTINCT s.yearId.year FROM Schema s", String.class)
+                .getResultList();
+    }
 }

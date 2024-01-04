@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TransactionServiceImpl implements TransactionService
@@ -94,5 +95,11 @@ public class TransactionServiceImpl implements TransactionService
             }
         }
         return monthlyProfit;
+    }
+
+    @Override
+    public List<Transaction> getMatching(Set<String> schemas)
+    {
+        return  transactionDao.listMatching(schemas);
     }
 }

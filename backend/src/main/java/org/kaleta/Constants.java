@@ -26,4 +26,11 @@ public class Constants
     {
         A, L, R, E, X
     }
+
+    public static class Label
+    {
+        public static final String NET_INCOME = "Net Income";
+        public static final String OPERATING_PROFIT = "Operating Profit";
+        public static final String NET_PROFIT = "Net Profit";
+    }
 }

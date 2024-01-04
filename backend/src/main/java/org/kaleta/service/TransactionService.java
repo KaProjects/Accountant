@@ -3,6 +3,7 @@ package org.kaleta.service;
 import org.kaleta.entity.Transaction;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TransactionService
 {
@@ -78,4 +79,9 @@ public interface TransactionService
      * @return monthly profit values for specified year
      */
     Integer[] getMonthlyProfit(String year);
+
+    /**
+     * @return all transactions matching schema prefix (e.i. for all years)
+     */
+    List<Transaction> getMatching(Set<String> schemas);
 }

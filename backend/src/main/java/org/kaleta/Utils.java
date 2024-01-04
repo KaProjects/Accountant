@@ -128,4 +128,14 @@ public class Utils
     {
         return new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     }
+
+    public static Integer[] invertValues(Integer[] monthlyValues)
+    {
+        Integer[] result = new Integer[monthlyValues.length];
+
+        for (int i=0;i<monthlyValues.length;i++) {
+            result[i] = -monthlyValues[i];
+        }
+        return result;
+    }
 }
