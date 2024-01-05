@@ -3,6 +3,7 @@ import {AppBar, Box, Button, IconButton, MenuItem, Select, Toolbar, Typography} 
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import {getChartConfigStyle} from "../constants";
 
 const MainBar = props => {
 
@@ -51,7 +52,7 @@ const MainBar = props => {
                             onChange={event => props.setSelectedValue(event.target.value)}
                         >
                             {props.selectValues.map((value, index) => (
-                                <MenuItem key={index} value={value}>{value.name}</MenuItem>
+                                <MenuItem key={index} value={value} style={getChartConfigStyle(value.id)}>{value.name}</MenuItem>
                             ))}
                         </Select>
                     }

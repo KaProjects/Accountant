@@ -7,6 +7,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import TransactionsDialog from "../components/TransactionsDialog";
 import {useParams} from "react-router-dom";
 import LaunchIcon from '@mui/icons-material/Launch';
+import {colors} from "../constants";
 
 const AccountingStatement = props => {
     let { type } = useParams();
@@ -65,40 +66,40 @@ const AccountingStatement = props => {
             color = "#227222";
         }
         if (type === 'INCOME_GROUP'){
-            background = "#67da67";
-            color = "#017901";
+            background = colors.income_group.background;
+            color = colors.income_group.foreground;
         }
         if (type === 'EXPENSE_ACCOUNT'){
             background = "#ffffff";
             color = "#a13c3c";
         }
         if (type === 'EXPENSE_GROUP'){
-            background = "#fc9e9e";
-            color = "#a62d2d";
+            background = colors.expense_group.background;
+            color = colors.expense_group.foreground;
         }
         if (type === 'PROFIT_SUMMARY'){
-            background = "#8bbefa";
-            color = "#22468d";
+            background = colors.profit_summary.background;
+            color = colors.profit_summary.foreground;
         }
         if (type === 'CASH_FLOW_ACCOUNT'){
             background = "#ffffff";
             color = "#721c67";
         }
         if (type === 'CASH_FLOW_GROUP'){
-            background = "#ab75a5";
-            color = "#620155";
+            background = colors.cash_flow_group.background;
+            color = colors.cash_flow_group.foreground;
         }
         if (type === 'CASH_FLOW_SUMMARY'){
-            background = "#983f8d";
-            color = "#3a0032";
+            background = colors.cash_flow_summary.background;
+            color = colors.cash_flow_summary.foreground;
         }
         if (type === 'BALANCE_SUMMARY'){
-            background = "#cdf8f3";
-            color = "#3fab9e";
+            background = colors.balance_summary.background;
+            color = colors.balance_summary.foreground;
         }
         if (type === 'BALANCE_CLASS'){
-            background = "#f3e2ac";
-            color = "#544209";
+            background = colors.balance_class.background;
+            color = colors.balance_class.foreground;
         }
         if (type === 'BALANCE_GROUP'){
             background = "#fdfac4";

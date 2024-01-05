@@ -3,6 +3,7 @@ import React, {useEffect} from "react";
 import Loader from "../components/Loader";
 import {FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 import {Bar, BarChart, Brush, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import {getChartConfigStyle} from "../constants";
 
 
 const AccountingChart = props => {
@@ -61,7 +62,7 @@ const AccountingChart = props => {
                                 onChange={event => {props.setSelectedValue(event.target.value);props.setSelectValues(data);}}
                             >
                                 {data.map((value, index) => (
-                                    <MenuItem key={index} value={value}>{value.name}</MenuItem>
+                                    <MenuItem key={index} value={value} style={getChartConfigStyle(value.id)}>{value.name}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
