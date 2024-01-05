@@ -2,6 +2,7 @@ package org.kaleta.rest;
 
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
+import org.kaleta.Utils;
 import org.kaleta.dto.ChartDto;
 import org.kaleta.entity.Transaction;
 import org.kaleta.model.ChartData;
@@ -14,7 +15,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,14 +50,19 @@ public class ChartResource
         return Endpoint.process(() -> {
             ParamValidators.validateChartId(id);
         }, () -> {
-            Set<String> schemas = ChartData.getConfigs(new HashMap<>()).get(id).getSchemas();
+            Set<String> schemas = ChartData.getConfigs().get(id).getSchemas();
             List<Transaction> transactions = transactionService.getMatching(schemas);
             List<String> years = schemaService.getYears();
             ChartData data = new ChartData(transactions, years);
 
             ChartDto dto = new ChartDto();
-            dto.setLabels(data.getLabels());
-            dto.setValues(data.getValues(id));
+            String[] labels = data.getLabels();
+            Integer[] balances = data.getValues(id);
+            Integer[] cumulative = Utils.toCumulativeArray(balances);
+            for (int i=0; i<labels.length; i++)
+            {
+                dto.addValue(labels[i], balances[i], cumulative[i]);
+            }
             return dto;
         });
     }

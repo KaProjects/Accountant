@@ -24,7 +24,7 @@ const AccountingChart = props => {
                     <Loader error ={error}/>
                 }
                 {loaded &&
-                    <div style={{minHeight: "85vh", minWidth: "90vw"}}>
+                    <div style={{height: "85vh", width: "90vw"}}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart
                                 data={data.values}

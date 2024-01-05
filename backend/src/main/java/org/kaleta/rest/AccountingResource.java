@@ -51,7 +51,7 @@ public class AccountingResource
 
             GroupComponent group60 = profitRevenuesData.getGroupComponent("60");
             GroupComponent group55a = profitExpensesData.getGroupComponent("55", "0", "1", "2");
-            GroupComponent group63a = profitRevenuesData.getGroupComponent("63", "1", "2", "3");
+            GroupComponent group63a = profitRevenuesData.getGroupComponent("63", "1", "2", "3", "4");
 
             GroupComponent group51 = profitExpensesData.getGroupComponent("51");
             GroupComponent group52 = profitExpensesData.getGroupComponent("52");
@@ -145,7 +145,7 @@ public class AccountingResource
             profitDto.getRows().add(row60);
             AccountingDto.Row row55a = from(group55a, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("55", "0", "1", "2"));
             profitDto.getRows().add(row55a);
-            AccountingDto.Row row63a = from(group63a, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("63", "1", "2", "3"));
+            AccountingDto.Row row63a = from(group63a, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("63", "1", "2", "3", "4"));
             profitDto.getRows().add(row63a);
 
             AccountingDto.Row netIncomeRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, NET_INCOME, "ni");

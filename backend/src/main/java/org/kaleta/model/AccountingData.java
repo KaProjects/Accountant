@@ -28,6 +28,8 @@ public class AccountingData
         {
             SchemaClass.Group.Account schemaAccount = schemaClass.getGroup(groupId).getAccountBySuffix(schemaAccountSuffix);
 
+            if (schemaAccount == null) continue; // older years might not have some new schema accounts
+
             GroupComponent.AccountComponent accountComponent = new GroupComponent.AccountComponent();
             accountComponent.setSchemaId(schemaAccount.getId());
             accountComponent.setName(schemaAccount.getName());

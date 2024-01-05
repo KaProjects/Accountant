@@ -26,6 +26,7 @@ public class YearAccountTransactionDto implements Comparable<YearAccountTransact
     @Override
     public int compareTo(YearAccountTransactionDto other)
     {
-        return Utils.compareDates(this.getDate(), other.getDate());
+        // from latest
+        return -Utils.compareDates(this.getDate(), other.getDate());
     }
 }

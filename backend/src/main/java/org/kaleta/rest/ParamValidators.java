@@ -6,7 +6,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 
 public class ParamValidators
 {
@@ -76,7 +75,7 @@ public class ParamValidators
         if (accountId == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account ID Parameter is NULL");
         }
-        if (!accountId.matches("\\d\\d\\d\\.\\d+"))
+        if (!accountId.matches("\\d\\d\\d\\.\\d+(-\\d+)?"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Account ID Parameter: '" + accountId + "'");
     }
 
@@ -85,10 +84,9 @@ public class ParamValidators
         if (chartId == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chart ID Parameter is NULL");
         }
-        for (String configId : ChartData.getConfigs(new HashMap<>()).keySet())
+        if (!ChartData.getConfigs().containsKey(chartId))
         {
-            if (configId.equals(chartId)) return;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Chart ID Parameter: '" + chartId + "'");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Chart ID Parameter: '" + chartId + "'");
     }
 }

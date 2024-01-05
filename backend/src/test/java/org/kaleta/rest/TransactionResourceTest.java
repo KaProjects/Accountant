@@ -64,8 +64,8 @@ public class TransactionResourceTest
                 .statusCode(200)
                 .contentType(ContentType.JSON)
                 .body("size()", is(25))
-                .body("[0].date", is("0101"))
-                .body("[1].date", is("0504"))
+                .body("[0].date", is("1508"))
+                .body("[6].date", is("1006"))
                 .extract().response().jsonPath().getList("", YearAccountTransactionDto.class);
 
         assertThat(transactions, hasItem(YearAccountTransactionDto.from("0101", "1000", null, "700.0 account700", "init")));
@@ -194,5 +194,29 @@ public class TransactionResourceTest
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().body().asString(), containsString("Invalid Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/transaction/" + validYear + "/202.10-")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Account ID Parameter"));
+
+        assertThat(given().when()
+                .get("/transaction/" + validYear + "/202.10-x")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().body().asString(), containsString("Invalid Account ID Parameter"));
+
+        given().when()
+                .get("/transaction/" + validYear + "/202.10-123")
+                .then().statusCode(200);
+
+        given().when()
+                .get("/transaction/" + validYear + "/202.103")
+                .then().statusCode(200);
+
+        given().when()
+                .get("/transaction/" + validYear + "/202.0")
+                .then().statusCode(200);
     }
 }
