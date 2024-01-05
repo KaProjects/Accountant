@@ -1,5 +1,6 @@
 package org.kaleta.service;
 
+import org.kaleta.Constants;
 import org.kaleta.model.SchemaClass;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface SchemaService
     /**
      * @return account type for specified account ID and year
      */
-    String getAccountType(String year, String accountId);
+    Constants.AccountType getAccountType(String year, String accountId);
 
     /**
      * @return class model specified by class ID and year
@@ -31,16 +32,6 @@ public interface SchemaService
      * @return models of all classes for specified year
      */
     Map<String, SchemaClass> getSchema(String year);
-
-    /**
-     * @return true if specified schema account is of type Asset or Expense
-     */
-    boolean isDebitType(String year, String accountId);
-
-    /**
-     * @return true if specified schema account is of type Liability or Revenue
-     */
-    boolean isCreditType(String year, String accountId);
 
     /**
      * @return all years from data

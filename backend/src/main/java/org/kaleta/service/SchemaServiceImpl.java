@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
 
 @Service
@@ -47,10 +46,10 @@ public class SchemaServiceImpl implements SchemaService
     }
 
     @Override
-    public String getAccountType(String year, String accountId)
+    public Constants.AccountType getAccountType(String year, String accountId)
     {
         validateIdLength(accountId, 3);
-        return schemaDao.getAccountById(year, accountId).getType();
+        return Constants.AccountType.valueOf(schemaDao.getAccountById(year, accountId).getType());
     }
 
     @Override
@@ -104,20 +103,6 @@ public class SchemaServiceImpl implements SchemaService
             }
         }
         return classMap;
-    }
-
-    @Override
-    public boolean isDebitType(String year, String accountId)
-    {
-        validateIdLength(accountId, 3);
-        return Objects.equals(getAccountType(year, accountId), "A") || Objects.equals(getAccountType(year, accountId), "E");
-    }
-
-    @Override
-    public boolean isCreditType(String year, String accountId)
-    {
-        validateIdLength(accountId, 3);
-        return Objects.equals(getAccountType(year, accountId), "L") || Objects.equals(getAccountType(year, accountId), "R");
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.kaleta.service;
 
+import org.kaleta.AccountUtils;
 import org.kaleta.entity.Account;
 import org.kaleta.entity.Transaction;
 import org.kaleta.model.AccountingData;
@@ -76,9 +77,11 @@ public class AccountingServiceImpl implements AccountingService
         // filter correcting transactions between same schema account
         transactions.removeIf(transaction -> transaction.getDebit().substring(0,3).equals(transaction.getCredit().substring(0,3)));
 
+        boolean isDebit = AccountUtils.isDebit(schemaService.getAccountType(year, schemaId));
+
         transactions.forEach(transaction -> {
-            if ((transaction.getCredit().startsWith(schemaId) && schemaService.isDebitType(year, schemaId))
-                || (transaction.getDebit().startsWith(schemaId) && schemaService.isCreditType(year, schemaId)))
+            if ((transaction.getCredit().startsWith(schemaId) && isDebit)
+                || (transaction.getDebit().startsWith(schemaId) && !isDebit))
             {
                 transaction.setAmount(-transaction.getAmount());
             }

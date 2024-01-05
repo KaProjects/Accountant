@@ -52,16 +52,6 @@ public interface TransactionRepository
 
     /**
      * @param year year condition
-     * @param account account condition (is either debit or credit in a transaction)
-     *
-     * @return transactions matching conditions
-     *
-     * Note: off-balance transactions excluded
-     */
-    List<Transaction> listByAccount(String year, String account);
-
-    /**
-     * @param year year condition
      * @param descriptionSubString description substring condition
      *
      * @return transactions matching conditions
@@ -69,12 +59,6 @@ public interface TransactionRepository
      * Note: off-balance transactions excluded
      */
     List<Transaction> listByDescriptionMatching(String year, String descriptionSubString);
-
-    /**
-     * @param isDebit whether account is debit-like, false for credit-like
-     * @return initial transaction for specified account ID
-     */
-    Transaction getInitialTransaction(String year, String accountId, boolean isDebit);
 
     /**
      * @param year - year condition

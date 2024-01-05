@@ -12,16 +12,6 @@ public interface SchemaRepository
     void syncSchema(org.kaleta.entity.xml.Schema data);
 
     /**
-     * @return name of the schena object specified by ID and year
-     */
-    String getNameById(String year, String accountId);
-
-    /**
-     * @return list of accounts for specified group
-     */
-    List<Schema> getAccountByGroup(String year, String groupId);
-
-    /**
      * @return account specified by ID
      */
     Schema getAccountById(String year, String accountId);

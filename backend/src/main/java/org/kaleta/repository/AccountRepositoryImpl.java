@@ -50,18 +50,6 @@ public class AccountRepositoryImpl implements AccountRepository
     }
 
     @Override
-    public Account get(String year, String schemaId, String semanticId)
-    {
-        return entityManager.createQuery(selectYearly +
-                        " AND a.accountId.schemaId=:schemaId" +
-                        " AND a.accountId.semanticId=:semanticId", Account.class)
-                .setParameter("year", year)
-                .setParameter("schemaId", schemaId)
-                .setParameter("semanticId", semanticId)
-                .getSingleResult();
-    }
-
-    @Override
     public List<Account> listByMetadata(String year, String metadata)
     {
         return entityManager.createQuery(selectYearly + " AND a.metadata LIKE :metadata", Account.class)

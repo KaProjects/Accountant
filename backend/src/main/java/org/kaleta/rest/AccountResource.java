@@ -70,7 +70,7 @@ public class AccountResource
             ParamValidators.validateYear(year);
             ParamValidators.validateSchemaAccountId(schemaId);
         }, () -> {
-            Constants.AccountType accountType = Constants.AccountType.valueOf(schemaService.getAccountType(year, schemaId));
+            Constants.AccountType accountType = schemaService.getAccountType(year, schemaId);
             List<Account> accounts = accountService.listBySchema(year, schemaId);
             List<Transaction> transactions = transactionService.getTransactionsMatching(year, schemaId);
             List<YearAccountOverviewDto> dtoList = new ArrayList<>();

@@ -113,17 +113,6 @@ public class TransactionRepositoryImpl implements TransactionRepository
     }
 
     @Override
-    public List<Transaction> listByAccount(String year, String account)
-    {
-        return entityManager.createQuery(selectYearly
-                        + " AND (t.debit=:account OR t.credit=:account)"
-                        + excludeOffBalanceTransactions, Transaction.class)
-                .setParameter("year", year)
-                .setParameter("account", account)
-                .getResultList();
-    }
-
-    @Override
     public List<Transaction> listByDescriptionMatching(String year, String descriptionSubString)
     {
         return entityManager.createQuery(selectYearly
@@ -132,20 +121,6 @@ public class TransactionRepositoryImpl implements TransactionRepository
                 .setParameter("year", year)
                 .setParameter("description", "%" + descriptionSubString + "%")
                 .getResultList();
-    }
-
-    @Override
-    public Transaction getInitialTransaction(String year, String accountId, boolean isDebit)
-    {
-        String accountsCondition = isDebit
-                ? " AND t.debit=:accountId AND t.credit=:initialId"
-                : " AND t.debit=:initialId AND t.credit=:accountId";
-
-        return entityManager.createQuery(selectYearly + accountsCondition, Transaction.class)
-                .setParameter("year", year)
-                .setParameter("accountId", accountId)
-                .setParameter("initialId", Constants.Account.INIT_ACC_ID)
-                .getSingleResult();
     }
 
     @Override
