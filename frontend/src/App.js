@@ -9,6 +9,7 @@ import MainBar from "./components/MainBar";
 import AccountingStatement from "./views/AccountingStatement";
 import Home from "./views/Home";
 import AccountingData from "./views/AccountingData";
+import AccountingChart from "./views/AccountingChart";
 
 class App extends Component {
     constructor(props) {
@@ -27,12 +28,18 @@ class App extends Component {
             token: null,
             year: retrieveYear(),
             isYearly: false, // toggles year's switch in MainBar
-            setYearly: this.setYearly.bind(this)
+            setYearly: this.setYearly.bind(this),
+            selectValues: null,
+            selectedValue: "",
+            setSelectedValue: this.setSelectedValue.bind(this),
+            setSelectValues: this.setSelectValues.bind(this)
         }
 
         this.setToken = this.setToken.bind(this);
         this.getToken = this.getToken.bind(this);
         this.setYear = this.setYear.bind(this);
+        this.setSelectedValue = this.setSelectedValue.bind(this);
+        this.setSelectValues = this.setSelectValues.bind(this);
     }
 
     setToken(token){
@@ -58,7 +65,18 @@ class App extends Component {
     }
 
     setYearly(yearly){
+        this.setState({selectValues: null})
+        this.setState({selectedValue: ""})
         this.setState({isYearly: yearly})
+    }
+
+    setSelectValues(values){
+        this.setState({isYearly: false})
+        this.setState({selectValues: values})
+    }
+
+    setSelectedValue(value){
+        this.setState({selectedValue: value})
     }
 
     PageNotFound() {
@@ -88,6 +106,7 @@ class App extends Component {
                         <Route exact path="/financial/assets" element={<FinancialAssets {...this.state}/> }/>
                         <Route exact path="/accounting/:type" element={<AccountingStatement {...this.state}/> }/>
                         <Route exact path="/accounting/:type/:overall" element={<AccountingStatement {...this.state}/> }/>
+                        <Route exact path="/chart/accounting" element={<AccountingChart {...this.state}/> }/>
                         <Route exact path="/data" element={<AccountingData {...this.state}/> }/>
                         <Route path="*" element={this.PageNotFound()} />
                     </Routes>

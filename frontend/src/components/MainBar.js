@@ -1,5 +1,5 @@
 import React from "react";
-import {AppBar, Box, Button, IconButton, Toolbar, Typography} from "@mui/material";
+import {AppBar, Box, Button, IconButton, MenuItem, Select, Toolbar, Typography} from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -38,7 +38,23 @@ const MainBar = props => {
                         }
                     </>
                     }
-
+                    {props.selectValues !== null &&
+                        <Select
+                            variant="standard"
+                            sx={{
+                                color: "white",
+                                '.MuiSvgIcon-root ': {fill: "white"},
+                                ':before': { borderBottomColor: 'white' },
+                                ':after': { borderBottomColor: 'white' }
+                            }}
+                            value={props.selectedValue}
+                            onChange={event => props.setSelectedValue(event.target.value)}
+                        >
+                            {props.selectValues.map((value, index) => (
+                                <MenuItem key={index} value={value}>{value.name}</MenuItem>
+                            ))}
+                        </Select>
+                    }
                 </Box>
                 <Box sx={{ flexGrow: 1 }} />
                 <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
