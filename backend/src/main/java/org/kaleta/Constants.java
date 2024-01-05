@@ -32,5 +32,9 @@ public class Constants
         public static final String NET_INCOME = "Net Income";
         public static final String OPERATING_PROFIT = "Operating Profit";
         public static final String NET_PROFIT = "Net Profit";
+        public static final String CASH_FLOW = "Cash Flow";
+        public static final String ASSETS = "Assets";
+        public static final String PROFIT = "Profit";
+        public static final String LIABILITIES = "Liabilities";
     }
 }

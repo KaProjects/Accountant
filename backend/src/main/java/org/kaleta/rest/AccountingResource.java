@@ -23,9 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.kaleta.Constants.Label.ASSETS;
+import static org.kaleta.Constants.Label.CASH_FLOW;
+import static org.kaleta.Constants.Label.LIABILITIES;
 import static org.kaleta.Constants.Label.NET_INCOME;
 import static org.kaleta.Constants.Label.NET_PROFIT;
 import static org.kaleta.Constants.Label.OPERATING_PROFIT;
+import static org.kaleta.Constants.Label.PROFIT;
 
 @Path("/accounting")
 public class AccountingResource
@@ -217,7 +221,7 @@ public class AccountingResource
             cashFlowDto.getRows().add(from(group23, AccountingDto.Type.CASH_FLOW_GROUP));
             cashFlowDto.getRows().add(from(group22, AccountingDto.Type.CASH_FLOW_GROUP));
 
-            AccountingDto.Row cashFlowRow = new AccountingDto.Row(AccountingDto.Type.CASH_FLOW_SUMMARY, "Cash Flow", "cf");
+            AccountingDto.Row cashFlowRow = new AccountingDto.Row(AccountingDto.Type.CASH_FLOW_SUMMARY, CASH_FLOW, "cf");
             cashFlowRow.setInitial(group20.getInitialValue() + group21.getInitialValue() + group23.getInitialValue() + group22.getInitialValue());
             cashFlowRow.setMonthlyValues(Utils.mergeIntegerArrays(group20.getMonthlyBalance(), group21.getMonthlyBalance(), group23.getMonthlyBalance(), group22.getMonthlyBalance()));
             cashFlowRow.setTotal(group20.getBalance() + group21.getBalance() + group23.getBalance() + group22.getBalance());
@@ -261,7 +265,7 @@ public class AccountingResource
             AccountingDto.Row row22 = from(group22, AccountingDto.Type.CASH_FLOW_GROUP, group22Yearly);
             cashFlowDto.getRows().add(row22);
 
-            AccountingDto.Row cashFlowRow = new AccountingDto.Row(AccountingDto.Type.CASH_FLOW_SUMMARY, "Cash Flow", "cf");
+            AccountingDto.Row cashFlowRow = new AccountingDto.Row(AccountingDto.Type.CASH_FLOW_SUMMARY, CASH_FLOW, "cf");
             cashFlowRow.setYearlyValues(Utils.mergeIntegerArrays(row20.getYearlyValues(), row21.getYearlyValues(), row23.getYearlyValues(), row22.getYearlyValues()));
             cashFlowDto.getRows().add(cashFlowRow);
 
@@ -297,7 +301,7 @@ public class AccountingResource
             AccountingDto.Row rowClass2a = from(class2a);
             AccountingDto.Row rowClass3a = from(class3a);
 
-            AccountingDto.Row assetsRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, "Assets".toUpperCase(), "a");
+            AccountingDto.Row assetsRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, ASSETS.toUpperCase(), "a");
             assetsRow.setInitial(rowClass0.getInitial() + rowClass1.getInitial() + rowClass2a.getInitial() + rowClass3a.getInitial());
             assetsRow.setMonthlyValues(Utils.mergeIntegerArrays(rowClass0.getMonthlyValues(), rowClass1.getMonthlyValues(), rowClass2a.getMonthlyValues(), rowClass3a.getMonthlyValues()));
             assetsRow.setTotal(rowClass0.getTotal() + rowClass1.getTotal() + rowClass2a.getTotal() + rowClass3a.getTotal());
@@ -311,12 +315,12 @@ public class AccountingResource
             AccountingDto.Row rowClass2l = from(class2l);
             AccountingDto.Row rowClass3l = from(class3l);
             AccountingDto.Row rowClass4 = from(class4);
-            AccountingDto.Row rowProfit = new AccountingDto.Row(AccountingDto.Type.BALANCE_CLASS, "Profit", "p");
+            AccountingDto.Row rowProfit = new AccountingDto.Row(AccountingDto.Type.BALANCE_CLASS, PROFIT, "p");
             rowProfit.setInitial(0);
             rowProfit.setMonthlyValues(transactionService.getMonthlyProfit(year));
             rowProfit.setTotal(Utils.sumArray(rowProfit.getMonthlyValues()));
 
-            AccountingDto.Row liabilitiesRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, "Liabilities".toUpperCase(), "l");
+            AccountingDto.Row liabilitiesRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, LIABILITIES.toUpperCase(), "l");
             liabilitiesRow.setInitial(rowClass2l.getInitial() + rowClass3l.getInitial() + rowClass4.getInitial());
             liabilitiesRow.setMonthlyValues(Utils.mergeIntegerArrays(rowClass2l.getMonthlyValues(), rowClass3l.getMonthlyValues(), rowClass4.getMonthlyValues(), rowProfit.getMonthlyValues()));
             liabilitiesRow.setTotal(rowClass2l.getTotal() + rowClass3l.getTotal() + rowClass4.getTotal() + rowProfit.getTotal());
@@ -363,7 +367,7 @@ public class AccountingResource
             AccountingDto.Row rowClass2a = from(class2a, yearlyClosingData.getYearlyClassValues("2", "0", "1", "3"));
             AccountingDto.Row rowClass3a = from(class3a, yearlyClosingData.getYearlyClassValues("3", "0"));
 
-            AccountingDto.Row assetsRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, "Assets".toUpperCase(), "a");
+            AccountingDto.Row assetsRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, ASSETS.toUpperCase(), "a");
             assetsRow.setYearlyValues(Utils.mergeIntegerArrays(rowClass0.getYearlyValues(), rowClass1.getYearlyValues(), rowClass2a.getYearlyValues(), rowClass3a.getYearlyValues()));
             balanceSheetDto.getRows().add(assetsRow);
 
@@ -375,12 +379,12 @@ public class AccountingResource
             AccountingDto.Row rowClass2l = from(class2l, yearlyClosingData.getYearlyClassValues("2", "2"));
             AccountingDto.Row rowClass3l = from(class3l, yearlyClosingData.getYearlyClassValues("3", "1"));
             AccountingDto.Row rowClass4 = from(class4, yearlyClosingData.getYearlyClassValues("4"));
-            AccountingDto.Row rowProfit = new AccountingDto.Row(AccountingDto.Type.BALANCE_CLASS, "Profit", "p");
+            AccountingDto.Row rowProfit = new AccountingDto.Row(AccountingDto.Type.BALANCE_CLASS, PROFIT, "p");
             Integer[] yearlyProfit = yearlyProfitData.getYearlyOverallValues();
             yearlyProfit[years.length - 1] = Utils.sumArray(transactionService.getMonthlyProfit(years[years.length - 1]));
             rowProfit.setYearlyValues(yearlyProfit);
 
-            AccountingDto.Row liabilitiesRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, "Liabilities".toUpperCase(), "l");
+            AccountingDto.Row liabilitiesRow = new AccountingDto.Row(AccountingDto.Type.BALANCE_SUMMARY, LIABILITIES.toUpperCase(), "l");
             liabilitiesRow.setYearlyValues(Utils.mergeIntegerArrays(rowClass2l.getYearlyValues(), rowClass3l.getYearlyValues(), rowClass4.getYearlyValues(), rowProfit.getYearlyValues()));
             balanceSheetDto.getRows().add(liabilitiesRow);
 

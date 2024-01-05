@@ -59,11 +59,23 @@ public class ChartResource
             String[] labels = data.getLabels();
             Integer[] balances = data.getValues(id);
             Integer[] cumulative = Utils.toCumulativeArray(balances);
+            if (id.equals("l"))
+            {
+                cumulative = Utils.mergeIntegerArrays(cumulative, getCumulativeProfit(years));
+            }
             for (int i=0; i<labels.length; i++)
             {
                 dto.addValue(labels[i], balances[i], cumulative[i]);
             }
             return dto;
         });
+    }
+
+    private Integer[] getCumulativeProfit(List<String> years)
+    {
+        Set<String> schemas = ChartData.getConfigs().get("p").getSchemas();
+        List<Transaction> transactions = transactionService.getMatching(schemas);
+        ChartData data = new ChartData(transactions, years);
+        return Utils.toCumulativeArray(data.getValues("p"));
     }
 }

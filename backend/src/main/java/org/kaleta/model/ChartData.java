@@ -12,9 +12,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static org.kaleta.Constants.Label.ASSETS;
+import static org.kaleta.Constants.Label.CASH_FLOW;
+import static org.kaleta.Constants.Label.LIABILITIES;
 import static org.kaleta.Constants.Label.NET_INCOME;
 import static org.kaleta.Constants.Label.NET_PROFIT;
 import static org.kaleta.Constants.Label.OPERATING_PROFIT;
+import static org.kaleta.Constants.Label.PROFIT;
 
 public class ChartData
 {
@@ -52,18 +56,20 @@ public class ChartData
             {
                 if (transaction.getDebit().startsWith(schemaId) && notClosing(transaction.getCredit()))
                 {
+                    if (isBalance(schemaId) && transaction.getCredit().equals(Constants.Account.INIT_ACC_ID)) continue;
                     Integer amount = isBalance(schemaId) ? transaction.getAmount() : -transaction.getAmount();
                     monthlyData.put(key, monthlyData.get(key) + amount);
                 }
                 if (transaction.getCredit().startsWith(schemaId) && notClosing(transaction.getDebit()))
                 {
+                    if (isBalance(schemaId) && transaction.getDebit().equals(Constants.Account.INIT_ACC_ID) && (!transaction.getDescription().contains("Profit from") || id.equals("l"))) continue;
                     Integer amount = isBalance(schemaId) ? -transaction.getAmount() : transaction.getAmount();
                     monthlyData.put(key, monthlyData.get(key) + amount);
                 }
             }
         }
         Integer[] monthlyValues = monthlyData.values().toArray(new Integer[]{});
-        if (id.startsWith("5")) {
+        if (id.startsWith("5") || id.equals("22") || id.equals("l") || id.equals("2l") || id.equals("3l") || id.equals("4")) {
             return Utils.invertValues(monthlyValues);
         } else {
             return monthlyValues;
@@ -115,8 +121,27 @@ public class ChartData
 
         configs.add(new Config("np", NET_PROFIT, Config.ChartType.BALANCE, Set.of("6", "5")));
 
+        configs.add(new Config("20", schemaNames.get("20"), Config.ChartType.CUMULATIVE, Set.of("20")));
+        configs.add(new Config("21", schemaNames.get("21"), Config.ChartType.CUMULATIVE, Set.of("21")));
+        configs.add(new Config("23", schemaNames.get("23"), Config.ChartType.CUMULATIVE, Set.of("23")));
+        configs.add(new Config("22", schemaNames.get("22"), Config.ChartType.CUMULATIVE, Set.of("22")));
 
+        configs.add(new Config("cf", CASH_FLOW, Config.ChartType.CUMULATIVE, Set.of("20", "21", "22", "23")));
 
+        configs.add(new Config("a", ASSETS, Config.ChartType.CUMULATIVE, Set.of("0", "1", "20", "21", "23", "30")));
+
+        configs.add(new Config("0", schemaNames.get("0"), Config.ChartType.CUMULATIVE, Set.of("0")));
+        configs.add(new Config("1", schemaNames.get("1"), Config.ChartType.CUMULATIVE, Set.of("1")));
+        configs.add(new Config("2a", schemaNames.get("2") + " - " + ASSETS, Config.ChartType.CUMULATIVE, Set.of("20","21","23")));
+        configs.add(new Config("3a", schemaNames.get("3") + " - " + ASSETS, Config.ChartType.CUMULATIVE, Set.of("30")));
+
+        configs.add(new Config("l", LIABILITIES, Config.ChartType.CUMULATIVE, Set.of("22", "31", "4")));
+
+        configs.add(new Config("2l", schemaNames.get("2") + " - " + LIABILITIES, Config.ChartType.CUMULATIVE, Set.of("22")));
+        configs.add(new Config("3l", schemaNames.get("3") + " - " + LIABILITIES, Config.ChartType.CUMULATIVE, Set.of("31")));
+        configs.add(new Config("4", schemaNames.get("4"), Config.ChartType.CUMULATIVE, Set.of("4")));
+
+        configs.add(new Config("p", PROFIT, Config.ChartType.CUMULATIVE, Set.of("6", "5")));
 
         return configs;
     }
