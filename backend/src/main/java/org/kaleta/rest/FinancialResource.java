@@ -10,9 +10,7 @@ import org.kaleta.entity.Account;
 import org.kaleta.entity.json.FinAssetsConfig;
 import org.kaleta.model.FinancialAsset;
 import org.kaleta.model.FinancialAssetsData;
-import org.kaleta.service.AccountService;
 import org.kaleta.service.FinancialService;
-import org.kaleta.service.SchemaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,12 +31,6 @@ public class FinancialResource
 {
     @Inject
     FinancialService financialService;
-
-    @Inject
-    SchemaService schemaService;
-
-    @Inject
-    AccountService accountService;
 
     @GET
     @Secured
@@ -66,6 +58,7 @@ public class FinancialResource
                 }
                 dto.getGroups().add(groupDto);
             }
+            dto.trimFutureMonths();
             return dto;
         });
     }
@@ -139,6 +132,7 @@ public class FinancialResource
                 }
                 dto.getGroups().add(groupDto);
             }
+            dto.trimFutureMonths();
             return dto;
         });
     }

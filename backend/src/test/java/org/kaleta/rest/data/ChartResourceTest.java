@@ -12,6 +12,8 @@ import org.kaleta.model.ChartData;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 
@@ -123,7 +125,9 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart60.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        int futureMonths = 11 - new GregorianCalendar().get(Calendar.MONTH);
+
+        assertThat(chart60.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart60.getValues()), is(overallProfit.getRows().get(0).getYearlyValues()));
 
         ChartDto chart55a = given().when()
@@ -133,7 +137,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart55a.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart55a.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart55a.getValues()), is(overallProfit.getRows().get(1).getYearlyValues()));
 
         ChartDto chart63a = given().when()
@@ -143,7 +147,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart63a.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart63a.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart63a.getValues()), is(overallProfit.getRows().get(2).getYearlyValues()));
 
         ChartDto chartNi = given().when()
@@ -153,7 +157,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chartNi.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chartNi.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chartNi.getValues()), is(overallProfit.getRows().get(3).getYearlyValues()));
 
         ChartDto chart51 = given().when()
@@ -163,7 +167,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart51.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart51.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart51.getValues()), is(overallProfit.getRows().get(4).getYearlyValues()));
 
         ChartDto chart52 = given().when()
@@ -173,7 +177,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart52.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart52.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart52.getValues()), is(overallProfit.getRows().get(5).getYearlyValues()));
 
         ChartDto chart53 = given().when()
@@ -183,7 +187,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart53.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart53.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart53.getValues()), is(overallProfit.getRows().get(6).getYearlyValues()));
 
         ChartDto chartOp = given().when()
@@ -193,7 +197,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chartOp.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chartOp.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chartOp.getValues()), is(overallProfit.getRows().get(7).getYearlyValues()));
 
         ChartDto chart50 = given().when()
@@ -203,7 +207,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart50.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart50.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart50.getValues()), is(overallProfit.getRows().get(8).getYearlyValues()));
 
         ChartDto chart61 = given().when()
@@ -213,7 +217,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart61.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart61.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart61.getValues()), is(overallProfit.getRows().get(9).getYearlyValues()));
 
         ChartDto chart56 = given().when()
@@ -223,7 +227,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart56.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart56.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart56.getValues()), is(overallProfit.getRows().get(10).getYearlyValues()));
 
         ChartDto chart62 = given().when()
@@ -233,7 +237,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart62.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart62.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart62.getValues()), is(overallProfit.getRows().get(11).getYearlyValues()));
 
         ChartDto chart54 = given().when()
@@ -243,7 +247,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart54.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart54.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart54.getValues()), is(overallProfit.getRows().get(12).getYearlyValues()));
 
         ChartDto chart63b = given().when()
@@ -253,7 +257,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart63b.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart63b.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart63b.getValues()), is(overallProfit.getRows().get(13).getYearlyValues()));
 
         ChartDto chart55b = given().when()
@@ -263,7 +267,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart55b.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chart55b.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chart55b.getValues()), is(overallProfit.getRows().get(14).getYearlyValues()));
 
         ChartDto chartNp = given().when()
@@ -273,7 +277,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chartNp.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12));
+        assertThat(chartNp.getValues().size(), is((overallProfit.getColumns().size() - 2) * 12 - futureMonths));
         assertThat(toYearlyBalances(chartNp.getValues()), is(overallProfit.getRows().get(15).getYearlyValues()));
 
         AccountingDto overallCashFlow = given().when()
@@ -289,7 +293,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart20.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12));
+        assertThat(chart20.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart20.getValues()), is(overallCashFlow.getRows().get(0).getYearlyValues()));
 
         ChartDto chart21 = given().when()
@@ -299,7 +303,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart21.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12));
+        assertThat(chart21.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart21.getValues()), is(overallCashFlow.getRows().get(1).getYearlyValues()));
 
         ChartDto chart23 = given().when()
@@ -309,7 +313,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart23.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12));
+        assertThat(chart23.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart23.getValues()), is(overallCashFlow.getRows().get(2).getYearlyValues()));
 
         ChartDto chart22 = given().when()
@@ -319,7 +323,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart22.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12));
+        assertThat(chart22.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart22.getValues()), is(Utils.invertValues(overallCashFlow.getRows().get(3).getYearlyValues())));
 
         ChartDto chartCf = given().when()
@@ -329,7 +333,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chartCf.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12));
+        assertThat(chartCf.getValues().size(), is((overallCashFlow.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chartCf.getValues()), is(overallCashFlow.getRows().get(4).getYearlyValues()));
 
         AccountingDto overallBalance = given().when()
@@ -345,7 +349,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chartA.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chartA.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chartA.getValues()), is(overallBalance.getRows().get(0).getYearlyValues()));
 
         ChartDto chart0 = given().when()
@@ -355,7 +359,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart0.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chart0.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart0.getValues()), is(overallBalance.getRows().get(1).getYearlyValues()));
 
         ChartDto chart1 = given().when()
@@ -365,7 +369,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart1.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chart1.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart1.getValues()), is(overallBalance.getRows().get(2).getYearlyValues()));
 
         ChartDto chart2a = given().when()
@@ -375,7 +379,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart2a.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chart2a.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart2a.getValues()), is(overallBalance.getRows().get(3).getYearlyValues()));
 
         ChartDto chart3a = given().when()
@@ -385,7 +389,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart3a.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chart3a.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart3a.getValues()), is(overallBalance.getRows().get(4).getYearlyValues()));
 
         ChartDto chartL = given().when()
@@ -395,7 +399,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chartL.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chartL.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chartL.getValues()), is(overallBalance.getRows().get(5).getYearlyValues()));
 
         ChartDto chart2l = given().when()
@@ -405,7 +409,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart2l.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chart2l.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart2l.getValues()), is(overallBalance.getRows().get(6).getYearlyValues()));
 
         ChartDto chart3l = given().when()
@@ -415,7 +419,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart3l.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chart3l.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart3l.getValues()), is(overallBalance.getRows().get(7).getYearlyValues()));
 
         ChartDto chart4 = given().when()
@@ -425,7 +429,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chart4.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chart4.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyCumulative(chart4.getValues()), is(overallBalance.getRows().get(8).getYearlyValues()));
 
         ChartDto chartP = given().when()
@@ -435,7 +439,7 @@ public class ChartResourceTest
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", ChartDto.class);
 
-        assertThat(chartP.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12));
+        assertThat(chartP.getValues().size(), is((overallBalance.getColumns().size() - 1) * 12 - futureMonths));
         assertThat(toYearlyBalances(chartP.getValues()), is(overallBalance.getRows().get(9).getYearlyValues()));
     }
 
@@ -451,7 +455,7 @@ public class ChartResourceTest
 
     private Integer[] toYearlyBalances(List<ChartDto.Value> values)
     {
-        Integer[] yearly = new Integer[values.size()/12];
+        Integer[] yearly = new Integer[values.size()/12 + (values.size() % 12 == 0 ? 0 : 1)];
         Arrays.fill(yearly, 0);
         for (int i=0;i<values.size();i++)
         {
@@ -462,11 +466,13 @@ public class ChartResourceTest
 
     private Integer[] toYearlyCumulative(List<ChartDto.Value> values)
     {
-        Integer[] yearly = new Integer[values.size()/12];
+        int newLength = values.size()/12 + (values.size() % 12 == 0 ? 0 : 1);
+        Integer[] yearly = new Integer[newLength];
         Arrays.fill(yearly, 0);
-        for (int i=0;i<values.size()/12;i++)
+        for (int i=0;i<newLength;i++)
         {
-            yearly[i] += values.get(i*12 + 11).getCumulative();
+            int cumulativeIndex = (i*12 + 11) > (values.size() - 1) ? (i*12 + (values.size() % 12) - 1) : (i*12 + 11);
+            yearly[i] += values.get(cumulativeIndex).getCumulative();
         }
         return yearly;
     }
