@@ -4,6 +4,7 @@ import org.kaleta.entity.Transaction;
 import org.kaleta.entity.xml.Transactions;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TransactionRepository
 {
@@ -19,7 +20,15 @@ public interface TransactionRepository
      *
      * @return transactions matching parameters
      */
-    List<Transaction> listMatching(String year, String debitPrefix, String creditPrefix);
+    List<Transaction> list(String year, String debitPrefix, String creditPrefix);
+
+    /**
+     * @param year
+     * @param schemaPrefix
+     *
+     * @return transactions matching schema prefix for both debit or credit and year
+     */
+    List<Transaction> list(String year, String schemaPrefix);
 
     /**
      * @param year - year condition
@@ -43,16 +52,6 @@ public interface TransactionRepository
 
     /**
      * @param year year condition
-     * @param account account condition (is either debit or credit in a transaction)
-     *
-     * @return transactions matching conditions
-     *
-     * Note: off-balance transactions excluded
-     */
-    List<Transaction> listByAccount(String year, String account);
-
-    /**
-     * @param year year condition
      * @param descriptionSubString description substring condition
      *
      * @return transactions matching conditions
@@ -60,12 +59,6 @@ public interface TransactionRepository
      * Note: off-balance transactions excluded
      */
     List<Transaction> listByDescriptionMatching(String year, String descriptionSubString);
-
-    /**
-     * @param isDebit whether account is debit-like, false for credit-like
-     * @return initial transaction for specified account ID
-     */
-    Transaction getInitialTransaction(String year, String accountId, boolean isDebit);
 
     /**
      * @param year - year condition
@@ -81,4 +74,43 @@ public interface TransactionRepository
      * Note: off-balance transactions excluded
      */
     List<Transaction> listBySchema(String year, String schemaId, String month);
+
+    /**
+     * @return list of transactions that have debit or credit of classes 2, 4, 5 or 6.
+     *
+     * Note: off-balance transactions excluded
+     */
+    List<Transaction> listForClasses2456(String year);
+
+    /**
+     * @return list of transactions that have debit or credit of closing balance account ID (701.0).
+     */
+    List<Transaction> listClosingBalanceTransactions();
+
+    /**
+     * @return list of transactions that have debit or credit of closing profit account ID (710.0).
+     */
+    List<Transaction> listClosingProfitTransactions();
+
+    /**
+     * @return list of transactions that have debit or credit of profit account ID (e.i. 5x or 6x).
+     *
+     * Note: off-balance transactions excluded
+     */
+    List<Transaction> listProfitTransactions(String year);
+
+    /**
+     * @return list of financial asset transactions for specified year (e.i. schema 23x and 546)
+     */
+    List<Transaction> listFinancialAssetTransactions(String year);
+
+    /**
+     * @return list of all transactions for specified year
+     */
+    List<Transaction> list(String year);
+
+    /**
+     * @return all transactions matching schema prefix (e.i. for all years)
+     */
+    List<Transaction> listMatching(Set<String> schemas);
 }

@@ -18,4 +18,12 @@ public class CredentialsDto
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "password can't be null");
         }
     }
+
+    public static CredentialsDto from(String username, String password)
+    {
+        CredentialsDto dto = new CredentialsDto();
+        dto.setUsername(username);
+        dto.setPassword(password);
+        return dto;
+    }
 }

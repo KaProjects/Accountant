@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class TransactionRepositoryImpl implements TransactionRepository
@@ -39,13 +40,23 @@ public class TransactionRepositoryImpl implements TransactionRepository
     }
 
     @Override
-    public List<Transaction> listMatching(String year, String debitPrefix, String creditPrefix)
+    public List<Transaction> list(String year, String debitPrefix, String creditPrefix)
     {
         return entityManager.createQuery(selectYearly
                         + " AND t.debit LIKE :debit AND t.credit LIKE :credit", Transaction.class)
                 .setParameter("year", year)
                 .setParameter("debit", debitPrefix + "%")
                 .setParameter("credit", creditPrefix + "%")
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> list(String year, String schemaPrefix)
+    {
+        return entityManager.createQuery(selectYearly
+                        + " AND (t.debit LIKE :schema OR t.credit LIKE :schema)", Transaction.class)
+                .setParameter("year", year)
+                .setParameter("schema", schemaPrefix + "%")
                 .getResultList();
     }
 
@@ -102,17 +113,6 @@ public class TransactionRepositoryImpl implements TransactionRepository
     }
 
     @Override
-    public List<Transaction> listByAccount(String year, String account)
-    {
-        return entityManager.createQuery(selectYearly
-                        + " AND (t.debit=:account OR t.credit=:account)"
-                        + excludeOffBalanceTransactions, Transaction.class)
-                .setParameter("year", year)
-                .setParameter("account", account)
-                .getResultList();
-    }
-
-    @Override
     public List<Transaction> listByDescriptionMatching(String year, String descriptionSubString)
     {
         return entityManager.createQuery(selectYearly
@@ -121,20 +121,6 @@ public class TransactionRepositoryImpl implements TransactionRepository
                 .setParameter("year", year)
                 .setParameter("description", "%" + descriptionSubString + "%")
                 .getResultList();
-    }
-
-    @Override
-    public Transaction getInitialTransaction(String year, String accountId, boolean isDebit)
-    {
-        String accountsCondition = isDebit
-                ? " AND t.debit=:accountId AND t.credit=:initialId"
-                : " AND t.debit=:initialId AND t.credit=:accountId";
-
-        return entityManager.createQuery(selectYearly + accountsCondition, Transaction.class)
-                .setParameter("year", year)
-                .setParameter("accountId", accountId)
-                .setParameter("initialId", Constants.Account.INIT_ACC_ID)
-                .getSingleResult();
     }
 
     @Override
@@ -150,5 +136,73 @@ public class TransactionRepositoryImpl implements TransactionRepository
                 .setParameter("schemaId", schemaId + "%")
                 .setParameter("month", "%" + formattedMonth)
                 .getResultList();
+    }
+
+    @Override
+    public List<Transaction> listForClasses2456(String year)
+    {
+        return entityManager.createQuery(selectYearly
+                        + " AND (t.debit LIKE '2%' OR t.debit LIKE '4%' OR t.debit LIKE '5%' OR t.debit LIKE '6%' OR t.credit LIKE '2%' OR t.credit LIKE '4%' OR t.credit LIKE '5%' OR t.credit LIKE '6%')"
+                        + excludeOffBalanceTransactions, Transaction.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> listClosingBalanceTransactions()
+    {
+        return entityManager.createQuery("SELECT t FROM Transaction t WHERE"
+                        + " t.debit=:closing OR t.credit=:closing", Transaction.class)
+                .setParameter("closing", Constants.Account.CLOSING_ACC_ID)
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> listClosingProfitTransactions()
+    {
+        return entityManager.createQuery("SELECT t FROM Transaction t WHERE"
+                        + " t.debit=:closing OR t.credit=:closing", Transaction.class)
+                .setParameter("closing", Constants.Account.PROFIT_ACC_ID)
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> listProfitTransactions(String year)
+    {
+        return entityManager.createQuery(selectYearly
+                        + " AND (t.debit LIKE '5%' OR t.debit LIKE '6%' OR t.credit LIKE '5%' OR t.credit LIKE '6%')"
+                        + excludeOffBalanceTransactions, Transaction.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> listFinancialAssetTransactions(String year)
+    {
+        return entityManager.createQuery(selectYearly
+                        + " AND (t.debit LIKE '23%' OR t.debit LIKE '546%' OR t.credit LIKE '23%' OR t.credit LIKE '546%')", Transaction.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> list(String year)
+    {
+        return entityManager.createQuery(selectYearly, Transaction.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
+
+    @Override
+    public List<Transaction> listMatching(Set<String> schemas)
+    {
+        StringBuilder query = new StringBuilder("SELECT t FROM Transaction t");
+        String operand = " WHERE";
+        for (String schema : schemas)
+        {
+            query.append(operand + " t.debit LIKE '" + schema + "%' OR t.credit LIKE '" + schema + "%'");
+            operand = " OR";
+        }
+        return entityManager.createQuery(query.toString(), Transaction.class).getResultList();
     }
 }

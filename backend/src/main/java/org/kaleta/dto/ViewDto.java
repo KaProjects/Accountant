@@ -9,29 +9,29 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class VacationDto
+public class ViewDto
 {
     private List<String> columns = new ArrayList<>(List.of("Date", "Amount", "Debit", "Credit", "Description"));
 
-    private List<Vacation> vacations = new ArrayList<>();
+    private List<View> views = new ArrayList<>();
 
-    public static int compare(Vacation vacation1, Vacation vacation2)
+    public static int compare(View view1, View view2)
     {
-        return Utils.compareDates(vacation1.getTransactions().get(0).getDate(), vacation2.getTransactions().get(0).getDate());
+        return Utils.compareDates(view1.getTransactions().get(0).getDate(), view2.getTransactions().get(0).getDate());
+    }
+
+    public static int compare(View.Transaction transaction1, View.Transaction transaction2)
+    {
+        return Utils.compareDates(transaction1.getDate(), transaction2.getDate());
     }
 
     @Data
-    public static class Vacation
+    public static class View
     {
         private String name;
         private String expenses;
         private List<Transaction> transactions = new ArrayList<>();
         private Set<ChartData> chartData = new HashSet<>();
-
-        public static int compare(Transaction transaction1, Transaction transaction2)
-        {
-            return Utils.compareDates(transaction1.getDate(), transaction2.getDate());
-        }
 
         public void addChartData(String name, Integer amount){
             for (ChartData data : chartData){
@@ -59,6 +59,7 @@ public class VacationDto
             private String name;
             private Integer value;
 
+            public ChartData(){}
             public ChartData(String name, Integer value)
             {
                 this.name = name;

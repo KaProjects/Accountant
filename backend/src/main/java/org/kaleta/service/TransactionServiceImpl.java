@@ -2,117 +2,52 @@ package org.kaleta.service;
 
 import org.kaleta.Utils;
 import org.kaleta.dao.TransactionDao;
-import org.kaleta.dto.YearTransactionDto;
-import org.kaleta.entity.Account;
 import org.kaleta.entity.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TransactionServiceImpl implements TransactionService
 {
-    @Autowired
-    TransactionDao transactionDao;
+    private final TransactionDao transactionDao;
 
     @Autowired
-    SchemaService schemaService;
-
-    @Override
-    public List<YearTransactionDto> getTransactionsMatching(String year, String debitPrefix, String creditPrefix)
+    public TransactionServiceImpl(TransactionDao transactionDao)
     {
-        return mapYearTransactions(transactionDao.listMatching(year, debitPrefix, creditPrefix));
+        this.transactionDao = transactionDao;
     }
 
     @Override
-    public List<YearTransactionDto> getTransactionsMatching(String year, String debit, String credit, String description)
+    public List<Transaction> getBalanceTransactions(String year)
     {
-        return mapYearTransactions(transactionDao.listByAccounts(year, debit, credit, description));
+        return transactionDao.listByDescriptionMatching(year, "");
     }
 
     @Override
-    public Integer[] monthlyBalanceByAccounts(String year, String debit, String credit)
+    public List<Transaction> getTransactionsMatching(String year, String debitPrefix, String creditPrefix)
     {
-        return monthlyBalanceByAccounts(year, debit, credit, "");
+        return transactionDao.list(year, debitPrefix, creditPrefix);
     }
 
     @Override
-    public Integer[] monthlyBalanceByAccounts(String year, String debit, String credit, String description)
+    public List<Transaction> getTransactionsMatchingDescription(String year, String description)
     {
-        List<Transaction> transactions = transactionDao.listByAccounts(year, debit, credit, description);
-        Integer[] monthlyBalance = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        for (Transaction tr : transactions) {
-            int month = Integer.parseInt(tr.getDate().substring(2, 4));
-            monthlyBalance[month - 1] += tr.getAmount();
-        }
-
-        return monthlyBalance;
+        return transactionDao.listByDescriptionMatching(year, description);
     }
 
     @Override
-    public Integer sumExpensesOf(List<Transaction> transactions)
+    public List<Transaction> getTransactionsMatching(String year, String schemaPrefix)
     {
-        Integer sum = 0;
-        for (Transaction transaction : transactions) {
-            if (transaction.getDebit().startsWith("5")){
-                if (!transaction.getCredit().startsWith("5")){
-                    sum += transaction.getAmount();
-                }
-                // else: no action - it's just change of expense
-            } else if (transaction.getCredit().startsWith("5")) {
-                sum -= transaction.getAmount();
-            } else {
-                throw new IllegalArgumentException("Transaction doesn't contain expense: debit=" +
-                        transaction.getDebit() + " credit=" + transaction.getCredit());
-            }
-        }
-        return sum;
+        return transactionDao.list(year, schemaPrefix);
     }
 
     @Override
-    public Integer getInitialValue(Account account)
+    public List<Transaction> getTransactionsMatching(String year, String debit, String credit, String description)
     {
-        String type = schemaService.getAccountType(account.getAccountId().getYear(), account.getAccountId().getSchemaId());
-
-        if (type.equals("A")) {
-            return transactionDao.getInitialTransaction(account.getAccountId().getYear(), account.getFullId(), true).getAmount();
-        } else if (type.equals("L")){
-            return transactionDao.getInitialTransaction(account.getAccountId().getYear(), account.getFullId(), false).getAmount();
-        } else {
-            throw new IllegalArgumentException("Only types A(ssets) and L(iabilities) have initial value, " +
-                    "but was '" + type + "' for account '" + account.getFullId()+ ":" + account.getName() + "'");
-        }
-    }
-
-    @Override
-    public Integer[] cumulativeMonthlyBalanceByAccount(Account account)
-    {
-        Integer[] monthlyBalance = monthlyBalanceByAccount(account);
-        monthlyBalance[0] += getInitialValue(account);
-        return Utils.toCumulativeArray(monthlyBalance);
-    }
-
-    @Override
-    public Integer[] monthlyBalanceByAccount(Account account)
-    {
-        String year = account.getAccountId().getYear();
-        boolean isDebit = schemaService.isDebitType(year, account.getAccountId().getSchemaId());
-
-        Integer[] monthlySums = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-        for (Transaction tr : transactionDao.listByAccount(year, account.getFullId())) {
-            int month = Integer.parseInt(tr.getDate().substring(2, 4));
-
-            if (tr.getDebit().equals(account.getFullId())) {
-                monthlySums[month - 1] +=  isDebit ? tr.getAmount() : -tr.getAmount();
-            } else {
-                monthlySums[month - 1] +=  isDebit ? -tr.getAmount() : tr.getAmount();
-
-            }
-        }
-        return monthlySums;
+        return transactionDao.listByAccounts(year, debit, credit, description);
     }
 
     @Override
@@ -121,18 +56,50 @@ public class TransactionServiceImpl implements TransactionService
         return transactionDao.listBySchema(year, schemaId, month);
     }
 
-    private List<YearTransactionDto> mapYearTransactions(List<Transaction> transactions)
+    @Override
+    public List<Transaction> getBudgetTransactions(String year)
     {
-        List<YearTransactionDto> output = new ArrayList<>();
-        for (Transaction transaction : transactions) {
-            YearTransactionDto dto = new YearTransactionDto();
-            dto.setDate(transaction.getDate());
-            dto.setDescription(transaction.getDescription());
-            dto.setAmount(String.valueOf(transaction.getAmount()));
-            dto.setDebit(transaction.getDebit());
-            dto.setCredit(transaction.getCredit());
-            output.add(dto);
+        return transactionDao.listForClasses2456(year);
+    }
+
+    @Override
+    public List<Transaction> getClosingTransactions()
+    {
+        return transactionDao.listClosingBalanceTransactions();
+    }
+
+    @Override
+    public List<Transaction> getProfitTransactions()
+    {
+        return transactionDao.listClosingProfitTransactions();
+    }
+
+    @Override
+    public List<Transaction> getFinancialAssetTransactions(String year)
+    {
+        return transactionDao.listFinancialAssetTransactions(year);
+    }
+
+    @Override
+    public Integer[] getMonthlyProfit(String year)
+    {
+        Integer[] monthlyProfit = Utils.initialMonthlyBalance();
+        for (Transaction transaction : transactionDao.listProfitTransactions(year))
+        {
+            int monthIndex = Integer.parseInt(transaction.getDate().substring(2,4)) - 1;
+            if (transaction.getDebit().startsWith("5") || transaction.getDebit().startsWith("6")) {
+                monthlyProfit[monthIndex] -= transaction.getAmount();
+            }
+            if (transaction.getCredit().startsWith("5") || transaction.getCredit().startsWith("6")) {
+                monthlyProfit[monthIndex] += transaction.getAmount();
+            }
         }
-        return output;
+        return monthlyProfit;
+    }
+
+    @Override
+    public List<Transaction> getMatching(Set<String> schemas)
+    {
+        return  transactionDao.listMatching(schemas);
     }
 }

@@ -6,19 +6,22 @@ import {IconButton, Table, TableBody, TableCell, TableContainer, TableHead, Tabl
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import TransactionsDialog from "../components/TransactionsDialog";
 import {useParams} from "react-router-dom";
-
+import LaunchIcon from '@mui/icons-material/Launch';
+import {colors} from "../constants";
 
 const AccountingStatement = props => {
     let { type } = useParams();
+    let { overall } = useParams();
 
-    const {data, loaded, error} = useData("/accounting/" + props.year + "/" + type)
+    const {data, loaded, error} = useData("/accounting/" + type + "/" + (overall === undefined ? props.year : ""))
 
     useEffect(() => {
-        props.setYearly(true)
+        props.setYearly(overall === undefined)
         // eslint-disable-next-line
     }, []);
 
-    const [showAccounts, setShowAccounts] = React.useState([]);
+    const [showChildren, setShowChildren] = React.useState([]);
+    const [showGrandChild, setShowGrandChild] = React.useState(null);
 
     const [showTransactionsDialog, setShowTransactionsDialog] = React.useState(false);
     const [transactionsDialogRowName, setTransactionsDialogRowName] = React.useState(null);
@@ -36,9 +39,16 @@ const AccountingStatement = props => {
         setTransactionsDialogMonth(month)
     }
 
+    const [redirectYearIndex, setRedirectYearIndex] = React.useState(-1);
+
+    const redirectToYear = () => {
+        sessionStorage.setItem('year', data.columns[redirectYearIndex])
+        window.location.href='/accounting/' + type
+    }
+
     function getHeaderStyle(index) {
-        const borderLeft = index === 13 ? "2px solid" : "0px";
-        const borderRight = (index === 0 || index === 13 || index === 14) ? "2px solid" : "0px";
+        const borderLeft = (index === 0 || (index === data.columns.length - 1 && hasTotal())) ? "2px solid" : "0px";
+        const borderRight = (index === 0 || (hasInitial() && index === 1) || index === data.columns.length - 1) ? "2px solid" : "0px";
         const color = "#676767";
         return {boxShadow: "0 0 3px 0", border: "0px", textAlign: "center", borderBottom: "2px solid", borderLeft: borderLeft, borderRight: borderRight, borderColor: color};
     }
@@ -56,38 +66,56 @@ const AccountingStatement = props => {
             color = "#227222";
         }
         if (type === 'INCOME_GROUP'){
-            background = "#67da67";
-            color = "#017901";
+            background = colors.income_group.background;
+            color = colors.income_group.foreground;
         }
         if (type === 'EXPENSE_ACCOUNT'){
             background = "#ffffff";
             color = "#a13c3c";
         }
         if (type === 'EXPENSE_GROUP'){
-            background = "#fc9e9e";
-            color = "#a62d2d";
+            background = colors.expense_group.background;
+            color = colors.expense_group.foreground;
         }
         if (type === 'PROFIT_SUMMARY'){
-            background = "#8bbefa";
-            color = "#22468d";
+            background = colors.profit_summary.background;
+            color = colors.profit_summary.foreground;
         }
         if (type === 'CASH_FLOW_ACCOUNT'){
             background = "#ffffff";
             color = "#721c67";
         }
         if (type === 'CASH_FLOW_GROUP'){
-            background = "#ab75a5";
-            color = "#620155";
+            background = colors.cash_flow_group.background;
+            color = colors.cash_flow_group.foreground;
         }
         if (type === 'CASH_FLOW_SUMMARY'){
-            background = "#983f8d";
-            color = "#3a0032";
+            background = colors.cash_flow_summary.background;
+            color = colors.cash_flow_summary.foreground;
+        }
+        if (type === 'BALANCE_SUMMARY'){
+            background = colors.balance_summary.background;
+            color = colors.balance_summary.foreground;
+        }
+        if (type === 'BALANCE_CLASS'){
+            background = colors.balance_class.background;
+            color = colors.balance_class.foreground;
+        }
+        if (type === 'BALANCE_GROUP'){
+            background = "#fdfac4";
+            color = "#65612a";
+        }
+        if (type === 'BALANCE_ACCOUNT'){
+            background = "#fdfcf3";
+            color = "#797746";
         }
 
         let borderTop;
         let borderBottom;
         let fontWeight;
-        if (type === 'INCOME_GROUP' || type === 'EXPENSE_GROUP' || type === 'PROFIT_SUMMARY' || type === 'CASH_FLOW_SUMMARY' || type === 'CASH_FLOW_GROUP'){
+        if (type === 'INCOME_GROUP' || type === 'EXPENSE_GROUP' || type === 'PROFIT_SUMMARY'
+            || type === 'CASH_FLOW_SUMMARY' || type === 'CASH_FLOW_GROUP'
+            || type === 'BALANCE_SUMMARY' || type === 'BALANCE_CLASS'){
             borderTop = "2px solid";
             borderBottom = "2px solid";
             fontWeight = "bold";
@@ -100,71 +128,90 @@ const AccountingStatement = props => {
             border: "0px", boxShadow: boxShadow, borderTop: borderTop, borderBottom: borderBottom, borderLeft: borderLeft, borderRight: borderRight};
     }
 
+    function hasInitial() {
+        return data.columns[1] === "Initial"
+    }
+
+    function hasTotal() {
+        return data.columns[data.columns.length - 1] === "Total"
+    }
+
     function Row(props) {
         const {row, id } = props;
 
-        const handleShowAccounts = (id) => {
-            const newFlag = !showAccounts[id]
-            const newFlags =showAccounts.slice()
+        const handleShowChildren = (id) => {
+            const newFlag = !showChildren[id]
+            const newFlags = showChildren.slice()
             newFlags[id] = newFlag
-            setShowAccounts(newFlags)
+            setShowChildren(newFlags)
+        }
+
+        const handleShowGrandChildren = (id) => {
+            if (showGrandChild === id){
+                setShowGrandChild(null)
+            } else {
+                setShowGrandChild(id)
+            }
         }
 
         return (
             <React.Fragment>
-                <TableRow key={id} onClick={() => handleShowAccounts(id)}>
+                <TableRow key={id} onClick={() => handleShowChildren(id)}>
                     <TableCell key={-1} style={getRowStyle(row.type, true, true)}>
                         {" " + row.name}
                     </TableCell>
-                    {row.type.startsWith("CASH_FLOW_") &&
+                    {hasInitial() &&
                         <TableCell key={-2} align="right" style={getRowStyle(row.type, false, true)}>
                             {row.initial}
                         </TableCell>
                     }
-                    {row.monthlyValues.map((month, index) => (
+                    {overall === undefined && row.monthlyValues.map((month, index) => (
                         <TableCell
                             align="right" key={index}
-                            style={getRowStyle(row.type, false, false)}
+                            style={getRowStyle(row.type, false, row.monthlyValues.length -1 === index)}
                         >
                             {month}
-                            {row.schemaId === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
-                                <IconButton
-                                    style={{height: "2px", width: "25px"}}
-                                    onClick={() => setShowTransactionsDialog(true)}
-                                >
-                                    <ReceiptLongIcon sx={{width: 18}}/>
-                                </IconButton>
-                            }
                         </TableCell>
                     ))}
-                    <TableCell
-                        align="right" key={12}
-                        style={getRowStyle(row.type, true, true)}
-                    >
-                        {row.total}
-                    </TableCell>
-                </TableRow>
-                {showAccounts[id] && row.accounts.map((account, index) => (
-                    <TableRow key={id + "a" + index}>
-                        <TableCell component="th" scope="row" key={-1} style={getRowStyle(account.type, false, true)}>
-                            {account.name}
+                    {overall !== undefined && row.yearlyValues.map((year, index) => (
+                        <TableCell
+                            align="right" key={index}
+                            style={getRowStyle(row.type, false, row.yearlyValues.length -1 === index)}
+                        >
+                            {year}
                         </TableCell>
-                        {account.type.startsWith("CASH_FLOW_") &&
-                            <TableCell key={-2} align="right" style={getRowStyle(account.type, false, true)}>
-                                {account.initial}
+                    ))}
+                    {hasTotal() &&
+                        <TableCell
+                            align="right" key={-3}
+                            style={getRowStyle(row.type, false, true)}
+                        >
+                            {row.total}
+                        </TableCell>
+                    }
+                </TableRow>
+                {showChildren[id] && row.children.map((child, index) => (
+                    <React.Fragment key={child.schemaId + "f" + index}>
+                    <TableRow key={child.schemaId + "x" + index} onClick={() => handleShowGrandChildren(child.schemaId)}>
+                        <TableCell component="th" scope="row" key={-1} style={getRowStyle(child.type, true, true)}>
+                            {child.name}
+                        </TableCell>
+                        {hasInitial() &&
+                            <TableCell key={-2} align="right" style={getRowStyle(child.type, false, true)}>
+                                {child.initial}
                             </TableCell>
                         }
-                        {account.monthlyValues.map((month, index) => (
+                        {child.monthlyValues.map((month, index) => (
                             <TableCell
                                 align="right" key={index}
-                                style={getRowStyle(account.type, false, false)}
-                                onClick={() => setTransactionsDialogProps(account.name, account.schemaId, index + 1)}
+                                style={getRowStyle(child.type, false, child.monthlyValues.length -1 === index)}
+                                onClick={() => setTransactionsDialogProps(child.name, child.schemaId, index + 1)}
                                 onMouseLeave={() => setTransactionsDialogProps(null, null, -1)}
                             >
                                 {month}
-                                {account.schemaId === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
+                                {child.children.length === 0 && child.schemaId === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
                                     <IconButton
-                                        style={{height: "2px", width: "25px", color: account.type === 'INCOME_ACCOUNT' ? "#227222" : "#a13c3c"}}
+                                        style={{height: "2px", width: "25px", color: getRowStyle(child.type).color}}
                                         onClick={() => setShowTransactionsDialog(true)}
                                     >
                                         <ReceiptLongIcon sx={{width: 18}}/>
@@ -172,8 +219,40 @@ const AccountingStatement = props => {
                                 }
                             </TableCell>
                         ))}
-                        <TableCell align="right" key={12} style={getRowStyle(account.type, true, true)}>{account.total}</TableCell>
+                        {hasTotal() &&
+                            <TableCell align="right" key={-3} style={getRowStyle(child.type, true, true)}>{child.total}</TableCell>
+                        }
                     </TableRow>
+                    {type === "balance" && (showGrandChild === child.schemaId) && child.children.map((grandchild, index) => (
+                        <TableRow key={grandchild.schemaId + "x" + index}>
+                            <TableCell component="th" scope="row" key={-1} style={getRowStyle(grandchild.type, true, true)}>
+                                {grandchild.name}
+                            </TableCell>
+                            <TableCell key={-2} align="right" style={getRowStyle(grandchild.type, false, true)}>
+                                {grandchild.initial}
+                            </TableCell>
+                            {grandchild.monthlyValues.map((month, index) => (
+                                <TableCell
+                                    align="right" key={index}
+                                    style={getRowStyle(grandchild.type, false, grandchild.monthlyValues.length -1 === index)}
+                                    onClick={() => setTransactionsDialogProps(grandchild.name, grandchild.schemaId, index + 1)}
+                                    onMouseLeave={() => setTransactionsDialogProps(null, null, -1)}
+                                >
+                                    {month}
+                                    {grandchild.children.length === 0 && grandchild.schemaId === transactionsDialogRowId && index + 1 === transactionsDialogMonth &&
+                                        <IconButton
+                                            style={{height: "2px", width: "25px", color: getRowStyle(grandchild.type).color}}
+                                            onClick={() => setShowTransactionsDialog(true)}
+                                        >
+                                            <ReceiptLongIcon sx={{width: 18}}/>
+                                        </IconButton>
+                                    }
+                                </TableCell>
+                            ))}
+                            <TableCell align="right" key={-3} style={getRowStyle(grandchild.type, true, true)}>{grandchild.total}</TableCell>
+                        </TableRow>
+                    ))}
+                    </React.Fragment>
                 ))}
             </React.Fragment>
         );
@@ -191,7 +270,21 @@ const AccountingStatement = props => {
                         <TableHead>
                             <TableRow key={-1}>
                                 {data.columns.map((column, index) => (
-                                    <TableCell key={index} style={getHeaderStyle(index)}>{column}</TableCell>
+                                    <TableCell key={index}
+                                               style={getHeaderStyle(index)}
+                                               onClick={() => {if (index !== 0) setRedirectYearIndex(index)}}
+                                               onMouseLeave={() => setRedirectYearIndex(-1)}
+                                    >
+                                        {column}
+                                        {overall !== undefined && index === redirectYearIndex &&
+                                            <IconButton
+                                                style={{height: "2px", width: "25px"}}
+                                                onClick={() => redirectToYear()}
+                                            >
+                                                <LaunchIcon sx={{width: 18}}/>
+                                            </IconButton>
+                                        }
+                                    </TableCell>
                                 ))}
                             </TableRow>
                         </TableHead>

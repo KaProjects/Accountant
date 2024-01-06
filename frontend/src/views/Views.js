@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import '../vacationContainer.css';
+import '../viewsContainer.css';
 import {
     Collapse,
     List,
@@ -17,18 +17,21 @@ import Paper from "@mui/material/Paper";
 import Loader from "../components/Loader";
 import {useData} from "../fetch";
 import VacationChart from "../components/VacationChart";
+import {useParams} from "react-router-dom";
 
 
-const Vacation = props => {
+const Views = props => {
+    let { vacation } = useParams();
 
     const [transactionFlags, setTransactionFlags] = useState([])
 
-    const {data, loaded, error} = useData("/view/" + props.year + "/vacation")
+    const {data, loaded, error} = useData("/view/" + props.year + (vacation === undefined ? "" : "/vacation"))
 
     useEffect(() => {
         props.setYearly(true)
+        setTransactionFlags([])
         // eslint-disable-next-line
-    }, []);
+    }, [data]);
 
     function toggleTransactions(index){
         const newFlag = !transactionFlags[index]
@@ -44,7 +47,6 @@ const Vacation = props => {
         } else if (index <= 3) {
             width = "300px"
         }
-
         return {width: width, fontWeight: "bold"}
     }
 
@@ -69,11 +71,11 @@ const Vacation = props => {
             component="nav"
             aria-labelledby="nested-list-subheader"
             >
-            {data.vacations.map((vacation, index) => (
+            {data.views.map((view, index) => (
                 <div key={index}>
                 <ListItem button onClick={() => toggleTransactions(index)}
                             style={getTitleStyle(index)}>
-                    <ListItemText primary={formatTitle(vacation.name)} primaryTypographyProps={{ style: {fontWeight: "bold", fontFamily: "Copperplate", marginLeft: "10px"} }}/>
+                    <ListItemText primary={formatTitle(view.name)} primaryTypographyProps={{ style: {fontWeight: "bold", fontFamily: "Copperplate", marginLeft: "10px"} }}/>
                     {transactionFlags[index] ? <ExpandLess /> : <ExpandMore />}
                 </ListItem>
                 <Collapse in={transactionFlags[index]} timeout="auto" unmountOnExit>
@@ -89,7 +91,7 @@ const Vacation = props => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {vacation.transactions.map((transaction, index) => (
+                                        {view.transactions.map((transaction, index) => (
                                             <TableRow key={index}>
                                                 <TableCell>{transaction.date}</TableCell>
                                                 <TableCell style={{textAlign: "right"}}>{transaction.amount}</TableCell>
@@ -102,14 +104,14 @@ const Vacation = props => {
                                 </Table>
                             </TableContainer>
                             <Typography style={{fontWeight: "bold", margin: 15}}>
-                                Total Expenses: {vacation.expenses}
+                                Total Expenses: {view.expenses}
                             </Typography>
                         </div>
                         <div className={"chartBottom"}>
-                            <VacationChart data={vacation.chartData} isBottom={true}/>
+                            <VacationChart data={view.chartData} isBottom={true}/>
                         </div>
                         <div className={"chartRight"}>
-                            <VacationChart data={vacation.chartData} isBottom={false}/>
+                            <VacationChart data={view.chartData} isBottom={false}/>
                         </div>
                     </div>
                 </Collapse>
@@ -121,4 +123,4 @@ const Vacation = props => {
     )
 }
 
-export default Vacation;
+export default Views;

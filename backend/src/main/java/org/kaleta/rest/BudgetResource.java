@@ -6,6 +6,7 @@ import org.kaleta.Utils;
 import org.kaleta.dto.BudgetDto;
 import org.kaleta.dto.YearTransactionDto;
 import org.kaleta.model.BudgetComponent;
+import org.kaleta.model.BudgetingData;
 import org.kaleta.service.BudgetingService;
 
 import javax.inject.Inject;
@@ -13,7 +14,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.kaleta.dto.BudgetDto.Row.Type.BALANCE;
 import static org.kaleta.dto.BudgetDto.Row.Type.EXPENSE;
@@ -34,54 +37,57 @@ public class BudgetResource
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}")
-    public BudgetDto getBudget(@PathParam String year)
+    public Response getBudget(@PathParam String year)
     {
-        ParamValidators.validateYear(year);
+        return Endpoint.process(() -> {
+            ParamValidators.validateYear(year);
+        }, () -> {
+            BudgetingData budgetData = service.getBudgetData(year);
 
-        BudgetComponent incomeComponent = service.getBudgetComponent(year, "Income", "i");
-        BudgetComponent mandatoryExpensesComponent = service.getBudgetComponent(year, "Total Mandatory Expenses", "me");
-        BudgetComponent expensesComponent = service.getBudgetComponent(year, "Total Expenses", "e");
+            BudgetComponent incomeComponent = budgetData.getBudgetComponent("i", "Income");
+            BudgetComponent mandatoryExpensesComponent = budgetData.getBudgetComponent("me", "Total Mandatory Expenses");
+            BudgetComponent expensesComponent = budgetData.getBudgetComponent("e", "Total Expenses");
+            BudgetComponent ofBudgetComponent = budgetData.getBudgetComponent("of", "Desired CF");
 
-        BudgetDto budgetDto = new BudgetDto(year, computeLastFilledMonth(List.of(incomeComponent, mandatoryExpensesComponent, expensesComponent)));
+            BudgetDto budgetDto = new BudgetDto(year, computeLastFilledMonth(List.of(incomeComponent, mandatoryExpensesComponent, expensesComponent)));
 
-        constructBudgetComponentDtoRows(incomeComponent, budgetDto, INCOME);
+            constructBudgetComponentDtoRows(incomeComponent, budgetDto, INCOME);
 
-        budgetDto.addRow(INCOME_SUM, incomeComponent.getName(), "i", incomeComponent.getActualMonths(), incomeComponent.getPlannedMonths());
+            budgetDto.addRow(INCOME_SUM, incomeComponent.getName(), "i", incomeComponent.getActualMonths(), incomeComponent.getPlannedMonths());
 
-        constructBudgetComponentDtoRows(mandatoryExpensesComponent, budgetDto, EXPENSE);
+            constructBudgetComponentDtoRows(mandatoryExpensesComponent, budgetDto, EXPENSE);
 
-        budgetDto.addRow(EXPENSE_SUM, mandatoryExpensesComponent.getName(), "me", mandatoryExpensesComponent.getActualMonths(), mandatoryExpensesComponent.getPlannedMonths());
+            budgetDto.addRow(EXPENSE_SUM, mandatoryExpensesComponent.getName(), "me", mandatoryExpensesComponent.getActualMonths(), mandatoryExpensesComponent.getPlannedMonths());
 
-        Integer[] netAfterTme = Utils.subtractIntegerArrays(incomeComponent.getActualMonths(), mandatoryExpensesComponent.getActualMonths());
-        Integer[] netAfterTmePlanned = Utils.subtractIntegerArrays(incomeComponent.getPlannedMonths(), mandatoryExpensesComponent.getPlannedMonths());
-        budgetDto.addRow(BALANCE, "Net after TME", "ntme", netAfterTme, netAfterTmePlanned);
+            Integer[] netAfterTme = Utils.subtractIntegerArrays(incomeComponent.getActualMonths(), mandatoryExpensesComponent.getActualMonths());
+            Integer[] netAfterTmePlanned = Utils.subtractIntegerArrays(incomeComponent.getPlannedMonths(), mandatoryExpensesComponent.getPlannedMonths());
+            budgetDto.addRow(BALANCE, "Net after TME", "ntme", netAfterTme, netAfterTmePlanned);
 
-        constructBudgetComponentDtoRows(expensesComponent, budgetDto, EXPENSE);
+            constructBudgetComponentDtoRows(expensesComponent, budgetDto, EXPENSE);
 
-        Integer[] budgetCf = Utils.subtractIntegerArrays(netAfterTme, expensesComponent.getActualMonths());
-        Integer[] budgetCfPlanned = Utils.subtractIntegerArrays(netAfterTmePlanned, expensesComponent.getPlannedMonths());
-        budgetDto.addRow(BALANCE, "Budget CF", "bcf", budgetCf, budgetCfPlanned);
+            Integer[] budgetCf = Utils.subtractIntegerArrays(netAfterTme, expensesComponent.getActualMonths());
+            Integer[] budgetCfPlanned = Utils.subtractIntegerArrays(netAfterTmePlanned, expensesComponent.getPlannedMonths());
+            budgetDto.addRow(BALANCE, "Budget CF", "bcf", budgetCf, budgetCfPlanned);
 
-        BudgetComponent ofBudgetComponent = service.getBudgetComponent(year, "Desired CF", "of");
-        constructBudgetComponentDtoRows(ofBudgetComponent, budgetDto, OF_BUDGET);
-        budgetDto.addRow(OF_BUDGET_BALANCE, ofBudgetComponent.getName(), "dcf", ofBudgetComponent.getActualMonths(), ofBudgetComponent.getPlannedMonths());
+            constructBudgetComponentDtoRows(ofBudgetComponent, budgetDto, OF_BUDGET);
+            budgetDto.addRow(OF_BUDGET_BALANCE, ofBudgetComponent.getName(), "dcf", ofBudgetComponent.getActualMonths(), ofBudgetComponent.getPlannedMonths());
 
-        return budgetDto;
+            return budgetDto;
+        });
     }
-
 
     @GET
     @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/transaction/{budgetId}/month/{month}")
-    public List<YearTransactionDto> getTransactions(@PathParam String year, @PathParam String budgetId, @PathParam String month)
+    public Response getTransactions(@PathParam String year, @PathParam String budgetId, @PathParam String month)
     {
-        ParamValidators.validateYear(year);
-        ParamValidators.validateBudgetId(budgetId);
-        ParamValidators.validateMonth(month);
-
-        return service.getBudgetTransactions(year, budgetId, month);
+        return Endpoint.process(() -> {
+            ParamValidators.validateYear(year);
+            ParamValidators.validateBudgetId(budgetId);
+            ParamValidators.validateMonth(month);
+        }, () -> YearTransactionDto.from(service.getBudgetTransactions(year, budgetId, month)).stream().sorted().collect(Collectors.toList()));
     }
 
     private Integer computeLastFilledMonth(List<BudgetComponent> components)

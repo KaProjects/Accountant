@@ -123,4 +123,19 @@ public class Utils
             return Integer.parseInt(dateA.substring(0, 2)) - Integer.parseInt(dateB.substring(0, 2));
         }
     }
+
+    public static Integer[] initialMonthlyBalance()
+    {
+        return new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    }
+
+    public static Integer[] invertValues(Integer[] monthlyValues)
+    {
+        Integer[] result = new Integer[monthlyValues.length];
+
+        for (int i=0;i<monthlyValues.length;i++) {
+            result[i] = -monthlyValues[i];
+        }
+        return result;
+    }
 }

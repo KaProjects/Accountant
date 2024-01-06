@@ -1,7 +1,11 @@
 package org.kaleta.rest;
 
+import org.kaleta.model.ChartData;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class ParamValidators
 {
@@ -10,8 +14,15 @@ public class ParamValidators
         if (year == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Year Parameter is NULL");
         }
-        if (!year.matches("20\\d\\d"))
+        if (!year.matches("\\d\\d\\d\\d")){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Year Parameter: '" + year + "'");
+        }
+        if (Integer.parseInt(year) < 2015){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Year '" + year + "' not found");
+        }
+        if (Integer.parseInt(year) > new GregorianCalendar().get(Calendar.YEAR)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Year '" + year + "' not found");
+        }
     }
 
     public static void validateDebitPrefix(String debitPrefix)
@@ -57,5 +68,25 @@ public class ParamValidators
         }
         if (!accountId.matches("\\d\\d\\d"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Schema Account ID Parameter: '" + accountId + "'");
+    }
+
+    public static void validateAccountId(String accountId)
+    {
+        if (accountId == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account ID Parameter is NULL");
+        }
+        if (!accountId.matches("\\d\\d\\d\\.\\d+(-\\d+)?"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Account ID Parameter: '" + accountId + "'");
+    }
+
+    public static void validateChartId(String chartId)
+    {
+        if (chartId == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chart ID Parameter is NULL");
+        }
+        if (!ChartData.getConfigs().containsKey(chartId))
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Chart ID Parameter: '" + chartId + "'");
+        }
     }
 }

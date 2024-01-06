@@ -6,27 +6,34 @@ import org.kaleta.entity.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Service
 public class AccountServiceImpl implements AccountService
 {
-    @Autowired
-    AccountDao accountDao;
+    private final AccountDao accountDao;
+    private final SchemaService schemaService;
 
     @Autowired
-    SchemaService schemaService;
+    public AccountServiceImpl(AccountDao accountDao, SchemaService schemaService)
+    {
+        this.accountDao = accountDao;
+        this.schemaService = schemaService;
+    }
 
     @Override
     public Map<String, String> getAccountNamesMap(String year)
     {
+        Map<String, String> schemaNames = schemaService.getSchemaNames(year);
         Map<String, String> map = new HashMap<>();
         for (Account account : accountDao.list(year)){
             String fullId = account.getAccountId().getSchemaId() + "." + account.getAccountId().getSemanticId();
             String name = account.getName().contains("general")
-                    ? schemaService.getAccountName(year, account.getAccountId().getSchemaId())
+                    ? schemaNames.get(account.getAccountId().getSchemaId())
                     : account.getName();
 
             map.put(fullId, name);
@@ -41,61 +48,28 @@ public class AccountServiceImpl implements AccountService
     }
 
     @Override
-    public List<Account> listBySchemaId(String year, String schemaIdPrefix)
+    public List<Account> listBySchema(String year, String schemaPrefix)
     {
-        return accountDao.list(year, schemaIdPrefix);
+        return accountDao.list(year, schemaPrefix);
     }
 
     @Override
-    public String getFinCreationAccountId(Account account)
+    public List<Account> listMatchingMetadata(String year, String metadata)
     {
-        String id = account.getFullId();
-        validateFinAssetAccount(id);
-        if (Integer.parseInt(account.getAccountId().getYear()) > 2020) {
-            return Constants.Schema.FIN_CREATION_ID + "." + id.charAt(2) + "-" + id.split("\\.")[1];
-        } else {
-            return Constants.Schema.FIN_CREATION_ID  + "." + id.split("\\.")[1];
-        }
+        return accountDao.listByMetadata(year, metadata);
     }
 
     @Override
-    public String getFinRevRevaluationAccountId(Account account)
+    public Map<String, List<Account>> getFinancialAssetAccounts(String year)
     {
-        String id = account.getFullId();
-        validateFinAssetAccount(id);
-        if (Integer.parseInt(account.getAccountId().getYear()) > 2020) {
-            return Constants.Schema.FIN_REV_REVALUATION_ID + "." + id.charAt(2) + "-" + id.split("\\.")[1];
-        } else {
-            return Constants.Schema.FIN_REV_REVALUATION_ID  + "." + id.split("\\.")[1];
+        List<Account> finAssetAccounts = accountDao.list(year, Constants.Schema.FIN_GROUP_ID);
+        Map<String, List<Account>> map = new TreeMap<>();
+        for (Account account : finAssetAccounts)
+        {
+            String schemaId = account.getAccountId().getSchemaId();
+            if (!map.containsKey(schemaId)) map.put(schemaId, new ArrayList<>());
+            map.get(schemaId).add(account);
         }
-    }
-
-    @Override
-    public String getFinExpRevaluationAccountId(Account account)
-    {
-        String id = account.getFullId();
-        validateFinAssetAccount(id);
-        if (Integer.parseInt(account.getAccountId().getYear()) > 2020) {
-            return Constants.Schema.FIN_EXP_REVALUATION_ID + "." + id.charAt(2) + "-" + id.split("\\.")[1];
-        } else {
-            return Constants.Schema.FIN_EXP_REVALUATION_ID  + "." + id.split("\\.")[1];
-        }
-    }
-
-    @Override
-    public Account getAccount(String year, String fullId)
-    {
-        String[] split = fullId.split("\\.");
-        return accountDao.get(year, split[0], split[1]);
-    }
-
-    public static void validateFinAssetAccount(String fullId)
-    {
-        if (!fullId.startsWith("23")){
-            throw new IllegalArgumentException("Only 23x accounts are financial assets, but was '" + fullId + "'");
-        }
-        if (!fullId.contains(".")){
-            throw new IllegalArgumentException("Full account id required, e.i. 'groupId.semanticId', but was '" + fullId + "'");
-        }
+        return map;
     }
 }

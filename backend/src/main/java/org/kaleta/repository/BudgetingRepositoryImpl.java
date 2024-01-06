@@ -12,20 +12,18 @@ public class BudgetingRepositoryImpl implements BudgetingRepository
     EntityManager entityManager;
 
     @Override
-    public List<Budgeting> getSchemaByIdPrefix(String year, String idPrefix)
-    {
-        return entityManager.createQuery("SELECT b FROM Budgeting b WHERE b.yearId.year=:year AND b.yearId.id LIKE :id", Budgeting.class)
-                .setParameter("year", year)
-                .setParameter("id", idPrefix + "%")
-                .getResultList();
-    }
-
-    @Override
     public Budgeting getSchemaById(String year, String id)
     {
         return entityManager.createQuery("SELECT b FROM Budgeting b WHERE b.yearId.year=:year AND b.yearId.id=:id", Budgeting.class)
                 .setParameter("year", year)
                 .setParameter("id", id)
                 .getSingleResult();
+    }
+
+    @Override
+    public List<Budgeting> getSchema(String year){
+        return entityManager.createQuery("SELECT b FROM Budgeting b WHERE b.yearId.year=:year", Budgeting.class)
+                .setParameter("year", year)
+                .getResultList();
     }
 }

@@ -1,6 +1,6 @@
 package org.kaleta.service;
 
-import org.kaleta.dao.TransactionDao;
+import org.kaleta.entity.Account;
 import org.kaleta.entity.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,17 +13,24 @@ import java.util.Map;
 @Service
 public class ViewServiceImpl implements ViewService
 {
+    private final TransactionService transactionService;
+    private final AccountService accountService;
+
     @Autowired
-    TransactionDao transactionDao;
+    public ViewServiceImpl(TransactionService transactionService, AccountService accountService)
+    {
+        this.transactionService = transactionService;
+        this.accountService = accountService;
+    }
 
     @Override
     public Map<String, List<Transaction>> getVacationMap(String year)
     {
-        List<Transaction> vacationTransactions = transactionDao.listByDescriptionMatching(year,"vac=");
+        List<Transaction> vacationTransactions = transactionService.getTransactionsMatchingDescription(year,"vac=");
         Map<String, List<Transaction>> map = new HashMap<>();
 
         for (Transaction transaction : vacationTransactions){
-            String key = extractVacationKey(transaction.getDescription());
+            String key = extractKey(transaction.getDescription(), "vac=");
             if (!map.containsKey(key)){
                 map.put(key, new ArrayList<>());
             }
@@ -33,13 +40,44 @@ public class ViewServiceImpl implements ViewService
         return map;
     }
 
-    private String extractVacationKey(String description)
+    @Override
+    public Map<String, List<Transaction>> getViewMap(String year)
     {
-        for (String split : description.split(" ")) {
-            if (split.startsWith("vac=")){
-                return split.substring(4);
+        List<Transaction> allTransactions = transactionService.getBalanceTransactions(year);
+        List<Account> viewAccounts = accountService.listMatchingMetadata(year, "view=");
+
+        Map<String, List<Transaction>> map = new HashMap<>();
+
+        for (Transaction transaction : allTransactions){
+            String key = null;
+            if (transaction.getDescription().contains("view="))
+            {
+                key = extractKey(transaction.getDescription(), "view=");
+            }
+            for (Account account : viewAccounts)
+            {
+                if (transaction.getDebit().equals(account.getFullId()) || transaction.getCredit().equals(account.getFullId()))
+                {
+                    key = extractKey(account.getMetadata(), "view=");
+                }
+            }
+            if (key != null){
+                if (!map.containsKey(key)){
+                    map.put(key, new ArrayList<>());
+                }
+                map.get(key).add(transaction);
             }
         }
-        throw new IllegalArgumentException("Couldn't find 'vac=' in '" + description + "'");
+        return map;
+    }
+
+    private String extractKey(String description, String key)
+    {
+        for (String split : description.split(" ")) {
+            if (split.startsWith(key)){
+                return split.substring(key.length());
+            }
+        }
+        throw new IllegalArgumentException("Couldn't find '" + key + "' in '" + description + "'");
     }
 }
