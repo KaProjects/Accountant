@@ -83,10 +83,14 @@ public class AccountResource
                 Integer credit = 0;
                 for (Transaction transaction : transactions)
                 {
-                    if (transaction.getDebit().equals(account.getFullId()) && transaction.getCredit().equals(Constants.Account.INIT_ACC_ID)) dto.setInitial(transaction.getAmount());
-                    if (transaction.getCredit().equals(account.getFullId()) && transaction.getDebit().equals(Constants.Account.INIT_ACC_ID)) dto.setInitial(dto.getInitial() + transaction.getAmount());
-                    if (transaction.getDebit().equals(account.getFullId())) debit += transaction.getAmount();
-                    if (transaction.getCredit().equals(account.getFullId())) credit += transaction.getAmount();
+                    if (transaction.getDebit().equals(account.getFullId()) && transaction.getCredit().equals(Constants.Account.INIT_ACC_ID))
+                        dto.setInitial(transaction.getAmount());
+                    if (transaction.getCredit().equals(account.getFullId()) && transaction.getDebit().equals(Constants.Account.INIT_ACC_ID))
+                        dto.setInitial(dto.getInitial() + transaction.getAmount());
+                    if (transaction.getDebit().equals(account.getFullId()) && !transaction.getCredit().equals(Constants.Account.CLOSING_ACC_ID))
+                        debit += transaction.getAmount();
+                    if (transaction.getCredit().equals(account.getFullId()) && !transaction.getDebit().equals(Constants.Account.CLOSING_ACC_ID))
+                        credit += transaction.getAmount();
                 }
                 if (AccountUtils.isDebit(accountType)) {
                     dto.setTurnover(debit);

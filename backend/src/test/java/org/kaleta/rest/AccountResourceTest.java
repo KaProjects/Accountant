@@ -60,7 +60,7 @@ public class AccountResourceTest
                 .body("size()", is(3))
                 .extract().response().jsonPath().getList("", YearAccountOverviewDto.class);
 
-        assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.0", "general", 0, 6000, 3500)));
+        assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.0", "general", 0, 6000, 6000)));
         assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.1", "generaly", 0, 0, -5000)));
         assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.2", "generalz", 0, 5000, -1000)));
     }

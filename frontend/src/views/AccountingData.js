@@ -68,7 +68,7 @@ const AccountingData = props => {
     function AccountTable(props) {
         const {year, schemaId} = props;
         const {data, loaded, error} = useData("/account/" + year + "/" + schemaId)
-        const columns = ["Id", "Name", "Initial", "Turnover", "Balance"]
+        const columns = ["Id", "Name", "Initial", "Turnover", new Date().getFullYear() === year ? "Balance" : "Closure"]
 
         return (
             <React.Fragment>
