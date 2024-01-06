@@ -87,9 +87,9 @@ public class AccountResource
                         dto.setInitial(transaction.getAmount());
                     if (transaction.getCredit().equals(account.getFullId()) && transaction.getDebit().equals(Constants.Account.INIT_ACC_ID))
                         dto.setInitial(dto.getInitial() + transaction.getAmount());
-                    if (transaction.getDebit().equals(account.getFullId()) && !transaction.getCredit().equals(Constants.Account.CLOSING_ACC_ID))
+                    if (transaction.getDebit().equals(account.getFullId()) && notClosing(transaction.getCredit()))
                         debit += transaction.getAmount();
-                    if (transaction.getCredit().equals(account.getFullId()) && !transaction.getDebit().equals(Constants.Account.CLOSING_ACC_ID))
+                    if (transaction.getCredit().equals(account.getFullId()) && notClosing(transaction.getDebit()))
                         credit += transaction.getAmount();
                 }
                 if (AccountUtils.isDebit(accountType)) {
@@ -103,5 +103,10 @@ public class AccountResource
             }
             return dtoList;
         });
+    }
+
+    private boolean notClosing(String schemaId)
+    {
+        return !schemaId.equals(Constants.Account.CLOSING_ACC_ID) && !schemaId.equals(Constants.Account.PROFIT_ACC_ID);
     }
 }
