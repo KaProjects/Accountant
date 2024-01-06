@@ -5,6 +5,15 @@
      bump pom.xml version
      bump build_deploy.sh versions 
 
+## 2.1
+Released: 6.1.2024
+
+    omptimized backend endpoints - significantly reduced DB calls
+    endpoint that validates imported data
+    endpoints for new frontend views
+    test coverage for all endpoints
+    trimmed future months from charts data
+
 ## 2.0
 Released: 17.12.2023
 
