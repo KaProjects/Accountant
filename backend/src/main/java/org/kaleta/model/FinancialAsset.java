@@ -59,7 +59,8 @@ public class FinancialAsset
     public BigDecimal getCurrentReturn() {
         BigDecimal funding = BigDecimal.valueOf(initialValue + getDepositsSum());
         BigDecimal realisation = BigDecimal.valueOf(getCurrentValue() + getWithdrawalsSum());
-        if (funding.equals(new BigDecimal(0))) funding = new BigDecimal(1);
+        if (funding.equals(new BigDecimal(0))) return new BigDecimal(0);
         return realisation.divide(funding, 4, RoundingMode.HALF_UP).subtract(new BigDecimal(1)).multiply(new BigDecimal(100));
+
     }
 }
