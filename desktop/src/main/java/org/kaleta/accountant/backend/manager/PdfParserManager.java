@@ -23,14 +23,13 @@ import java.util.Objects;
 
 public class PdfParserManager {
 
-    public static final String CSOB_CREDIT_PARSER_10_2022 = "CSOB - Kreditka 10/22";
-    public static final String CSOB_CREDIT_CSV_PARSER_07_2023 = "CSOB - Kreditka CSV 07/23";
+    public static final String CSOB_CREDIT_CSV_02_2025 = "CSOB - Kreditka CSV 02/25";
     public static final String REVOLUT_PARSER_12_2022 = "Revolut 12/22";
     public static final String REVOLUT_CSV_PARSER_03_2023 = "Revolut CSV 03/23";
 
 
     public static String[] getDataTypeOptions(){
-        return new String[]{CSOB_CREDIT_PARSER_10_2022, CSOB_CREDIT_CSV_PARSER_07_2023, REVOLUT_PARSER_12_2022, REVOLUT_CSV_PARSER_03_2023};
+        return new String[]{CSOB_CREDIT_CSV_02_2025, REVOLUT_PARSER_12_2022, REVOLUT_CSV_PARSER_03_2023};
     }
 
     private final File file;
@@ -43,7 +42,7 @@ public class PdfParserManager {
     }
 
     public String loadContent() throws IOException, TikaException, SAXException {
-        if (Objects.equals(dataType, REVOLUT_PARSER_12_2022) || Objects.equals(dataType, CSOB_CREDIT_PARSER_10_2022)) {
+        if (Objects.equals(dataType, REVOLUT_PARSER_12_2022)) {
             BodyContentHandler contentHandler = new BodyContentHandler();
             FileInputStream fis = new FileInputStream(file);
             Metadata metadata = new Metadata();
@@ -54,7 +53,7 @@ public class PdfParserManager {
 
             content = contentHandler.toString();
 
-        } else if (Objects.equals(dataType, REVOLUT_CSV_PARSER_03_2023) || Objects.equals(dataType, CSOB_CREDIT_CSV_PARSER_07_2023)) {
+        } else if (Objects.equals(dataType, REVOLUT_CSV_PARSER_03_2023) || Objects.equals(dataType, CSOB_CREDIT_CSV_02_2025)) {
             byte[] encoded = Files.readAllBytes(file.toPath());
             content = new String(encoded, Charset.defaultCharset());
         } else {
@@ -71,63 +70,12 @@ public class PdfParserManager {
         if (content == null) throw new NullPointerException("first load PDF file content via #loadContent");
 
         switch (dataType){
-            case CSOB_CREDIT_PARSER_10_2022: return use_CSOB_CREDIT_PARSER_10_2022();
             case REVOLUT_PARSER_12_2022: return use_REVOLUT_PARSER_12_2022();
             case REVOLUT_CSV_PARSER_03_2023: return use_REVOLUT_CSV_PARSER_03_2023();
-            case CSOB_CREDIT_CSV_PARSER_07_2023: return use_CSOB_CREDIT_CSV_PARSER_07_2023();
+            case CSOB_CREDIT_CSV_02_2025: return use_CSOB_CREDIT_CSV_PARSER_02_2025();
 
             default: throw new IllegalArgumentException("unknown dataType");
         }
-    }
-
-    private List<PdfTransactionModel> use_CSOB_CREDIT_PARSER_10_2022(){
-        List<PdfTransactionModel> transactions = new ArrayList<>();
-
-        String[] records = content.split("Částka: ");
-        for (int i=1;i<records.length;i++){
-            String record = records[i];
-
-            PdfTransactionModel transaction = new PdfTransactionModel();
-            transaction.setDescription("");
-
-            String firstLine = record.split("\n")[0];
-
-            String[] dateSplits = firstLine.split(" ")[2].split("\\.");
-            transaction.setDate(dateSplits[0] + dateSplits[1]);
-
-            int amountLineIndex = 3;
-
-            if (!firstLine.split(" ")[1].equals("CZK")) {
-                transaction.setDescription(firstLine.split(" ")[0] + firstLine.split(" ")[1] + " ");
-                amountLineIndex = 4;
-            }
-
-            if (firstLine.contains("Místo: ")){
-                transaction.setDescription(transaction.getDescription() + firstLine.split("Místo: ")[1]);
-            } else {
-                amountLineIndex = 2;
-            }
-
-            String sAmount = record.split("\n")[amountLineIndex]
-                    .replace("-","")
-                    .replace(" ", "")
-                    .replace(",", ".");
-
-            transaction.setAmount(String.valueOf(Math.round(Double.parseDouble(sAmount))));
-
-            transaction.setCredit("222.0");
-
-            for (ConfigModel.Mapping.Debit mapping : Service.CONFIG.getDebitMappings()){
-                if (transaction.getDescription().contains(mapping.getSubstring())){
-                    transaction.setDebit(mapping.getAccount());
-                }
-            }
-
-            transactions.add(transaction);
-        }
-        System.out.println("transactions loaded: " + transactions.size());
-        Collections.reverse(transactions);
-        return transactions;
     }
 
     private List<PdfTransactionModel> use_REVOLUT_PARSER_12_2022(){
@@ -287,7 +235,7 @@ public class PdfParserManager {
         return transactions;
     }
 
-    private List<PdfTransactionModel> use_CSOB_CREDIT_CSV_PARSER_07_2023() {
+    private List<PdfTransactionModel> use_CSOB_CREDIT_CSV_PARSER_02_2025() {
         List<PdfTransactionModel> transactions = new ArrayList<>();
 
         for (String record: content.split("\n")) {
@@ -299,11 +247,11 @@ public class PdfParserManager {
 
             String amount = split[2].replace("-", "").split(",")[0];
 
-            if (!split[14].startsWith("Částka:")) continue;
+            if (!split[15].startsWith("Částka:")) continue;
 
-            String description = split[14].split("Místo: ")[1];
+            String description = split[15].split("Místo: ")[1];
 
-            String fullDate = split[14].split(" ")[3].replace(",", "");
+            String fullDate = split[15].split(" ")[3].replace(",", "");
             if (fullDate.length() != 10 || fullDate.charAt(2) != '.' | fullDate.charAt(5) != '.') continue;
             String date = fullDate.replace(".", "").substring(0,4);
 
