@@ -1,3 +1,3 @@
 export const properties = {
-    backend: process.env.BACKEND_URL
+    backend: process.env.REACT_APP_BACKEND_URL
 }
