@@ -1,6 +1,7 @@
 FROM node:23.11.0-alpine3.21 as build-stage
 WORKDIR /app
 COPY . /app
+ENV BACKEND_URL=${BACKEND_URL}
 RUN npm install
 RUN npm run build
 

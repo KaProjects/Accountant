@@ -28,7 +28,7 @@ const TransactionsDialog = props => {
         }
 
         const dataFetch = async () => {
-            const url = properties.protocol + "://" + properties.host + ":" + properties.port + path;
+            const url = properties.backend + path;
             const headers = { headers: {Authorization: 'Bearer ' + sessionStorage.getItem('token')}};
             await axios.get(url, headers).then(
                 (response) => {

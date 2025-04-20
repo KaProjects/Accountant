@@ -182,7 +182,7 @@ const Home = props => {
                     </CardContent>
                 </Card>
             </ButtonBase>
-            <ButtonBase onClick={() => window.open(properties.protocol + "://" + properties.host + ":" + properties.port + '/api/docs', '_blank')}>
+            <ButtonBase onClick={() => window.open(properties.backend + '/api/docs', '_blank')}>
                 <Card sx={{ width: 300, height: 150 }} raised style={{backgroundColor: cardBgColor}}>
                     <CardContent>
                         <Typography variant="h5" component="div" align={"center"}>

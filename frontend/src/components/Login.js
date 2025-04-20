@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, {useState} from "react";
-import {properties as props} from "../properties";
+import {properties} from "../properties";
 import {Alert, Button, Slide, Snackbar, TextField} from "@mui/material";
 import axios from "axios";
 
@@ -18,7 +18,7 @@ export default function Login({ setToken}){
 
         axios({
             method: 'post',
-            url: props.protocol + "://" + props.host + ":" + props.port + "/authenticate",
+            url: properties.backend + "/authenticate",
             headers: {'Content-Type': 'application/json'},
             data: {username, password}
         }).then(
