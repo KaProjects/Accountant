@@ -1,7 +1,7 @@
 FROM node:23.11.0-alpine3.21 as build-stage
 WORKDIR /app
 COPY . /app
-ENV BACKEND_URL=${BACKEND_URL}
+ARG BACKEND_URL='http://127.0.0.1:8080'
 RUN npm install
 RUN npm run build
 
