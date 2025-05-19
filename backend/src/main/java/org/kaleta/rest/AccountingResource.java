@@ -66,7 +66,7 @@ public class AccountingResource
             GroupComponent group56 = profitExpensesData.getGroupComponent("56");
             GroupComponent group62 = profitRevenuesData.getGroupComponent("62");
             GroupComponent group54 = profitExpensesData.getGroupComponent("54");
-            GroupComponent group63b = profitRevenuesData.getGroupComponent("63", "0");
+            GroupComponent group63b = profitRevenuesData.getGroupComponent("63", "0", "5");
             GroupComponent group55b = profitExpensesData.getGroupComponent("55", "3", "4", "5");
 
             AccountingDto profitDto = new AccountingDto(year, AccountingDto.Type.PROFIT_SUMMARY);
