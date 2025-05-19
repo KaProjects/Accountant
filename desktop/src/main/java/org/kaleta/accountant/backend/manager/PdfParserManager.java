@@ -249,8 +249,11 @@ public class PdfParserManager {
 
             if (!split[15].startsWith("Částka:")) continue;
 
-            String description = split[15].split("Místo: ")[1];
-
+            String description = "";
+            String[] splitDescription = split[15].split("Místo: ");
+            if (splitDescription.length > 1) {
+                description = splitDescription[1];
+            }
             String fullDate = split[15].split(" ")[3].replace(",", "");
             if (fullDate.length() != 10 || fullDate.charAt(2) != '.' | fullDate.charAt(5) != '.') continue;
             String date = fullDate.replace(".", "").substring(0,4);
