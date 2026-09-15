@@ -2,8 +2,8 @@ package org.kaleta.repository;
 
 import org.kaleta.entity.Budgeting;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 
 public class BudgetingRepositoryImpl implements BudgetingRepository

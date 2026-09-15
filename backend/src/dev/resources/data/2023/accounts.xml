@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<accounts year="2023">
+    <account schemaId="000" semanticId="0" name="general" metadata=""/>
+    <account schemaId="000" semanticId="1" name="general of 000" metadata=""/>
+    <account schemaId="000" semanticId="2" name="account000.2" metadata=""/>
+    <account schemaId="001" semanticId="0" name="general" metadata=""/>
+    <account schemaId="001" semanticId="1" name="general of 001" metadata=""/>
+    <account schemaId="001" semanticId="2" name="account001.2" metadata=""/>
+    <account schemaId="002" semanticId="0" name="general" metadata=""/>
+    <account schemaId="002" semanticId="1" name="general of 002" metadata=""/>
+    <account schemaId="002" semanticId="2" name="account002.2" metadata=""/>
+    <account schemaId="003" semanticId="0" name="general" metadata=""/>
+    <account schemaId="003" semanticId="1" name="general of 003" metadata=""/>
+    <account schemaId="003" semanticId="2" name="account003.2" metadata=""/>
+    <account schemaId="010" semanticId="0" name="general" metadata=""/>
+    <account schemaId="010" semanticId="1" name="general of 010" metadata=""/>
+    <account schemaId="010" semanticId="2" name="account010.2" metadata=""/>
+    <account schemaId="700" semanticId="0" name="general" metadata=""/>
+</accounts>

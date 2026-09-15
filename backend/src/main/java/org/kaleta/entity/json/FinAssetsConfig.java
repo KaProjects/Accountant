@@ -1,5 +1,7 @@
 package org.kaleta.entity.json;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 @Data
+@RegisterForReflection
 public class FinAssetsConfig
 {
     private List<Group> groups = new ArrayList<>();
@@ -26,6 +29,7 @@ public class FinAssetsConfig
     }
 
     @Data
+    @RegisterForReflection
     public static class Group
     {
         private String name;
@@ -33,6 +37,7 @@ public class FinAssetsConfig
         private List<Account> accounts = new ArrayList<>();
 
         @Data
+        @RegisterForReflection
         public static class Account
         {
             private String name;
@@ -40,6 +45,7 @@ public class FinAssetsConfig
             private List<Record> records = new ArrayList<>();
 
             @Data
+            @RegisterForReflection
             public static class Record
             {
                 private String year;

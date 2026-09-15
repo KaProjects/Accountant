@@ -2,7 +2,7 @@ package org.kaleta.rest;
 
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import java.util.function.Supplier;
 
 public class Endpoint
@@ -11,7 +11,7 @@ public class Endpoint
         try {
             validators.run();
         } catch (ResponseStatusException e) {
-            return Response.status(e.getStatus().value()).entity(e.getMessage()).build();
+            return Response.status(e.getStatusCode().value()).entity(e.getMessage()).build();
         }
         return Response.ok().entity(logic.get()).build();
     }

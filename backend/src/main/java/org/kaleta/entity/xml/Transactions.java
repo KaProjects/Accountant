@@ -1,5 +1,7 @@
 package org.kaleta.entity.xml;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import lombok.Data;
 
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@RegisterForReflection
 public class Transactions
 {
     private String year;
@@ -34,6 +37,7 @@ public class Transactions
     }
 
     @Data
+    @RegisterForReflection
     public static class Transaction
     {
         private String id;

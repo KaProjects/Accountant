@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<accounts year="2021">
+    <account schemaId="200" semanticId="0" name="cash" metadata=""/>
+    <account schemaId="230" semanticId="0" name="fin0-0" metadata=""/>
+    <account schemaId="230" semanticId="1" name="fin0-1" metadata=""/>
+    <account schemaId="231" semanticId="0" name="fin1-0" metadata=""/>
+    <account schemaId="544" semanticId="0-0" name="erev0-0" metadata=""/>
+    <account schemaId="544" semanticId="0-1" name="erev0-1" metadata=""/>
+    <account schemaId="544" semanticId="1-0" name="erev1-0" metadata=""/>
+    <account schemaId="546" semanticId="0-0" name="cre0-0" metadata=""/>
+    <account schemaId="546" semanticId="0-1" name="cre0-1" metadata=""/>
+    <account schemaId="546" semanticId="1-0" name="cre1-0" metadata=""/>
+    <account schemaId="624" semanticId="0-0" name="rrev0-0" metadata=""/>
+    <account schemaId="624" semanticId="0-1" name="rrev0-1" metadata=""/>
+    <account schemaId="624" semanticId="1-0" name="rrev1-0" metadata=""/>
+    <account schemaId="700" semanticId="0" name="inits" metadata=""/>
+</accounts>

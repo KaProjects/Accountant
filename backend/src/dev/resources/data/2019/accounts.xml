@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<accounts year="2019">
+    <account schemaId="201" semanticId="0" name="sads sd as" metadata=""/>
+    <account schemaId="201" semanticId="1" name="sd s dasda s" metadata=""/>
+    <account schemaId="202" semanticId="10" name="general" metadata=""/>
+    <account schemaId="202" semanticId="20" name="general" metadata=""/>
+    <account schemaId="210" semanticId="0" name="general" metadata="a"/>
+    <account schemaId="210" semanticId="1" name="generaly" metadata="b"/>
+    <account schemaId="210" semanticId="2" name="generalz" metadata="c"/>
+    <account schemaId="520" semanticId="0" name="general" metadata=""/>
+    <account schemaId="550" semanticId="0" name="general of x" metadata=""/>
+    <account schemaId="553" semanticId="0" name="general" metadata=""/>
+    <account schemaId="554" semanticId="0" name="sda ad" metadata=""/>
+    <account schemaId="600" semanticId="0" name="general" metadata=""/>
+    <account schemaId="600" semanticId="1" name="second" metadata="aaaa"/>
+    <account schemaId="630" semanticId="0" name="general" metadata=""/>
+    <account schemaId="631" semanticId="0" name="general" metadata=""/>
+    <account schemaId="701" semanticId="0" name="ds asd d" metadata="ssss"/>
+</accounts>

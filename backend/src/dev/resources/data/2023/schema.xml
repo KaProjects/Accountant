@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<schema year="2023">
+    <class id="0" name="class0">
+        <group id="0" name="group00">
+            <account id="0" name="account000" type="A"/>
+            <account id="1" name="account001" type="L"/>
+            <account id="2" name="account002" type="E"/>
+            <account id="3" name="account003" type="R"/>
+        </group>
+        <group id="1" name="group01">
+            <account id="0" name="account010" type="A"/>
+        </group>
+    </class>
+    <class id="7" name="class7">
+        <group id="0" name="group70">
+            <account id="0" name="account700" type="X"/>
+        </group>
+    </class>
+</schema>

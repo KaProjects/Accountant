@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<transactions year="2023">
+    <transaction id="1" date="0101" description="init" amount="1000" debit="000.0" credit="700.0"/>
+    <transaction id="2" date="0101" description="init" amount="1000" debit="000.1" credit="700.0"/>
+    <transaction id="3" date="0101" description="init" amount="1000" debit="000.2" credit="700.0"/>
+    <transaction id="4" date="0101" description="init" amount="1000" debit="700.0" credit="001.0"/>
+    <transaction id="5" date="0101" description="init" amount="1000" debit="700.0" credit="001.1"/>
+    <transaction id="6" date="0101" description="init" amount="1000" debit="700.0" credit="001.2"/>
+    <transaction id="7" date="0101" description="init" amount="1000" debit="010.0" credit="700.0"/>
+    <transaction id="8" date="0101" description="init" amount="1000" debit="010.1" credit="700.0"/>
+    <transaction id="9" date="0101" description="init" amount="1000" debit="010.2" credit="700.0"/>
+    <transaction id="10" date="0504" description="month4 000" amount="100" debit="000.0" credit="003.0"/>
+    <transaction id="15" date="0505" description="month5 000" amount="600" debit="000.0" credit="001.0"/>
+    <transaction id="18" date="0506" description="month6 000" amount="900" debit="000.0" credit="003.0"/>
+    <transaction id="11" date="1004" description="month4 000" amount="200" debit="000.0" credit="001.0"/>
+    <transaction id="17" date="1005" description="month5 000" amount="800" debit="000.2" credit="001.2"/>
+    <transaction id="22" date="1005" description="month5 !000" amount="2000" debit="002.0" credit="001.0"/>
+    <transaction id="19" date="1006" description="month6 000" amount="1000" debit="000.0" credit="001.0"/>
+    <transaction id="12" date="1504" description="month4 000 -amount" amount="300" debit="001.1" credit="000.1"/>
+    <transaction id="16" date="1505" description="month5 000 -amount" amount="700" debit="001.1" credit="000.1"/>
+    <transaction id="20" date="1506" description="month6 000 -amount" amount="1100" debit="001.1" credit="000.1"/>
+    <transaction id="13" date="2004" description="month4 000" amount="400" debit="000.2" credit="001.2"/>
+    <transaction id="14" date="2005" description="month5 000" amount="500" debit="000.0" credit="003.0"/>
+    <transaction id="21" date="2006" description="month6 000" amount="1200" debit="000.2" credit="001.2"/>
+    <transaction id="23" date="3005" description="month5 000correction" amount="3000" debit="000.0" credit="000.1"/>
+</transactions>

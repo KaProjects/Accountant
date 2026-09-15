@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<schema year="2021">
+    <class id="2" name="class2">
+        <group id="0" name="group20">
+            <account id="0" name="account200" type="A"/>
+        </group>
+        <group id="3" name="group23">
+            <account id="0" name="account230" type="A"/>
+            <account id="1" name="account231" type="A"/>
+        </group>
+    </class>
+    <class id="5" name="class5">
+        <group id="4" name="group54">
+            <account id="4" name="account544" type="E"/>
+            <account id="6" name="account546" type="E"/>
+        </group>
+    </class>
+    <class id="6" name="class6">
+        <group id="2" name="group62">
+            <account id="4" name="account624" type="R"/>
+        </group>
+    </class>
+    <class id="7" name="class7">
+        <group id="0" name="group70">
+            <account id="0" name="account700" type="X"/>
+        </group>
+    </class>
+</schema>

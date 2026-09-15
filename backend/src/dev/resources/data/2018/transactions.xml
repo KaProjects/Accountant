@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<transactions year="2018">
+    <transaction id="18x3" date="0402" description="vac=xxx" amount="3000" debit="500.0" credit="200.0"/>
+    <transaction id="18x4" date="0403" description="vac=yyy" amount="3000" debit="500.0" credit="200.0"/>
+    <transaction id="18x5" date="0503" description="vac=yyy" amount="3000" debit="510.0" credit="200.0"/>
+    <transaction id="18x6" date="0603" description="vac=yyy" amount="1000" debit="520.0" credit="510.0"/>
+    <transaction id="18x7" date="0703" description="vac=yyy" amount="1000" debit="200.0" credit="500.0"/>
+    <transaction id="18x9" date="0704" description="view=zzz" amount="100" debit="200.0" credit="520.0"/>
+    <transaction id="18x10" date="0707" description="view=ww" amount="1" debit="200.0" credit="500.0"/>
+    <transaction id="18x8" date="0905" description="view=zzz" amount="100" debit="520.0" credit="200.0"/>
+    <transaction id="18x2" date="1102" description="vac=xxx" amount="2000" debit="510.0" credit="200.0"/>
+    <transaction id="18x1" date="2001" description="vac=xxx" amount="1000" debit="500.0" credit="200.0"/>
+    <transaction id="cx5" date="3112" description="closing" amount="1100" debit="701.0" credit="200.0"/>
+    <transaction id="cx6" date="3112" description="closing" amount="2200" debit="701.0" credit="210.0"/>
+    <transaction id="cx7" date="3112" description="closing" amount="3300" debit="220.0" credit="701.0"/>
+    <transaction id="cx8" date="3112" description="closing" amount="4400" debit="701.0" credit="230.0"/>
+    <transaction id="cx8b" date="3112" description="closing" amount="5800" debit="400.0" credit="701.0"/>
+    <transaction id="px12" date="3112" description="closing" amount="100" debit="600.0" credit="710.0"/>
+    <transaction id="px22" date="3112" description="closing" amount="200" debit="710.0" credit="550.0"/>
+    <transaction id="px32" date="3112" description="closing" amount="300" debit="631.0" credit="710.0"/>
+    <transaction id="px42" date="3112" description="closing" amount="400" debit="710.0" credit="510.0"/>
+    <transaction id="px52" date="3112" description="closing" amount="500" debit="710.0" credit="520.0"/>
+    <transaction id="px62" date="3112" description="closing" amount="600" debit="710.0" credit="530.0"/>
+    <transaction id="px72" date="3112" description="closing" amount="700" debit="630.0" credit="710.0"/>
+    <transaction id="px82" date="3112" description="closing" amount="800" debit="710.0" credit="553.0"/>
+</transactions>

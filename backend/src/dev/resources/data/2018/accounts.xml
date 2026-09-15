@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<accounts year="2018">
+    <account schemaId="200" semanticId="0" name="cash" metadata=""/>
+    <account schemaId="500" semanticId="0" name="general" metadata=""/>
+    <account schemaId="510" semanticId="0" name="doprava" metadata="view=zzz"/>
+    <account schemaId="520" semanticId="0" name="dolava" metadata=""/>
+</accounts>

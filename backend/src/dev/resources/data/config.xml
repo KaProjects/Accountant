@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+    <years active="2020">
+        <year name="2018"/>
+        <year name="2019"/>
+        <year name="2020"/>
+        <year name="2021"/>
+        <year name="2022"/>
+        <year name="2023"/>
+    </years>
+    <mapping/>
+</config>

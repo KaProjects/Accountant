@@ -3,8 +3,8 @@ package org.kaleta.repository;
 import org.kaleta.entity.Account;
 import org.kaleta.entity.xml.Accounts;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 
 public class AccountRepositoryImpl implements AccountRepository

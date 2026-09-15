@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<schema year="2018">
+    <class id="2" name="class2">
+        <group id="0" name="group20">
+            <account id="0" name="account200" type="L"/>
+        </group>
+    </class>
+    <class id="5" name="class5">
+        <group id="0" name="group50">
+            <account id="0" name="account500" type="E"/>
+        </group>
+        <group id="1" name="group51">
+            <account id="0" name="account510" type="E"/>
+        </group>
+        <group id="2" name="group52">
+            <account id="0" name="account520" type="E"/>
+        </group>
+    </class>
+</schema>

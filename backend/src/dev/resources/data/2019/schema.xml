@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<schema year="2019">
+    <class id="2" name="class2">
+        <group id="0" name="group20">
+            <account id="1" name="account201" type="A"/>
+            <account id="2" name="account202" type="A"/>
+        </group>
+        <group id="1" name="group21">
+            <account id="0" name="account210" type="A"/>
+        </group>
+    </class>
+    <class id="5" name="class5">
+        <group id="0" name="group50">
+            <account id="0" name="account500" type="E"/>
+        </group>
+        <group id="1" name="group51">
+            <account id="0" name="account510" type="E"/>
+        </group>
+        <group id="2" name="group52">
+            <account id="0" name="account520" type="E"/>
+        </group>
+        <group id="3" name="group53">
+            <account id="0" name="account530" type="E"/>
+        </group>
+        <group id="4" name="group54">
+            <account id="0" name="account540" type="E"/>
+        </group>
+        <group id="5" name="group55">
+            <account id="0" name="account550" type="E"/>
+            <account id="1" name="account551" type="E"/>
+            <account id="2" name="account552" type="E"/>
+            <account id="3" name="account553" type="E"/>
+            <account id="4" name="account554" type="E"/>
+            <account id="5" name="account555" type="E"/>
+        </group>
+        <group id="6" name="group56">
+            <account id="0" name="account560" type="E"/>
+        </group>
+    </class>
+    <class id="6" name="class6">
+        <group id="0" name="group60">
+            <account id="0" name="account600" type="R"/>
+        </group>
+        <group id="1" name="group61">
+            <account id="0" name="account610" type="R"/>
+        </group>
+        <group id="2" name="group62">
+            <account id="0" name="account620" type="R"/>
+        </group>
+        <group id="3" name="group63">
+            <account id="0" name="account630" type="R"/>
+            <account id="1" name="account631" type="R"/>
+            <account id="2" name="account632" type="R"/>
+            <account id="3" name="account633" type="R"/>
+        </group>
+    </class>
+    <class id="7" name="class7">
+        <group id="0" name="group70">
+            <account id="1" name="account701" type="X"/>
+        </group>
+    </class>
+</schema>
