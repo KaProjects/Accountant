@@ -5,9 +5,9 @@ import org.kaleta.accountant.backend.model.TransactionsModel;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 

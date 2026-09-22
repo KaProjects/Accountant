@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class FirebaseManager {
+public class RealtimeFirebaseStore implements FirebaseStore {
 
-    private static FirebaseManager instance;
+    private static RealtimeFirebaseStore instance;
 
     private final String serviceKey = "/accountant-andr-servicekey.json";
     private final String databaseUrl = "https://accountant-andr.firebaseio.com/";
@@ -28,14 +28,14 @@ public class FirebaseManager {
     private final List<FirebaseAccountModel> debitList = new ArrayList<>();
     private final List<FirebaseAccountModel> creditList = new ArrayList<>();
 
-    public static FirebaseManager getInstance() throws ManagerException {
+    public static RealtimeFirebaseStore getInstance() throws ManagerException {
         if (instance == null) {
-            instance = new FirebaseManager();
+            instance = new RealtimeFirebaseStore();
         }
         return instance;
     }
 
-    private FirebaseManager() throws ManagerException {
+    private RealtimeFirebaseStore() throws ManagerException {
         FirebaseOptions options;
         try {
             InputStream serviceKeyStream = Initializer.class.getResourceAsStream(serviceKey);
@@ -106,14 +106,17 @@ public class FirebaseManager {
         });
     }
 
+    @Override
     public List<FirebaseTransactionModel> getTransactionList() {
         return transactionList;
     }
 
+    @Override
     public void clearTransactions() {
         database.getReference("transaction").removeValueAsync();
     }
 
+    @Override
     public boolean hasAccount(String accountId, boolean isDebit){
         for (FirebaseAccountModel account : isDebit ? debitList : creditList){
             if (Objects.equals(account.getId(), accountId)){
@@ -123,6 +126,7 @@ public class FirebaseManager {
         return false;
     }
 
+    @Override
     public void pushAccount(String id, String name, boolean isDebit){
         Initializer.LOG.info((isDebit ? "Debit" : "Credit") + " account added to Firebase: id=" + id + " name='" + name + "'");
         database.getReference("accounts/" + (isDebit ? "debit" : "credit") + "/" + id.replace(".", "a"))

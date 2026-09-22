@@ -68,7 +68,7 @@ public class Initializer {
                 }
 
                 if (System.getProperty("os.name").startsWith("Mac")) {
-                    DEFAULT_FILES_DIR = "/Users/skaleta/Downloads";
+                    DEFAULT_FILES_DIR = "/Users/stanley/Downloads";
                 }
 
                 new AppFrame().setVisible(true);
