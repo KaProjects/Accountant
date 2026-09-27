@@ -1,4 +1,4 @@
-import {colors, getChartConfigStyle} from "../constants";
+import {colors, getChartConfigStyle} from "../palette";
 
 // Characterization tests: these pin down the behaviour getChartConfigStyle has
 // today, including the fact that later rules deliberately override earlier ones

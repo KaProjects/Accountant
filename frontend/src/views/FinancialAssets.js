@@ -1,191 +1,120 @@
-import {useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import Loader from "../components/Loader";
-import FinancialChart from "../components/FinancialChart";
+import PropTypes from "prop-types";
+import {useParams} from "react-router-dom";
 import {
-    Card,
-    CardContent,
     Checkbox,
     Collapse,
     FormControlLabel,
     List,
     ListItem,
     ListItemText,
-    ListSubheader, Typography
+    ListSubheader,
 } from "@mui/material";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
 import {useData} from "../fetch";
+import DataView from "../components/common/DataView";
+import FinancialChart from "../components/FinancialChart";
+import AssetSummaryCard from "../components/financial/AssetSummaryCard";
+import {assetTitleStyle} from "../theme/tableStyles";
+import {closedFlagsFor, isFullyWithdrawn, toAssetChartSeries} from "../services/financialAssets";
 
+const subheaderStyle = {
+    fontWeight: "bold", boxShadow: "0 0 8px 0", fontSize: "18px", fontFamily: "Copperplate",
+};
 
 const FinancialAssets = props => {
-    let { all } = useParams();
+    const {all} = useParams();
+    const isOverall = all !== undefined;
 
     const [chartFlags, setChartFlags] = useState([])
     const [chartOptions, setChartOptions] = useState([false])
 
-    const {data, loaded, error} = useData("/financial/assets/" + (all === undefined ? props.year : ""))
+    const {data, loaded, error} = useData("/financial/assets/" + (isOverall ? "" : props.year))
 
     useEffect(() => {
-        props.setYearly(all === undefined)
+        props.setYearly(!isOverall)
         // eslint-disable-next-line
     }, []);
 
-    function constructInitialFlags(data)
-    {
-        let flags = [data.groups.length];
-        for (let g=0; g < data.groups.length; g++){
-            flags[g] = Array(data.groups[g].accounts.length).fill(false)
+    // Note: this initialises the flags during render when they are still empty,
+    // which is how the original behaved. It would be better done from a state
+    // initialiser, but that would change when the flags first appear.
+    const isOpen = (gIndex, aIndex) => {
+        if (chartFlags[gIndex] === undefined) {
+            setChartFlags(closedFlagsFor(data.groups))
+            return undefined
         }
-        return flags
+        return chartFlags[gIndex][aIndex]
     }
 
-    function getChartFlag(gIndex, aIndex)
-    {
-        if (chartFlags[gIndex] === undefined){
-            setChartFlags(constructInitialFlags(data))
-        } else {
-            return chartFlags[gIndex][aIndex]
-        }
-    }
-
-    function toggleChart(gIndex, aIndex)
-    {
-        resetChartOptions(gIndex, aIndex)
-
-        const newFlag = !getChartFlag(gIndex, aIndex)
-        const newFlags = constructInitialFlags(data)
-        newFlags[gIndex][aIndex] = newFlag
-        setChartFlags(newFlags)
-    }
-
-    function resetChartOptions(gIndex, aIndex)
-    {
+    /** Opening an account closes every other one. */
+    const toggleAccount = (gIndex, aIndex) => {
         const account = data.groups[gIndex].accounts[aIndex]
-        const showWithdrawals = account.balances[account.balances.length - 1] === 0
-        setChartOptions([showWithdrawals])
+        setChartOptions([isFullyWithdrawn(account)])
+
+        const opened = !isOpen(gIndex, aIndex)
+        const flags = closedFlagsFor(data.groups)
+        flags[gIndex][aIndex] = opened
+        setChartFlags(flags)
     }
 
-    function toggleChartOption(index)
-    {
-        const newOption = !chartOptions[index]
-        const newOptions = {...chartOptions}
-        newOptions[index] = newOption
-        setChartOptions(newOptions)
+    const toggleChartOption = (index) => {
+        const options = {...chartOptions}
+        options[index] = !chartOptions[index]
+        setChartOptions(options)
     }
-
-    function getTitleStyle(gIndex, aIndex) {
-        let boxShadow = "0 0 8px 0";
-        let background = getChartFlag(gIndex, aIndex) ? "#87befc" : "#b6d8ff";
-        let color = "#3361bb";
-        return {boxShadow: boxShadow, background: background, color: color, fontWeight: "bold"};
-    }
-
-    const constructChartData = (account) => {
-        const data = [];
-        data.push({
-            valuation: account.initialValue,
-            funding: account.initialValue,
-            month: "0",
-            deposits: 0,
-            withdrawals: 0
-        });
-        for (let i = 0; i < account.balances.length; i++) {
-            data.push({
-                valuation: account.balances[i],
-                funding: account.funding[i],
-                month: account.labels[i],
-                deposits: account.cumulativeDeposits[i],
-                withdrawals: account.cumulativeWithdrawals[i]
-            });
-        }
-        return data;
-    };
 
     return (
-        <>
-        {!loaded &&
-            <Loader error={error}/>
-        }
-        {loaded &&
-            <List
-                component="nav"
-                aria-labelledby="nested-list-subheader"
-            >
-            {data.groups.map((group, gIndex) => (
-                <List key={gIndex}
-                    subheader={
-                        <ListSubheader component="div" id="nested-list-subheader"
-                                       style={{fontWeight: "bold", boxShadow: "0 0 8px 0", fontSize: "18px", fontFamily: "Copperplate"}}>
-                            {group.name}
-                        </ListSubheader>
-                    }
-                    component="div" disablePadding
-                >
-                {group.accounts.map((account, aIndex) => (
-                    <div key={aIndex}>
-                        <ListItem  button onClick={() => toggleChart(gIndex, aIndex)} style={getTitleStyle(gIndex, aIndex)}>
-                            <ListItemText primary={account.name} primaryTypographyProps={{ style: {fontWeight: "bold", fontFamily: "Copperplate"} }}/>
-                            {getChartFlag(gIndex, aIndex) ? <ExpandLess /> : <ExpandMore />}
-                        </ListItem>
+        <DataView loaded={loaded} error={error}>
+            {() => (
+                <List component="nav" aria-labelledby="nested-list-subheader">
+                    {data.groups.map((group, gIndex) => (
+                        <List key={gIndex}
+                              subheader={
+                                  <ListSubheader component="div" id="nested-list-subheader" style={subheaderStyle}>
+                                      {group.name}
+                                  </ListSubheader>
+                              }
+                              component="div" disablePadding
+                        >
+                            {group.accounts.map((account, aIndex) => (
+                                <div key={aIndex}>
+                                    <ListItem button
+                                              onClick={() => toggleAccount(gIndex, aIndex)}
+                                              style={assetTitleStyle(isOpen(gIndex, aIndex))}>
+                                        <ListItemText primary={account.name}
+                                                      primaryTypographyProps={{style: {fontWeight: "bold", fontFamily: "Copperplate"}}}/>
+                                        {isOpen(gIndex, aIndex) ? <ExpandLess/> : <ExpandMore/>}
+                                    </ListItem>
 
-                        <Collapse in={getChartFlag(gIndex,aIndex)} timeout="auto" unmountOnExit>
+                                    <Collapse in={isOpen(gIndex, aIndex)} timeout="auto" unmountOnExit>
+                                        <AssetSummaryCard account={account}/>
 
-                            <Card sx={{ width: 150 }} style={{backgroundColor:"white", display:"inline-block", verticalAlign: "middle", marginLeft: 10}}>
-                                <CardContent>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
-                                        Current Return
-                                    </Typography>
-                                    <Typography variant="h5" component="div" align={"center"}
-                                                style={{color: account.currentReturn > 0 ? "#158615" : account.currentReturn < 0 ? "#b93333" : "black"}}>
-                                        {account.currentReturn > 0 ? "+" : ""}{account.currentReturn}%
-                                    </Typography>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
-                                        Current Value
-                                    </Typography>
-                                    <Typography color="text.secondary" align={"center"}>
-                                        {account.currentValue}
-                                    </Typography>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
-                                        Initial Value
-                                    </Typography>
-                                    <Typography color="text.secondary" align={"center"}>
-                                        {account.initialValue}
-                                    </Typography>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
-                                        Withdrawals
-                                    </Typography>
-                                    <Typography color="text.secondary" align={"center"}>
-                                        {account.withdrawalsSum}
-                                    </Typography>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" align={"center"}>
-                                        Deposits
-                                    </Typography>
-                                    <Typography color="text.secondary" align={"center"}>
-                                        {account.depositsSum}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-
-                            <div style={{display:"inline-block", verticalAlign: "middle", width: "85%", marginLeft: 10}}>
-                                <FormControlLabel control={<Checkbox checked={chartOptions[0]} onChange={() => toggleChartOption(0)}/>}
-                                                  label="Decompose Funding"
-                                                  style={{marginLeft: "50px"}}
-                                />
-                                <FinancialChart data={constructChartData(account)}
-                                                decomposedFunding={chartOptions[0]}
-                                                width={all === undefined ? 700 : "100%"}
-                                />
-                            </div>
-
-                         </Collapse>
-                     </div>
-                 ))}
-                 </List>
-             ))}
-             </List>
-        }
-        </>
+                                        <div style={{display: "inline-block", verticalAlign: "middle", width: "85%", marginLeft: 10}}>
+                                            <FormControlLabel
+                                                control={<Checkbox checked={chartOptions[0]} onChange={() => toggleChartOption(0)}/>}
+                                                label="Decompose Funding"
+                                                style={{marginLeft: "50px"}}
+                                            />
+                                            <FinancialChart data={toAssetChartSeries(account)}
+                                                            decomposedFunding={chartOptions[0]}
+                                                            width={isOverall ? "100%" : 700}
+                                            />
+                                        </div>
+                                    </Collapse>
+                                </div>
+                            ))}
+                        </List>
+                    ))}
+                </List>
+            )}
+        </DataView>
     )
+}
+
+FinancialAssets.propTypes = {
+    year: PropTypes.number.isRequired,
+    setYearly: PropTypes.func.isRequired,
 }
 
 export default FinancialAssets;

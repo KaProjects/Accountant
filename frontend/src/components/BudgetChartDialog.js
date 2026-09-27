@@ -3,50 +3,54 @@ import {Area, Bar, CartesianGrid, ComposedChart, LabelList, Tooltip, XAxis, YAxi
 import {Card, CardContent, Dialog, DialogTitle, Typography} from "@mui/material";
 
 
+// Declared at module scope: recharts is handed these as component types, so
+// rebuilding them on every render would remount the tooltip and labels.
+const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+        const planned = payload[0].value
+        const sign = (payload[0].value === payload[1].value) ? "+" : "-"
+        return (
+            <Card>
+                <CardContent>
+                    <Typography variant="body2" component="div">
+                        month: {label}
+                    </Typography>
+                    <Typography variant="body2" component="div" style={{ color:  payload[0].fill}}>
+                        planned: {planned}
+                    </Typography>
+                    {payload[2].value > 0 &&
+                        <Typography variant="body2" component="div" style={{ color:  payload[2].fill}}>
+                            difference: {sign}{payload[2].value}
+                        </Typography>
+                    }
+                    {payload[3].value > 0 &&
+                        <Typography variant="body2" component="div" style={{ color:  payload[3].fill}}>
+                            difference: {sign}{payload[3].value}
+                        </Typography>
+                    }
+                </CardContent>
+            </Card>
+        );
+    }
+    return null;
+};
+
+const BarLabel = (props) => {
+    const {value, fill, x, y, width, offset, sign} = props;
+    if (value > 0) {
+        return (
+            <text x={x + width / 2} y={y - 10} textAnchor="middle" dominantBaseline="middle" fill={fill} offset={offset} fontSize={13}>
+                {sign}{value}
+            </text>
+        );
+    } else {
+        return <text></text>;
+    }
+};
+
 const BudgetChartDialog = props => {
 
-    const CustomTooltip = ({ active, payload, label }) => {
-        if (active && payload && payload.length) {
-            const planned = payload[0].value
-            const sign = (payload[0].value === payload[1].value) ? "+" : "-"
-            return (
-                <Card>
-                    <CardContent>
-                        <Typography variant="body2" component="div">
-                            month: {label}
-                        </Typography>
-                        <Typography variant="body2" component="div" style={{ color:  payload[0].fill}}>
-                            planned: {planned}
-                        </Typography>
-                        {payload[2].value > 0 &&
-                            <Typography variant="body2" component="div" style={{ color:  payload[2].fill}}>
-                                difference: {sign}{payload[2].value}
-                            </Typography>
-                        }
-                        {payload[3].value > 0 &&
-                            <Typography variant="body2" component="div" style={{ color:  payload[3].fill}}>
-                                difference: {sign}{payload[3].value}
-                            </Typography>
-                        }
-                    </CardContent>
-                </Card>
-            );
-        }
-        return null;
-    };
 
-    const BarLabel = (props) => {
-        const {value, fill, x, y, width, offset, sign} = props;
-        if (value > 0) {
-            return (
-                <text x={x + width / 2} y={y - 10} textAnchor="middle" dominantBaseline="middle" fill={fill} offset={offset} fontSize={13}>
-                    {sign}{value}
-                </text>
-            );
-        } else {
-            return <text></text>;
-        }
-    };
 
     return (
         <Dialog

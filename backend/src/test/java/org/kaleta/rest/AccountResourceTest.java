@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -63,6 +64,38 @@ public class AccountResourceTest
         assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.0", "general", 0, 6000, 6000)));
         assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.1", "generaly", 0, 0, -5000)));
         assertThat(accounts, hasItem(YearAccountOverviewDto.from("210.2", "generalz", 0, 5000, -1000)));
+    }
+
+    @Test
+    void offBalanceSchemaIsNotAnError()
+    {
+        // 700 is an off-balance (type X) account, which has no debit or credit
+        // orientation. Picking it in the accounting data view used to raise a 500.
+        given().when()
+                .get("/account/2020/700")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON);
+    }
+
+    @Test
+    void offBalanceAccountsAreListedWithoutATurnoverOrBalance()
+    {
+        // asserted on the wire rather than through the DTO, whose fields default to
+        // zero and would mask the absence
+        List<Map<String, Object>> accounts = given().when()
+                .get("/account/2020/700")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().response().jsonPath().getList("");
+
+        assertThat(accounts.size(), is(1));
+        assertThat(accounts.get(0).get("id"), is("700.0"));
+        assertThat(accounts.get(0).get("name"), is("general"));
+        // neither figure is meaningful for an off-balance account, so neither is sent
+        assertThat(accounts.get(0).containsKey("turnover"), is(false));
+        assertThat(accounts.get(0).containsKey("balance"), is(false));
     }
 
     @Test

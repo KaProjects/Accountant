@@ -3,7 +3,7 @@ import {AppBar, Box, Button, IconButton, MenuItem, Select, Toolbar, Typography} 
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import {getChartConfigStyle} from "../constants";
+import {getChartConfigStyle} from "../theme/palette";
 
 const MainBar = props => {
 

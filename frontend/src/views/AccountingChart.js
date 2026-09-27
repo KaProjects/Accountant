@@ -1,10 +1,15 @@
-import {useData} from "../fetch";
 import React, {useEffect} from "react";
-import Loader from "../components/Loader";
+import PropTypes from "prop-types";
 import {FormControl, InputLabel, MenuItem, Select} from "@mui/material";
-import {Bar, BarChart, Brush, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
-import {getChartConfigStyle} from "../constants";
+import {useData} from "../fetch";
+import DataView from "../components/common/DataView";
+import AccountingBarChart from "../components/chart/AccountingBarChart";
+import {getChartConfigStyle} from "../theme/palette";
 
+const centered = {
+    display: "grid", placeContent: "center", position: "absolute",
+    left: 0, top: 50, bottom: 0, right: 0,
+};
 
 const AccountingChart = props => {
 
@@ -15,46 +20,13 @@ const AccountingChart = props => {
         // eslint-disable-next-line
     }, []);
 
-    function Chart(){
-
-        const {data, loaded, error} = useData("/chart/data/" + props.selectedValue.id)
-
-        return (
-            <React.Fragment>
-                {!loaded &&
-                    <Loader error ={error}/>
-                }
-                {loaded &&
-                    <div style={{height: "85vh", width: "90vw"}}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart
-                                data={data.values}
-                                margin={{top: 5, right: 30, left: 30, bottom: 5}}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="label" />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey={props.selectedValue.type.toLowerCase()} fill="#8884d8"/>
-                                <Brush />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                }
-            </React.Fragment>
-        )
-    }
-
     return (
-        <>
-            {!loaded &&
-                <Loader error ={error}/>
-            }
-            {loaded &&
-                <div style={{display: "grid", placeContent: "center", position: "absolute", left:0,top:50,bottom:0,right:0}}>
+        <DataView loaded={loaded} error={error}>
+            {() => (
+                <div style={centered}>
                     {!props.selectedValue &&
-                        <FormControl sx={{ minWidth: "200px"}}>
-                            <InputLabel id="chart-select-label" >Select a dataset</InputLabel>
+                        <FormControl sx={{minWidth: "200px"}}>
+                            <InputLabel id="chart-select-label">Select a dataset</InputLabel>
                             <Select
                                 labelId="chart-select-label"
                                 value={props.selectedValue}
@@ -67,11 +39,18 @@ const AccountingChart = props => {
                             </Select>
                         </FormControl>
                     }
-                    {props.selectedValue && <Chart/>}
+                    {props.selectedValue && <AccountingBarChart config={props.selectedValue}/>}
                 </div>
-            }
-        </>
+            )}
+        </DataView>
     )
+}
+
+AccountingChart.propTypes = {
+    setYearly: PropTypes.func.isRequired,
+    selectedValue: PropTypes.object,
+    setSelectedValue: PropTypes.func.isRequired,
+    setSelectValues: PropTypes.func.isRequired,
 }
 
 export default AccountingChart;

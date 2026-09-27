@@ -92,7 +92,13 @@ public class AccountResource
                     if (transaction.getCredit().equals(account.getFullId()) && !transaction.getDebit().equals(Constants.Account.CLOSING_ACC_ID))
                         credit += transaction.getAmount();
                 }
-                if (AccountUtils.isDebit(accountType)) {
+                if (accountType == Constants.AccountType.X) {
+                    // Off-balance accounts are neither debit nor credit, so neither a
+                    // turnover nor a balance can be stated for them. They are reported
+                    // as absent rather than as a misleading zero.
+                    dto.setTurnover(null);
+                    dto.setBalance(null);
+                } else if (AccountUtils.isDebit(accountType)) {
                     dto.setTurnover(debit);
                     dto.setBalance(debit - credit);
                 } else {
