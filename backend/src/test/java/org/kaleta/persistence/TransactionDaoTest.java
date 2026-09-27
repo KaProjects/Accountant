@@ -183,10 +183,10 @@ class TransactionDaoTest
 
     @Test
     @TestTransaction
-    void listFinancialAssetTransactionsCoversBoth23xAnd546Accounts()
+    void listFinancialAssetTransactionsCoversBoth23xAnd549Accounts()
     {
         insert("t1", "0101", 100, "230.0", "210.0", "");
-        insert("t2", "0101", 200, "546.0", "210.0", "");
+        insert("t2", "0101", 200, "549.0", "210.0", "");
         insert("t3", "0101", 300, "510.0", "210.0", "");
         entityManager.flush();
 

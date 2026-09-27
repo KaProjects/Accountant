@@ -32,13 +32,13 @@ INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024
 INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2024', 'of1', 'Other Flow 1', 'all=46560', '5%', '5%', 'vac=');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2024', 'of2', 'Other Flow 2', 'all=9120');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.1.1', 'Other Flow 2.1.1', '546.0-0', '230.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.1.2', 'Other Flow 2.1.2', '546.0-9', '230.9', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.2.1', 'Other Flow 2.2.1', '546.1-0', '231.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.2.2', 'Other Flow 2.2.2', '546.1-1', '231.1', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.3.1', 'Other Flow 2.3.1', '546.2-0', '232.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.4.1', 'Other Flow 2.4.1', '546.3-0', '233.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.4.2', 'Other Flow 2.4.2', '546.3-1', '233.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.1.1', 'Other Flow 2.1.1', '549.0-0', '230.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.1.2', 'Other Flow 2.1.2', '549.0-9', '230.9', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.2.1', 'Other Flow 2.2.1', '549.1-0', '231.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.2.2', 'Other Flow 2.2.2', '549.1-1', '231.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.3.1', 'Other Flow 2.3.1', '549.2-0', '232.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.4.1', 'Other Flow 2.4.1', '549.3-0', '233.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2024', 'of2.4.2', 'Other Flow 2.4.2', '549.3-1', '233.1', 'finXasset');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2024', 'of3', 'Other Flow 3', 'all=0');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2024', 'of3.1', 'Other Flow 3.1', '211.7', '211.7');
@@ -79,13 +79,13 @@ INSERT INTO Budgeting (year, id, name, planning, debit, credit) VALUES ('2023', 
 INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2023', 'of1', 'Other Flow 1', 'all=4460', '5%', '5%', 'vac=');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2023', 'of2', 'Other Flow 2', '23190|36200|99120|57840|17000|33190|68990|87600|40010|97350|91160|84990');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.1.1', 'Other Flow 2.1.1', '546.0-0', '230.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.1.2', 'Other Flow 2.1.2', '546.0-2', '230.2', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.2.1', 'Other Flow 2.2.1', '546.1-0', '231.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.2.2', 'Other Flow 2.2.2', '546.1-1', '231.1', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.3.1', 'Other Flow 2.3.1', '546.2-0', '232.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.4.1', 'Other Flow 2.4.1', '546.3-0', '233.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.4.2', 'Other Flow 2.4.2', '546.3-1', '233.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.1.1', 'Other Flow 2.1.1', '549.0-0', '230.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.1.2', 'Other Flow 2.1.2', '549.0-2', '230.2', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.2.1', 'Other Flow 2.2.1', '549.1-0', '231.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.2.2', 'Other Flow 2.2.2', '549.1-1', '231.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.3.1', 'Other Flow 2.3.1', '549.2-0', '232.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.4.1', 'Other Flow 2.4.1', '549.3-0', '233.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2023', 'of2.4.2', 'Other Flow 2.4.2', '549.3-1', '233.1', 'finXasset');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2023', 'of3', 'Other Flow 3', '46330|82150|95830|66880|72680|61730|27020|88090|30490|50550|25980|89200');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2023', 'of3.1', 'Other Flow 3.1', '211.7', '211.7');
@@ -110,7 +110,7 @@ INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2022', 'me2.1', '
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2022', 'me2.2', 'Fixed Cost 2.2', '523.10', '523.10');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2022', 'me3', 'Fixed Cost 3', 'all=4000');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2022', 'me3.1', 'Fixed Cost 3.1', '553.0', '553.0');
-INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2022', 'me3.2', 'Fixed Cost 3.2', '546.0-2', '546.0-2');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2022', 'me3.2', 'Fixed Cost 3.2', '549.0-2', '549.0-2');
 INSERT INTO Budgeting (year, id, name, debit, credit, planning) VALUES ('2022', 'me4', 'Fixed Cost 4', '220.26', '210.0', 'all=8120');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2022', 'me5', 'Fixed Cost 5', 'all=3240');
 INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'me5.1', 'Fixed Cost 5.1', '220.27', '210.1', 'splatka');
@@ -136,18 +136,18 @@ INSERT INTO Budgeting (year, id, name, planning, debit, credit) VALUES ('2022', 
 INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2022', 'of1', 'Other Flow 1', 'all=98210', '5%', '5%', 'vac=');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2022', 'of2', 'Other Flow 2', 'all=47400');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.1', 'Other Flow 2.1.1', '546.0-0', '230.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.2', 'Other Flow 2.1.2', '546.0-2', '230.2', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.3', 'Other Flow 2.1.3', '546.0-3', '230.3', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.4', 'Other Flow 2.1.4', '546.0-6', '230.6', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.5', 'Other Flow 2.1.5', '546.0-7', '230.7', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.6', 'Other Flow 2.1.6', '546.0-8', '230.8', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.7', 'Other Flow 2.1.7', '546.0-9', '230.9', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.2.1', 'Other Flow 2.2.1', '546.1-0', '231.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.2.2', 'Other Flow 2.2.2', '546.1-1', '231.1', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.3.1', 'Other Flow 2.3.1', '546.2-0', '232.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.4.1', 'Other Flow 2.4.1', '546.3-0', '233.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.4.2', 'Other Flow 2.4.2', '546.3-1', '233.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.1', 'Other Flow 2.1.1', '549.0-0', '230.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.2', 'Other Flow 2.1.2', '549.0-2', '230.2', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.3', 'Other Flow 2.1.3', '549.0-3', '230.3', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.4', 'Other Flow 2.1.4', '549.0-6', '230.6', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.5', 'Other Flow 2.1.5', '549.0-7', '230.7', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.6', 'Other Flow 2.1.6', '549.0-8', '230.8', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.1.7', 'Other Flow 2.1.7', '549.0-9', '230.9', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.2.1', 'Other Flow 2.2.1', '549.1-0', '231.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.2.2', 'Other Flow 2.2.2', '549.1-1', '231.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.3.1', 'Other Flow 2.3.1', '549.2-0', '232.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.4.1', 'Other Flow 2.4.1', '549.3-0', '233.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2022', 'of2.4.2', 'Other Flow 2.4.2', '549.3-1', '233.1', 'finXasset');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2022', 'of3', 'Other Flow 3', 'all=6500');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2022', 'of3.1', 'Other Flow 3.1', '211.7', '211.7');
@@ -170,7 +170,7 @@ INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2021', 'me2.1', '
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2021', 'me2.2', 'Fixed Cost 2.2', '502.3-2', '092.3-2');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2021', 'me3', 'Fixed Cost 3', 'all=5940');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2021', 'me3.1', 'Fixed Cost 3.1', '553.0', '553.0');
-INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2021', 'me3.2', 'Fixed Cost 3.2', '546.0-2', '546.0-2');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2021', 'me3.2', 'Fixed Cost 3.2', '549.0-2', '549.0-2');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2021', 'me4', 'Fixed Cost 4', 'all=1000');
 INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'me4.1', 'Fixed Cost 4.1', '220.20', '210.0', 'splatka');
 INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'me4.2', 'Fixed Cost 4.2', '220.26', '210.0', 'splatka');
@@ -205,17 +205,17 @@ INSERT INTO Budgeting (year, id, name, planning, debit, credit) VALUES ('2021', 
 INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2021', 'of1', 'Other Flow 1', 'all=1230', '5%', '5%', 'vac=');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2021', 'of2', 'Other Flow 2', 'all=7500');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.1', 'Other Flow 2.1.1', '546.0-0', '230.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.2', 'Other Flow 2.1.2', '546.0-2', '230.2', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.3', 'Other Flow 2.1.3', '546.0-3', '230.3', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.4', 'Other Flow 2.1.4', '546.0-6', '230.6', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.5', 'Other Flow 2.1.5', '546.0-7', '230.7', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.6', 'Other Flow 2.1.6', '546.0-8', '230.8', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.7', 'Other Flow 2.1.7', '546.0-9', '230.9', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.2.1', 'Other Flow 2.2.1', '546.1-0', '231.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.2.2', 'Other Flow 2.2.2', '546.1-1', '231.1', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.3.1', 'Other Flow 2.3.1', '546.2-0', '232.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.4.1', 'Other Flow 2.4.1', '546.3-0', '233.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.1', 'Other Flow 2.1.1', '549.0-0', '230.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.2', 'Other Flow 2.1.2', '549.0-2', '230.2', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.3', 'Other Flow 2.1.3', '549.0-3', '230.3', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.4', 'Other Flow 2.1.4', '549.0-6', '230.6', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.5', 'Other Flow 2.1.5', '549.0-7', '230.7', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.6', 'Other Flow 2.1.6', '549.0-8', '230.8', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.1.7', 'Other Flow 2.1.7', '549.0-9', '230.9', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.2.1', 'Other Flow 2.2.1', '549.1-0', '231.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.2.2', 'Other Flow 2.2.2', '549.1-1', '231.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.3.1', 'Other Flow 2.3.1', '549.2-0', '232.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2021', 'of2.4.1', 'Other Flow 2.4.1', '549.3-0', '233.0', 'finXasset');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2021', 'of3', 'Other Flow 3', 'all=4120');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2021', 'of3.1', 'Other Flow 3.1', '211.7', '211.7');
@@ -237,7 +237,7 @@ INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2020', 'me2.1', '
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2020', 'me2.2', 'Fixed Cost 2.2', '502.3-1', '092.3-1');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2020', 'me3', 'Fixed Cost 3', 'all=1450');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2020', 'me3.1', 'Fixed Cost 3.1', '553.0', '553.0');
-INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2020', 'me3.2', 'Fixed Cost 3.2', '546.2', '546.2');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2020', 'me3.2', 'Fixed Cost 3.2', '549.2', '549.2');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2020', 'me4', 'Fixed Cost 4', 'all=6190');
 INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'me4.1', 'Fixed Cost 4.1', '220.4', '210.0', 'splatka');
 INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'me4.2', 'Fixed Cost 4.2', '220.20', '210.0', 'splatka');
@@ -274,16 +274,16 @@ INSERT INTO Budgeting (year, id, name, planning, debit, credit) VALUES ('2020', 
 INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2020', 'of1', 'Other Flow 1', 'all=6270', '5%', '5%', 'vac=');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2020', 'of2', 'Other Flow 2', 'all=1030');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.0', 'Other Flow 2.0', '546.0', '230.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.1', 'Other Flow 2.1', '546.1', '230.1', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.2', 'Other Flow 2.2', '546.2', '230.2', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.3', 'Other Flow 2.3', '546.3', '230.3', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.4', 'Other Flow 2.4', '546.4', '230.4', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.5', 'Other Flow 2.5', '546.5', '230.5', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.6', 'Other Flow 2.6', '546.6', '230.6', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.7', 'Other Flow 2.7', '546.7', '230.7', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.8', 'Other Flow 2.8', '546.8', '230.8', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.9', 'Other Flow 2.9', '546.9', '230.9', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.0', 'Other Flow 2.0', '549.0', '230.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.1', 'Other Flow 2.1', '549.1', '230.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.2', 'Other Flow 2.2', '549.2', '230.2', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.3', 'Other Flow 2.3', '549.3', '230.3', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.4', 'Other Flow 2.4', '549.4', '230.4', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.5', 'Other Flow 2.5', '549.5', '230.5', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.6', 'Other Flow 2.6', '549.6', '230.6', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.7', 'Other Flow 2.7', '549.7', '230.7', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.8', 'Other Flow 2.8', '549.8', '230.8', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2020', 'of2.9', 'Other Flow 2.9', '549.9', '230.9', 'finXasset');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2020', 'of3', 'Other Flow 3', 'all=6450');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2020', 'of3.1', 'Other Flow 3.1', '211.7', '211.7');
@@ -306,7 +306,7 @@ INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'me2.1', '
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'me2.2', 'Fixed Cost 2.2', '502.3-0', '092.3-0');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'me3', 'Fixed Cost 3', 'all=8300');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'me3.1', 'Fixed Cost 3.1', '553.0', '553.0');
-INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'me3.2', 'Fixed Cost 3.2', '546.2', '546.2');
+INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'me3.2', 'Fixed Cost 3.2', '549.2', '549.2');
 INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2019', 'me4', 'Fixed Cost 4', 'all=2960', '220.4', '210.0', 'splatka');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'me5', 'Fixed Cost 5', 'all=8780');
 INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'me5.01', 'Fixed Cost 5.01', '220.5', '210.1', 'splatka');
@@ -348,14 +348,14 @@ INSERT INTO Budgeting (year, id, name, planning, debit, credit) VALUES ('2019', 
 INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2019', 'of1', 'Other Flow 1', 'all=3810', '5%', '5%', 'vac=');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'of2', 'Other Flow 2', 'all=5850');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.0', 'Other Flow 2.0', '546.0', '230.0', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.1', 'Other Flow 2.1', '546.1', '230.1', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.2', 'Other Flow 2.2', '546.2', '230.2', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.3', 'Other Flow 2.3', '546.3', '230.3', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.4', 'Other Flow 2.4', '546.4', '230.4', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.5', 'Other Flow 2.5', '546.5', '230.5', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.6', 'Other Flow 2.6', '546.6', '230.6', 'finXasset');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.7', 'Other Flow 2.7', '546.7', '230.7', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.0', 'Other Flow 2.0', '549.0', '230.0', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.1', 'Other Flow 2.1', '549.1', '230.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.2', 'Other Flow 2.2', '549.2', '230.2', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.3', 'Other Flow 2.3', '549.3', '230.3', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.4', 'Other Flow 2.4', '549.4', '230.4', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.5', 'Other Flow 2.5', '549.5', '230.5', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.6', 'Other Flow 2.6', '549.6', '230.6', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.7', 'Other Flow 2.7', '549.7', '230.7', 'finXasset');
 
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'of3', 'Other Flow 3', 'all=4320');
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'of3.1', 'Other Flow 3.1', '211.0', '211.0');

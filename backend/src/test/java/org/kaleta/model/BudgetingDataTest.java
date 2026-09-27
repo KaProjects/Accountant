@@ -170,6 +170,43 @@ class BudgetingDataTest
     }
 
     @Test
+    void aFinancialAssetRowNetsCreationsAgainstSales()
+    {
+        // 549 is the financial asset creation schema (moved there from 546). A
+        // finXasset row counts everything debited to the creation account, less
+        // anything credited back to the asset account as a sale.
+        BudgetComponent component = componentOf(
+                List.of(budgetingRow(YEAR, "e1", "549.3-1", "233.1", "finXasset", "all=0")),
+                List.of(transaction(YEAR, "0101", 2800, "549.3-1", "210.0", "Creation of Bitcoin"),
+                        transaction(YEAR, "0101", 1200, "549.3-1", "210.0", "Creation of Bitcoin"),
+                        transaction(YEAR, "0101", 1000, "210.0", "233.1", "Sale of Bitcoin")));
+
+        assertThat(component.getActualMonths()[0], is(3000));
+    }
+
+    @Test
+    void aFinancialAssetRowIgnoresOtherCreationAccounts()
+    {
+        BudgetComponent component = componentOf(
+                List.of(budgetingRow(YEAR, "e1", "549.3-1", "233.1", "finXasset", "all=0")),
+                List.of(transaction(YEAR, "0101", 2800, "549.3-1", "210.0", "Creation of Bitcoin"),
+                        transaction(YEAR, "0101", 9999, "549.3-0", "210.0", "Creation of something else")));
+
+        assertThat(component.getActualMonths()[0], is(2800));
+    }
+
+    @Test
+    void aFinancialAssetRowCountsOnlySalesBackToItsOwnAssetAccount()
+    {
+        BudgetComponent component = componentOf(
+                List.of(budgetingRow(YEAR, "e1", "549.3-1", "233.1", "finXasset", "all=0")),
+                List.of(transaction(YEAR, "0101", 5000, "549.3-1", "210.0", "Creation of Bitcoin"),
+                        transaction(YEAR, "0101", 1000, "210.0", "233.0", "Sale of a different asset")));
+
+        assertThat(component.getActualMonths()[0], is(5000));
+    }
+
+    @Test
     void anEmptyComponentReportsTwelveZeroes()
     {
         BudgetComponent component = componentOf(List.of(), List.of());

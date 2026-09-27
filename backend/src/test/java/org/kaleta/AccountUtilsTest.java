@@ -18,38 +18,38 @@ public class AccountUtilsTest
     @Test
     void finCreationAccountIdFrom2021OnwardsKeepsTheGroupDigit()
     {
-        // 230.1 -> 546.0-1 : group digit of 23x, then the semantic id
-        assertThat(AccountUtils.getFinCreationAccountId(account("2021", "230.1")), is("546.0-1"));
-        assertThat(AccountUtils.getFinCreationAccountId(account("2024", "233.10")), is("546.3-10"));
+        // 230.1 -> 549.0-1 : group digit of 23x, then the semantic id
+        assertThat(AccountUtils.getFinCreationAccountId(account("2021", "230.1")), is("549.0-1"));
+        assertThat(AccountUtils.getFinCreationAccountId(account("2024", "233.10")), is("549.3-10"));
     }
 
     @Test
     void finCreationAccountIdUpTo2020OmitsTheGroupDigit()
     {
-        assertThat(AccountUtils.getFinCreationAccountId(account("2020", "230.1")), is("546.1"));
-        assertThat(AccountUtils.getFinCreationAccountId(account("2019", "232.7")), is("546.7"));
+        assertThat(AccountUtils.getFinCreationAccountId(account("2020", "230.1")), is("549.1"));
+        assertThat(AccountUtils.getFinCreationAccountId(account("2019", "232.7")), is("549.7"));
     }
 
     @Test
     void revenueRevaluationAccountIdFollowsTheSameRule()
     {
-        assertThat(AccountUtils.getFinRevRevaluationAccountId(account("2021", "231.2")), is("624.1-2"));
-        assertThat(AccountUtils.getFinRevRevaluationAccountId(account("2020", "231.2")), is("624.2"));
+        assertThat(AccountUtils.getFinRevRevaluationAccountId(account("2021", "231.2")), is("629.1-2"));
+        assertThat(AccountUtils.getFinRevRevaluationAccountId(account("2020", "231.2")), is("629.2"));
     }
 
     @Test
     void expenseRevaluationAccountIdFollowsTheSameRule()
     {
-        assertThat(AccountUtils.getFinExpRevaluationAccountId(account("2021", "233.0")), is("544.3-0"));
-        assertThat(AccountUtils.getFinExpRevaluationAccountId(account("2020", "233.0")), is("544.0"));
+        assertThat(AccountUtils.getFinExpRevaluationAccountId(account("2021", "233.0")), is("548.3-0"));
+        assertThat(AccountUtils.getFinExpRevaluationAccountId(account("2020", "233.0")), is("548.0"));
     }
 
     @Test
     void the2020BoundaryIsExclusiveOfTheOldForm()
     {
         // 2020 uses the old form, 2021 the new one
-        assertThat(AccountUtils.getFinCreationAccountId(account("2020", "230.0")), is("546.0"));
-        assertThat(AccountUtils.getFinCreationAccountId(account("2021", "230.0")), is("546.0-0"));
+        assertThat(AccountUtils.getFinCreationAccountId(account("2020", "230.0")), is("549.0"));
+        assertThat(AccountUtils.getFinCreationAccountId(account("2021", "230.0")), is("549.0-0"));
     }
 
     @Test

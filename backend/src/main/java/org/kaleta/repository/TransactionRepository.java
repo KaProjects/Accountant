@@ -100,7 +100,7 @@ public interface TransactionRepository
     List<Transaction> listProfitTransactions(String year);
 
     /**
-     * @return list of financial asset transactions for specified year (e.i. schema 23x and 546)
+     * @return list of financial asset transactions for specified year (e.i. schema 23x and 549)
      */
     List<Transaction> listFinancialAssetTransactions(String year);
 

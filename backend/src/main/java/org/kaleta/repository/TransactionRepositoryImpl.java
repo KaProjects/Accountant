@@ -180,7 +180,10 @@ public class TransactionRepositoryImpl implements TransactionRepository
     public List<Transaction> listFinancialAssetTransactions(String year)
     {
         return entityManager.createQuery(selectYearly
-                        + " AND (t.debit LIKE '23%' OR t.debit LIKE '546%' OR t.credit LIKE '23%' OR t.credit LIKE '546%')", Transaction.class)
+                        + " AND (t.debit LIKE '" + Constants.Schema.FIN_GROUP_ID + "%'"
+                        + " OR t.debit LIKE '" + Constants.Schema.FIN_CREATION_ID + "%'"
+                        + " OR t.credit LIKE '" + Constants.Schema.FIN_GROUP_ID + "%'"
+                        + " OR t.credit LIKE '" + Constants.Schema.FIN_CREATION_ID + "%')", Transaction.class)
                 .setParameter("year", year)
                 .getResultList();
     }

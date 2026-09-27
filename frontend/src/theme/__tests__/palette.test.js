@@ -13,7 +13,7 @@ describe("getChartConfigStyle", () => {
 
     it("styles expense accounts by their leading 5", () => {
         expect(getChartConfigStyle("510")).toEqual(styleOf("expense_group"))
-        expect(getChartConfigStyle("546.0-0")).toEqual(styleOf("expense_group"))
+        expect(getChartConfigStyle("549.0-0")).toEqual(styleOf("expense_group"))
     })
 
     it("styles income accounts by their leading 6", () => {

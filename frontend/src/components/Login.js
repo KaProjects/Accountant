@@ -4,6 +4,21 @@ import {properties} from "../properties";
 import {Alert, Button, Slide, Snackbar, TextField} from "@mui/material";
 import axios from "axios";
 
+/** The login screen is the entire page until a token exists, so it centres itself. */
+const centeredPage = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "100vh",
+};
+
+const loginForm = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "10px",
+};
+
 export default function Login({ setToken}){
 
     const [username, setUsername] = useState("");
@@ -35,21 +50,15 @@ export default function Login({ setToken}){
     }
 
     return(
-        <div style={{display: "flex", flexDirection: "column", alignItems: "left", marginLeft: "50px"}}>
-            <form onSubmit={handleSubmit}>
-                <div style={{marginTop: "50px"}}>
-                    <TextField label="Username" variant="outlined"
-                               value={username}
-                               onChange={(e) => setUsername(e.target.value)}/>
-                </div>
-                <div style={{marginTop: "10px"}}>
-                    <TextField label="Password" variant="outlined" type="password"
-                               value={password}
-                               onChange={(e) => setPassword(e.target.value)}/>
-                </div>
-                <div style={{marginTop: "10px"}}>
-                    <Button variant="contained" type="submit">Login</Button>
-                </div>
+        <div style={centeredPage} data-testid="login-page">
+            <form onSubmit={handleSubmit} style={loginForm}>
+                <TextField label="Username" variant="outlined"
+                           value={username}
+                           onChange={(e) => setUsername(e.target.value)}/>
+                <TextField label="Password" variant="outlined" type="password"
+                           value={password}
+                           onChange={(e) => setPassword(e.target.value)}/>
+                <Button variant="contained" type="submit">Login</Button>
             </form>
             <Slide direction="up" in={errorToggle} mountOnEnter unmountOnExit>
                 <Snackbar open={errorToggle}

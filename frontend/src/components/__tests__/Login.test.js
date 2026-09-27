@@ -60,6 +60,19 @@ describe("Login", () => {
         expect(await screen.findByRole("alert")).toHaveTextContent("ERR_NETWORK Network Error");
     });
 
+    it("centres the page on both axes over the full viewport height", () => {
+        // jsdom does not lay out, so this guards the styling intent rather than the
+        // rendered geometry - enough to catch a reintroduced left margin
+        render(<Login setToken={jest.fn()}/>);
+
+        expect(screen.getByTestId("login-page")).toHaveStyle({
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "100vh",
+        });
+    });
+
     it("does not submit anything until the form is submitted", () => {
         render(<Login setToken={jest.fn()}/>);
 
