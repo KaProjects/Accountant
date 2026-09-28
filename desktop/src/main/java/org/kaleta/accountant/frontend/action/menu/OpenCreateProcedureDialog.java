@@ -12,9 +12,16 @@ import java.util.Map;
 import java.util.Set;
 
 public class OpenCreateProcedureDialog extends MenuAction {
+    private final String groupName;
 
     public OpenCreateProcedureDialog(Configuration config) {
+        this(config, null);
+    }
+
+    /** With a group name the dialog opens with that group already filled in. */
+    public OpenCreateProcedureDialog(Configuration config, String groupName) {
         super(config, "Create Procedure");
+        this.groupName = groupName;
     }
 
     @Override
@@ -24,7 +31,7 @@ public class OpenCreateProcedureDialog extends MenuAction {
         Map<AccountPairModel, Set<String>> accountPairDescriptionMap = Service.TRANSACTIONS.getAccountPairDescriptions(getConfiguration().getSelectedYear());
         List<String> procedureGroupNameList = Service.PROCEDURES.getProcedureGroupNameList(getConfiguration().getSelectedYear());
 
-        CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, null, null, procedureGroupNameList);
+        CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, null, groupName, procedureGroupNameList);
         dialog.setVisible(true);
         if (dialog.getResult()){
             Service.PROCEDURES.createProcedure(getConfiguration().getSelectedYear(), dialog.getProcedureName(), dialog.getGroupName(), dialog.getTransactions());

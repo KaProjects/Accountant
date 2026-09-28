@@ -1,31 +1,68 @@
 #!/usr/bin/env bash
 #
-# Development loop: watches the sources and restarts the app on every change.
+# Development loop: watches the sources, compiles on every change, restarts when asked.
+#
+# Compiling and restarting are deliberately separate. A task usually touches several files
+# in a row, and restarting on each save made the window disappear and reappear a handful of
+# times for one logical change. So the loop compiles continuously - errors show up within a
+# second of a bad save - while the app keeps running until a restart is requested:
+#
+#     ./dev.sh --restart      apply everything compiled so far, in one restart
+#
+# The running app is isolated from those compiles: it runs from a snapshot of the classes in
+# target/classes-run, so recompiling underneath it cannot leave it with half of one build and
+# half of another. The snapshot sits next to target/classes on purpose, because the app finds
+# its data directory relative to the classes it was loaded from, and both resolve to
+# target/DEVEL-DATA.
 #
 # Runs against the fakes in src/dev (Maven profile 'dev'), so it needs neither the
 # network nor the Firebase service key. Set FIREBASE_MODE=real to talk to the real
 # database instead.
 #
-# The app keeps all of its state in DEVEL-DATA next to the classes, so a restart
-# is not destructive - the active year, accounts and transactions all survive it.
-# That makes restart-on-change a better fit here than class hot-swapping.
+# The app keeps all of its state in DEVEL-DATA, so a restart is not destructive - the active
+# year, accounts and transactions all survive it. That makes restarting a better fit here
+# than class hot-swapping.
 #
-# Usage:  ./dev.sh          - watch and restart
-#         ./dev.sh --once   - build and run a single time
+# Usage:  ./dev.sh             - watch and compile, restart on request
+#         ./dev.sh --restart   - ask the running loop to restart the app now
+#         ./dev.sh --auto      - restart on every change, as it used to
+#         ./dev.sh --once      - build and run a single time
 
 set -u
 
 cd "$(dirname "$0")"
 
+RUN_CLASSES=target/classes-run
+RESTART_FLAG=target/.dev-restart
+LOCK_DIR=target/.dev-lock
+PID_FILE=target/.dev-loop.pid
+# a file, not a variable: with fswatch the compiles happen in a subshell of their own
+PENDING_FILE=target/.dev-pending
+
 JAR_DEPS=$(ls target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
 APP_PID=""
+WATCH_PID=""
 FIREBASE_MODE=${FIREBASE_MODE:-fake}
 
 log() { printf '\033[36m[dev]\033[0m %s\n' "$*"; }
 err() { printf '\033[31m[dev]\033[0m %s\n' "$*"; }
 
-# The fat jar supplies the dependencies; target/classes comes first on the
-# classpath so freshly compiled code always wins over the packaged copy.
+# --restart is a second invocation talking to the loop running in another terminal.
+if [ "${1:-}" = "--restart" ]; then
+    mkdir -p target
+    touch "$RESTART_FLAG"
+    # the loop writes its pid down, which is the only reliable way to ask "is it running?" -
+    # matching the process name would match this very invocation of the script
+    if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+        log "restart requested"
+    else
+        log "restart requested - but no dev loop is running to pick it up (start one with ./dev.sh)"
+    fi
+    exit 0
+fi
+
+# The fat jar supplies the dependencies; the class snapshot comes first on the
+# classpath so the code being developed always wins over the packaged copy.
 ensure_deps() {
     if [ -z "$JAR_DEPS" ] || [ pom.xml -nt "$JAR_DEPS" ]; then
         log "packaging (dependencies changed or jar missing) ..."
@@ -33,6 +70,20 @@ ensure_deps() {
         JAR_DEPS=$(ls target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
     fi
     [ -n "$JAR_DEPS" ]
+}
+
+# Serialises the watcher's compiles against the restart's snapshot copy.
+lock() { while ! mkdir "$LOCK_DIR" 2>/dev/null; do sleep 0.2; done; }
+unlock() { rmdir "$LOCK_DIR" 2>/dev/null; }
+
+compile() {
+    local output
+    if ! output=$(./mvnw -B -q -Pdev compile 2>&1); then
+        err "compile failed - the running app is untouched:"
+        printf '%s\n' "$output" | grep -E '\.java:|COMPILATION ERROR|symbol:|location:' | head -20
+        return 1
+    fi
+    return 0
 }
 
 stop_app() {
@@ -44,21 +95,30 @@ stop_app() {
 }
 
 start_app() {
-    java -Dfirebase.mode="$FIREBASE_MODE" ${JAVA_OPTS:-} -cp "target/classes:$JAR_DEPS" org.kaleta.accountant.Initializer &
+    rsync -a --delete target/classes/ "$RUN_CLASSES"/
+    java -Dfirebase.mode="$FIREBASE_MODE" ${JAVA_OPTS:-} -cp "$RUN_CLASSES:$JAR_DEPS" org.kaleta.accountant.Initializer &
     APP_PID=$!
+    echo 0 > "$PENDING_FILE"
     log "app started (pid $APP_PID, firebase=$FIREBASE_MODE)"
 }
 
-rebuild_and_restart() {
-    log "change detected, compiling ..."
-    local output
-    if ! output=$(./mvnw -B -q -Pdev compile 2>&1); then
-        err "compile failed - keeping the running app alive:"
-        printf '%s\n' "$output" | grep -E '\.java:|COMPILATION ERROR|symbol:|location:' | head -20
-        return 1
+compile_only() {
+    lock
+    if compile; then
+        local pending=$(( $(cat "$PENDING_FILE" 2>/dev/null || echo 0) + 1 ))
+        echo "$pending" > "$PENDING_FILE"
+        log "compiled - $pending change(s) waiting, './dev.sh --restart' to apply them"
     fi
-    stop_app
-    start_app
+    unlock
+}
+
+restart_now() {
+    lock
+    if compile; then
+        stop_app
+        start_app
+    fi
+    unlock
 }
 
 # Fingerprint of every source file's modification time.
@@ -69,9 +129,33 @@ snapshot() {
     } | sort | shasum | cut -d' ' -f1
 }
 
-trap 'echo; log "shutting down"; stop_app; exit 0' INT TERM
+cleanup() {
+    echo
+    log "shutting down"
+    [ -n "$WATCH_PID" ] && kill "$WATCH_PID" 2>/dev/null
+    stop_app
+    unlock
+    # only if it is still ours: another loop may have taken over since we started
+    [ "$(cat "$PID_FILE" 2>/dev/null)" = "$$" ] && rm -f "$PID_FILE"
+    exit 0
+}
+trap cleanup INT TERM
+
+mkdir -p target
+
+# Two loops would mean two app windows and a race for every restart request, and the second
+# one is nearly always an accident - one started here, one left running elsewhere.
+if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+    RUNNING_PID=$(cat "$PID_FILE")
+    err "a dev loop is already running (pid $RUNNING_PID) - it would fight this one over the app"
+    err "use it instead ('./dev.sh --restart'), or stop it first ('kill $RUNNING_PID')"
+    exit 1
+fi
 
 ensure_deps || exit 1
+rm -f "$RESTART_FLAG"
+unlock
+echo $$ > "$PID_FILE"
 
 log "initial compile ..."
 ./mvnw -B -q -Pdev compile || { err "initial compile failed"; exit 1; }
@@ -82,21 +166,51 @@ if [ "${1:-}" = "--once" ]; then
     exit 0
 fi
 
+AUTO_RESTART=0
+[ "${1:-}" = "--auto" ] && AUTO_RESTART=1
+
+on_change() {
+    if [ "$AUTO_RESTART" = "1" ]; then
+        log "change detected, compiling and restarting ..."
+        restart_now
+    else
+        log "change detected, compiling ..."
+        compile_only
+    fi
+}
+
+if [ "$AUTO_RESTART" = "1" ]; then
+    log "watching src/main and src/dev - every change restarts the app (Ctrl-C to stop)"
+else
+    log "watching src/main and src/dev - changes are compiled, './dev.sh --restart' applies them (Ctrl-C to stop)"
+fi
+
 if command -v fswatch >/dev/null 2>&1; then
-    log "watching src/main and src/dev with fswatch - edit a file, the app restarts (Ctrl-C to stop)"
-    fswatch -o src/main src/dev pom.xml | while read -r _; do
-        rebuild_and_restart
+    # fswatch compiles in the background; the loop below stays free to watch for restart requests
+    fswatch -o src/main src/dev pom.xml | while read -r _; do on_change; done &
+    WATCH_PID=$!
+    while true; do
+        sleep 1
+        if [ -f "$RESTART_FLAG" ]; then
+            rm -f "$RESTART_FLAG"
+            log "restarting ..."
+            restart_now
+        fi
     done
 else
-    log "watching src/main and src/dev by polling - edit a file, the app restarts (Ctrl-C to stop)"
-    log "(\`brew install fswatch\` makes this instant instead of ~1s polled)"
+    log "(\`brew install fswatch\` makes compiling instant instead of ~1s polled)"
     LAST=$(snapshot)
     while true; do
         sleep 1
+        if [ -f "$RESTART_FLAG" ]; then
+            rm -f "$RESTART_FLAG"
+            log "restarting ..."
+            restart_now
+            LAST=$(snapshot)
+        fi
         NOW=$(snapshot)
         if [ "$NOW" != "$LAST" ]; then
-            LAST=$NOW
-            rebuild_and_restart
+            on_change
             LAST=$(snapshot)
         fi
     done

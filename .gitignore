@@ -8,3 +8,5 @@ classes
 firebase-config.js
 google-services.json
 .DS_Store
+DEVEL-DATA*
+desktop/tools/migrations/

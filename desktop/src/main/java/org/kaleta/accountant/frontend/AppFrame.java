@@ -3,6 +3,7 @@ package org.kaleta.accountant.frontend;
 import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
+import org.kaleta.accountant.frontend.common.WindowPlacement;
 import org.kaleta.accountant.frontend.component.ActiveYearMenu;
 import org.kaleta.accountant.frontend.component.YearMenu;
 import org.kaleta.accountant.frontend.core.YearPane;
@@ -25,11 +26,7 @@ public class AppFrame extends JFrame implements Configuration {
         initComponents();
         applySettings();
         this.pack();
-        this.setSize(1800,1000);
-
-        int centerPosX = (Toolkit.getDefaultToolkit().getScreenSize().width - this.getSize().width) / 2;
-        int centerPosY = (Toolkit.getDefaultToolkit().getScreenSize().height - this.getSize().height) / 2;
-        this.setLocation(centerPosX, centerPosY);
+        WindowPlacement.apply(this, new Dimension(1800, 1000));
     }
 
     private void initMenuBar() {
@@ -41,7 +38,9 @@ public class AppFrame extends JFrame implements Configuration {
         fileMenu.add(new MenuItemWrapper(new InvalidateModels(this)));
         fileMenu.add(new MenuItemWrapper(new OpenYearClosingDialog(this)));
         fileMenu.add(new JSeparator(SwingConstants.HORIZONTAL));
-        fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
+        // no accelerator: Escape belongs to whatever dialog is open, and quitting the whole app on
+        // a stray Escape in the main window is never what was meant
+        fileMenu.add(new MenuItemWrapper(new PerformExit(this)));
 
 
         JMenu addMenu = new ActiveYearMenu("Add");

@@ -41,14 +41,17 @@ public class CreateProcedureDialog extends Dialog {
         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) cbGroup.getModel();
         procedureGroupNameList.forEach(model::addElement);
 
+        // filled in for both cases: when creating from inside a group's card it is that group, and
+        // when editing it is the procedure's own group - which may be changed, moving the procedure
+        if (procedureGroupName != null) {
+            ((JTextField) cbGroup.getEditor().getEditorComponent()).setText(procedureGroupName);
+        }
+
         if (procedure == null) {
             addTransactionPanel();
         } else {
             tfName.focusGained(null);
             tfName.setText(procedure.getName());
-
-            ((JTextField)cbGroup.getEditor().getEditorComponent()).setText(procedureGroupName);
-            cbGroup.setEnabled(false);
 
             for (ProceduresModel.Group.Procedure.Transaction preparedTr : procedure.getTransaction()){
                 addTransactionPanel();

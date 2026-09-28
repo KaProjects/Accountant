@@ -75,15 +75,21 @@ public class ConfigService {
             new ConfigManager().create();
             System.out.println("# File '%DATA_DIR%/config.xml' created!");
         }
+        File rootSchemaFile = new File(Initializer.getDataSource() + "schema.xml");
+        if (!rootSchemaFile.exists()) {
+            new SchemaManager().create();
+            System.out.println("# File '%DATA_DIR%/schema.xml' created!");
+        }
+        File rootProceduresFile = new File(Initializer.getDataSource() + "procedures.xml");
+        if (!rootProceduresFile.exists()) {
+            new ProceduresManager().create();
+            System.out.println("# File '%DATA_DIR%/procedures.xml' created!");
+        }
         for (ConfigModel.Years.Year yearModel : getModel().getYears().getYearList()){
             String year = yearModel.getName();
             File yearDir = new File(Initializer.getDataSource() + year);
             if (!yearDir.exists()) {
                 throw new ServiceFailureException("Directory '%DATA_DIR%/" + year +"' is missing!");
-            }
-            File schemaFile = new File(Initializer.getDataSource() + year + File.separator + "schema.xml");
-            if (!schemaFile.exists()) {
-                throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "schema.xml' is missing!");
             }
             File trFile = new File(Initializer.getDataSource() + year + File.separator + "transactions.xml");
             if (!trFile.exists()) {
@@ -92,10 +98,6 @@ public class ConfigService {
             File accFile = new File(Initializer.getDataSource() + year + File.separator + "accounts.xml");
             if (!accFile.exists()) {
                 throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "accounts.xml' is missing!");
-            }
-            File prFile = new File(Initializer.getDataSource() + year + File.separator + "procedures.xml");
-            if (!prFile.exists()) {
-                throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "procedures.xml' is missing!");
             }
         }
         System.out.println("# Data checked. Everything OK.");
@@ -121,10 +123,8 @@ public class ConfigService {
         }
 
         try {
-            new SchemaManager(newYearName).create();
             new TransactionsManager(newYearName).create();
             new AccountsManager(newYearName).create();
-            new ProceduresManager(newYearName).create();
 
             Manager<ConfigModel> manager = new ConfigManager();
             ConfigModel model = manager.retrieve();

@@ -103,14 +103,14 @@ public class OpenYearClosingDialog extends MenuAction {
 
     /**
      * init new year's files
-     * import schema
      * set new year as active
+     *
+     * The schema is shared by every year and lives in the data root, so there is nothing to
+     * import when a year is opened.
      */
     private void initYear(){
         Service.CONFIG.initYearData(newYear);
         getConfiguration().update(Configuration.YEAR_ADDED);
-
-        Service.SCHEMA.importSchema(lastYear, newYear);
     }
 
     /**

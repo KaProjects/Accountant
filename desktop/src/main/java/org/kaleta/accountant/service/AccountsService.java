@@ -340,20 +340,48 @@ public class AccountsService {
 
     /**
      * Generates next semantic ID.
+     * <p>
+     * The highest id is taken across <b>every</b> year, not only the selected one. An account
+     * deleted from the current year must keep its id reserved: looking at the selected year
+     * alone would hand that id out again, and the same id would then mean two different things
+     * in different years.
      */
     public String getNextSemanticId(String year, String schemaId){
         try {
-            Integer maxValue = -1;
-            for (AccountsModel.Account account : getModel(year).getAccount()) {
-                if (account.getSchemaId().startsWith(schemaId)) {
-                    Integer accSemId = Integer.parseInt(account.getSemanticId());
-                    maxValue =  (accSemId > maxValue) ? accSemId : maxValue;
+            int maxValue = -1;
+            for (String dataYear : Service.CONFIG.getYears()) {
+                // the selected year goes through the cache; the others are read directly so
+                // that this loop does not evict it
+                AccountsModel model = dataYear.equals(year)
+                        ? getModel(dataYear)
+                        : new AccountsManager(dataYear).retrieve();
+                for (AccountsModel.Account account : model.getAccount()) {
+                    if (!account.getSchemaId().equals(schemaId)) {
+                        continue;
+                    }
+                    Integer reserved = reservedNumber(account.getSemanticId());
+                    if (reserved != null && reserved > maxValue) {
+                        maxValue = reserved;
+                    }
                 }
             }
-            return String.valueOf(++maxValue);
+            return String.valueOf(maxValue + 1);
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * The number a semantic id reserves: "7" reserves 7, and so does a retired "7-2020".
+     * Returns null for anything that reserves no number.
+     */
+    static Integer reservedNumber(String semanticId) {
+        String head = (semanticId == null ? "" : semanticId).split("-")[0];
+        try {
+            return Integer.valueOf(head);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }

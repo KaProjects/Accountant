@@ -14,18 +14,18 @@ import java.io.File;
 public class ProceduresManager implements Manager<ProceduresModel>{
     private final String schemaUri;
     private final String schemaFileUri;
-    private final String year;
 
-    public ProceduresManager(String year) {
-        this.year = year;
+    /**
+     * Procedures are shared by every year and live in the data root, so this takes no year.
+     */
+    public ProceduresManager() {
         schemaUri = "/schema/procedures.xsd";
-        schemaFileUri = Initializer.getDataSource() + year + File.separator + "procedures.xml";
+        schemaFileUri = Initializer.getDataSource() + "procedures.xml";
     }
 
     @Override
     public void create() throws ManagerException {
         ProceduresModel newModel = new ProceduresModel();
-        newModel.setYear(year);
         update(newModel);
         Initializer.LOG.info("File created: '" + schemaFileUri + "'");
     }

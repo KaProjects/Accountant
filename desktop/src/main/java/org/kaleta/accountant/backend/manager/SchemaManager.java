@@ -17,18 +17,18 @@ import static org.kaleta.accountant.common.Constants.Schema.*;
 public class SchemaManager implements Manager<SchemaModel> {
     private final String schemaUri;
     private final String schemaFileUri;
-    private final String year;
 
-    public SchemaManager(String year) {
-        this.year = year;
+    /**
+     * The schema is shared by every year and lives in the data root, so this takes no year.
+     */
+    public SchemaManager() {
         schemaUri = "/schema/schema.xsd";
-        schemaFileUri = Initializer.getDataSource() + year + File.separator + "schema.xml";
+        schemaFileUri = Initializer.getDataSource() + "schema.xml";
     }
 
     @Override
     public void create() throws ManagerException {
         SchemaModel newSchemaModel = new SchemaModel();
-        newSchemaModel.setYear(year);
 
         SchemaModel.Class c0 = new SchemaModel.Class();
         c0.setId("0");

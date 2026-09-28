@@ -72,12 +72,12 @@ public class Constants {
         public static final String PROFIT_STATEMENT_ACCOUNT_NAME = "vykaz zisku a strat";
         public static final String PROFIT_STATEMENT_ACCOUNT_ID = "0";
 
-        public static final String FIN_CREATION_FULL_ID = "546";
-        public static final String FIN_CREATION_ACCOUNT_PREFIX = "Creation of ";
-        public static final String FIN_REV_REVALUATION_FULL_ID = "624";
-        public static final String FIN_REV_REVALUATION_ACCOUNT_PREFIX = "Revaluation of ";
-        public static final String FIN_EXP_REVALUATION_FULL_ID = "544";
-        public static final String FIN_EXP_REVALUATION_ACCOUNT_PREFIX = "Revaluation of ";
+        public static final String FIN_CREATION_FULL_ID = "549";
+        public static final String FIN_CREATION_ACCOUNT_PREFIX = "creation of ";
+        public static final String FIN_REV_REVALUATION_FULL_ID = "629";
+        public static final String FIN_REV_REVALUATION_ACCOUNT_PREFIX = "revaluation of ";
+        public static final String FIN_EXP_REVALUATION_FULL_ID = "548";
+        public static final String FIN_EXP_REVALUATION_ACCOUNT_PREFIX = "revaluation of ";
     }
 
     public static class Account {
