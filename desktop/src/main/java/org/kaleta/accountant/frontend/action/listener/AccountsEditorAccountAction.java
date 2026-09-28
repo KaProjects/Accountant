@@ -4,6 +4,7 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.component.accounts.AccountsEditorRules;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -14,10 +15,7 @@ public class AccountsEditorAccountAction extends ActionListener {
 
     public AccountsEditorAccountAction(Configurable configurable, String schemaId, JTextField tfName) {
         super(configurable);
-        if (schemaId.startsWith("7") || schemaId.startsWith("0")
-                || schemaId.startsWith("0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID)
-                || schemaId.startsWith("5" + Constants.Schema.DEPRECIATION_GROUP_ID)
-                || schemaId.startsWith("5" + Constants.Schema.CONSUMPTION_GROUP_ID)) {
+        if (!AccountsEditorRules.canCreateAccount(schemaId)) {
             throw new IllegalArgumentException("Adding accounts restricted for '" + schemaId + "'");
         }
         this.schemaId = schemaId;

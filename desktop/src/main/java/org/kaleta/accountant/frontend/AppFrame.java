@@ -45,20 +45,20 @@ public class AppFrame extends JFrame implements Configuration {
 
         JMenu addMenu = new ActiveYearMenu("Add");
         addMenu.setMnemonic(KeyEvent.VK_A);
-        addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK)));
-        addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK)));
-        addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK)));
-        addMenu.add(new MenuItemWrapper(new OpenAddFinAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK)));
-        addMenu.add(new MenuItemWrapper(new OpenAddMonthlyTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddFinAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddMonthlyTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK)));
 
         JMenu createMenu = new ActiveYearMenu("Create");
         createMenu.setMnemonic(KeyEvent.VK_C);
-        createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK)));
+        createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)));
 
         JMenu importMenu = new ActiveYearMenu("Import");
         importMenu.setMnemonic(KeyEvent.VK_I);
-        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsFromAndroidDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK)));
-        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsFromPdfDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK)));
+        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsFromAndroidDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK)));
+        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsFromPdfDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
 
         menuBar.add(fileMenu);
         menuBar.add(addMenu);

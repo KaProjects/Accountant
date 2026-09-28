@@ -292,6 +292,80 @@ public class AccountsService {
     }
 
     /**
+     * Renames the account with this full id. The id keeps its meaning, only the label changes.
+     */
+    public void renameAccount(String year, String fullId, String newName){
+        try {
+            Manager<AccountsModel> manager = new AccountsManager(year);
+            AccountsModel model = manager.retrieve();
+
+            AccountsModel.Account account = null;
+            for (AccountsModel.Account candidate : model.getAccount()) {
+                if (candidate.getFullId().equals(fullId)) account = candidate;
+            }
+            if (account == null) {
+                throw new IllegalArgumentException("Account with id='" + fullId + "' not found!");
+            }
+            account.setName(newName);
+
+            manager.update(model);
+            Initializer.LOG.info("Account id=" + fullId + " renamed to '" + newName + "'");
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Renames the account and, with it, every account that is named after it: the consumption
+     * account of a resource, the accumulated depreciation and depreciation accounts of an asset,
+     * the creation and revaluation accounts of a financial asset. Each of those is created as a
+     * fixed prefix plus its owner's name and has no identity of its own, so renaming the owner
+     * alone would leave the same thing carrying several different names.
+     */
+    public void renameAccountWithRelated(String year, AccountsModel.Account account, String newName){
+        renameAccount(year, account.getFullId(), newName);
+
+        String schemaId = account.getSchemaId();
+        String semanticId = account.getSemanticId();
+
+        if (schemaId.startsWith("1")){
+            renameIfExists(year, getConsumptionAccountId(schemaId, semanticId), consumptionName(year, account, newName));
+        }
+        // 09x are the accumulated depreciation accounts themselves, and have nothing named after them
+        if (schemaId.startsWith("0") && !schemaId.startsWith("0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID)){
+            renameIfExists(year, getAccumulatedDepAccountId(schemaId, semanticId),
+                    Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + newName);
+            renameIfExists(year, getDepreciationAccountId(schemaId, semanticId),
+                    Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + newName);
+        }
+        if (schemaId.startsWith("23")){
+            renameIfExists(year, getFinCreationAccountId(schemaId, semanticId),
+                    Constants.Schema.FIN_CREATION_ACCOUNT_PREFIX + newName);
+            renameIfExists(year, getFinRevRevaluationAccountId(schemaId, semanticId),
+                    Constants.Schema.FIN_REV_REVALUATION_ACCOUNT_PREFIX + newName);
+            renameIfExists(year, getFinExpRevaluationAccountId(schemaId, semanticId),
+                    Constants.Schema.FIN_EXP_REVALUATION_ACCOUNT_PREFIX + newName);
+        }
+    }
+
+    /** The general account of a group is mirrored by the name of its schema account, not by its own. */
+    private String consumptionName(String year, AccountsModel.Account account, String newName){
+        return newName.equals(Constants.Account.GENERAL_ACCOUNT_NAME)
+                ? Constants.Account.GENERAL_ACCOUNT_NAME + " " + Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX
+                        + Service.SCHEMA.getAccountName(year, "1", account.getGroupId(), account.getSchemaAccountId())
+                : Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + newName;
+    }
+
+    /** A related account that was never created - an asset bought without depreciation, say - is simply skipped. */
+    private void renameIfExists(String year, String fullId, String newName){
+        if (checkAccountExists(year, fullId)){
+            renameAccount(year, fullId, newName);
+        }
+    }
+
+    /**
      * Creates semantic account according to specified attributes.
      */
     public AccountsModel.Account createAccount(String year, String name, String schemaId, String semanticId, String metadata){

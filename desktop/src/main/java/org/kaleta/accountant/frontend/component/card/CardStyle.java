@@ -32,6 +32,7 @@ public final class CardStyle {
     public static final Color ID_FG = new Color(0x7B, 0x86, 0x97);
     public static final Color MUTED_FG = new Color(0xA6, 0xAE, 0xBA);
     public static final Color SLOT_FG = new Color(0xBC, 0xC4, 0xCF);
+    public static final Color LINK_FG = new Color(0x1F, 0x5C, 0xB8);
 
     public static final int CARD_ARC = 10;
     public static final int HEADER_HEIGHT = 28;
@@ -142,10 +143,20 @@ public final class CardStyle {
     }
 
     /**
+     * Makes a name label renamable: under the pointer it turns into a link, and a click anywhere on
+     * the text opens the rename dialog. Only its colour changes, so nothing around it moves as the
+     * pointer passes over.
+     */
+    public static void makeRenamable(JLabel name, java.awt.event.ActionListener action) {
+        Color resting = name.getForeground();
+        makeClickable(name, action, () -> name.setForeground(LINK_FG), () -> name.setForeground(resting));
+    }
+
+    /**
      * Makes a whole panel behave like a button: highlighted under the pointer, acting on a click
      * anywhere inside it, wherever in its children that click actually landed.
      */
-    public static void makeClickable(JPanel area, java.awt.event.ActionListener action, Runnable highlight, Runnable unhighlight) {
+    public static void makeClickable(JComponent area, java.awt.event.ActionListener action, Runnable highlight, Runnable unhighlight) {
         area.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         MouseAdapter adapter = new MouseAdapter() {
             private boolean pressedHere;
