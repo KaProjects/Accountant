@@ -35,6 +35,8 @@ public class CashFlowOverview extends AccountingOverview implements Configurable
                 getGroupPanelInstance("2", "3", AccountingRowPanel.CF, valuesType, true),
                 getGroupPanelInstance("2", "2", AccountingRowPanel.CF, valuesType, false)));
 
+        alignNameColumn();
+
         this.repaint();
         this.revalidate();
     }

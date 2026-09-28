@@ -15,7 +15,7 @@ import java.awt.event.MouseEvent;
 import java.text.DateFormatSymbols;
 import java.util.Locale;
 
-public class AccountingRowPanel extends JPanel implements Configurable {
+public class AccountingRowPanel extends JPanel implements Configurable, TableRow {
     public static final String HEADER = "HEADER";
     public static final String SUM = "SUM";
     public static final String CLASS = "CLASS";
@@ -36,9 +36,16 @@ public class AccountingRowPanel extends JPanel implements Configurable {
     private String[] monthlyBalance;
     private String balance;
 
+    /** Width every value cell asks for; they all share it, and they grow together beyond it. */
+    private static final int VALUE_COLUMN_WIDTH = 110;
+
     private int rowHeight;
     private Font cellValueFont;
     private Color backgroundColor;
+
+    private JPanel panelHeader;
+    private JLabel buttonGraph;
+    private int titleWidth;
 
     private Configuration configuration;
 
@@ -144,7 +151,7 @@ public class AccountingRowPanel extends JPanel implements Configurable {
         JLabel labelName = new JLabel(" " + title);
         labelName.setFont(cellValueFont);
 
-        JLabel buttonGraph = new JLabel(IconLoader.getIcon(IconLoader.CHART, new Dimension(20, 20)));
+        buttonGraph = new JLabel(IconLoader.getIcon(IconLoader.CHART, new Dimension(20, 20)));
         buttonGraph.setOpaque(true);
         buttonGraph.setBackground(backgroundColor);
         buttonGraph.addMouseListener(new MouseAdapter() {
@@ -169,17 +176,23 @@ public class AccountingRowPanel extends JPanel implements Configurable {
         });
         if (aggregate == null) buttonGraph.setVisible(false);
 
-        JPanel panelHeader = new JPanel();
+        panelHeader = new JPanel();
         panelHeader.setLayout(new BoxLayout(panelHeader, BoxLayout.X_AXIS));
         panelHeader.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         panelHeader.setOpaque(false);
         panelHeader.add(labelName);
+        // the column is only as wide as the longest title, so without this the icon would touch it
+        panelHeader.add(Box.createHorizontalStrut(10));
         panelHeader.add(Box.createHorizontalGlue());
         panelHeader.add(buttonGraph);
         panelHeader.add(Box.createHorizontalStrut(5));
+        // what this row alone would need; the overview widens every row to the longest of them
+        titleWidth = panelHeader.getPreferredSize().width;
 
+        // a grid, not a box: every value cell keeps exactly the same width as the others and they
+        // share the space the name column does not take
         JPanel panelValues = new JPanel();
-        panelValues.setLayout(new BoxLayout(panelValues, BoxLayout.X_AXIS));
+        panelValues.setLayout(new GridLayout(1, 0));
         panelValues.setOpaque(false);
 
         if (initialValue != null) {
@@ -187,9 +200,7 @@ public class AccountingRowPanel extends JPanel implements Configurable {
                     ? new JLabel(initialValue, SwingConstants.CENTER)
                     : new JLabel(initialValue + " ", SwingConstants.RIGHT);
             if (!rowType.equals(HEADER)) labelInitBalance.setToolTipText(initialValue);
-            labelInitBalance.setMinimumSize(new Dimension(110, rowHeight));
-            labelInitBalance.setPreferredSize(new Dimension(110, rowHeight));
-            labelInitBalance.setMaximumSize(new Dimension(110, rowHeight));
+            labelInitBalance.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
             labelInitBalance.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             labelInitBalance.setFont(cellValueFont);
             panelValues.add(labelInitBalance);
@@ -201,9 +212,7 @@ public class AccountingRowPanel extends JPanel implements Configurable {
                         ? new JLabel(monthlyBalance[m], SwingConstants.CENTER)
                         : new JLabel(monthlyBalance[m] + " ", SwingConstants.RIGHT);
                 if (!rowType.equals(HEADER)) labelMonthlyBalance.setToolTipText(monthlyBalance[m]);
-                labelMonthlyBalance.setMinimumSize(new Dimension(100, rowHeight));
-                labelMonthlyBalance.setPreferredSize(new Dimension(100, rowHeight));
-                labelMonthlyBalance.setMaximumSize(new Dimension(100, rowHeight));
+                labelMonthlyBalance.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
                 labelMonthlyBalance.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 labelMonthlyBalance.setFont(new Font(cellValueFont.getName(), Font.PLAIN, cellValueFont.getSize()));
                 panelValues.add(labelMonthlyBalance);
@@ -214,9 +223,7 @@ public class AccountingRowPanel extends JPanel implements Configurable {
                 ? new JLabel(balance, SwingConstants.CENTER)
                 : new JLabel(balance + " ", SwingConstants.RIGHT);
         if (!rowType.equals(HEADER)) labelFinalBalance.setToolTipText(balance);
-        labelFinalBalance.setMinimumSize(new Dimension(110, rowHeight));
-        labelFinalBalance.setPreferredSize(new Dimension(110, rowHeight));
-        labelFinalBalance.setMaximumSize(new Dimension(110, rowHeight));
+        labelFinalBalance.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
         labelFinalBalance.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         labelFinalBalance.setFont(cellValueFont);
         panelValues.add(labelFinalBalance);
@@ -224,8 +231,8 @@ public class AccountingRowPanel extends JPanel implements Configurable {
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(layout.createSequentialGroup()
-                .addComponent(panelHeader, 320, 320, Short.MAX_VALUE)
-                .addComponent(panelValues));
+                .addComponent(panelHeader, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(panelValues, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         layout.setVerticalGroup(layout.createParallelGroup()
                 .addComponent(panelHeader, rowHeight, rowHeight, rowHeight)
                 .addComponent(panelValues, rowHeight, rowHeight, rowHeight));
@@ -233,6 +240,48 @@ public class AccountingRowPanel extends JPanel implements Configurable {
 
     public String getType() {
         return rowType;
+    }
+
+    /**
+     * Registers a listener that fires wherever the row is clicked, the chart icon aside.
+     * <p>
+     * Adding it to the row alone is not enough: a click is delivered to the innermost component
+     * that is listening, and every value cell has a tooltip, which quietly makes it one. So the
+     * listener goes on the cells too, and only the chart icon is left with its own click.
+     */
+    @Override
+    public void addRowMouseListener(java.awt.event.MouseListener listener) {
+        attachToRow(this, listener);
+    }
+
+    private void attachToRow(Component component, java.awt.event.MouseListener listener) {
+        if (component == buttonGraph) {
+            return;
+        }
+        component.addMouseListener(listener);
+        if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                attachToRow(child, listener);
+            }
+        }
+    }
+
+    /** Width this row needs for its own title and chart icon, before any alignment. */
+    @Override
+    public int getTitleWidth() {
+        return titleWidth;
+    }
+
+    /**
+     * Pins the name column, so that every row of a table lines up and the longest title still fits.
+     * Whatever is left over goes to the value cells.
+     */
+    @Override
+    public void setNameColumnWidth(int width) {
+        Dimension size = new Dimension(width, rowHeight);
+        panelHeader.setMinimumSize(size);
+        panelHeader.setPreferredSize(size);
+        panelHeader.setMaximumSize(size);
     }
 
     @Override

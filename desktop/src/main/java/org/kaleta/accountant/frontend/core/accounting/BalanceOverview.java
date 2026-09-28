@@ -115,6 +115,10 @@ public class BalanceOverview extends AccountingOverview {
         layout.setHorizontalGroup(layout.createSequentialGroup()
                 .addComponent(assetsPanel)
                 .addComponent(liabilitiesPanel));
+
+        // the two sides are separate tables, so each is measured on its own names
+        alignNameColumn(assetsPanel, liabilitiesPanel);
+
         this.repaint();
         this.revalidate();
     }
@@ -135,11 +139,11 @@ public class BalanceOverview extends AccountingOverview {
                 return getSumPanelInstance(header, true, body);
             }
             case AccountingRowPanel.CLASS: {
-                header.addMouseListener(mouseAdapter);
+                header.addRowMouseListener(mouseAdapter);
                 break;
             }
             case AccountingRowPanel.GROUP: {
-                header.addMouseListener(mouseAdapter);
+                header.addRowMouseListener(mouseAdapter);
                 break;
             }
         }

@@ -4,6 +4,7 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.component.TableRow;
 import org.kaleta.accountant.frontend.core.accounting.AccountingOverview;
 import org.kaleta.accountant.service.Service;
 
@@ -73,7 +74,7 @@ public class AssetDepreciationOverview extends AccountingOverview {
                             String.valueOf(seAccActualBalance), String.format("%.2f%%", seAccDepRatio * 100f));
                     accBody.add(seAccRow);
                 }
-                accRow.addMouseListener(new MouseAdapter() {
+                accRow.addRowMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         accBody.setVisible(!accBody.isVisible());
@@ -81,7 +82,7 @@ public class AssetDepreciationOverview extends AccountingOverview {
                 });
                 groupBody.add(accBody);
             }
-            groupRow.addMouseListener(new MouseAdapter() {
+            groupRow.addRowMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     groupBody.setVisible(!groupBody.isVisible());
@@ -92,6 +93,7 @@ public class AssetDepreciationOverview extends AccountingOverview {
 
         this.add(getSumPanelInstance(assetRow, true, assetBodyPanels.toArray(new JPanel[]{})));
 
+        alignNameColumn();
 
         this.repaint();
         this.revalidate();
@@ -105,10 +107,15 @@ public class AssetDepreciationOverview extends AccountingOverview {
         return filteredAccounts;
     }
 
-    private class Row extends JPanel {
+    private class Row extends JPanel implements TableRow {
+        /** Width every value cell asks for; they all share it, and they grow together beyond it. */
+        private static final int VALUE_COLUMN_WIDTH = 250;
+
+        private JPanel panelHeader;
+        private int titleWidth;
+        private int rowHeight;
 
         public Row(String title, int type, String value, String dep, String actual, String ratio) {
-            int rowHeight;
             Color backgroundColor;
             Font cellValueFont;
             switch (type) {
@@ -139,30 +146,30 @@ public class AssetDepreciationOverview extends AccountingOverview {
                 default:
                     throw new IllegalArgumentException("illegal type");
             }
-            int cellWidth = 250;
-
             this.setBackground(backgroundColor);
 
             JLabel labelName = new JLabel(" " + title);
             labelName.setFont(cellValueFont);
 
-            JPanel panelHeader = new JPanel();
+            panelHeader = new JPanel();
             panelHeader.setLayout(new BoxLayout(panelHeader, BoxLayout.X_AXIS));
             panelHeader.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             panelHeader.setOpaque(false);
             panelHeader.add(labelName);
+            panelHeader.add(Box.createHorizontalStrut(10));
+            // what this row alone would need; the overview widens every row to the longest of them
+            titleWidth = panelHeader.getPreferredSize().width;
 
-
+            // a grid, not a box: every value cell keeps the same width and they share the space
+            // the name column does not take
             JPanel panelValues = new JPanel();
-            panelValues.setLayout(new BoxLayout(panelValues, BoxLayout.X_AXIS));
+            panelValues.setLayout(new GridLayout(1, 0));
             panelValues.setOpaque(false);
 
             JLabel labelValue = (type == -1) ? new JLabel(value, SwingConstants.CENTER)
                     : new JLabel(value + " ", SwingConstants.RIGHT);
             if (type != -1) labelValue.setToolTipText(value);
-            labelValue.setMinimumSize(new Dimension(cellWidth, rowHeight));
-            labelValue.setPreferredSize(new Dimension(cellWidth, rowHeight));
-            labelValue.setMaximumSize(new Dimension(cellWidth, rowHeight));
+            labelValue.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
             labelValue.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             labelValue.setFont(cellValueFont);
             panelValues.add(labelValue);
@@ -170,9 +177,7 @@ public class AssetDepreciationOverview extends AccountingOverview {
             JLabel labelDep = (type == -1) ? new JLabel(dep, SwingConstants.CENTER)
                     : new JLabel(dep + " ", SwingConstants.RIGHT);
             if (type != -1) labelDep.setToolTipText(dep);
-            labelDep.setMinimumSize(new Dimension(cellWidth, rowHeight));
-            labelDep.setPreferredSize(new Dimension(cellWidth, rowHeight));
-            labelDep.setMaximumSize(new Dimension(cellWidth, rowHeight));
+            labelDep.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
             labelDep.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             labelDep.setFont(cellValueFont);
             panelValues.add(labelDep);
@@ -180,9 +185,7 @@ public class AssetDepreciationOverview extends AccountingOverview {
             JLabel labelActual = (type == -1) ? new JLabel(actual, SwingConstants.CENTER)
                     : new JLabel(actual + " ", SwingConstants.RIGHT);
             if (type != -1) labelActual.setToolTipText(actual);
-            labelActual.setMinimumSize(new Dimension(cellWidth, rowHeight));
-            labelActual.setPreferredSize(new Dimension(cellWidth, rowHeight));
-            labelActual.setMaximumSize(new Dimension(cellWidth, rowHeight));
+            labelActual.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
             labelActual.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             labelActual.setFont(cellValueFont);
             panelValues.add(labelActual);
@@ -190,9 +193,7 @@ public class AssetDepreciationOverview extends AccountingOverview {
             JLabel labelRatio = (type == -1) ? new JLabel(ratio, SwingConstants.CENTER)
                     : new JLabel(ratio + " ", SwingConstants.RIGHT);
             if (type != -1) labelRatio.setToolTipText(ratio);
-            labelRatio.setMinimumSize(new Dimension(cellWidth, rowHeight));
-            labelRatio.setPreferredSize(new Dimension(cellWidth, rowHeight));
-            labelRatio.setMaximumSize(new Dimension(cellWidth, rowHeight));
+            labelRatio.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
             labelRatio.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             labelRatio.setFont(cellValueFont);
             panelValues.add(labelRatio);
@@ -201,12 +202,38 @@ public class AssetDepreciationOverview extends AccountingOverview {
             GroupLayout layout = new GroupLayout(this);
             this.setLayout(layout);
             layout.setHorizontalGroup(layout.createSequentialGroup()
-                    .addComponent(panelHeader, 320, 320, Short.MAX_VALUE)
-                    .addComponent(panelValues));
+                    .addComponent(panelHeader, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelValues, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
             layout.setVerticalGroup(layout.createParallelGroup()
                     .addComponent(panelHeader, rowHeight, rowHeight, rowHeight)
                     .addComponent(panelValues, rowHeight, rowHeight, rowHeight));
         }
 
+        @Override
+        public int getTitleWidth() {
+            return titleWidth;
+        }
+
+        @Override
+        public void setNameColumnWidth(int width) {
+            Dimension size = new Dimension(width, rowHeight);
+            panelHeader.setMinimumSize(size);
+            panelHeader.setPreferredSize(size);
+            panelHeader.setMaximumSize(size);
+        }
+
+        @Override
+        public void addRowMouseListener(java.awt.event.MouseListener listener) {
+            attachToRow(this, listener);
+        }
+
+        private void attachToRow(Component component, java.awt.event.MouseListener listener) {
+            component.addMouseListener(listener);
+            if (component instanceof Container) {
+                for (Component child : ((Container) component).getComponents()) {
+                    attachToRow(child, listener);
+                }
+            }
+        }
     }
 }
