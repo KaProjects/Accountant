@@ -4,7 +4,7 @@ import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.configuration.ConfigurationAction;
-import org.kaleta.accountant.frontend.action.listener.OpenCreateProcedureDialog;
+import org.kaleta.accountant.frontend.action.listener.CreateProcedureGroupAction;
 import org.kaleta.accountant.frontend.component.card.CardCanvas;
 import org.kaleta.accountant.frontend.component.card.CardStyle;
 import org.kaleta.accountant.frontend.component.card.PlaceholderCard;
@@ -59,7 +59,7 @@ public class ProceduresEditor extends JPanel implements Configurable {
         for (ProceduresModel.Group group : Service.PROCEDURES.getProcedureGroupList(getConfiguration().getSelectedYear())) {
             cards.add(new ProcedureGroupCard(this, group));
         }
-        cards.add(new PlaceholderCard("+  new group", new OpenCreateProcedureDialog(this)));
+        cards.add(new PlaceholderCard("+  new group", new CreateProcedureGroupAction(this)));
         canvas.showCards(cards);
     }
 

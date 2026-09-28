@@ -7,6 +7,7 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
 import org.kaleta.accountant.frontend.component.HintValidatedTextField;
 import org.kaleta.accountant.frontend.component.TransactionPanel;
+import org.kaleta.accountant.frontend.component.procedure.ProcedureRules;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +26,7 @@ public class CreateProcedureDialog extends Dialog {
 
     private JComboBox<String> cbGroup;
     private final List<TransactionPanel> transactionPanelList;
+    private boolean deleteRequested;
 
     public CreateProcedureDialog(Configuration configuration, Map<AccountPairModel, Set<String>> accountPairDescriptionMap,
                                  Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
@@ -50,6 +52,14 @@ public class CreateProcedureDialog extends Dialog {
         if (procedure == null) {
             addTransactionPanel();
         } else {
+            if (ProcedureRules.isAppMaintained(procedureGroupName)) {
+                // what the app writes, it names and keeps: only the transactions are the user's to
+                // change here - the amount usually put in is exactly what this dialog is opened for
+                tfName.setEnabled(false);
+                cbGroup.setEnabled(false);
+            } else {
+                addDeleteButton();
+            }
             tfName.focusGained(null);
             tfName.setText(procedure.getName());
 
@@ -65,6 +75,26 @@ public class CreateProcedureDialog extends Dialog {
         }
         pack();
         this.setSize(new Dimension(this.getWidth(), this.getHeight() + 100));
+    }
+
+    /**
+     * Deleting is offered where the procedure is already open and its transactions are in view, so
+     * that it is deleted knowing what it books - and it is closed out of the way immediately after,
+     * since there is nothing left to edit.
+     */
+    private void addDeleteButton() {
+        JButton buttonDelete = new JButton("Delete");
+        buttonDelete.setToolTipText("Delete this procedure");
+        buttonDelete.addActionListener(a -> {
+            deleteRequested = true;
+            dispose();
+        });
+        setButtons(panel -> panel.add(buttonDelete));
+    }
+
+    /** Whether the dialog was closed by the delete button rather than by confirming the edit. */
+    public boolean isDeleteRequested() {
+        return deleteRequested;
     }
 
     private void buildDialogContent() {

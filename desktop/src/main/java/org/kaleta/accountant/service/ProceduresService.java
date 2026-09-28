@@ -5,6 +5,7 @@ import org.kaleta.accountant.backend.manager.Manager;
 import org.kaleta.accountant.backend.manager.ManagerException;
 import org.kaleta.accountant.backend.manager.ProceduresManager;
 import org.kaleta.accountant.backend.model.ProceduresModel;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 
 import java.util.ArrayList;
@@ -68,12 +69,25 @@ public class ProceduresService {
      * Group of that name, created at the end of the file when there is none yet.
      */
     private ProceduresModel.Group groupByName(ProceduresModel model, String groupName) {
+        return groupByName(model, groupName, false);
+    }
+
+    /**
+     * Group of that name, created when there is none yet. A group the app maintains itself is
+     * created at the front of the file, so that what the app writes stays above the user's own
+     * groups instead of appearing wherever the first one happened to be created.
+     */
+    private ProceduresModel.Group groupByName(ProceduresModel model, String groupName, boolean managed) {
         for (ProceduresModel.Group group : model.getGroup()){
             if (group.getName().equals(groupName)) return group;
         }
         ProceduresModel.Group newGroup = new ProceduresModel.Group();
         newGroup.setName(groupName);
-        model.getGroup().add(newGroup);
+        if (managed) {
+            model.getGroup().add(0, newGroup);
+        } else {
+            model.getGroup().add(newGroup);
+        }
         return newGroup;
     }
 
@@ -100,6 +114,19 @@ public class ProceduresService {
      * Creates procedure according to specified values.
      */
     public void createProcedure(String year, String name, String groupName, List<ProceduresModel.Group.Procedure.Transaction> transactions){
+        create(name, groupName, transactions, false);
+    }
+
+    /**
+     * Creates a procedure the app writes for itself, in a group of its own kept at the front of the
+     * file. Such a procedure is a by-product of creating something else - a financial asset, say -
+     * so it is not composed by hand and its group is shown locked in the editor.
+     */
+    public void createManagedProcedure(String year, String name, String groupName, List<ProceduresModel.Group.Procedure.Transaction> transactions){
+        create(name, groupName, transactions, true);
+    }
+
+    private void create(String name, String groupName, List<ProceduresModel.Group.Procedure.Transaction> transactions, boolean managed){
         try {
             Manager<ProceduresModel> manager = new ProceduresManager();
             ProceduresModel model = manager.retrieve();
@@ -108,7 +135,7 @@ public class ProceduresService {
             procedure.setName(name);
             procedure.setId(nextProcedureId(model));
             procedure.getTransaction().addAll(transactions);
-            groupByName(model, groupName).getProcedure().add(procedure);
+            groupByName(model, groupName, managed).getProcedure().add(procedure);
 
             manager.update(model);
             Initializer.LOG.info("Procedure created: group=" + groupName + " id=" + procedure.getId() + " name='" + procedure.getName() + "'");
@@ -161,6 +188,99 @@ public class ProceduresService {
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Creates an empty procedure group. A name that is already taken is left as it is: there is
+     * nothing to create, and the group the user meant is already on screen.
+     */
+    public void createProcedureGroup(String year, String groupName){
+        try {
+            Manager<ProceduresModel> manager = new ProceduresManager();
+            ProceduresModel model = manager.retrieve();
+
+            for (ProceduresModel.Group group : model.getGroup()){
+                if (group.getName().equals(groupName)) return;
+            }
+            groupByName(model, groupName);
+
+            manager.update(model);
+            Initializer.LOG.info("Procedure group created: '" + groupName + "'");
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Deletes the procedure with this id. The group it was in is kept even when it is left empty:
+     * the user deletes a group deliberately, and an emptied one is usually about to be filled again.
+     */
+    public void deleteProcedure(String year, String id){
+        try {
+            Manager<ProceduresModel> manager = new ProceduresManager();
+            ProceduresModel model = manager.retrieve();
+
+            ProceduresModel.Group.Procedure procedure = null;
+            ProceduresModel.Group group = null;
+            for (ProceduresModel.Group candidate : model.getGroup()){
+                for (ProceduresModel.Group.Procedure procedureCandidate : candidate.getProcedure()){
+                    if (procedureCandidate.getId().equals(id)){
+                        group = candidate;
+                        procedure = procedureCandidate;
+                    }
+                }
+            }
+            if (procedure == null) {
+                throw new IllegalArgumentException("Procedure id=" + id + " not found!");
+            }
+            refuseAppMaintained(group.getName());
+            group.getProcedure().remove(procedure);
+
+            manager.update(model);
+            Initializer.LOG.info("Procedure deleted: id=" + id + " name='" + procedure.getName() + "'");
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Deletes a procedure group and every procedure in it. Recorded transactions are untouched:
+     * a procedure is only a template of what to book, never the booking itself.
+     */
+    public void deleteProcedureGroup(String year, String groupName){
+        try {
+            refuseAppMaintained(groupName);
+            Manager<ProceduresModel> manager = new ProceduresManager();
+            ProceduresModel model = manager.retrieve();
+
+            ProceduresModel.Group group = null;
+            for (ProceduresModel.Group candidate : model.getGroup()){
+                if (candidate.getName().equals(groupName)) group = candidate;
+            }
+            if (group == null) {
+                throw new IllegalArgumentException("Group '" + groupName + "' not found!");
+            }
+            int count = group.getProcedure().size();
+            model.getGroup().remove(group);
+
+            manager.update(model);
+            Initializer.LOG.info("Procedure group '" + groupName + "' deleted with " + count + " procedure(s)");
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /** What the app writes for itself it also owns: those procedures go when their account goes, not before. */
+    private void refuseAppMaintained(String groupName){
+        if (Constants.Procedure.DERIVED_GROUP_NAMES.contains(groupName)){
+            throw new IllegalArgumentException("Group '" + groupName + "' is maintained by the app and cannot be deleted");
         }
     }
 

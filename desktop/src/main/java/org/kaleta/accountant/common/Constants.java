@@ -72,6 +72,13 @@ public class Constants {
         public static final String PROFIT_STATEMENT_ACCOUNT_NAME = "vykaz zisku a strat";
         public static final String PROFIT_STATEMENT_ACCOUNT_ID = "0";
 
+        /** 22x: the credit accounts - loans, overdrafts, credit cards - which are repaid. */
+        public static final String CREDIT_ACCOUNT_SCHEMA_PREFIX = "22";
+        /** 210: the current accounts, which are repaid from and withdrawn from. */
+        public static final String CURRENT_ACCOUNT_SCHEMA_ID = "210";
+        /** 200: the cash accounts, which a withdrawal puts the money into. */
+        public static final String CASH_ACCOUNT_SCHEMA_ID = "200";
+
         public static final String FIN_CREATION_FULL_ID = "549";
         public static final String FIN_CREATION_ACCOUNT_PREFIX = "creation of ";
         public static final String FIN_REV_REVALUATION_FULL_ID = "629";
@@ -108,6 +115,23 @@ public class Constants {
         public static final String EXPENSE = "E";
         public static final String REVENUE = "R";
         public static final String OFF_BALANCE = "X";
+    }
+
+    public static class Procedure {
+        /**
+         * Procedure groups the app writes itself, one procedure per account they follow, written as
+         * that account is created. Nothing in them is composed, renamed or deleted by hand, which is
+         * why the editor shows them as derived.
+         */
+        public static final String FIN_CREATION_GROUP_NAME = "financial assets";
+        public static final String REPAYMENT_GROUP_NAME = "repayments";
+        public static final String WITHDRAWAL_GROUP_NAME = "withdrawals";
+
+        public static final String REPAYMENT_PROCEDURE_PREFIX = "repayment of ";
+        public static final String WITHDRAWAL_PROCEDURE_PREFIX = "withdrawal from ";
+
+        public static final java.util.List<String> DERIVED_GROUP_NAMES =
+                java.util.Arrays.asList(FIN_CREATION_GROUP_NAME, REPAYMENT_GROUP_NAME, WITHDRAWAL_GROUP_NAME);
     }
 
     public static class Transaction {

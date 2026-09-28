@@ -15,14 +15,17 @@ import java.awt.*;
 public class ProcedureGroupCard extends CardStyle.Card {
 
     public ProcedureGroupCard(Configurable owner, ProceduresModel.Group group) {
-        super(CardStyle.HEADER_BG);
+        super(ProcedureRules.isAppMaintained(group.getName()) ? CardStyle.HEADER_BG_LOCKED : CardStyle.HEADER_BG);
         String groupName = group.getName();
+        boolean appMaintained = ProcedureRules.isAppMaintained(groupName);
 
         JPanel header = header(groupName);
         add(header, BorderLayout.NORTH);
-        CardStyle.makeHeaderClickable(header, this, new RenameProcedureGroupAction(owner, groupName));
+        if (!appMaintained) {
+            CardStyle.makeHeaderClickable(header, this, new RenameProcedureGroupAction(owner, groupName));
+        }
 
-        add(procedures(owner, group, groupName), BorderLayout.CENTER);
+        add(procedures(owner, group, groupName, appMaintained), BorderLayout.CENTER);
     }
 
     private JPanel header(String groupName) {
@@ -32,10 +35,20 @@ public class ProcedureGroupCard extends CardStyle.Card {
         name.setForeground(CardStyle.NAME_FG);
         header.add(name);
         header.add(Box.createHorizontalGlue());
+
+        String hintText = ProcedureRules.modeHint(groupName);
+        if (hintText != null) {
+            header.add(Box.createHorizontalStrut(8));
+            JLabel hint = new JLabel(hintText);
+            hint.setFont(CardStyle.hintFont());
+            hint.setForeground(CardStyle.MUTED_FG);
+            header.add(hint);
+            header.add(Box.createHorizontalStrut(8));
+        }
         return header;
     }
 
-    private JPanel procedures(Configurable owner, ProceduresModel.Group group, String groupName) {
+    private JPanel procedures(Configurable owner, ProceduresModel.Group group, String groupName, boolean appMaintained) {
         JPanel procedures = new JPanel();
         procedures.setLayout(new BoxLayout(procedures, BoxLayout.Y_AXIS));
         procedures.setOpaque(false);
@@ -44,7 +57,9 @@ public class ProcedureGroupCard extends CardStyle.Card {
         for (ProceduresModel.Group.Procedure procedure : group.getProcedure()) {
             procedures.add(ProcedureRow.procedure(owner, procedure, groupName));
         }
-        procedures.add(ProcedureRow.newProcedure(owner, groupName));
+        if (!appMaintained) {
+            procedures.add(ProcedureRow.newProcedure(owner, groupName));
+        }
         procedures.add(Box.createVerticalGlue());
         return procedures;
     }

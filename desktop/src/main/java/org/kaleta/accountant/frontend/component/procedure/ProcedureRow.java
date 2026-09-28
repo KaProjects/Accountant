@@ -22,6 +22,12 @@ class ProcedureRow extends CardRow {
     }
 
     static ProcedureRow procedure(Configurable owner, ProceduresModel.Group.Procedure procedure, String groupName) {
+        ProcedureRow row = row(procedure);
+        CardStyle.makeRowClickable(row, new OpenEditProcedureDialog(owner.getConfiguration(), procedure, groupName));
+        return row;
+    }
+
+    private static ProcedureRow row(ProceduresModel.Group.Procedure procedure) {
         ProcedureRow row = new ProcedureRow();
 
         row.add(CardStyle.id(procedure.getId(), CardStyle.ID_FG));
@@ -36,8 +42,6 @@ class ProcedureRow extends CardRow {
         row.add(Box.createHorizontalGlue());
         row.add(transactionCount(procedure.getTransaction().size()));
         row.add(Box.createHorizontalStrut(6));
-
-        CardStyle.makeRowClickable(row, new OpenEditProcedureDialog(owner.getConfiguration(), procedure, groupName));
         return row;
     }
 
