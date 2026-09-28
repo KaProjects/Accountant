@@ -19,14 +19,19 @@ public abstract class SwingWorkerHandler {
                     runInBackground();
                 } catch (ServiceFailureException e){
                     // No need to log here. Cause exc. is (should be) always logged before SFEx is thrown.
-                    ErrorHandler.getThrowableDialog(e).setVisible(true);
+                    showFailure(e);
                 } catch (Exception e){
                     Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-                    ErrorHandler.getThrowableDialog(e).setVisible(true);
+                    showFailure(e);
                 }
                 return null;
             }
         }.execute();
+    }
+
+    /** A dialog is a component like any other, so it is shown on the event thread. */
+    private static void showFailure(Exception e) {
+        Edt.run(() -> ErrorHandler.getThrowableDialog(e).setVisible(true));
     }
 
     protected abstract void runInBackground();

@@ -1,6 +1,7 @@
 package org.kaleta.accountant.frontend.action.menu;
 
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.common.Edt;
 import org.kaleta.accountant.frontend.component.TransactionPanel;
 import org.kaleta.accountant.frontend.dialog.ImportTransactionsFromAndroidDialog;
 import org.kaleta.accountant.service.Service;
@@ -13,8 +14,12 @@ public class OpenImportTransactionsFromAndroidDialog extends MenuAction {
 
     @Override
     protected void actionPerformed() {
-        ImportTransactionsFromAndroidDialog dialog = new ImportTransactionsFromAndroidDialog(getConfiguration());
-        dialog.setVisible(true);
+        // built and shown on the event thread; the booking below stays on the worker
+        ImportTransactionsFromAndroidDialog dialog = Edt.get(() -> {
+            ImportTransactionsFromAndroidDialog created = new ImportTransactionsFromAndroidDialog(getConfiguration());
+            created.setVisible(true);
+            return created;
+        });
         if (dialog.getResult()) {
             for (TransactionPanel panel : dialog.getTransactionPanelList()) {
                 String year = getConfiguration().getSelectedYear();
