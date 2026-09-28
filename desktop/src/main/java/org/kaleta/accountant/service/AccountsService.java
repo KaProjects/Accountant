@@ -51,6 +51,21 @@ public class AccountsService {
     }
 
     /**
+     * Returns true if an account with this full id exists in the year.
+     */
+    public boolean checkAccountExists(String year, String fullId){
+        try {
+            for (AccountsModel.Account account : getModel(year).getAccount()) {
+                if (account.getFullId().equals(fullId)) return true;
+            }
+            return false;
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
      * Returns model of semantic account specified by full id.
      */
     public AccountsModel.Account getAccount(String year, String fullId){
