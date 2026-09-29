@@ -9,6 +9,7 @@ import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -193,6 +194,114 @@ public class ProceduresService {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
+    }
+
+    /**
+     * The procedures of the user's own that book this account, by name - what they would have to
+     * think about if it disappeared.
+     * <p>
+     * The derived groups are left out on purpose: those procedures were written by the app with the
+     * account they book, and go with it without anybody being asked.
+     */
+    public List<String> getProceduresBooking(String year, String accountId){
+        List<String> names = new ArrayList<>();
+        for (ProceduresModel.Group group : getProcedureGroupList(year)){
+            if (Constants.Procedure.DERIVED_GROUP_NAMES.contains(group.getName())){
+                continue;
+            }
+            for (ProceduresModel.Group.Procedure procedure : group.getProcedure()){
+                for (ProceduresModel.Group.Procedure.Transaction transaction : procedure.getTransaction()){
+                    if (accountId.equals(transaction.getDebit()) || accountId.equals(transaction.getCredit())){
+                        names.add(procedure.getName());
+                        break;
+                    }
+                }
+            }
+        }
+        return names;
+    }
+
+    /**
+     * What would happen to the procedures if these accounts were gone, without anything happening.
+     * This is what the year closing shows before it is agreed to.
+     */
+    public List<String> previewRemovalOf(Collection<String> accountIds){
+        try {
+            return removeBookings(new ProceduresManager().retrieve(), accountIds);
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Takes out of every procedure the transactions that book any of these accounts, because the
+     * accounts are gone and a procedure that books one would fail the moment it was used.
+     * <p>
+     * A procedure left with nothing to book goes with them, and so does a group left with no
+     * procedures. A procedure the app wrote itself - the creation of a financial asset, the
+     * repayment of a loan, the withdrawal from an account - goes whole: it was created with its
+     * account and it is removed with it.
+     *
+     * @return one line per procedure that was changed or removed, for the closing to report
+     */
+    public List<String> removeBookingsOf(Collection<String> accountIds){
+        if (accountIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            Manager<ProceduresModel> manager = new ProceduresManager();
+            ProceduresModel model = manager.retrieve();
+
+            List<String> done = removeBookings(model, accountIds);
+            if (!done.isEmpty()) {
+                manager.update(model);
+                invalidateModel();
+                done.forEach(Initializer.LOG::info);
+            }
+            return done;
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    private List<String> removeBookings(ProceduresModel model, Collection<String> accountIds){
+        List<String> done = new ArrayList<>();
+        if (accountIds.isEmpty()) {
+            return done;
+        }
+        for (ProceduresModel.Group group : new ArrayList<>(model.getGroup())){
+            boolean derived = Constants.Procedure.DERIVED_GROUP_NAMES.contains(group.getName());
+            for (ProceduresModel.Group.Procedure procedure : new ArrayList<>(group.getProcedure())){
+                boolean books = procedure.getTransaction().stream().anyMatch(transaction ->
+                        accountIds.contains(transaction.getDebit()) || accountIds.contains(transaction.getCredit()));
+                if (!books) {
+                    continue;
+                }
+                if (derived) {
+                    group.getProcedure().remove(procedure);
+                    done.add("'" + procedure.getName() + "' removed from " + group.getName()
+                            + ", the account it was written for is not carried over");
+                    continue;
+                }
+                int before = procedure.getTransaction().size();
+                procedure.getTransaction().removeIf(transaction ->
+                        accountIds.contains(transaction.getDebit()) || accountIds.contains(transaction.getCredit()));
+                if (procedure.getTransaction().isEmpty()) {
+                    group.getProcedure().remove(procedure);
+                    done.add("'" + procedure.getName() + "' removed, it booked nothing else");
+                } else {
+                    done.add("'" + procedure.getName() + "' loses "
+                            + (before - procedure.getTransaction().size()) + " transaction(s)");
+                }
+            }
+            if (group.getProcedure().isEmpty() && model.getGroup().contains(group)) {
+                model.getGroup().remove(group);
+                done.add("group '" + group.getName() + "' removed, it was left empty");
+            }
+        }
+        return done;
     }
 
     /**

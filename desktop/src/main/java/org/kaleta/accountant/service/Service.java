@@ -32,6 +32,11 @@ public class Service {
     public static final ProceduresService PROCEDURES = new ProceduresService();
 
     /**
+     * Instance of the service that closes a year and opens the next one
+     */
+    public static final ClosingService CLOSING = new ClosingService();
+
+    /**
      * Instance of analysis service class
      */
     public static final AnalysisService ANALYSIS = new AnalysisService();
