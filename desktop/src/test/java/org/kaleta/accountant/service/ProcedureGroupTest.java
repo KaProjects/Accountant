@@ -6,6 +6,7 @@ import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.core.TestParent;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -140,6 +141,37 @@ public class ProcedureGroupTest extends TestParent {
         Service.PROCEDURES.updateProcedure(YEAR, id, "creation of fund", MANAGED, transaction("549.0-0", "211.7"));
 
         Assert.assertEquals("211.7", group(MANAGED).getProcedure().get(0).getTransaction().get(0).getCredit());
+    }
+
+    /** A correction made while booking goes back into the one transaction it was made on. */
+    @Test
+    public void oneTransactionOfAProcedureCanBeReplaced() {
+        List<ProceduresModel.Group.Procedure.Transaction> two = new ArrayList<>(transaction("520.0", "210.0"));
+        two.addAll(transaction("520.5", "210.0"));
+        Service.PROCEDURES.createProcedure(YEAR, "household", "household", two);
+        String id = group("household").getProcedure().get(0).getId();
+
+        ProceduresModel.Group.Procedure.Transaction corrected = new ProceduresModel.Group.Procedure.Transaction();
+        corrected.setDescription("power");
+        corrected.setAmount("250");
+        corrected.setDebit("520.5");
+        corrected.setCredit("210.1");
+        Service.PROCEDURES.updateProcedureTransaction(YEAR, id, 1, corrected);
+
+        List<ProceduresModel.Group.Procedure.Transaction> transactions =
+                group("household").getProcedure().get(0).getTransaction();
+        Assert.assertEquals(2, transactions.size());
+        Assert.assertEquals("100", transactions.get(0).getAmount());
+        Assert.assertEquals("250", transactions.get(1).getAmount());
+        Assert.assertEquals("210.1", transactions.get(1).getCredit());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void aTransactionThatIsNotThereCannotBeReplaced() {
+        Service.PROCEDURES.createProcedure(YEAR, "rent", "household", transaction("520.0", "210.0"));
+        String id = group("household").getProcedure().get(0).getId();
+
+        Service.PROCEDURES.updateProcedureTransaction(YEAR, id, 3, new ProceduresModel.Group.Procedure.Transaction());
     }
 
     @Test(expected = IllegalArgumentException.class)

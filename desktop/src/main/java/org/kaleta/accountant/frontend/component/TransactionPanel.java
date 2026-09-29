@@ -21,6 +21,7 @@ public class TransactionPanel extends JPanel implements DocumentListener {
     private final Map<AccountPairModel, Set<String>> accountPairDescriptionMap;
 
     private final JButton buttonDelete;
+    private final JButton buttonUpdateProcedure;
     private final DatePickerTextField tfDate;
     private final JComboBox<String> cbDescription;
     private final HintValidatedTextField tfAmount;
@@ -28,6 +29,10 @@ public class TransactionPanel extends JPanel implements DocumentListener {
     private final SelectAccountTextField tfCredit;
 
     private boolean isSuppressedUpdate = false;
+
+    private String procedureId;
+    private int procedureTransactionIndex = -1;
+    private String[] asProcedureHasIt;
 
     public TransactionPanel(Configuration configuration, Map<AccountPairModel, Set<String>> accountPairDescriptionMap,
                             Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
@@ -51,6 +56,30 @@ public class TransactionPanel extends JPanel implements DocumentListener {
         buttonDelete = new JButton(IconLoader.getIcon(IconLoader.DELETE, new Dimension(10, 10)));
         buttonDelete.setEnabled(false);
 
+        // shown only on a row that came from a procedure, and only worth pressing once that row
+        // says something the procedure does not
+        buttonUpdateProcedure = new JButton(IconLoader.getIcon(IconLoader.EDIT, new Dimension(10, 10)));
+        buttonUpdateProcedure.setToolTipText("Update the procedure with these values");
+        buttonUpdateProcedure.setEnabled(false);
+        buttonUpdateProcedure.setVisible(false);
+        DocumentListener watchesForChanges = new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                refreshUpdateProcedureButton();
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                refreshUpdateProcedureButton();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                refreshUpdateProcedureButton();
+            }
+        };
+        tfAmount.getDocument().addDocumentListener(watchesForChanges);
+        tfDebit.getDocument().addDocumentListener(watchesForChanges);
+        tfCredit.getDocument().addDocumentListener(watchesForChanges);
+        ((JTextField) cbDescription.getEditor().getEditorComponent()).getDocument().addDocumentListener(watchesForChanges);
+
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -63,14 +92,58 @@ public class TransactionPanel extends JPanel implements DocumentListener {
                 .addGap(5)
                 .addComponent(tfCredit)
                 .addGap(5)
-                .addComponent(cbDescription,200,200,Short.MAX_VALUE));
+                .addComponent(cbDescription,200,200,Short.MAX_VALUE)
+                .addComponent(buttonUpdateProcedure,20,20,20));
         layout.setVerticalGroup(layout.createParallelGroup()
                 .addComponent(buttonDelete,25,25,25)
                 .addComponent(tfDate,25,25,25)
                 .addComponent(tfAmount,25,25,25)
                 .addComponent(tfDebit,25,25,25)
                 .addComponent(tfCredit,25,25,25)
-                .addComponent(cbDescription,25,25,25));
+                .addComponent(cbDescription,25,25,25)
+                .addComponent(buttonUpdateProcedure,25,25,25));
+    }
+
+    /**
+     * Records that this row was booked from a procedure, and offers to send a correction back to it.
+     * <p>
+     * The date is left out of the comparison on purpose: a procedure says what is booked, not when,
+     * so entering today's date is not a change to it.
+     *
+     * @param onUpdate what to run when the user asks for the procedure to be brought up to date
+     */
+    public void bookedFromProcedure(String procedureId, int transactionIndex, ActionListener onUpdate) {
+        this.procedureId = procedureId;
+        this.procedureTransactionIndex = transactionIndex;
+        this.asProcedureHasIt = values();
+        buttonUpdateProcedure.setVisible(true);
+        buttonUpdateProcedure.addActionListener(onUpdate);
+        refreshUpdateProcedureButton();
+    }
+
+    /** Called once the procedure has been brought up to date: this row is now what it says. */
+    public void procedureUpdated() {
+        this.asProcedureHasIt = values();
+        refreshUpdateProcedureButton();
+    }
+
+    public String getProcedureId() {
+        return procedureId;
+    }
+
+    public int getProcedureTransactionIndex() {
+        return procedureTransactionIndex;
+    }
+
+    private String[] values() {
+        return new String[]{getAmount(), getDebit(), getCredit(), getDescription()};
+    }
+
+    private void refreshUpdateProcedureButton() {
+        if (asProcedureHasIt == null) {
+            return;
+        }
+        buttonUpdateProcedure.setEnabled(!java.util.Arrays.equals(asProcedureHasIt, values()));
     }
 
     public void disableValidators(){

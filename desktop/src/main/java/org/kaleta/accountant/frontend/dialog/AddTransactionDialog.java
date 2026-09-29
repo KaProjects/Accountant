@@ -47,14 +47,7 @@ public class AddTransactionDialog extends Dialog {
         if (procedure == null) {
             addTransactionPanel();
         } else {
-            for (ProceduresModel.Group.Procedure.Transaction preparedTr : procedure.getTransaction()){
-                addTransactionPanel();
-                TransactionPanel panel = transactionPanelList.get(transactionPanelList.size() - 1);
-                panel.setDescription(preparedTr.getDescription());
-                panel.setAmount(preparedTr.getAmount());
-                panel.setDebit(preparedTr.getDebit());
-                panel.setCredit(preparedTr.getCredit());
-            }
+            book(procedure);
             validateDialog();
         }
         pack();
@@ -241,12 +234,34 @@ public class AddTransactionDialog extends Dialog {
 
     /** Adds one transaction panel per transaction the procedure books, filled in from it. */
     private void book(ProceduresModel.Group.Procedure procedure) {
-        for (ProceduresModel.Group.Procedure.Transaction transaction : procedure.getTransaction()) {
+        for (int i = 0; i < procedure.getTransaction().size(); i++) {
+            ProceduresModel.Group.Procedure.Transaction transaction = procedure.getTransaction().get(i);
+            int index = i;
             addTransactionPanel(transactionPanel -> {
                 transactionPanel.setAmount(transaction.getAmount());
                 transactionPanel.setDebitCreditDescription(transaction.getDebit(), transaction.getCredit(), transaction.getDescription());
+                transactionPanel.bookedFromProcedure(procedure.getId(), index,
+                        e -> updateProcedureFrom(transactionPanel));
             });
         }
+    }
+
+    /**
+     * Sends what this row now says back to the procedure it was booked from. The correction is made
+     * where it was noticed - the amount usually paid has changed, or the account it comes from has -
+     * instead of being repeated in the procedure editor afterwards.
+     */
+    private void updateProcedureFrom(TransactionPanel panel) {
+        ProceduresModel.Group.Procedure.Transaction transaction = new ProceduresModel.Group.Procedure.Transaction();
+        transaction.setDescription(panel.getDescription());
+        transaction.setAmount(panel.getAmount());
+        transaction.setDebit(panel.getDebit());
+        transaction.setCredit(panel.getCredit());
+
+        Service.PROCEDURES.updateProcedureTransaction(getConfiguration().getSelectedYear(),
+                panel.getProcedureId(), panel.getProcedureTransactionIndex(), transaction);
+        panel.procedureUpdated();
+        getConfiguration().update(Configuration.PROCEDURE_UPDATED);
     }
 
     /**

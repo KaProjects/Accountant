@@ -219,6 +219,42 @@ public class ProceduresService {
     }
 
     /**
+     * Replaces one transaction of a procedure, leaving the rest of it alone.
+     * <p>
+     * This is how a correction made while booking finds its way back: the amount usually paid has
+     * changed, or the account it comes from has, and the procedure is brought up to date from the
+     * transaction that was just entered instead of being edited separately.
+     */
+    public void updateProcedureTransaction(String year, String procedureId, int index,
+                                           ProceduresModel.Group.Procedure.Transaction transaction){
+        try {
+            Manager<ProceduresModel> manager = new ProceduresManager();
+            ProceduresModel model = manager.retrieve();
+
+            ProceduresModel.Group.Procedure procedure = null;
+            for (ProceduresModel.Group group : model.getGroup()){
+                for (ProceduresModel.Group.Procedure candidate : group.getProcedure()){
+                    if (candidate.getId().equals(procedureId)) procedure = candidate;
+                }
+            }
+            if (procedure == null) {
+                throw new IllegalArgumentException("Procedure id=" + procedureId + " not found!");
+            }
+            if (index < 0 || index >= procedure.getTransaction().size()) {
+                throw new IllegalArgumentException("Procedure id=" + procedureId + " has no transaction " + index);
+            }
+            procedure.getTransaction().set(index, transaction);
+
+            manager.update(model);
+            Initializer.LOG.info("Procedure id=" + procedureId + " transaction " + index + " updated");
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
      * Deletes the procedure with this id. The group it was in is kept even when it is left empty:
      * the user deletes a group deliberately, and an emptied one is usually about to be filled again.
      */
