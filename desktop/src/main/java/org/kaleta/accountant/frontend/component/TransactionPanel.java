@@ -34,7 +34,7 @@ public class TransactionPanel extends JPanel implements DocumentListener {
                             DocumentListener documentListener, boolean withDate) {
         this.accountPairDescriptionMap = accountPairDescriptionMap;
 
-        tfDate = new DatePickerTextField("",documentListener);
+        tfDate = new DatePickerTextField("", documentListener, configuration.getSelectedYear());
         if (!withDate){
             tfDate.setVisible(false);
             tfDate.setValidatorEnabled(false);
@@ -99,6 +99,14 @@ public class TransactionPanel extends JPanel implements DocumentListener {
 
     public String getCredit(){
         return tfCredit.getSelectedAccount();
+    }
+
+    /**
+     * The row's fields from left to right, which is the order the arrow keys move through them. The
+     * description is reached through the combo box's editor, since that is what takes the focus.
+     */
+    public List<JComponent> navigableFields() {
+        return List.of(tfDate, tfAmount, tfDebit, tfCredit, (JComponent) cbDescription.getEditor().getEditorComponent());
     }
 
     public String getDescription(){

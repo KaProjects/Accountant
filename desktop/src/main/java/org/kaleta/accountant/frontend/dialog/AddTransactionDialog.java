@@ -9,6 +9,7 @@ import org.kaleta.accountant.frontend.action.menu.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
 import org.kaleta.accountant.frontend.common.Validable;
 import org.kaleta.accountant.frontend.component.DatePickerTextField;
+import org.kaleta.accountant.frontend.component.ArrowKeyNavigation;
 import org.kaleta.accountant.frontend.component.ProceduresTree;
 import org.kaleta.accountant.frontend.component.TransactionPanel;
 import org.kaleta.accountant.service.Service;
@@ -169,6 +170,7 @@ public class AddTransactionDialog extends Dialog {
         TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, accountMap, classList, this, true);
         // a procedure may be dropped onto a transaction that is already there, not only beside it
         transactionPanel.setTransferHandler(new ProcedureDropHandler());
+        ArrowKeyNavigation.install(transactionPanel, () -> transactionPanelList);
         transactionPanel.addDeleteAction(e1 -> {
             transactionPanel.disableValidators();
             AddTransactionDialog.this.validateDialog();

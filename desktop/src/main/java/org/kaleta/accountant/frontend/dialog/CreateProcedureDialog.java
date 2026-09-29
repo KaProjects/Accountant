@@ -5,6 +5,7 @@ import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
+import org.kaleta.accountant.frontend.component.ArrowKeyNavigation;
 import org.kaleta.accountant.frontend.component.HintValidatedTextField;
 import org.kaleta.accountant.frontend.component.TransactionPanel;
 import org.kaleta.accountant.frontend.component.procedure.ProcedureRules;
@@ -142,6 +143,7 @@ public class CreateProcedureDialog extends Dialog {
 
     private void addTransactionPanel(){
         TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, accountMap, classList, this, false);
+        ArrowKeyNavigation.install(transactionPanel, () -> transactionPanelList);
         transactionPanel.addDeleteAction(e1 -> {
             transactionPanel.disableValidators();
             CreateProcedureDialog.this.validateDialog();
