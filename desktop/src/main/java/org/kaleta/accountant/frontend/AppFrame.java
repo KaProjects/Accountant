@@ -3,6 +3,7 @@ package org.kaleta.accountant.frontend;
 import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.frontend.action.menu.*;
 import org.kaleta.accountant.frontend.common.MenuItemWrapper;
+import org.kaleta.accountant.frontend.common.WindowPlacement;
 import org.kaleta.accountant.frontend.component.ActiveYearMenu;
 import org.kaleta.accountant.frontend.component.YearMenu;
 import org.kaleta.accountant.frontend.core.YearPane;
@@ -25,11 +26,7 @@ public class AppFrame extends JFrame implements Configuration {
         initComponents();
         applySettings();
         this.pack();
-        this.setSize(1800,1000);
-
-        int centerPosX = (Toolkit.getDefaultToolkit().getScreenSize().width - this.getSize().width) / 2;
-        int centerPosY = (Toolkit.getDefaultToolkit().getScreenSize().height - this.getSize().height) / 2;
-        this.setLocation(centerPosX, centerPosY);
+        WindowPlacement.apply(this, new Dimension(1800, 1000));
     }
 
     private void initMenuBar() {
@@ -41,25 +38,27 @@ public class AppFrame extends JFrame implements Configuration {
         fileMenu.add(new MenuItemWrapper(new InvalidateModels(this)));
         fileMenu.add(new MenuItemWrapper(new OpenYearClosingDialog(this)));
         fileMenu.add(new JSeparator(SwingConstants.HORIZONTAL));
-        fileMenu.add(new MenuItemWrapper(new PerformExit(this), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)));
+        // no accelerator: Escape belongs to whatever dialog is open, and quitting the whole app on
+        // a stray Escape in the main window is never what was meant
+        fileMenu.add(new MenuItemWrapper(new PerformExit(this)));
 
 
         JMenu addMenu = new ActiveYearMenu("Add");
         addMenu.setMnemonic(KeyEvent.VK_A);
-        addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK)));
-        addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK)));
-        addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK)));
-        addMenu.add(new MenuItemWrapper(new OpenAddFinAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK)));
-        addMenu.add(new MenuItemWrapper(new OpenAddMonthlyTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddResourcesDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddFinAssetDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)));
+        addMenu.add(new MenuItemWrapper(new OpenAddMonthlyTransactionDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK)));
 
         JMenu createMenu = new ActiveYearMenu("Create");
         createMenu.setMnemonic(KeyEvent.VK_C);
-        createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK)));
+        createMenu.add(new MenuItemWrapper(new OpenCreateProcedureDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)));
 
         JMenu importMenu = new ActiveYearMenu("Import");
         importMenu.setMnemonic(KeyEvent.VK_I);
-        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsFromAndroidDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK)));
-        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsFromPdfDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK)));
+        importMenu.add(new MenuItemWrapper(new OpenImportTransactionsFromAndroidDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK)));
+        importMenu.add(new MenuItemWrapper(new OpenImportStatementDialog(this), KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
 
         menuBar.add(fileMenu);
         menuBar.add(addMenu);

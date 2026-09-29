@@ -1,13 +1,17 @@
 package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.backend.model.ConfigModel;
 import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.action.menu.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
 import org.kaleta.accountant.frontend.common.Validable;
 import org.kaleta.accountant.frontend.component.DatePickerTextField;
+import org.kaleta.accountant.frontend.component.ArrowKeyNavigation;
+import org.kaleta.accountant.frontend.component.ProceduresTree;
 import org.kaleta.accountant.frontend.component.TransactionPanel;
 import org.kaleta.accountant.service.Service;
 
@@ -16,6 +20,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
@@ -41,14 +48,7 @@ public class AddTransactionDialog extends Dialog {
         if (procedure == null) {
             addTransactionPanel();
         } else {
-            for (ProceduresModel.Group.Procedure.Transaction preparedTr : procedure.getTransaction()){
-                addTransactionPanel();
-                TransactionPanel panel = transactionPanelList.get(transactionPanelList.size() - 1);
-                panel.setDescription(preparedTr.getDescription());
-                panel.setAmount(preparedTr.getAmount());
-                panel.setDebit(preparedTr.getDebit());
-                panel.setCredit(preparedTr.getCredit());
-            }
+            book(procedure);
             validateDialog();
         }
         pack();
@@ -58,19 +58,26 @@ public class AddTransactionDialog extends Dialog {
     private void buildDialogContent() {
         panelTransactions = new JPanel();
         panelTransactions.setLayout(new BoxLayout(panelTransactions, BoxLayout.Y_AXIS));
+        // a procedure dragged from the helper lands anywhere on the list of transactions
+        panelTransactions.setTransferHandler(new ProcedureDropHandler());
         JScrollPane trPane = new JScrollPane(panelTransactions);
+        trPane.setTransferHandler(new ProcedureDropHandler());
 
         JButton buttonAddTr = new JButton("Add Transaction");
         buttonAddTr.addActionListener(e -> addTransactionPanel());
 
-        JButton buttonAddProcedure = new JButton("Add Procedure");
+        JButton buttonAddProcedure = new JButton("Use Procedure");
         buttonAddProcedure.addActionListener(e -> addProcedurePanel());
 
         JButton buttonAddResource = new JButton("Add Resource");
         buttonAddResource.addActionListener(e -> addResourcePanel());
 
-        JButton buttonShowAccounts = new JButton("Show Accounts");
-        buttonShowAccounts.addActionListener(e -> showAccounts());
+        // an asset is bought in the middle of booking other things, and the assets tab is a tab away
+        JButton buttonAddAsset = new JButton("Add Asset");
+        buttonAddAsset.addActionListener(e -> new OpenAddAssetDialog(getConfiguration()).actionPerformed(e));
+
+        JButton buttonShowAccounts = new JButton("DnD Palette");
+        buttonShowAccounts.addActionListener(e -> new TransactionHelperDialog(getConfiguration()).setVisible(true));
 
         JButton buttonSetDate = new JButton("Set Date");
         JButton buttonConfirmSetDate = new JButton("Confirm");
@@ -140,13 +147,9 @@ public class AddTransactionDialog extends Dialog {
             jPanel.add(buttonAddTr);
             jPanel.add(buttonAddProcedure);
             jPanel.add(buttonAddResource);
+            jPanel.add(buttonAddAsset);
             jPanel.add(buttonShowAccounts);
         });
-    }
-
-    private void showAccounts() {
-        SelectAccountDialog selectExpenseAccountDialog = new SelectAccountDialog(getConfiguration(), accountMap, classList, false, false);
-        selectExpenseAccountDialog.setVisible(true);
     }
 
     public List<TransactionPanel> getTransactionPanelList() {
@@ -159,6 +162,9 @@ public class AddTransactionDialog extends Dialog {
 
     public void addTransactionPanel(Consumer<TransactionPanel> transactionPanelConsumer){
         TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, accountMap, classList, this, true);
+        // a procedure may be dropped onto a transaction that is already there, not only beside it
+        transactionPanel.setTransferHandler(new ProcedureDropHandler());
+        ArrowKeyNavigation.install(transactionPanel, () -> transactionPanelList);
         transactionPanel.addDeleteAction(e1 -> {
             transactionPanel.disableValidators();
             AddTransactionDialog.this.validateDialog();
@@ -183,6 +189,59 @@ public class AddTransactionDialog extends Dialog {
         transactionPanelList.add(transactionPanel);
         panelTransactions.repaint();
         panelTransactions.revalidate();
+    }
+
+    /**
+     * Adds a row that came from an imported statement. Such a row offers to teach the import what
+     * its description means: the account it was booked against, kept as a mapping for next time.
+     */
+    public void addImportedTransactionPanel(Consumer<TransactionPanel> fill) {
+        addImportedTransactionPanel(fill, true);
+    }
+
+    /**
+     * @param counterSideIsDebit which side the statement left open: the debit for money spent, the
+     *                           credit for money received. That is the side a mapping fills in, and
+     *                           the side the row can teach the import about
+     */
+    public void addImportedTransactionPanel(Consumer<TransactionPanel> fill, boolean counterSideIsDebit) {
+        addTransactionPanel(panel -> {
+            fill.accept(panel);
+            panel.importedFromStatement(e -> mapDescriptionOf(panel, counterSideIsDebit),
+                    () -> mappingWouldSaySomethingNew(panel, counterSideIsDebit));
+        });
+    }
+
+    /** Nothing to teach while no account is chosen, or while the import already says the same. */
+    private boolean mappingWouldSaySomethingNew(TransactionPanel panel, boolean counterSideIsDebit) {
+        String account = counterSideIsDebit ? panel.getDebit() : panel.getCredit();
+        if (account == null || account.isEmpty()) {
+            return false;
+        }
+        ConfigModel.Mapping.Entry mapping = Service.CONFIG.getMatchingMapping(panel.getDescription(), counterSideIsDebit);
+        return mapping == null || !mapping.getAccount().equals(account);
+    }
+
+    private void mapDescriptionOf(TransactionPanel panel, boolean counterSideIsDebit) {
+        String description = panel.getDescription();
+        String account = counterSideIsDebit ? panel.getDebit() : panel.getCredit();
+        ConfigModel.Mapping.Entry mapping = Service.CONFIG.getMatchingMapping(description, counterSideIsDebit);
+
+        MappingDialog dialog = new MappingDialog(getConfiguration(), description,
+                mapping == null ? description : mapping.getSubstring(),
+                Service.ACCOUNT.getAccountAndGroupName(getConfiguration().getSelectedYear(), account),
+                mapping != null);
+        dialog.setVisible(true);
+        if (!dialog.getResult()) {
+            return;
+        }
+
+        if (mapping == null) {
+            Service.CONFIG.addMapping(dialog.getSubstring(), account, counterSideIsDebit);
+        } else {
+            Service.CONFIG.updateMapping(mapping.getSubstring(), dialog.getSubstring(), account, counterSideIsDebit);
+        }
+        panel.mappingSaved();
     }
 
     private void addProcedurePanel() {
@@ -223,12 +282,90 @@ public class AddTransactionDialog extends Dialog {
         dialog.setVisible(true);
         if (dialog.getResult()) {
             ProceduresModel.Group group = procedureGroupList.get(pane.getSelectedIndex());
-            ProceduresModel.Group.Procedure procedure = group.getProcedure().get(uiLists.get(pane.getSelectedIndex()).getSelectedIndex());
-            for (ProceduresModel.Group.Procedure.Transaction transaction : procedure.getTransaction()) {
-                addTransactionPanel(transactionPanel -> {
-                    transactionPanel.setAmount(transaction.getAmount());
-                    transactionPanel.setDebitCreditDescription(transaction.getDebit(), transaction.getCredit(), transaction.getDescription());
-                });
+            book(group.getProcedure().get(uiLists.get(pane.getSelectedIndex()).getSelectedIndex()));
+        }
+    }
+
+    /** Adds one transaction panel per transaction the procedure books, filled in from it. */
+    private void book(ProceduresModel.Group.Procedure procedure) {
+        for (int i = 0; i < procedure.getTransaction().size(); i++) {
+            ProceduresModel.Group.Procedure.Transaction transaction = procedure.getTransaction().get(i);
+            addProcedureTransactionPanel(procedure, i, panel -> {
+                panel.setAmount(transaction.getAmount());
+                panel.setDebitCreditDescription(transaction.getDebit(), transaction.getCredit(), transaction.getDescription());
+            });
+        }
+    }
+
+    /**
+     * Adds a row that one transaction of a procedure books, however it was arrived at - chosen from
+     * the procedures, dragged in from the palette, or recognised in an imported statement. The row
+     * keeps the link either way, so a correction made on it can be sent back to the procedure.
+     *
+     * @param index which transaction of the procedure this row is, since a correction goes back to
+     *              that one and leaves the rest of the procedure alone
+     */
+    public void addProcedureTransactionPanel(ProceduresModel.Group.Procedure procedure, int index,
+                                             Consumer<TransactionPanel> fill) {
+        addTransactionPanel(panel -> {
+            fill.accept(panel);
+            panel.bookedFromProcedure(procedure.getId(), index, procedure.getTransaction().get(index),
+                    e -> updateProcedureFrom(panel));
+        });
+    }
+
+    /**
+     * Sends what this row now says back to the procedure it was booked from. The correction is made
+     * where it was noticed - the amount usually paid has changed, or the account it comes from has -
+     * instead of being repeated in the procedure editor afterwards.
+     */
+    private void updateProcedureFrom(TransactionPanel panel) {
+        ProceduresModel.Group.Procedure.Transaction transaction = new ProceduresModel.Group.Procedure.Transaction();
+        transaction.setDescription(panel.getDescription());
+        transaction.setAmount(panel.getAmount());
+        transaction.setDebit(panel.getDebit());
+        transaction.setCredit(panel.getCredit());
+
+        Service.PROCEDURES.updateProcedureTransaction(getConfiguration().getSelectedYear(),
+                panel.getProcedureId(), panel.getProcedureTransactionIndex(), transaction);
+        panel.procedureUpdated();
+        getConfiguration().update(Configuration.PROCEDURE_UPDATED);
+    }
+
+    /**
+     * Accepts a procedure dragged from the helper dialog. Only a procedure: an account dragged onto
+     * the list rather than onto one of its fields means nothing, and is refused rather than guessed.
+     */
+    private class ProcedureDropHandler extends TransferHandler {
+        @Override
+        public boolean canImport(TransferSupport support) {
+            return support.isDataFlavorSupported(DataFlavor.stringFlavor) && procedureId(support) != null;
+        }
+
+        @Override
+        public boolean importData(TransferSupport support) {
+            String id = procedureId(support);
+            if (id == null) {
+                return false;
+            }
+            for (ProceduresModel.Group group : Service.PROCEDURES.getProcedureGroupList(getConfiguration().getSelectedYear())) {
+                for (ProceduresModel.Group.Procedure procedure : group.getProcedure()) {
+                    if (procedure.getId().equals(id)) {
+                        book(procedure);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private String procedureId(TransferSupport support) {
+            try {
+                String data = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
+                return data.startsWith(ProceduresTree.PROCEDURE_PREFIX)
+                        ? data.substring(ProceduresTree.PROCEDURE_PREFIX.length()) : null;
+            } catch (UnsupportedFlavorException | IOException e) {
+                return null;
             }
         }
     }

@@ -32,11 +32,13 @@ public class ProfitOverview extends AccountingOverview {
                 getSubGroupPanelInstance("6", "3", Arrays.asList("1","2","3"), AccountingRowPanel.REVENUE, valuesType)));
 
 
-        AccountAggregate operatingBalanceAgg = AccountAggregate.create("Prevadzkovy Zisk").increasing("60", "631","632","633").decreasing("550","551","552", "50", "51", "52", "53");
+        // depreciation (50) is deliberately not part of the operating profit: it is not money spent
+        // running the year, it is last year's assets being written down, so it belongs below the
+        // operating line together with the other non-operating items
+        AccountAggregate operatingBalanceAgg = AccountAggregate.create("Prevadzkovy Zisk").increasing("60", "631","632","633").decreasing("550","551","552", "51", "52", "53");
 
         AccountingRowPanel obHeader = new AccountingRowPanel(getConfiguration(), operatingBalanceAgg, AccountingRowPanel.SUM, valuesType);
         this.add(getSumPanelInstance(obHeader, false,
-                getGroupPanelInstance("5", "0", AccountingRowPanel.EXPENSE, valuesType, true),
                 getGroupPanelInstance("5", "1", AccountingRowPanel.EXPENSE, valuesType, true),
                 getGroupPanelInstance("5", "2", AccountingRowPanel.EXPENSE, valuesType, true),
                 getGroupPanelInstance("5", "3", AccountingRowPanel.EXPENSE, valuesType, true)));
@@ -46,12 +48,15 @@ public class ProfitOverview extends AccountingOverview {
 
         AccountingRowPanel nbHeader = new AccountingRowPanel(getConfiguration(), netBalanceAgg, AccountingRowPanel.SUM, valuesType);
         this.add(getSumPanelInstance(nbHeader, false,
+                getGroupPanelInstance("5", "0", AccountingRowPanel.EXPENSE, valuesType, true),
                 getGroupPanelInstance("6", "1", AccountingRowPanel.REVENUE, valuesType, true),
                 getGroupPanelInstance("5", "6", AccountingRowPanel.EXPENSE, valuesType, true),
                 getGroupPanelInstance("6", "2", AccountingRowPanel.REVENUE, valuesType, true),
                 getGroupPanelInstance("5", "4", AccountingRowPanel.EXPENSE, valuesType, true),
                 getSubGroupPanelInstance("6", "3", Arrays.asList("0"), AccountingRowPanel.REVENUE, valuesType),
                 getSubGroupPanelInstance("5", "5", Arrays.asList("3","4","5"), AccountingRowPanel.EXPENSE, valuesType)));
+
+        alignNameColumn();
 
         this.repaint();
         this.revalidate();

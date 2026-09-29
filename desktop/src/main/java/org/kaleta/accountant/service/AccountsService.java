@@ -51,6 +51,21 @@ public class AccountsService {
     }
 
     /**
+     * Returns true if an account with this full id exists in the year.
+     */
+    public boolean checkAccountExists(String year, String fullId){
+        try {
+            for (AccountsModel.Account account : getModel(year).getAccount()) {
+                if (account.getFullId().equals(fullId)) return true;
+            }
+            return false;
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
      * Returns model of semantic account specified by full id.
      */
     public AccountsModel.Account getAccount(String year, String fullId){
@@ -277,6 +292,80 @@ public class AccountsService {
     }
 
     /**
+     * Renames the account with this full id. The id keeps its meaning, only the label changes.
+     */
+    public void renameAccount(String year, String fullId, String newName){
+        try {
+            Manager<AccountsModel> manager = new AccountsManager(year);
+            AccountsModel model = manager.retrieve();
+
+            AccountsModel.Account account = null;
+            for (AccountsModel.Account candidate : model.getAccount()) {
+                if (candidate.getFullId().equals(fullId)) account = candidate;
+            }
+            if (account == null) {
+                throw new IllegalArgumentException("Account with id='" + fullId + "' not found!");
+            }
+            account.setName(newName);
+
+            manager.update(model);
+            Initializer.LOG.info("Account id=" + fullId + " renamed to '" + newName + "'");
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Renames the account and, with it, every account that is named after it: the consumption
+     * account of a resource, the accumulated depreciation and depreciation accounts of an asset,
+     * the creation and revaluation accounts of a financial asset. Each of those is created as a
+     * fixed prefix plus its owner's name and has no identity of its own, so renaming the owner
+     * alone would leave the same thing carrying several different names.
+     */
+    public void renameAccountWithRelated(String year, AccountsModel.Account account, String newName){
+        renameAccount(year, account.getFullId(), newName);
+
+        String schemaId = account.getSchemaId();
+        String semanticId = account.getSemanticId();
+
+        if (schemaId.startsWith("1")){
+            renameIfExists(year, getConsumptionAccountId(schemaId, semanticId), consumptionName(year, account, newName));
+        }
+        // 09x are the accumulated depreciation accounts themselves, and have nothing named after them
+        if (schemaId.startsWith("0") && !schemaId.startsWith("0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID)){
+            renameIfExists(year, getAccumulatedDepAccountId(schemaId, semanticId),
+                    Constants.Schema.ACCUMULATED_DEP_ACCOUNT_PREFIX + newName);
+            renameIfExists(year, getDepreciationAccountId(schemaId, semanticId),
+                    Constants.Schema.DEPRECIATION_ACCOUNT_PREFIX + newName);
+        }
+        if (schemaId.startsWith("23")){
+            renameIfExists(year, getFinCreationAccountId(schemaId, semanticId),
+                    Constants.Schema.FIN_CREATION_ACCOUNT_PREFIX + newName);
+            renameIfExists(year, getFinRevRevaluationAccountId(schemaId, semanticId),
+                    Constants.Schema.FIN_REV_REVALUATION_ACCOUNT_PREFIX + newName);
+            renameIfExists(year, getFinExpRevaluationAccountId(schemaId, semanticId),
+                    Constants.Schema.FIN_EXP_REVALUATION_ACCOUNT_PREFIX + newName);
+        }
+    }
+
+    /** The general account of a group is mirrored by the name of its schema account, not by its own. */
+    private String consumptionName(String year, AccountsModel.Account account, String newName){
+        return newName.equals(Constants.Account.GENERAL_ACCOUNT_NAME)
+                ? Constants.Account.GENERAL_ACCOUNT_NAME + " " + Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX
+                        + Service.SCHEMA.getAccountName(year, "1", account.getGroupId(), account.getSchemaAccountId())
+                : Constants.Schema.CONSUMPTION_ACCOUNT_PREFIX + newName;
+    }
+
+    /** A related account that was never created - an asset bought without depreciation, say - is simply skipped. */
+    private void renameIfExists(String year, String fullId, String newName){
+        if (checkAccountExists(year, fullId)){
+            renameAccount(year, fullId, newName);
+        }
+    }
+
+    /**
      * Creates semantic account according to specified attributes.
      */
     public AccountsModel.Account createAccount(String year, String name, String schemaId, String semanticId, String metadata){
@@ -340,20 +429,48 @@ public class AccountsService {
 
     /**
      * Generates next semantic ID.
+     * <p>
+     * The highest id is taken across <b>every</b> year, not only the selected one. An account
+     * deleted from the current year must keep its id reserved: looking at the selected year
+     * alone would hand that id out again, and the same id would then mean two different things
+     * in different years.
      */
     public String getNextSemanticId(String year, String schemaId){
         try {
-            Integer maxValue = -1;
-            for (AccountsModel.Account account : getModel(year).getAccount()) {
-                if (account.getSchemaId().startsWith(schemaId)) {
-                    Integer accSemId = Integer.parseInt(account.getSemanticId());
-                    maxValue =  (accSemId > maxValue) ? accSemId : maxValue;
+            int maxValue = -1;
+            for (String dataYear : Service.CONFIG.getYears()) {
+                // the selected year goes through the cache; the others are read directly so
+                // that this loop does not evict it
+                AccountsModel model = dataYear.equals(year)
+                        ? getModel(dataYear)
+                        : new AccountsManager(dataYear).retrieve();
+                for (AccountsModel.Account account : model.getAccount()) {
+                    if (!account.getSchemaId().equals(schemaId)) {
+                        continue;
+                    }
+                    Integer reserved = reservedNumber(account.getSemanticId());
+                    if (reserved != null && reserved > maxValue) {
+                        maxValue = reserved;
+                    }
                 }
             }
-            return String.valueOf(++maxValue);
+            return String.valueOf(maxValue + 1);
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * The number a semantic id reserves: "7" reserves 7, and so does a retired "7-2020".
+     * Returns null for anything that reserves no number.
+     */
+    static Integer reservedNumber(String semanticId) {
+        String head = (semanticId == null ? "" : semanticId).split("-")[0];
+        try {
+            return Integer.valueOf(head);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }

@@ -3,6 +3,7 @@ package org.kaleta.accountant.service;
 import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.manager.*;
 import org.kaleta.accountant.backend.model.ConfigModel;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 
 import java.io.File;
@@ -75,15 +76,21 @@ public class ConfigService {
             new ConfigManager().create();
             System.out.println("# File '%DATA_DIR%/config.xml' created!");
         }
+        File rootSchemaFile = new File(Initializer.getDataSource() + "schema.xml");
+        if (!rootSchemaFile.exists()) {
+            new SchemaManager().create();
+            System.out.println("# File '%DATA_DIR%/schema.xml' created!");
+        }
+        File rootProceduresFile = new File(Initializer.getDataSource() + "procedures.xml");
+        if (!rootProceduresFile.exists()) {
+            new ProceduresManager().create();
+            System.out.println("# File '%DATA_DIR%/procedures.xml' created!");
+        }
         for (ConfigModel.Years.Year yearModel : getModel().getYears().getYearList()){
             String year = yearModel.getName();
             File yearDir = new File(Initializer.getDataSource() + year);
             if (!yearDir.exists()) {
                 throw new ServiceFailureException("Directory '%DATA_DIR%/" + year +"' is missing!");
-            }
-            File schemaFile = new File(Initializer.getDataSource() + year + File.separator + "schema.xml");
-            if (!schemaFile.exists()) {
-                throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "schema.xml' is missing!");
             }
             File trFile = new File(Initializer.getDataSource() + year + File.separator + "transactions.xml");
             if (!trFile.exists()) {
@@ -93,16 +100,16 @@ public class ConfigService {
             if (!accFile.exists()) {
                 throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "accounts.xml' is missing!");
             }
-            File prFile = new File(Initializer.getDataSource() + year + File.separator + "procedures.xml");
-            if (!prFile.exists()) {
-                throw new ServiceFailureException("File '%DATA_DIR%/" + year + File.separator + "procedures.xml' is missing!");
-            }
         }
         System.out.println("# Data checked. Everything OK.");
     }
 
     /**
      * Registers year in configuration and creates year's data directory and files.
+     * <p>
+     * The very first year of the books also gets the accumulated earnings account, which the
+     * closing books the profit onto. Every year after that is opened by the closing, which carries
+     * that account over from the year it closed.
      */
     public void initYearData(String newYearName){
         File yearDir = new File(Initializer.getDataSource() + newYearName + File.separator);
@@ -121,13 +128,13 @@ public class ConfigService {
         }
 
         try {
-            new SchemaManager(newYearName).create();
             new TransactionsManager(newYearName).create();
             new AccountsManager(newYearName).create();
-            new ProceduresManager(newYearName).create();
 
             Manager<ConfigModel> manager = new ConfigManager();
             ConfigModel model = manager.retrieve();
+
+            boolean firstYear = model.getYears().getYearList().isEmpty();
 
             ConfigModel.Years.Year configYear = new ConfigModel.Years.Year();
             configYear.setName(newYearName);
@@ -136,6 +143,14 @@ public class ConfigService {
             manager.update(model);
             Initializer.LOG.info("Year '" + newYearName + "' added to config");
             invalidateModel();
+
+            if (firstYear) {
+                Service.ACCOUNT.createAccount(newYearName, Constants.Account.GENERAL_ACCOUNT_NAME,
+                        Constants.Account.ACCUMULATED_EARNINGS_ACC_ID.split("\\.")[0],
+                        Constants.Account.ACCUMULATED_EARNINGS_ACC_ID.split("\\.")[1], "");
+                Initializer.LOG.info("Account '" + Constants.Account.ACCUMULATED_EARNINGS_ACC_ID
+                        + "' created for the first year '" + newYearName + "'");
+            }
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
@@ -200,4 +215,114 @@ public class ConfigService {
             throw new ServiceFailureException(e);
         }
     }
+
+    public List<ConfigModel.Mapping.Credit> getCreditMappings(){
+        try {
+            return getModel().getMapping().getCredit();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * The mapping that decides the account an imported transaction is booked against, or null when
+     * none of them matches its description.
+     * <p>
+     * A mapping matches when its substring appears anywhere in the description, and the last such
+     * mapping wins - the file is read in order, and a later line is the more specific correction of
+     * an earlier one. Money spent is looked up among the debit mappings, money received among the
+     * credit ones, since an income is not booked against an expense account.
+     *
+     * @param debitSide whether the side the statement left open is the debit
+     */
+    public ConfigModel.Mapping.Entry getMatchingMapping(String description, boolean debitSide){
+        ConfigModel.Mapping.Entry matching = null;
+        if (description == null) {
+            return null;
+        }
+        for (ConfigModel.Mapping.Entry mapping : debitSide ? getDebitMappings() : getCreditMappings()){
+            if (description.contains(mapping.getSubstring())){
+                matching = mapping;
+            }
+        }
+        return matching;
+    }
+
+    /**
+     * Records that a description holding this substring is booked against this account, so that the
+     * next import fills it in by itself.
+     */
+    public void addMapping(String substring, String account, boolean debitSide){
+        try {
+            Manager<ConfigModel> manager = new ConfigManager();
+            ConfigModel model = manager.retrieve();
+
+            if (debitSide) {
+                ConfigModel.Mapping.Debit mapping = new ConfigModel.Mapping.Debit();
+                mapping.setSubstring(substring);
+                mapping.setAccount(account);
+                model.getMapping().getDebit().add(mapping);
+            } else {
+                ConfigModel.Mapping.Credit mapping = new ConfigModel.Mapping.Credit();
+                mapping.setSubstring(substring);
+                mapping.setAccount(account);
+                model.getMapping().getCredit().add(mapping);
+            }
+
+            manager.update(model);
+            Initializer.LOG.info((debitSide ? "Debit" : "Credit") + " mapping added: '" + substring + "' -> " + account);
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Changes the mapping known by that substring - what it matches, or what it books against, or
+     * both. This is the correction made when an import filled in an account that is no longer the
+     * right one.
+     */
+    public void updateMapping(String substring, String newSubstring, String account, boolean debitSide){
+        try {
+            Manager<ConfigModel> manager = new ConfigManager();
+            ConfigModel model = manager.retrieve();
+
+            ConfigModel.Mapping.Entry mapping = null;
+            List<? extends ConfigModel.Mapping.Entry> mappings = debitSide
+                    ? model.getMapping().getDebit() : model.getMapping().getCredit();
+            for (ConfigModel.Mapping.Entry candidate : mappings){
+                if (candidate.getSubstring().equals(substring)) mapping = candidate;
+            }
+            if (mapping == null) {
+                throw new IllegalArgumentException((debitSide ? "Debit" : "Credit")
+                        + " mapping for '" + substring + "' not found!");
+            }
+            mapping.setSubstring(newSubstring);
+            mapping.setAccount(account);
+
+            manager.update(model);
+            Initializer.LOG.info((debitSide ? "Debit" : "Credit") + " mapping '" + substring
+                    + "' updated: '" + newSubstring + "' -> " + account);
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * The statements that can be imported, as the user has configured them: what each is called,
+     * which format it is in, and the account it is about.
+     */
+    public List<ConfigModel.Imports.Source> getImportSources(){
+        try {
+            return getModel().getImports().getSource();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
 }

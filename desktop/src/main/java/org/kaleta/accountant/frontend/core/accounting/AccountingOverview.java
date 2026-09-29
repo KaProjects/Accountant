@@ -5,6 +5,7 @@ import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.AccountingRowPanel;
+import org.kaleta.accountant.frontend.component.TableRow;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -43,6 +44,39 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
 
     public abstract void update();
 
+    /**
+     * Gives every row the same name column, wide enough for the longest title in the view.
+     * <p>
+     * The name column is what varies between rows, so it is the one that has to be pinned: with it
+     * fixed, the value cells line up across every row and take all the width the window has to
+     * spare. Call this once the rows have been built.
+     */
+    protected void alignNameColumn(JComponent... tables) {
+        for (JComponent table : tables.length == 0 ? new JComponent[]{this} : tables) {
+            List<TableRow> rows = new ArrayList<>();
+            collectRows(table, rows);
+            int width = 0;
+            for (TableRow row : rows) {
+                width = Math.max(width, row.getTitleWidth());
+            }
+            for (TableRow row : rows) {
+                row.setNameColumnWidth(width);
+            }
+        }
+    }
+
+    private void collectRows(Component component, List<TableRow> rows) {
+        if (component instanceof TableRow) {
+            rows.add((TableRow) component);
+            return;
+        }
+        if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                collectRows(child, rows);
+            }
+        }
+    }
+
     protected JPanel getBodyPanelInstance() {
         JPanel bodyPanel = new JPanel();
         bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
@@ -51,14 +85,14 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
         return bodyPanel;
     }
 
-    protected JPanel getSumPanelInstance(JPanel header, boolean isHeaderOnTop, JPanel... contentPanels) {
+    protected <T extends JPanel & TableRow> JPanel getSumPanelInstance(T header, boolean isHeaderOnTop, JPanel... contentPanels) {
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         for (JPanel panel : contentPanels) {
             body.add(panel);
         }
 
-        header.addMouseListener(new MouseAdapter() {
+        header.addRowMouseListener(new MouseAdapter() {
             private boolean toggle = true;
 
             @Override
@@ -147,7 +181,7 @@ public abstract class AccountingOverview extends JPanel implements Configurable 
 
     private JPanel constructGroupPanel(String groupType, int valuesType, boolean isPositive, JPanel groupBody, AccountAggregate groupAggregate) {
         AccountingRowPanel groupHeader = new AccountingRowPanel(getConfiguration(), groupAggregate, groupType, valuesType, isPositive);
-        groupHeader.addMouseListener(new MouseAdapter() {
+        groupHeader.addRowMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 groupBody.setVisible(!groupBody.isVisible());

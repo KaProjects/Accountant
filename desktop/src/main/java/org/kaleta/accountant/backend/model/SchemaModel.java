@@ -1,6 +1,6 @@
 package org.kaleta.accountant.backend.model;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,13 +14,10 @@ public class SchemaModel {
 
     @XmlElement(name = "class", required = true)
     private List<SchemaModel.Class> clazz;
-    @XmlAttribute(name = "year", required = true)
-    private String year;
 
     public SchemaModel(){}
 
     public SchemaModel(SchemaModel schemaModel){
-        this.setYear(schemaModel.getYear());
         for (SchemaModel.Class clazz : schemaModel.getClazz()){
             this.getClazz().add(new SchemaModel.Class(clazz));
         }
@@ -33,13 +30,7 @@ public class SchemaModel {
         return this.clazz;
     }
 
-    public String getYear() {
-        return year;
-    }
 
-    public void setYear(String value) {
-        this.year = value;
-    }
 
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {

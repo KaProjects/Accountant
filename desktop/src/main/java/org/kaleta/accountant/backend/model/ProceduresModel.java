@@ -8,7 +8,7 @@
 
 package org.kaleta.accountant.backend.model;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,13 +20,10 @@ import java.util.List;
 public class ProceduresModel {
 
     private List<Group> group;
-    @XmlAttribute(name = "year", required = true)
-    private String year;
 
     public ProceduresModel(){}
 
     public ProceduresModel(ProceduresModel proceduresModel){
-        this.setYear(proceduresModel.getYear());
         for (ProceduresModel.Group group : proceduresModel.getGroup()){
             this.getGroup().add(new ProceduresModel.Group(group));
         }
@@ -39,13 +36,7 @@ public class ProceduresModel {
         return this.group;
     }
 
-    public String getYear() {
-        return year;
-    }
 
-    public void setYear(String value) {
-        this.year = value;
-    }
 
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {

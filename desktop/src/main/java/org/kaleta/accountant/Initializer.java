@@ -1,13 +1,5 @@
 package org.kaleta.accountant;
 
-import org.kaleta.accountant.backend.manager.PdfParserManager;
-import org.kaleta.accountant.common.Constants;
-import org.kaleta.accountant.common.ErrorHandler;
-import org.kaleta.accountant.common.LogFormatter;
-import org.kaleta.accountant.frontend.AppFrame;
-import org.kaleta.accountant.service.Service;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
@@ -15,16 +7,25 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+
+import org.kaleta.accountant.common.Constants;
+import org.kaleta.accountant.common.ErrorHandler;
+import org.kaleta.accountant.common.LogFormatter;
+import org.kaleta.accountant.frontend.AppFrame;
+import org.kaleta.accountant.service.Service;
+
 /**
  * Performs initialization of this app. Includes data and resources checks, app. wide constants and default logger.
  */
 public class Initializer {
     public static final String NAME = "Accountant";
-    public static final String VERSION = "1.7";
+    public static final String VERSION = "2.0";
     public static final Logger LOG = Logger.getLogger("Logger");
     public static int CONTEXT;
 
-    public static String DEFAULT_FILES_DIR = "C:/Users/stanley/Downloads";
+    /** Where the file chooser starts when a statement is imported: this machine's own downloads. */
+    public static String DEFAULT_FILES_DIR = System.getProperty("user.home") + File.separator + "Downloads";
 
     public static String getDataSource(){
         String appParentPath = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation().getPath())
@@ -65,10 +66,6 @@ public class Initializer {
                         Service.CONFIG.initYearData(name);
                         Service.CONFIG.setActiveYear(name);
                     }
-                }
-
-                if (System.getProperty("os.name").startsWith("Mac")) {
-                    DEFAULT_FILES_DIR = "/Users/skaleta/Downloads";
                 }
 
                 new AppFrame().setVisible(true);

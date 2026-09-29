@@ -7,4 +7,8 @@ public class OpenCreateProcedureDialog extends org.kaleta.accountant.frontend.ac
     public OpenCreateProcedureDialog(Configurable configurable) {
         super(configurable.getConfiguration());
     }
+
+    public OpenCreateProcedureDialog(Configurable configurable, String groupName) {
+        super(configurable.getConfiguration(), groupName);
+    }
 }

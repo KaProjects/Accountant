@@ -11,6 +11,8 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenDepreciateDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenExcludeDialog;
+import org.kaleta.accountant.frontend.action.listener.RenameAccountAction;
+import org.kaleta.accountant.frontend.component.card.CardStyle;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -41,7 +43,6 @@ public class AssetsEditor extends JPanel implements Configurable {
         JButton buttonAddItem = new JButton("Add");
         buttonAddItem.addActionListener(new OpenAddAssetDialog(this));
 
-        JCheckBox toggleFilter = new JCheckBox("Toggle Filter");
         JComboBox<Object> cbGroups = new JComboBox<>();
         JComboBox<Object> cbAccounts = new JComboBox<>();
         JComboBox<String> cbActive = new JComboBox<>();
@@ -92,36 +93,26 @@ public class AssetsEditor extends JPanel implements Configurable {
             update();
         });
 
-        JPanel panelFilter = new JPanel();
-        panelFilter.setPreferredSize(new Dimension(Short.MAX_VALUE, 0));
-        panelFilter.setMaximumSize(new Dimension(Short.MAX_VALUE, 25));
-        panelFilter.setLayout(new BoxLayout(panelFilter, BoxLayout.X_AXIS));
-        panelFilter.add(cbActive);
-        panelFilter.add(cbGroups);
-        panelFilter.add(cbAccounts);
-        panelFilter.setVisible(false);
-
-        toggleFilter.addActionListener(e -> {
-            panelFilter.setVisible(toggleFilter.isSelected());
-            if (!toggleFilter.isSelected()) {
-                cbGroups.setSelectedIndex(0);
-                cbActive.setSelectedIndex(0);
-            }
-        });
-
         JScrollPane paneItems = new JScrollPane(panelItems);
 
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(layout.createParallelGroup()
                 .addGroup(layout.createSequentialGroup()
-                        .addComponent(buttonAddItem).addGap(5).addComponent(buttonDepreciateAll).addGap(5).addComponent(toggleFilter))
-                .addComponent(panelFilter)
+                        .addComponent(buttonAddItem).addGap(5)
+                        .addComponent(buttonDepreciateAll).addGap(15)
+                        .addComponent(cbActive, 110, 130, 160).addGap(5)
+                        .addComponent(cbGroups, 140, 200, 260).addGap(5)
+                        .addComponent(cbAccounts, 140, 200, 260))
                 .addComponent(paneItems));
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup()
-                        .addComponent(buttonAddItem, 25, 25, 25).addComponent(buttonDepreciateAll, 25, 25, 25).addComponent(toggleFilter, 25, 25, 25))
-                .addGap(2).addComponent(panelFilter, 25, 25, 25).addGap(2)
+                        .addComponent(buttonAddItem, 25, 25, 25)
+                        .addComponent(buttonDepreciateAll, 25, 25, 25)
+                        .addComponent(cbActive, 25, 25, 25)
+                        .addComponent(cbGroups, 25, 25, 25)
+                        .addComponent(cbAccounts, 25, 25, 25))
+                .addGap(4)
                 .addComponent(paneItems));
 
         this.getActionMap().put(Configuration.ACCOUNT_UPDATED, new AbstractAction() {
@@ -210,6 +201,7 @@ public class AssetsEditor extends JPanel implements Configurable {
             JLabel labelAccountName = new JLabel(account.getName());
             labelAccountName.setFont(boldFont);
             labelAccountName.setToolTipText(account.getName());
+            CardStyle.makeRenamable(labelAccountName, new RenameAccountAction(AssetsEditor.this, account));
             JLabel labelGroup = new JLabel("> " + Service.SCHEMA.getGroupName(year, account.getClassId(), account.getGroupId()));
             labelGroup.setToolTipText("Group");
             JLabel labelAccType = new JLabel(">> " + Service.SCHEMA.getAccountName(year, account.getClassId(), account.getGroupId(), account.getSchemaAccountId()));
@@ -225,15 +217,21 @@ public class AssetsEditor extends JPanel implements Configurable {
 
             separator = new JSeparator(SwingConstants.VERTICAL);
 
-            labelDepInfo = new JLabel();
+            labelDepInfo = new JLabel("", SwingConstants.CENTER);
+            labelDepInfo.setFont(labelDepInfo.getFont().deriveFont(Font.PLAIN, labelDepInfo.getFont().getSize2D() - 1f));
+            labelDepInfo.setForeground(Color.DARK_GRAY);
+            labelDepInfo.setAlignmentX(CENTER_ALIGNMENT);
 
             buttonDep = new JButton("Depreciate");
             buttonDep.addActionListener(new OpenDepreciateDialog(AssetsEditor.this, account));
+            buttonDep.setAlignmentX(CENTER_ALIGNMENT);
 
             depPanel = new JPanel();
             depPanel.setLayout(new BoxLayout(depPanel, BoxLayout.Y_AXIS));
             depPanel.add(buttonDep);
-            depPanel.add(new JPanel());
+            // directly under the button: an empty panel used to sit here and pushed the line to the
+            // bottom of the row, where it was cut off
+            depPanel.add(Box.createVerticalStrut(3));
             depPanel.add(labelDepInfo);
 
             JPanel panelSeparator = new JPanel();

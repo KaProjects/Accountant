@@ -1,6 +1,7 @@
 package org.kaleta.accountant.common;
 
 import org.kaleta.accountant.frontend.common.IconLoader;
+import org.kaleta.accountant.frontend.common.WindowPlacement;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,11 +34,6 @@ public class ErrorHandler {
             this.setTitle("Application Failure!");
             this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             this.setModal(true);
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            Dimension dialogSize = this.getSize();
-            int centerPosX = (screenSize.width - dialogSize.width) / 2;
-            int centerPosY = (screenSize.height - dialogSize.height) / 2;
-            this.setLocation(centerPosX, centerPosY);
 
             JLabel errorIcon = new JLabel(IconLoader.getIcon(IconLoader.ERROR_ICON,"error", new Dimension(50, 50)));
 
@@ -97,6 +93,9 @@ public class ErrorHandler {
                     .addComponent(buttonClose)
                     .addGap(10));
             this.pack();
+            // after packing: centring a window of size zero used to put it in a corner, and on the
+            // default display rather than the one the app is on
+            WindowPlacement.centreOnActiveWindow(this);
         }
     }
 }

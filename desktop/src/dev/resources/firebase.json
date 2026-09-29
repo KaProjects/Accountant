@@ -1,0 +1,38 @@
+{
+  "transaction" : [ {
+    "date" : "0309",
+    "description" : "groceries",
+    "amount" : "24.90",
+    "debit" : "501.0",
+    "credit" : "221.0"
+  }, {
+    "date" : "0709",
+    "description" : "coffee",
+    "amount" : "3.40",
+    "debit" : "513.0",
+    "credit" : "211.0"
+  }, {
+    "date" : "1109",
+    "description" : "train ticket",
+    "amount" : "12.00",
+    "debit" : "512.0",
+    "credit" : "221.0"
+  }, {
+    "date" : "1509",
+    "description" : "unmapped expense",
+    "amount" : "55.00",
+    "debit" : "",
+    "credit" : ""
+  } ],
+  "accounts" : {
+    "debit" : {
+      "501a0" : "consumed material - general",
+      "513a0" : "representation - general",
+      "512a0" : "travelling - general"
+    },
+    "credit" : {
+      "221a0" : "bank account - general",
+      "211a0" : "cash - general"
+    }
+  }
+}

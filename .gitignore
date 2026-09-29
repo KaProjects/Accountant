@@ -7,5 +7,6 @@ classes
 *.zip
 firebase-config.js
 google-services.json
-accountant-andr-servicekey.json
 .DS_Store
+DEVEL-DATA*
+desktop/tools/migrations/
