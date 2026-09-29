@@ -10,7 +10,7 @@ import java.awt.*;
  * The little A / L / E / R / X badge on a schema account row, coloured by the side of the books
  * the account belongs to.
  */
-final class AccountTypeChip {
+public final class AccountTypeChip {
 
     private AccountTypeChip() {
         // static members only
@@ -25,6 +25,11 @@ final class AccountTypeChip {
         chip.setOpaque(true);
         chip.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
         return chip;
+    }
+
+    /** The colour of a side of the books, for anything that shows an account type without a chip. */
+    public static Color colourOf(String type) {
+        return typeForeground(type);
     }
 
     private static Color typeForeground(String type) {

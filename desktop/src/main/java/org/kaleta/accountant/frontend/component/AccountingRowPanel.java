@@ -6,6 +6,7 @@ import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.IconLoader;
 import org.kaleta.accountant.frontend.core.accounting.AccountAggregate;
+import org.kaleta.accountant.frontend.component.table.TableStyle;
 import org.kaleta.accountant.frontend.dialog.AccountingChartDialog;
 
 import javax.swing.*;
@@ -40,8 +41,10 @@ public class AccountingRowPanel extends JPanel implements Configurable, TableRow
     private static final int VALUE_COLUMN_WIDTH = 110;
 
     private int rowHeight;
+    private int level;
     private Font cellValueFont;
     private Color backgroundColor;
+    private Color valueColor;
 
     private JPanel panelHeader;
     private JLabel buttonGraph;
@@ -99,57 +102,58 @@ public class AccountingRowPanel extends JPanel implements Configurable, TableRow
         switch (rowType) {
             case SUM:
             case CLASS: {
-                cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 25);
-                backgroundColor = Color.LIGHT_GRAY.darker();
-                rowHeight = 35;
+                level = TableStyle.TOTAL;
+                backgroundColor = TableStyle.background(TableStyle.TOTAL);
+                valueColor = TableStyle.TEXT;
                 break;
             }
             case GROUP: {
-                cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 20);
-                backgroundColor = Color.LIGHT_GRAY;
-                rowHeight = 30;
+                level = TableStyle.CLASS;
+                backgroundColor = TableStyle.background(TableStyle.CLASS);
+                valueColor = TableStyle.TEXT;
                 break;
             }
             case ACCOUNT: {
-                cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 15);
-                backgroundColor = Color.WHITE;
-                rowHeight = 25;
+                level = TableStyle.ACCOUNT;
+                backgroundColor = TableStyle.background(TableStyle.ACCOUNT);
+                valueColor = TableStyle.TEXT;
                 break;
             }
             case REVENUE: {
-                cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 20);
-                backgroundColor = Constants.Color.INCOME_GREEN;
-                rowHeight = 30;
+                level = TableStyle.GROUP;
+                backgroundColor = TableStyle.REVENUE_BG;
+                valueColor = TableStyle.REVENUE_FG;
                 break;
             }
             case EXPENSE: {
-                cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 20);
-                backgroundColor = Constants.Color.EXPENSE_RED;
-                rowHeight = 30;
-                break;
-            }
-            case HEADER: {
-                cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 15);
-                backgroundColor = Color.LIGHT_GRAY;
-                rowHeight = 20;
+                level = TableStyle.GROUP;
+                backgroundColor = TableStyle.EXPENSE_BG;
+                valueColor = TableStyle.EXPENSE_FG;
                 break;
             }
             case CF: {
-                cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 20);
-                backgroundColor = Constants.Color.CASH_FLOW_PURPLE;
-                rowHeight = 30;
+                level = TableStyle.GROUP;
+                backgroundColor = TableStyle.CASH_FLOW_BG;
+                valueColor = TableStyle.CASH_FLOW_FG;
+                break;
+            }
+            case HEADER: {
+                level = TableStyle.HEADING;
+                backgroundColor = TableStyle.background(TableStyle.HEADING);
+                valueColor = TableStyle.MUTED;
                 break;
             }
             default:
                 throw new IllegalArgumentException("illegal rowType");
         }
+        rowHeight = TableStyle.rowHeight(level);
+        cellValueFont = TableStyle.font(level);
     }
 
     private void initComponents() {
         this.setBackground(backgroundColor);
 
-        JLabel labelName = new JLabel(" " + title);
-        labelName.setFont(cellValueFont);
+        JLabel labelName = TableStyle.name(title, level);
 
         buttonGraph = new JLabel(IconLoader.getIcon(IconLoader.CHART, new Dimension(20, 20)));
         buttonGraph.setOpaque(true);
@@ -178,7 +182,8 @@ public class AccountingRowPanel extends JPanel implements Configurable, TableRow
 
         panelHeader = new JPanel();
         panelHeader.setLayout(new BoxLayout(panelHeader, BoxLayout.X_AXIS));
-        panelHeader.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        panelHeader.setBorder(BorderFactory.createCompoundBorder(TableStyle.cellBorder(),
+                BorderFactory.createEmptyBorder(0, 8, 0, 0)));
         panelHeader.setOpaque(false);
         panelHeader.add(labelName);
         // the column is only as wide as the longest title, so without this the icon would touch it
@@ -196,37 +201,16 @@ public class AccountingRowPanel extends JPanel implements Configurable, TableRow
         panelValues.setOpaque(false);
 
         if (initialValue != null) {
-            JLabel labelInitBalance = rowType.equals(HEADER)
-                    ? new JLabel(initialValue, SwingConstants.CENTER)
-                    : new JLabel(initialValue + " ", SwingConstants.RIGHT);
-            if (!rowType.equals(HEADER)) labelInitBalance.setToolTipText(initialValue);
-            labelInitBalance.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
-            labelInitBalance.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            labelInitBalance.setFont(cellValueFont);
-            panelValues.add(labelInitBalance);
+            panelValues.add(cell(initialValue));
         }
 
         if (monthlyBalance != null) {
             for (int m = 0; m < 12; m++) {
-                JLabel labelMonthlyBalance = rowType.equals(HEADER)
-                        ? new JLabel(monthlyBalance[m], SwingConstants.CENTER)
-                        : new JLabel(monthlyBalance[m] + " ", SwingConstants.RIGHT);
-                if (!rowType.equals(HEADER)) labelMonthlyBalance.setToolTipText(monthlyBalance[m]);
-                labelMonthlyBalance.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
-                labelMonthlyBalance.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-                labelMonthlyBalance.setFont(new Font(cellValueFont.getName(), Font.PLAIN, cellValueFont.getSize()));
-                panelValues.add(labelMonthlyBalance);
+                panelValues.add(cell(monthlyBalance[m]));
             }
         }
 
-        JLabel labelFinalBalance = rowType.equals(HEADER)
-                ? new JLabel(balance, SwingConstants.CENTER)
-                : new JLabel(balance + " ", SwingConstants.RIGHT);
-        if (!rowType.equals(HEADER)) labelFinalBalance.setToolTipText(balance);
-        labelFinalBalance.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
-        labelFinalBalance.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        labelFinalBalance.setFont(cellValueFont);
-        panelValues.add(labelFinalBalance);
+        panelValues.add(cell(balance));
 
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
@@ -236,6 +220,17 @@ public class AccountingRowPanel extends JPanel implements Configurable, TableRow
         layout.setVerticalGroup(layout.createParallelGroup()
                 .addComponent(panelHeader, rowHeight, rowHeight, rowHeight)
                 .addComponent(panelValues, rowHeight, rowHeight, rowHeight));
+    }
+
+    /** One value under its heading: the headings read as headings, the numbers as numbers. */
+    private JLabel cell(String text) {
+        JLabel cell = rowType.equals(HEADER) ? TableStyle.heading(text) : TableStyle.value(text, level);
+        if (!rowType.equals(HEADER)) {
+            cell.setToolTipText(text);
+            cell.setForeground(valueColor);
+        }
+        cell.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
+        return cell;
     }
 
     public String getType() {

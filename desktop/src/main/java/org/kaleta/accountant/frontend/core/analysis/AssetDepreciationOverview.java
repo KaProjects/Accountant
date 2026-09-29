@@ -4,6 +4,7 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.component.table.TableStyle;
 import org.kaleta.accountant.frontend.component.TableRow;
 import org.kaleta.accountant.frontend.core.accounting.AccountingOverview;
 import org.kaleta.accountant.service.Service;
@@ -116,46 +117,19 @@ public class AssetDepreciationOverview extends AccountingOverview {
         private int rowHeight;
 
         public Row(String title, int type, String value, String dep, String actual, String ratio) {
-            Color backgroundColor;
-            Font cellValueFont;
-            switch (type) {
-                case -1: {
-                    rowHeight = 25;
-                    backgroundColor = Color.lightGray.darker();
-                    cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, rowHeight - 5);
-                    break;
-                }
-                case 0: {
-                    rowHeight = 30;
-                    backgroundColor = Color.lightGray.darker();
-                    cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, rowHeight - 5);
-                    break;
-                }
-                case 1: {
-                    rowHeight = 25;
-                    backgroundColor = Color.lightGray;
-                    cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, rowHeight - 5);
-                    break;
-                }
-                case 2: {
-                    rowHeight = 20;
-                    backgroundColor = Color.white;
-                    cellValueFont = new Font(new JLabel().getFont().getName(), Font.BOLD, rowHeight - 5);
-                    break;
-                }
-                default:
-                    throw new IllegalArgumentException("illegal type");
-            }
-            this.setBackground(backgroundColor);
-
-            JLabel labelName = new JLabel(" " + title);
-            labelName.setFont(cellValueFont);
+            // -1 is the heading, 0 the total of everything, 1 a group of assets, 2 one asset
+            int level = type == -1 ? TableStyle.HEADING
+                    : type == 0 ? TableStyle.TOTAL
+                    : type == 1 ? TableStyle.CLASS : TableStyle.ACCOUNT;
+            rowHeight = TableStyle.rowHeight(level);
+            this.setBackground(TableStyle.background(level));
 
             panelHeader = new JPanel();
             panelHeader.setLayout(new BoxLayout(panelHeader, BoxLayout.X_AXIS));
-            panelHeader.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            panelHeader.setBorder(BorderFactory.createCompoundBorder(TableStyle.cellBorder(),
+                    BorderFactory.createEmptyBorder(0, 8, 0, 0)));
             panelHeader.setOpaque(false);
-            panelHeader.add(labelName);
+            panelHeader.add(TableStyle.name(title, level));
             panelHeader.add(Box.createHorizontalStrut(10));
             // what this row alone would need; the overview widens every row to the longest of them
             titleWidth = panelHeader.getPreferredSize().width;
@@ -165,39 +139,15 @@ public class AssetDepreciationOverview extends AccountingOverview {
             JPanel panelValues = new JPanel();
             panelValues.setLayout(new GridLayout(1, 0));
             panelValues.setOpaque(false);
-
-            JLabel labelValue = (type == -1) ? new JLabel(value, SwingConstants.CENTER)
-                    : new JLabel(value + " ", SwingConstants.RIGHT);
-            if (type != -1) labelValue.setToolTipText(value);
-            labelValue.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
-            labelValue.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            labelValue.setFont(cellValueFont);
-            panelValues.add(labelValue);
-
-            JLabel labelDep = (type == -1) ? new JLabel(dep, SwingConstants.CENTER)
-                    : new JLabel(dep + " ", SwingConstants.RIGHT);
-            if (type != -1) labelDep.setToolTipText(dep);
-            labelDep.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
-            labelDep.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            labelDep.setFont(cellValueFont);
-            panelValues.add(labelDep);
-
-            JLabel labelActual = (type == -1) ? new JLabel(actual, SwingConstants.CENTER)
-                    : new JLabel(actual + " ", SwingConstants.RIGHT);
-            if (type != -1) labelActual.setToolTipText(actual);
-            labelActual.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
-            labelActual.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            labelActual.setFont(cellValueFont);
-            panelValues.add(labelActual);
-
-            JLabel labelRatio = (type == -1) ? new JLabel(ratio, SwingConstants.CENTER)
-                    : new JLabel(ratio + " ", SwingConstants.RIGHT);
-            if (type != -1) labelRatio.setToolTipText(ratio);
-            labelRatio.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
-            labelRatio.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            labelRatio.setFont(cellValueFont);
-            panelValues.add(labelRatio);
-
+            for (String cellValue : new String[]{value, dep, actual, ratio}) {
+                JLabel cell = level == TableStyle.HEADING
+                        ? TableStyle.heading(cellValue) : TableStyle.value(cellValue, level);
+                if (level != TableStyle.HEADING) {
+                    cell.setToolTipText(cellValue);
+                }
+                cell.setPreferredSize(new Dimension(VALUE_COLUMN_WIDTH, rowHeight));
+                panelValues.add(cell);
+            }
 
             GroupLayout layout = new GroupLayout(this);
             this.setLayout(layout);
