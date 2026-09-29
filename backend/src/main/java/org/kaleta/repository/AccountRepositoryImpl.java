@@ -29,7 +29,6 @@ public class AccountRepositoryImpl implements AccountRepository
                     .setParameter(4, account.getName())
                     .setParameter(5, account.getMetadata())
                     .executeUpdate();
-
         }
     }
 
@@ -42,23 +41,20 @@ public class AccountRepositoryImpl implements AccountRepository
     }
 
     @Override
-    public List<Account> list(String year, String schemaIdPrefix)
+    public List<Account> list(String year, String schemaPrefix)
     {
-        return entityManager.createQuery(selectYearly + " AND a.accountId.schemaId LIKE :schemaId", Account.class)
+        return entityManager.createQuery(selectYearly + " AND a.accountId.schemaId LIKE :schema", Account.class)
                 .setParameter("year", year)
-                .setParameter("schemaId", schemaIdPrefix + "%")
+                .setParameter("schema", schemaPrefix + "%")
                 .getResultList();
     }
 
     @Override
-    public Account get(String year, String schemaId, String semanticId)
+    public List<Account> listByMetadata(String year, String metadata)
     {
-        return entityManager.createQuery(selectYearly +
-                        " AND a.accountId.schemaId=:schemaId" +
-                        " AND a.accountId.semanticId=:semanticId", Account.class)
+        return entityManager.createQuery(selectYearly + " AND a.metadata LIKE :metadata", Account.class)
                 .setParameter("year", year)
-                .setParameter("schemaId", schemaId)
-                .setParameter("semanticId", semanticId)
-                .getSingleResult();
+                .setParameter("metadata", "%" + metadata + "%")
+                .getResultList();
     }
 }

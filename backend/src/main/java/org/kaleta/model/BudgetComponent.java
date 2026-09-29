@@ -12,6 +12,12 @@ public class BudgetComponent
     private final List<Row> rows = new ArrayList<>();
     private String name;
 
+    public Row createRow() {
+        Row row = new Row();
+        rows.add(row);
+        return row;
+    }
+
     public Integer[] getActualMonths()
     {
         if (rows.size() == 0){
@@ -41,8 +47,15 @@ public class BudgetComponent
     {
         private final List<Row> subRows = new ArrayList<>();
         private String name;
+        private String id;
         private Integer[] monthsPlanned = new Integer[]{};
         private Integer[] monthsActual = new Integer[]{};
+
+        public Row createSubRow() {
+            Row row = new Row();
+            subRows.add(row);
+            return row;
+        }
 
         public Integer[] getActualMonths()
         {

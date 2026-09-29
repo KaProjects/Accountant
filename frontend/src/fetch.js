@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {properties} from "./properties";
+import {wait} from "@testing-library/user-event/dist/utils";
 
 export const useData = (path) => {
 
@@ -10,15 +11,26 @@ export const useData = (path) => {
 
     useEffect(() => {
         const dataFetch = async () => {
-            axios.get(properties.protocol + "://" + properties.host + ":" + properties.port + path).then(
-                (response) => {
-                    setData(response.data);
+            const url = properties.protocol + "://" + properties.host + ":" + properties.port + path;
+            const headers = { headers: {Authorization: 'Bearer ' + sessionStorage.getItem('token')}};
+            await axios.get(url, headers)
+                .then((response) => {
+                    setData(response.data)
                     setError(null)
-                    setLoaded(true);
+                    setLoaded(true)
                 }).catch((error) => {
-                console.error(error)
-                setError(error)
-            })
+                    console.error(error)
+                    if (error.response.status === 401){
+                        error.message = "Token expired! Redirecting..."
+                        wait(1000).then(() => {
+                            sessionStorage.removeItem('token')
+                            // eslint-disable-next-line no-restricted-globals
+                            location.reload()
+                        })
+                    }
+                    setError(error)
+                    setLoaded(false)
+                })
         };
 
         dataFetch();

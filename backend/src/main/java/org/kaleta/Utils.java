@@ -67,17 +67,17 @@ public class Utils
     /**
      * add two integer arrays of the same length.
      */
-    public static Integer[] addIntegerArrays(Integer[] base, Integer[] subtraction)
+    public static Integer[] addIntegerArrays(Integer[] base, Integer[] addition)
     {
         // check same length
-        if (!(base.length == subtraction.length)){
-            throw new IllegalArgumentException("arrays not same length: a0=" + base.length + " != an="+subtraction.length);
+        if (!(base.length == addition.length)){
+            throw new IllegalArgumentException("arrays not same length: a0=" + base.length + " != an="+addition.length);
         }
 
         Integer[] result = new Integer[base.length];
 
         for (int i=0;i<base.length;i++) {
-            result[i] = base[i] + subtraction[i];
+            result[i] = base[i] + addition[i];
         }
         return result;
     }
@@ -93,6 +93,7 @@ public class Utils
         }
         return cumulativeArray;
     }
+
     public static <T> T[] concatArrays(T[] array1, T[] array2)
     {
         List<T> resultList = new ArrayList<>(array1.length + array2.length);
@@ -103,5 +104,38 @@ public class Utils
         //the type cast is safe as the array1 has the type T[]
         T[] resultArray = (T[]) Array.newInstance(array1.getClass().getComponentType(), 0);
         return resultList.toArray(resultArray);
+    }
+
+    public static Integer sumArray(Integer[] array){
+        Integer sum = 0;
+        for (int i=0; i<array.length; i++){
+            sum += array[i];
+        }
+        return sum;
+    }
+
+    public static int compareDates(String dateA, String dateB) {
+        Integer monthA = Integer.parseInt(dateA.substring(2));
+        Integer monthB = Integer.parseInt(dateB.substring(2));
+        if (!monthA.equals(monthB)) {
+            return monthA - monthB;
+        } else {
+            return Integer.parseInt(dateA.substring(0, 2)) - Integer.parseInt(dateB.substring(0, 2));
+        }
+    }
+
+    public static Integer[] initialMonthlyBalance()
+    {
+        return new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    }
+
+    public static Integer[] invertValues(Integer[] monthlyValues)
+    {
+        Integer[] result = new Integer[monthlyValues.length];
+
+        for (int i=0;i<monthlyValues.length;i++) {
+            result[i] = -monthlyValues[i];
+        }
+        return result;
     }
 }

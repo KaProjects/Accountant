@@ -2,8 +2,28 @@
 
      rest/web same versioning
      check src/properties.js
-     bump package.json version
-     bump build deploy sh versions 
+     bump package.json version +(npm i --package-lock-only)
+     bump build_deploy.sh versions 
+
+## 2.1
+Released: 6.1.2024
+
+    yearly balance sheet
+    overall views for income statemnt, cashflow statement and balance sheet
+    accounting data overview
+    accounting chart
+    view for grouping related transactions/accounts
+
+## 2.0
+Released: 17.12.2023
+
+    expense pie chart to vacations view
+    show transactions dialog for profit, cashflow and budgeting
+    planning vs actual chart for budgeting
+    income & cash flow statement views
+    config for financial assets for 2024
+    improved dockerization
+    fixed dependencies & eslint warnings
 
 ## 1.3
 Released: 24.1.2023

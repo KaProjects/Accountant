@@ -7,7 +7,12 @@ import java.util.List;
 public interface BudgetingRepository
 {
     /**
-     * @return budget schema with ID for specified year
+     * @return budget schema for specified ID and year
      */
-    List<Budgeting> getSchemaByIdPrefix(String year, String idPrefix);
+    Budgeting getSchemaById(String year, String id);
+
+    /**
+     * @return budget schema for specified year
+     */
+    List<Budgeting> getSchema(String year);
 }

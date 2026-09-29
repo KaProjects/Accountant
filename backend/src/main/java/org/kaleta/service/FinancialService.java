@@ -1,18 +1,11 @@
 package org.kaleta.service;
 
-import org.kaleta.entity.Account;
-import org.kaleta.entity.json.FinAssetsConfig;
-import org.kaleta.model.FinancialAsset;
+import org.kaleta.model.FinancialAssetsData;
 
 public interface FinancialService
 {
     /**
-     * @return financial asset for specified financial asset account
+     * @return data for financial assets for specified year
      */
-    FinancialAsset getFinancialAsset(Account account);
-
-    /**
-     * @return financial asset for specified financial asset config
-     */
-    FinancialAsset getFinancialAsset(FinAssetsConfig.Group.Account account);
+    FinancialAssetsData getFinancialAssetsData(String year);
 }
