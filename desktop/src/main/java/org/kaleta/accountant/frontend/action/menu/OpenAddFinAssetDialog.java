@@ -31,28 +31,38 @@ public class OpenAddFinAssetDialog extends MenuAction {
 
     @Override
     protected void actionPerformed() {
+        createFinancialAsset(null);
+    }
+
+    /**
+     * Runs the whole flow and says whether an asset was created, so that a list of accounts which
+     * opened this dialog can show what came out of it. Where it was opened from one of the 23x
+     * schema accounts, that one is the type it starts on.
+     *
+     * @param schemaAccountId the 23x schema account to start on, or null to let the user pick
+     */
+    public boolean createFinancialAsset(String schemaAccountId) {
         String year = getConfiguration().getSelectedYear();
 
         List<SchemaModel.Class.Group.Account> schemaAccounts = new ArrayList<>(
                 Service.SCHEMA.getSchemaAccountMap(Service.SCHEMA.getGroup(year, "2", "3")).values());
 
         AddFinAssetDialog dialog = new AddFinAssetDialog(getConfiguration(), schemaAccounts,
-                paymentAccounts(year), paymentClasses(year));
+                paymentAccounts(year), paymentClasses(year), schemaAccountId);
         dialog.setVisible(true);
         if (!dialog.getResult()) {
-            return;
+            return false;
         }
 
         String name = dialog.getAccName();
-        String schemaAccountId = dialog.getSchemaAccountId();
-        String schemaId = "23" + schemaAccountId;
+        String schemaId = Constants.Schema.FIN_ASSET_SCHEMA_PREFIX + dialog.getSchemaAccountId();
         String semanticId = Service.ACCOUNT.getNextSemanticId(year, schemaId);
 
         Service.ACCOUNT.createAccount(year, name, schemaId, semanticId, "");
         Service.TRANSACTIONS.addTransaction(year, "0101", "0", schemaId + "." + semanticId,
                 Constants.Account.INIT_ACC_ID, Constants.Transaction.OPEN_DESCRIPTION);
 
-        String extendedSemanticId = schemaAccountId + "-" + semanticId;
+        String extendedSemanticId = dialog.getSchemaAccountId() + "-" + semanticId;
 
         Service.ACCOUNT.createAccount(year, Constants.Schema.FIN_CREATION_ACCOUNT_PREFIX + name,
                 Constants.Schema.FIN_CREATION_FULL_ID, extendedSemanticId, "");
@@ -66,6 +76,7 @@ public class OpenAddFinAssetDialog extends MenuAction {
         getConfiguration().update(Configuration.ACCOUNT_UPDATED);
         getConfiguration().update(Configuration.TRANSACTION_UPDATED);
         getConfiguration().update(Configuration.PROCEDURE_UPDATED);
+        return true;
     }
 
     /**

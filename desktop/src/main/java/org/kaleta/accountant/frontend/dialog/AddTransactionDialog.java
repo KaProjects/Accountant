@@ -5,9 +5,11 @@ import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.action.menu.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
 import org.kaleta.accountant.frontend.common.Validable;
 import org.kaleta.accountant.frontend.component.DatePickerTextField;
+import org.kaleta.accountant.frontend.component.ProceduresTree;
 import org.kaleta.accountant.frontend.component.TransactionPanel;
 import org.kaleta.accountant.service.Service;
 
@@ -16,6 +18,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
@@ -58,19 +63,26 @@ public class AddTransactionDialog extends Dialog {
     private void buildDialogContent() {
         panelTransactions = new JPanel();
         panelTransactions.setLayout(new BoxLayout(panelTransactions, BoxLayout.Y_AXIS));
+        // a procedure dragged from the helper lands anywhere on the list of transactions
+        panelTransactions.setTransferHandler(new ProcedureDropHandler());
         JScrollPane trPane = new JScrollPane(panelTransactions);
+        trPane.setTransferHandler(new ProcedureDropHandler());
 
         JButton buttonAddTr = new JButton("Add Transaction");
         buttonAddTr.addActionListener(e -> addTransactionPanel());
 
-        JButton buttonAddProcedure = new JButton("Add Procedure");
+        JButton buttonAddProcedure = new JButton("Use Procedure");
         buttonAddProcedure.addActionListener(e -> addProcedurePanel());
 
         JButton buttonAddResource = new JButton("Add Resource");
         buttonAddResource.addActionListener(e -> addResourcePanel());
 
-        JButton buttonShowAccounts = new JButton("Show Accounts");
-        buttonShowAccounts.addActionListener(e -> showAccounts());
+        // an asset is bought in the middle of booking other things, and the assets tab is a tab away
+        JButton buttonAddAsset = new JButton("Add Asset");
+        buttonAddAsset.addActionListener(e -> new OpenAddAssetDialog(getConfiguration()).actionPerformed(e));
+
+        JButton buttonShowAccounts = new JButton("DnD Palette");
+        buttonShowAccounts.addActionListener(e -> new TransactionHelperDialog(getConfiguration()).setVisible(true));
 
         JButton buttonSetDate = new JButton("Set Date");
         JButton buttonConfirmSetDate = new JButton("Confirm");
@@ -140,13 +152,9 @@ public class AddTransactionDialog extends Dialog {
             jPanel.add(buttonAddTr);
             jPanel.add(buttonAddProcedure);
             jPanel.add(buttonAddResource);
+            jPanel.add(buttonAddAsset);
             jPanel.add(buttonShowAccounts);
         });
-    }
-
-    private void showAccounts() {
-        SelectAccountDialog selectExpenseAccountDialog = new SelectAccountDialog(getConfiguration(), accountMap, classList, false, false);
-        selectExpenseAccountDialog.setVisible(true);
     }
 
     public List<TransactionPanel> getTransactionPanelList() {
@@ -159,6 +167,8 @@ public class AddTransactionDialog extends Dialog {
 
     public void addTransactionPanel(Consumer<TransactionPanel> transactionPanelConsumer){
         TransactionPanel transactionPanel = new TransactionPanel(getConfiguration(), accountPairDescriptionMap, accountMap, classList, this, true);
+        // a procedure may be dropped onto a transaction that is already there, not only beside it
+        transactionPanel.setTransferHandler(new ProcedureDropHandler());
         transactionPanel.addDeleteAction(e1 -> {
             transactionPanel.disableValidators();
             AddTransactionDialog.this.validateDialog();
@@ -223,12 +233,54 @@ public class AddTransactionDialog extends Dialog {
         dialog.setVisible(true);
         if (dialog.getResult()) {
             ProceduresModel.Group group = procedureGroupList.get(pane.getSelectedIndex());
-            ProceduresModel.Group.Procedure procedure = group.getProcedure().get(uiLists.get(pane.getSelectedIndex()).getSelectedIndex());
-            for (ProceduresModel.Group.Procedure.Transaction transaction : procedure.getTransaction()) {
-                addTransactionPanel(transactionPanel -> {
-                    transactionPanel.setAmount(transaction.getAmount());
-                    transactionPanel.setDebitCreditDescription(transaction.getDebit(), transaction.getCredit(), transaction.getDescription());
-                });
+            book(group.getProcedure().get(uiLists.get(pane.getSelectedIndex()).getSelectedIndex()));
+        }
+    }
+
+    /** Adds one transaction panel per transaction the procedure books, filled in from it. */
+    private void book(ProceduresModel.Group.Procedure procedure) {
+        for (ProceduresModel.Group.Procedure.Transaction transaction : procedure.getTransaction()) {
+            addTransactionPanel(transactionPanel -> {
+                transactionPanel.setAmount(transaction.getAmount());
+                transactionPanel.setDebitCreditDescription(transaction.getDebit(), transaction.getCredit(), transaction.getDescription());
+            });
+        }
+    }
+
+    /**
+     * Accepts a procedure dragged from the helper dialog. Only a procedure: an account dragged onto
+     * the list rather than onto one of its fields means nothing, and is refused rather than guessed.
+     */
+    private class ProcedureDropHandler extends TransferHandler {
+        @Override
+        public boolean canImport(TransferSupport support) {
+            return support.isDataFlavorSupported(DataFlavor.stringFlavor) && procedureId(support) != null;
+        }
+
+        @Override
+        public boolean importData(TransferSupport support) {
+            String id = procedureId(support);
+            if (id == null) {
+                return false;
+            }
+            for (ProceduresModel.Group group : Service.PROCEDURES.getProcedureGroupList(getConfiguration().getSelectedYear())) {
+                for (ProceduresModel.Group.Procedure procedure : group.getProcedure()) {
+                    if (procedure.getId().equals(id)) {
+                        book(procedure);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private String procedureId(TransferSupport support) {
+            try {
+                String data = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
+                return data.startsWith(ProceduresTree.PROCEDURE_PREFIX)
+                        ? data.substring(ProceduresTree.PROCEDURE_PREFIX.length()) : null;
+            } catch (UnsupportedFlavorException | IOException e) {
+                return null;
             }
         }
     }

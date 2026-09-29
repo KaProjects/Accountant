@@ -4,6 +4,8 @@ import org.kaleta.accountant.backend.model.AccountsModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.frontend.Configurable;
+import org.kaleta.accountant.frontend.action.menu.OpenAddFinAssetDialog;
+import org.kaleta.accountant.frontend.component.accounts.AccountsEditorRules;
 import org.kaleta.accountant.frontend.dialog.AddAccountWithProcedureDialog;
 import org.kaleta.accountant.service.Service;
 
@@ -18,14 +20,17 @@ import java.util.Map;
  * The first account of a schema account is almost always the general one, so that name is offered
  * as the default; every later one starts empty.
  * <p>
- * Two kinds of account are asked for more than a name, because the app writes a procedure for them
- * as they are created: a credit account, which is repaid from a current account, and a current
- * account, which is withdrawn from into cash.
+ * Some accounts are more than a name and open a dialog of their own: a credit account, which comes
+ * with the procedure that repays it, a current account, with the procedure that withdraws cash from
+ * it, and a long-term financial asset, with the three accounts it is booked through and the
+ * procedure that pays into it. A resource needs nothing extra - naming it is enough, and its
+ * consumption mirror is written along with it.
  */
 public class CreateAnalyticalAccountAction extends ActionListener {
     private final Configurable configurable;
     private final String schemaId;
     private final boolean suggestGeneral;
+    private Runnable afterCreate = () -> { };
 
     public CreateAnalyticalAccountAction(Configurable configurable, String schemaId, boolean suggestGeneral) {
         super(configurable);
@@ -34,8 +39,29 @@ public class CreateAnalyticalAccountAction extends ActionListener {
         this.suggestGeneral = suggestGeneral;
     }
 
+    /**
+     * What to do once an account has actually been created. A list that shows accounts cannot wait
+     * for this: the work runs off the event thread and behind a dialog of its own, so it is told
+     * when it is done rather than guessing from the window coming back to the front.
+     */
+    public CreateAnalyticalAccountAction onCreated(Runnable action) {
+        this.afterCreate = action;
+        return this;
+    }
+
     @Override
     protected void actionPerformed() {
+        if (!AccountsEditorRules.canCreateAccount(schemaId)) {
+            return; // the app fills these itself
+        }
+        if (schemaId.startsWith(Constants.Schema.FIN_ASSET_SCHEMA_PREFIX)) {
+            // a financial asset is opened with the accounts it is booked through and its procedure,
+            // so the schema account clicked here only says which type the dialog starts on
+            if (new OpenAddFinAssetDialog(getConfiguration()).createFinancialAsset(schemaId.substring(2))) {
+                afterCreate.run();
+            }
+            return;
+        }
         if (schemaId.startsWith(Constants.Schema.CREDIT_ACCOUNT_SCHEMA_PREFIX)) {
             createWithProcedure("Creating Credit Account", "Repayment procedure", "Repaid from:",
                     "Usual Instalment:", Constants.Schema.CURRENT_ACCOUNT_SCHEMA_ID);
@@ -46,13 +72,19 @@ public class CreateAnalyticalAccountAction extends ActionListener {
                     "Usual Amount:", Constants.Schema.CASH_ACCOUNT_SCHEMA_ID);
             return;
         }
-        String name = NamePrompt.ask((Component) getConfiguration(), "New Account under " + schemaId,
+        // over the list the account is being opened from, not over the app behind it
+        String name = NamePrompt.ask(parentComponent(), "New Account under " + schemaId,
                 "Name of the new account:", suggestGeneral ? Constants.Account.GENERAL_ACCOUNT_NAME : null);
         if (name != null) {
             // the creation itself - opening transaction, consumption mirror - lives with the older
             // action, which the account picker also uses
             new AccountsEditorAccountAction(configurable, schemaId, null).subactionPerformed(name);
+            afterCreate.run();
         }
+    }
+
+    private Component parentComponent() {
+        return configurable instanceof Component ? (Component) configurable : (Component) getConfiguration();
     }
 
     private void createWithProcedure(String title, String heading, String accountLabel, String amountLabel, String otherSchemaId) {
@@ -63,6 +95,7 @@ public class CreateAnalyticalAccountAction extends ActionListener {
         if (dialog.getResult()) {
             new AccountsEditorAccountAction(configurable, schemaId, null)
                     .subactionPerformed(dialog.getAccName(), dialog.getOtherAccount(), dialog.getAmount());
+            afterCreate.run();
         }
     }
 

@@ -41,7 +41,11 @@ public class CreateProcedureDialog extends Dialog {
         buildDialogContent();
 
         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) cbGroup.getModel();
-        procedureGroupNameList.forEach(model::addElement);
+        // a derived group is the app's to fill: nothing is composed into it by hand, so it is not
+        // offered here - except as the group of a derived procedure being edited, which stays put
+        procedureGroupNameList.stream()
+                .filter(group -> !ProcedureRules.isAppMaintained(group) || group.equals(procedureGroupName))
+                .forEach(model::addElement);
 
         // filled in for both cases: when creating from inside a group's card it is that group, and
         // when editing it is the procedure's own group - which may be changed, moving the procedure

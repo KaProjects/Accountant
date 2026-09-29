@@ -82,6 +82,25 @@ public final class WindowPlacement {
                 screen.y + (screen.height - window.getHeight()) / 2);
     }
 
+    /**
+     * Puts a window immediately to the left of another, tops aligned, so that the two are read and
+     * dragged between side by side. Where there is no room left of it - the other window is against
+     * the edge of its screen - the window goes to its right instead, and if neither side fits, it is
+     * pushed onto the screen rather than off it. Call it after the window has been sized.
+     */
+    public static void placeLeftOf(Window window, Window other) {
+        Rectangle screen = usableBounds(other.getGraphicsConfiguration() == null
+                ? screenUnderPointer() : other.getGraphicsConfiguration());
+        int gap = 8;
+        int x = other.getX() - window.getWidth() - gap;
+        if (x < screen.x) {
+            int toTheRight = other.getX() + other.getWidth() + gap;
+            x = toTheRight + window.getWidth() <= screen.x + screen.width ? toTheRight : screen.x;
+        }
+        int y = Math.min(Math.max(other.getY(), screen.y), screen.y + screen.height - window.getHeight());
+        window.setLocation(x, y);
+    }
+
     private static Rectangle centredOnThePointersScreen(Dimension preferredSize) {
         Rectangle screen = usableBounds(screenUnderPointer());
         int width = Math.min(preferredSize.width, screen.width);

@@ -128,6 +128,9 @@ public class ProceduresService {
 
     private void create(String name, String groupName, List<ProceduresModel.Group.Procedure.Transaction> transactions, boolean managed){
         try {
+            if (!managed) {
+                refuseAppMaintained(groupName);
+            }
             Manager<ProceduresModel> manager = new ProceduresManager();
             ProceduresModel model = manager.retrieve();
 
@@ -174,6 +177,7 @@ public class ProceduresService {
             procedure.getTransaction().addAll(newTransactions);
 
             if (!sourceGroup.getName().equals(groupName)) {
+                refuseAppMaintained(groupName); // a procedure is never moved into what the app writes
                 sourceGroup.getProcedure().remove(procedure);
                 groupByName(model, groupName).getProcedure().add(procedure);
                 if (sourceGroup.getProcedure().isEmpty()) {

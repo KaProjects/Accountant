@@ -74,6 +74,8 @@ public class Constants {
 
         /** 22x: the credit accounts - loans, overdrafts, credit cards - which are repaid. */
         public static final String CREDIT_ACCOUNT_SCHEMA_PREFIX = "22";
+        /** 23x: the long-term financial assets. */
+        public static final String FIN_ASSET_SCHEMA_PREFIX = "23";
         /** 210: the current accounts, which are repaid from and withdrawn from. */
         public static final String CURRENT_ACCOUNT_SCHEMA_ID = "210";
         /** 200: the cash accounts, which a withdrawal puts the money into. */

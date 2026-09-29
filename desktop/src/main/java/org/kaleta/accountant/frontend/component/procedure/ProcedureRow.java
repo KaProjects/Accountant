@@ -29,9 +29,7 @@ class ProcedureRow extends CardRow {
 
     private static ProcedureRow row(ProceduresModel.Group.Procedure procedure) {
         ProcedureRow row = new ProcedureRow();
-
-        row.add(CardStyle.id(procedure.getId(), CardStyle.ID_FG));
-        row.add(Box.createHorizontalStrut(8));
+        row.add(Box.createHorizontalStrut(4));
 
         JLabel name = new JLabel(procedure.getName());
         name.setFont(CardStyle.nameFont());
@@ -48,9 +46,7 @@ class ProcedureRow extends CardRow {
     /** Row that adds another procedure to this group. */
     static ProcedureRow newProcedure(Configurable owner, String groupName) {
         ProcedureRow row = new ProcedureRow();
-
-        row.add(CardStyle.id(" ", CardStyle.SLOT_FG));
-        row.add(Box.createHorizontalStrut(8));
+        row.add(Box.createHorizontalStrut(4));
 
         JLabel hint = new JLabel("new procedure");
         hint.setFont(CardStyle.hintFont());

@@ -117,6 +117,31 @@ public class ProcedureGroupTest extends TestParent {
         }
     }
 
+    /** A derived group is the app's to fill: nothing is composed into it, by the dialog or by hand. */
+    @Test(expected = IllegalArgumentException.class)
+    public void aProcedureCannotBeCreatedInADerivedGroup() {
+        Service.PROCEDURES.createProcedure(YEAR, "by hand", MANAGED, transaction("549.0-0", "210.0"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void aProcedureCannotBeMovedIntoADerivedGroup() {
+        Service.PROCEDURES.createProcedure(YEAR, "rent", "household", transaction("520.0", "210.0"));
+        String id = group("household").getProcedure().get(0).getId();
+
+        Service.PROCEDURES.updateProcedure(YEAR, id, "rent", MANAGED, transaction("520.0", "210.0"));
+    }
+
+    /** Editing one in place is what the group is opened for, and stays allowed. */
+    @Test
+    public void aDerivedProcedureCanBeEditedWhereItIs() {
+        Service.PROCEDURES.createManagedProcedure(YEAR, "creation of fund", MANAGED, transaction("549.0-0", "210.0"));
+        String id = group(MANAGED).getProcedure().get(0).getId();
+
+        Service.PROCEDURES.updateProcedure(YEAR, id, "creation of fund", MANAGED, transaction("549.0-0", "211.7"));
+
+        Assert.assertEquals("211.7", group(MANAGED).getProcedure().get(0).getTransaction().get(0).getCredit());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void theManagedGroupCannotBeDeleted() {
         Service.PROCEDURES.createManagedProcedure(YEAR, "creation of fund", MANAGED, transaction("549.0-0", "210.0"));

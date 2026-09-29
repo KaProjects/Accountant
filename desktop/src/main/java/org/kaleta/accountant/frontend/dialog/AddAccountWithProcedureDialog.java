@@ -16,9 +16,10 @@ import java.util.Map;
  * that pays it down, a bank account and the withdrawal that takes cash out of it.
  * <p>
  * Both procedures are one transaction whose other side never varies, so the only things asked for
- * beyond the name are that other account and the amount usually moved. The picker is narrowed to
- * the accounts that make sense there - a loan is repaid from a current account, cash is withdrawn
- * into a cash account - rather than showing everything and leaving the choice open.
+ * beyond the name are that other account and the amount usually moved. Neither is required: the
+ * procedure is written regardless, with the account it follows already in place, and what is left
+ * out is filled in later by editing it. The picker is narrowed to the accounts that make sense
+ * there - a loan is repaid from a current account, cash is withdrawn into a cash account.
  */
 public class AddAccountWithProcedureDialog extends Dialog {
     private final String procedureHeading;
@@ -29,7 +30,7 @@ public class AddAccountWithProcedureDialog extends Dialog {
 
     private JTextField textFieldName;
     private SelectAccountTextField textFieldAccount;
-    private JTextField textFieldAmount;
+    private HintValidatedTextField textFieldAmount;
 
     public AddAccountWithProcedureDialog(Configuration configuration, String title, String procedureHeading,
                                          String accountLabel, String amountLabel,
@@ -53,11 +54,14 @@ public class AddAccountWithProcedureDialog extends Dialog {
         JLabel labelProcedure = new JLabel(procedureHeading);
         labelProcedure.setFont(labelProcedure.getFont().deriveFont(Font.BOLD));
 
+        // the procedure is written either way: what is not known now is filled in by editing it
         JLabel labelAccount = new JLabel(accountLabel);
         textFieldAccount = new SelectAccountTextField(getConfiguration(), accountMap, classList, accountLabel, this);
+        textFieldAccount.setValidatorEnabled(false);
 
         JLabel labelAmount = new JLabel(amountLabel);
-        textFieldAmount = new HintValidatedTextField("", amountLabel, "set " + amountLabel.toLowerCase(), true, this);
+        textFieldAmount = new HintValidatedTextField("", amountLabel, "optional", true, this);
+        textFieldAmount.setValidatorEnabled(false);
 
         setContent(layout -> {
             layout.setHorizontalGroup(layout.createParallelGroup()

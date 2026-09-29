@@ -15,9 +15,9 @@ import java.util.Map;
  * Creates a long-term financial asset.
  * <p>
  * Besides the asset itself the dialog collects what its creation procedure needs: the account the
- * money comes from, and the amount usually put in. The procedure is written as the asset is
- * created, so that paying into it afterwards is a matter of running it rather than composing the
- * same transaction by hand every time.
+ * money comes from, and the amount usually put in. Neither is required - the procedure is written
+ * either way, and what is left out is filled in later by editing it - but with them the procedure
+ * is ready to run instead of being composed by hand every time.
  */
 public class AddFinAssetDialog extends Dialog {
     private final List<SchemaModel.Class.Group.Account> schemaAccounts;
@@ -26,17 +26,37 @@ public class AddFinAssetDialog extends Dialog {
 
     private JTextField textFieldName;
     private JComboBox<SchemaModel.Class.Group.Account> comboBoxAcc;
-    private JTextField textFieldAmount;
+    private HintValidatedTextField textFieldAmount;
     private SelectAccountTextField textFieldCreditAcc;
 
     public AddFinAssetDialog(Configuration configuration, List<SchemaModel.Class.Group.Account> schemaAccounts,
                              Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> creditClasses) {
+        this(configuration, schemaAccounts, creditAccountMap, creditClasses, null);
+    }
+
+    /**
+     * @param preselectedAccountId the 23x schema account the dialog starts on, when it was opened
+     *                             from that very schema account rather than from the menu
+     */
+    public AddFinAssetDialog(Configuration configuration, List<SchemaModel.Class.Group.Account> schemaAccounts,
+                             Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> creditClasses,
+                             String preselectedAccountId) {
         super(configuration, "Creating Long-Term Financial Asset", "Create");
         this.schemaAccounts = schemaAccounts;
         this.creditAccountMap = creditAccountMap;
         this.creditClasses = creditClasses;
         buildDialogContent();
+        preselect(preselectedAccountId);
         pack();
+    }
+
+    private void preselect(String accountId) {
+        for (int i = 0; i < schemaAccounts.size(); i++) {
+            if (schemaAccounts.get(i).getId().equals(accountId)) {
+                comboBoxAcc.setSelectedIndex(i);
+                return;
+            }
+        }
     }
 
     private void buildDialogContent() {
@@ -52,11 +72,14 @@ public class AddFinAssetDialog extends Dialog {
         JLabel labelProcedure = new JLabel("Creation procedure");
         labelProcedure.setFont(labelProcedure.getFont().deriveFont(java.awt.Font.BOLD));
 
+        // the procedure is written either way: what is not known now is filled in by editing it
         JLabel labelCreditAcc = new JLabel("Paid from:");
         textFieldCreditAcc = new SelectAccountTextField(getConfiguration(), creditAccountMap, creditClasses, "Paid from", this);
+        textFieldCreditAcc.setValidatorEnabled(false);
 
         JLabel labelAmount = new JLabel("Usual Amount:");
-        textFieldAmount = new HintValidatedTextField("", "Usual Amount", "set usual amount", true, this);
+        textFieldAmount = new HintValidatedTextField("", "Usual Amount", "optional", true, this);
+        textFieldAmount.setValidatorEnabled(false);
 
         setContent(layout -> {
             layout.setHorizontalGroup(layout.createParallelGroup()

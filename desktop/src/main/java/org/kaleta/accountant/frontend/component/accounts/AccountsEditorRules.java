@@ -10,6 +10,12 @@ import org.kaleta.accountant.common.Constants;
  * balance machinery, and the financial asset accounts that buying or revaluing an asset writes
  * into. The editors leave those alone, and the create action refuses them, so the rule lives here
  * rather than in either of them.
+ * <p>
+ * Assets are left out as well: an asset is not an account one opens but a purchase with a
+ * depreciation plan, and it is created from the tab that owns it. Everything else may be added to
+ * from a list of accounts - what differs is only which dialog opens. A resource takes a name and
+ * the app writes its consumption mirror; a long-term financial asset takes the dialog that also
+ * opens its creation and revaluation accounts.
  */
 public final class AccountsEditorRules {
 
@@ -32,7 +38,8 @@ public final class AccountsEditorRules {
         if (isAppMaintained(schemaId)) {
             return false;
         }
-        // assets and off balance are opened by their own flows, the rest mirror another class
+        // an asset is created from the assets tab, which books its purchase and its depreciation;
+        // 7 is written by the year's opening and closing
         return !schemaId.startsWith("0")
                 && !schemaId.startsWith("7")
                 && !schemaId.startsWith("5" + Constants.Schema.DEPRECIATION_GROUP_ID)
