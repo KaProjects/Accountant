@@ -3,6 +3,7 @@ package org.kaleta.accountant.frontend.component;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.core.TestParent;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.service.Service;
@@ -31,7 +32,33 @@ public class BookedFromProcedureTest extends TestParent {
                 Service.SCHEMA.getSchemaClassList(YEAR), null, true);
         panel.setAmount("100");
         panel.setDebitCreditDescription("300.0", "300.1", "rent");
-        panel.bookedFromProcedure("7", 0, e -> { });
+        panel.bookedFromProcedure("7", 0, asProcedureHasIt("100", "300.0", "300.1", "rent"), e -> { });
+    }
+
+    /**
+     * An imported movement is booked with the amount that was really paid, which is not the amount
+     * the procedure carries - and that difference is the whole point of offering to update it.
+     */
+    @Test
+    public void aRowThatAlreadyDiffersFromItsProcedureIsWorthSendingBack() {
+        TransactionPanel imported = new TransactionPanel(configuration(), new HashMap<>(), new HashMap<>(),
+                Service.SCHEMA.getSchemaClassList(YEAR), null, true);
+        imported.setAmount("2750");
+        imported.setDebitCreditDescription("300.0", "300.1", "rent");
+
+        imported.bookedFromProcedure("7", 0, asProcedureHasIt("100", "300.0", "300.1", "rent"), e -> { });
+
+        Assert.assertTrue("the procedure still says the old amount", buttonOf(imported).isEnabled());
+    }
+
+    private static ProceduresModel.Group.Procedure.Transaction asProcedureHasIt(String amount, String debit,
+                                                                               String credit, String description) {
+        ProceduresModel.Group.Procedure.Transaction transaction = new ProceduresModel.Group.Procedure.Transaction();
+        transaction.setAmount(amount);
+        transaction.setDebit(debit);
+        transaction.setCredit(credit);
+        transaction.setDescription(description);
+        return transaction;
     }
 
     @Test

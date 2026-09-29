@@ -143,6 +143,41 @@ public class ProcedureGroupTest extends TestParent {
         Assert.assertEquals("211.7", group(MANAGED).getProcedure().get(0).getTransaction().get(0).getCredit());
     }
 
+    /**
+     * An imported movement says which accounts it moved between; a procedure booking the same pair
+     * is what that movement is, written down already.
+     */
+    @Test
+    public void aProcedureIsFoundByThePairOfAccountsItBooks() {
+        Service.PROCEDURES.createProcedure(YEAR, "rent", "household", transaction("520.0", "210.0"));
+
+        ProceduresModel.Group.Procedure found = Service.PROCEDURES.getProcedureFor(YEAR, "520.0", "210.0");
+
+        Assert.assertNotNull(found);
+        Assert.assertEquals("rent", found.getName());
+    }
+
+    @Test
+    public void aPairNothingBooksIsRecognisedAsNothing() {
+        Service.PROCEDURES.createProcedure(YEAR, "rent", "household", transaction("520.0", "210.0"));
+
+        Assert.assertNull("the other way round is not the same booking",
+                Service.PROCEDURES.getProcedureFor(YEAR, "210.0", "520.0"));
+        Assert.assertNull(Service.PROCEDURES.getProcedureFor(YEAR, "520.9", "210.0"));
+        Assert.assertNull("a side that was never guessed recognises nothing",
+                Service.PROCEDURES.getProcedureFor(YEAR, null, "210.0"));
+    }
+
+    /** Any of a procedure's transactions identifies it, not only the first. */
+    @Test
+    public void aProcedureIsFoundByAnyOfItsTransactions() {
+        List<ProceduresModel.Group.Procedure.Transaction> salary = new ArrayList<>(transaction("302.0", "600.0"));
+        salary.addAll(transaction("210.0", "302.0"));
+        Service.PROCEDURES.createProcedure(YEAR, "salary", "income", salary);
+
+        Assert.assertEquals("salary", Service.PROCEDURES.getProcedureFor(YEAR, "210.0", "302.0").getName());
+    }
+
     /** A correction made while booking goes back into the one transaction it was made on. */
     @Test
     public void oneTransactionOfAProcedureCanBeReplaced() {

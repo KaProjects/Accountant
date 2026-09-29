@@ -290,14 +290,28 @@ public class AddTransactionDialog extends Dialog {
     private void book(ProceduresModel.Group.Procedure procedure) {
         for (int i = 0; i < procedure.getTransaction().size(); i++) {
             ProceduresModel.Group.Procedure.Transaction transaction = procedure.getTransaction().get(i);
-            int index = i;
-            addTransactionPanel(transactionPanel -> {
-                transactionPanel.setAmount(transaction.getAmount());
-                transactionPanel.setDebitCreditDescription(transaction.getDebit(), transaction.getCredit(), transaction.getDescription());
-                transactionPanel.bookedFromProcedure(procedure.getId(), index,
-                        e -> updateProcedureFrom(transactionPanel));
+            addProcedureTransactionPanel(procedure, i, panel -> {
+                panel.setAmount(transaction.getAmount());
+                panel.setDebitCreditDescription(transaction.getDebit(), transaction.getCredit(), transaction.getDescription());
             });
         }
+    }
+
+    /**
+     * Adds a row that one transaction of a procedure books, however it was arrived at - chosen from
+     * the procedures, dragged in from the palette, or recognised in an imported statement. The row
+     * keeps the link either way, so a correction made on it can be sent back to the procedure.
+     *
+     * @param index which transaction of the procedure this row is, since a correction goes back to
+     *              that one and leaves the rest of the procedure alone
+     */
+    public void addProcedureTransactionPanel(ProceduresModel.Group.Procedure procedure, int index,
+                                             Consumer<TransactionPanel> fill) {
+        addTransactionPanel(panel -> {
+            fill.accept(panel);
+            panel.bookedFromProcedure(procedure.getId(), index, procedure.getTransaction().get(index),
+                    e -> updateProcedureFrom(panel));
+        });
     }
 
     /**

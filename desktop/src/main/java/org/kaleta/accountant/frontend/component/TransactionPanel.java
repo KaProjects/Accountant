@@ -1,6 +1,7 @@
 package org.kaleta.accountant.frontend.component;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.common.AccountPairModel;
@@ -17,6 +18,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class TransactionPanel extends JPanel implements DocumentListener {
+    /** The tint of a row a procedure was recognised for, and filled in. */
+    private static final Color BOOKED_BY_PROCEDURE = new Color(0xE4, 0xF3, 0xE4);
+
     private final Object lock = new Object();
     private final Map<AccountPairModel, Set<String>> accountPairDescriptionMap;
 
@@ -121,15 +125,31 @@ public class TransactionPanel extends JPanel implements DocumentListener {
      * The date is left out of the comparison on purpose: a procedure says what is booked, not when,
      * so entering today's date is not a change to it.
      *
-     * @param onUpdate what to run when the user asks for the procedure to be brought up to date
+     * @param asProcedureHasIt the procedure's own transaction, which the row is compared against
+     * @param onUpdate         what to run when the user asks for the procedure to be brought up to date
      */
-    public void bookedFromProcedure(String procedureId, int transactionIndex, ActionListener onUpdate) {
+    public void bookedFromProcedure(String procedureId, int transactionIndex,
+                                    ProceduresModel.Group.Procedure.Transaction asProcedureHasIt, ActionListener onUpdate) {
         this.procedureId = procedureId;
         this.procedureTransactionIndex = transactionIndex;
-        this.asProcedureHasIt = values();
+        // what the procedure says, not what the row says: an imported movement carries the amount
+        // that was really paid, and that is exactly the difference worth sending back
+        this.asProcedureHasIt = new String[]{asProcedureHasIt.getAmount(), asProcedureHasIt.getDebit(),
+                asProcedureHasIt.getCredit(), asProcedureHasIt.getDescription()};
         buttonUpdateProcedure.setVisible(true);
         buttonUpdateProcedure.addActionListener(onUpdate);
         refreshRowButtons();
+    }
+
+    /**
+     * Marks a row that an imported movement was recognised as: the booking came from a procedure,
+     * not from the statement, and it is tinted so that what was filled in for the user stands out
+     * from what the statement actually said.
+     */
+    public void highlightAsBookedByProcedure(String procedureName) {
+        setOpaque(true);
+        setBackground(BOOKED_BY_PROCEDURE);
+        setToolTipText("Booked by the procedure '" + procedureName + "'");
     }
 
     /**

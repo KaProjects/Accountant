@@ -196,6 +196,29 @@ public class ProceduresService {
     }
 
     /**
+     * The procedure that books this pair of accounts, or null when none does.
+     * <p>
+     * A statement says which accounts money moved between and next to nothing about why; a procedure
+     * that books the same pair is that "why", written down already. The first one found wins - two
+     * procedures booking the same pair are the same booking under two names.
+     */
+    public ProceduresModel.Group.Procedure getProcedureFor(String year, String debit, String credit){
+        if (debit == null || credit == null) {
+            return null;
+        }
+        for (ProceduresModel.Group group : getProcedureGroupList(year)){
+            for (ProceduresModel.Group.Procedure procedure : group.getProcedure()){
+                for (ProceduresModel.Group.Procedure.Transaction transaction : procedure.getTransaction()){
+                    if (debit.equals(transaction.getDebit()) && credit.equals(transaction.getCredit())){
+                        return procedure;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Creates an empty procedure group. A name that is already taken is left as it is: there is
      * nothing to create, and the group the user meant is already on screen.
      */

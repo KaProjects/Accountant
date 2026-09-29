@@ -120,6 +120,32 @@ public class OpenImportStatementDialog extends MenuAction {
         return sources.stream().filter(source -> source.getName().equals(chosen)).findFirst().orElse(null);
     }
 
+    /**
+     * Books the movement the way a procedure says: every transaction it holds, not only the one that
+     * was recognised, because those go together. The amount is the statement's for the transaction
+     * that matched - that is the one that really happened - and the procedure's for the rest, which
+     * the statement says nothing about.
+     */
+    private void book(AddTransactionDialog dialog, StatementTransactionModel transaction,
+                      ProceduresModel.Group.Procedure procedure) {
+        for (int i = 0; i < procedure.getTransaction().size(); i++) {
+            ProceduresModel.Group.Procedure.Transaction booked = procedure.getTransaction().get(i);
+            boolean isTheOneThatHappened = transaction.getDebit().equals(booked.getDebit())
+                    && transaction.getCredit().equals(booked.getCredit());
+            String amount = isTheOneThatHappened ? transaction.getAmount() : booked.getAmount();
+            // linked to the procedure like any other row booked from one: what the statement shows
+            // is what really happened, and a procedure that no longer says so can be corrected here
+            dialog.addProcedureTransactionPanel(procedure, i, panel -> {
+                if (transaction.getDate() != null) {
+                    panel.setDate(transaction.getDate());
+                }
+                panel.setAmount(amount);
+                panel.setDebitCreditDescription(booked.getDebit(), booked.getCredit(), booked.getDescription());
+                panel.highlightAsBookedByProcedure(procedure.getName());
+            });
+        }
+    }
+
     /** Shows the parsed transactions for confirmation, and books the ones that are confirmed. */
     private void showTransactions(List<StatementTransactionModel> transactions,
                                   Map<String, List<AccountsModel.Account>> allAccountMap,
@@ -143,6 +169,12 @@ public class OpenImportStatementDialog extends MenuAction {
                 }
             });
             for (StatementTransactionModel transactionModel : transactions) {
+                ProceduresModel.Group.Procedure procedure = Service.PROCEDURES.getProcedureFor(
+                        getConfiguration().getSelectedYear(), transactionModel.getDebit(), transactionModel.getCredit());
+                if (procedure != null) {
+                    book(dialog, transactionModel, procedure);
+                    continue;
+                }
                 dialog.addImportedTransactionPanel(transactionPanel -> {
                     if (transactionModel.getDate() != null){
                         transactionPanel.setDate(transactionModel.getDate());

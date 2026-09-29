@@ -2,6 +2,7 @@ package org.kaleta.accountant.backend.manager;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.StatementTransactionModel;
 import org.kaleta.accountant.core.TestParent;
 import org.kaleta.accountant.service.Service;
@@ -9,6 +10,7 @@ import org.kaleta.accountant.service.Service;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -164,6 +166,29 @@ public class AccountStatementCsvParserTest extends TestParent {
         String internal = record("22.09.2026", "-299,77", "", "Sporici operace", "", "", "", "", "");
 
         Assert.assertEquals("Sporici operace", parse(internal).get(0).getDescription());
+    }
+
+    /**
+     * What the import is for, end to end: the mapping fills in the side the statement left open, and
+     * the pair of accounts that makes is what a procedure is recognised by.
+     */
+    @Test
+    public void aMappedMovementIsRecognisedByTheProcedureThatBooksThatPair() throws Exception {
+        Service.CONFIG.addMapping("1373888019/3030", "210.1", true);
+        ProceduresModel.Group.Procedure.Transaction booked = new ProceduresModel.Group.Procedure.Transaction();
+        booked.setDescription("prevod");
+        booked.setAmount("21660");
+        booked.setDebit("210.1");
+        booked.setCredit(ACCOUNT);
+        Service.PROCEDURES.createProcedure(YEAR, "transfer to the other bank", "banking", Collections.singletonList(booked));
+
+        StatementTransactionModel transaction = parse(record("18.09.2026", "-21660,00", "A NAME", "Trvaly prikaz",
+                "prevod", "", "1373888019", "3030", "")).get(0);
+
+        Assert.assertEquals("210.1", transaction.getDebit());
+        Assert.assertEquals(ACCOUNT, transaction.getCredit());
+        Assert.assertEquals("transfer to the other bank",
+                Service.PROCEDURES.getProcedureFor(YEAR, transaction.getDebit(), transaction.getCredit()).getName());
     }
 
     /** The bank has moved its columns once already, so they are found by their headings. */
