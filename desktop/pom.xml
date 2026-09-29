@@ -42,16 +42,6 @@
             <version>1.5.3</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>2.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parser-pdf-module</artifactId>
-            <version>2.5.0</version>
-        </dependency>
 
         <!-- JAXB was removed from the JDK in Java 11; it must now be an explicit dependency. -->
         <dependency>

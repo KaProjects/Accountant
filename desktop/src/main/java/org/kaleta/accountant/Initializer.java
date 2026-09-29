@@ -1,6 +1,6 @@
 package org.kaleta.accountant;
 
-import org.kaleta.accountant.backend.manager.PdfParserManager;
+import org.kaleta.accountant.backend.manager.StatementParserManager;
 import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.common.LogFormatter;

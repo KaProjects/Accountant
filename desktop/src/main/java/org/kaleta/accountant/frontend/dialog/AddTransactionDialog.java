@@ -196,29 +196,40 @@ public class AddTransactionDialog extends Dialog {
      * its description means: the account it was booked against, kept as a mapping for next time.
      */
     public void addImportedTransactionPanel(Consumer<TransactionPanel> fill) {
+        addImportedTransactionPanel(fill, true);
+    }
+
+    /**
+     * @param counterSideIsDebit which side the statement left open: the debit for money spent, the
+     *                           credit for money received. That is the side a mapping fills in, and
+     *                           the side the row can teach the import about
+     */
+    public void addImportedTransactionPanel(Consumer<TransactionPanel> fill, boolean counterSideIsDebit) {
         addTransactionPanel(panel -> {
             fill.accept(panel);
-            panel.importedFromStatement(e -> mapDescriptionOf(panel), () -> mappingWouldSaySomethingNew(panel));
+            panel.importedFromStatement(e -> mapDescriptionOf(panel, counterSideIsDebit),
+                    () -> mappingWouldSaySomethingNew(panel, counterSideIsDebit));
         });
     }
 
     /** Nothing to teach while no account is chosen, or while the import already says the same. */
-    private boolean mappingWouldSaySomethingNew(TransactionPanel panel) {
-        String debit = panel.getDebit();
-        if (debit == null || debit.isEmpty()) {
+    private boolean mappingWouldSaySomethingNew(TransactionPanel panel, boolean counterSideIsDebit) {
+        String account = counterSideIsDebit ? panel.getDebit() : panel.getCredit();
+        if (account == null || account.isEmpty()) {
             return false;
         }
-        ConfigModel.Mapping.Debit mapping = Service.CONFIG.getMatchingDebitMapping(panel.getDescription());
-        return mapping == null || !mapping.getAccount().equals(debit);
+        ConfigModel.Mapping.Entry mapping = Service.CONFIG.getMatchingMapping(panel.getDescription(), counterSideIsDebit);
+        return mapping == null || !mapping.getAccount().equals(account);
     }
 
-    private void mapDescriptionOf(TransactionPanel panel) {
+    private void mapDescriptionOf(TransactionPanel panel, boolean counterSideIsDebit) {
         String description = panel.getDescription();
-        ConfigModel.Mapping.Debit mapping = Service.CONFIG.getMatchingDebitMapping(description);
+        String account = counterSideIsDebit ? panel.getDebit() : panel.getCredit();
+        ConfigModel.Mapping.Entry mapping = Service.CONFIG.getMatchingMapping(description, counterSideIsDebit);
 
-        DebitMappingDialog dialog = new DebitMappingDialog(getConfiguration(), description,
+        MappingDialog dialog = new MappingDialog(getConfiguration(), description,
                 mapping == null ? description : mapping.getSubstring(),
-                Service.ACCOUNT.getAccountAndGroupName(getConfiguration().getSelectedYear(), panel.getDebit()),
+                Service.ACCOUNT.getAccountAndGroupName(getConfiguration().getSelectedYear(), account),
                 mapping != null);
         dialog.setVisible(true);
         if (!dialog.getResult()) {
@@ -226,9 +237,9 @@ public class AddTransactionDialog extends Dialog {
         }
 
         if (mapping == null) {
-            Service.CONFIG.addDebitMapping(dialog.getSubstring(), panel.getDebit());
+            Service.CONFIG.addMapping(dialog.getSubstring(), account, counterSideIsDebit);
         } else {
-            Service.CONFIG.updateDebitMapping(mapping.getSubstring(), dialog.getSubstring(), panel.getDebit());
+            Service.CONFIG.updateMapping(mapping.getSubstring(), dialog.getSubstring(), account, counterSideIsDebit);
         }
         panel.mappingSaved();
     }

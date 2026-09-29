@@ -8,20 +8,21 @@ import java.awt.*;
 
 /**
  * Teaches the import what an imported transaction is: the piece of its description that identifies
- * it, and the account it is booked against.
+ * it, and the account it is booked against - an expense for money spent, or where the money came
+ * from for money received.
  * <p>
  * The substring is what is edited here - a statement's description carries a date, a card number, a
  * reference - and the account is the one already chosen on the row. It has to appear in the
  * description, or the mapping would never match the transaction it was made from.
  */
-public class DebitMappingDialog extends Dialog {
+public class MappingDialog extends Dialog {
     private final String description;
     private final String account;
     private final boolean updating;
 
     private JTextField textFieldSubstring;
 
-    public DebitMappingDialog(Configuration configuration, String description, String substring, String account, boolean updating) {
+    public MappingDialog(Configuration configuration, String description, String substring, String account, boolean updating) {
         super(configuration, updating ? "Updating Mapping" : "Creating Mapping", updating ? "Update" : "Create");
         this.description = description;
         this.account = account;
@@ -71,7 +72,7 @@ public class DebitMappingDialog extends Dialog {
     private class SubstringField extends JTextField implements Validable {
         SubstringField(String substring) {
             super(substring);
-            getDocument().addDocumentListener(DebitMappingDialog.this);
+            getDocument().addDocumentListener(MappingDialog.this);
             getDocument().putProperty("owner", this);
         }
 

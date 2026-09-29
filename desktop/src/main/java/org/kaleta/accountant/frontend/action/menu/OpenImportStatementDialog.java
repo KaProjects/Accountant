@@ -1,8 +1,9 @@
 package org.kaleta.accountant.frontend.action.menu;
 
-import org.kaleta.accountant.backend.manager.PdfParserManager;
+import org.kaleta.accountant.backend.manager.StatementParserManager;
 import org.kaleta.accountant.backend.model.AccountsModel;
-import org.kaleta.accountant.backend.model.PdfTransactionModel;
+import org.kaleta.accountant.backend.model.ConfigModel;
+import org.kaleta.accountant.backend.model.StatementTransactionModel;
 import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.Initializer;
@@ -27,10 +28,10 @@ import java.util.Set;
 
 import static org.kaleta.accountant.Initializer.DEFAULT_FILES_DIR;
 
-public class OpenImportTransactionsFromPdfDialog extends MenuAction {
+public class OpenImportStatementDialog extends MenuAction {
 
-    public OpenImportTransactionsFromPdfDialog(Configuration config) {
-        super(config, "PDF/CSV Transaction(s)");
+    public OpenImportStatementDialog(Configuration config) {
+        super(config, "CSV Transaction(s)");
     }
 
     @Override
@@ -41,12 +42,12 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
         if (file == null) {
             return;
         }
-        String type = Edt.get(this::askDocumentType);
-        if (type == null) {
+        ConfigModel.Imports.Source source = Edt.get(this::askWhichStatement);
+        if (source == null) {
             return;
         }
 
-        PdfParserManager manager = new PdfParserManager(file, type);
+        StatementParserManager manager = new StatementParserManager(file, source.getFormat(), source.getAccount());
         try {
             manager.loadContent();
         } catch (Exception e) {
@@ -54,7 +55,7 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
             return;
         }
 
-        List<PdfTransactionModel> transactions;
+        List<StatementTransactionModel> transactions;
         try {
             transactions = manager.getTransactions();
         } catch (Exception e) {
@@ -83,12 +84,12 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
                     return true;
                 }
                 String extension = Arrays.stream(f.getName().split("\\.")).reduce((a, b) -> b).orElse(null);
-                return  extension != null && (extension.equals("pdf") || extension.equals("csv"));
+                return extension != null && extension.equals("csv");
             }
 
             @Override
             public String getDescription() {
-                return "PDF & CSV files";
+                return "CSV files";
             }
         });
 
@@ -96,20 +97,31 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
         return result == JFileChooser.APPROVE_OPTION ? fileChooser.getSelectedFile() : null;
     }
 
-    /** Asks which kind of statement it is. Returns null when the user cancels. */
-    private String askDocumentType() {
-        return (String) JOptionPane.showInputDialog(
+    /**
+     * Asks which statement this is, out of the ones configured. Returns null when the user cancels,
+     * and says so when none are configured - the app reads formats, the configuration says whose.
+     */
+    private ConfigModel.Imports.Source askWhichStatement() {
+        List<ConfigModel.Imports.Source> sources = Service.CONFIG.getImportSources();
+        if (sources.isEmpty()) {
+            JOptionPane.showMessageDialog((Frame) getConfiguration(),
+                    "No statements are configured to import.", "Importing", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+        String[] names = sources.stream().map(ConfigModel.Imports.Source::getName).toArray(String[]::new);
+        String chosen = (String) JOptionPane.showInputDialog(
                 (Frame) getConfiguration(),
-                "Select Document Type",
-                "Document Type",
+                "Select Statement",
+                "Importing",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
-                PdfParserManager.getDataTypeOptions(),
-                PdfParserManager.getDataTypeOptions()[0]);
+                names,
+                names[0]);
+        return sources.stream().filter(source -> source.getName().equals(chosen)).findFirst().orElse(null);
     }
 
     /** Shows the parsed transactions for confirmation, and books the ones that are confirmed. */
-    private void showTransactions(List<PdfTransactionModel> transactions,
+    private void showTransactions(List<StatementTransactionModel> transactions,
                                   Map<String, List<AccountsModel.Account>> allAccountMap,
                                   List<SchemaModel.Class> classList,
                                   Map<AccountPairModel, Set<String>> accountPairDescriptionMap) {
@@ -130,7 +142,7 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
                 public void windowClosing(WindowEvent e) {
                 }
             });
-            for (PdfTransactionModel transactionModel : transactions) {
+            for (StatementTransactionModel transactionModel : transactions) {
                 dialog.addImportedTransactionPanel(transactionPanel -> {
                     if (transactionModel.getDate() != null){
                         transactionPanel.setDate(transactionModel.getDate());
@@ -147,7 +159,7 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
                     if (transactionModel.getCredit() != null) {
                         transactionPanel.setCredit(transactionModel.getCredit());
                     }
-                });
+                }, transactionModel.isCounterSideDebit());
             }
             dialog.setVisible(true);
     }

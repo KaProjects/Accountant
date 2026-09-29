@@ -201,20 +201,32 @@ public class ConfigService {
         }
     }
 
+    public List<ConfigModel.Mapping.Credit> getCreditMappings(){
+        try {
+            return getModel().getMapping().getCredit();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
     /**
-     * The mapping that decides the debit account of an imported transaction with this description,
-     * or null when none of them matches it.
+     * The mapping that decides the account an imported transaction is booked against, or null when
+     * none of them matches its description.
      * <p>
      * A mapping matches when its substring appears anywhere in the description, and the last such
      * mapping wins - the file is read in order, and a later line is the more specific correction of
-     * an earlier one.
+     * an earlier one. Money spent is looked up among the debit mappings, money received among the
+     * credit ones, since an income is not booked against an expense account.
+     *
+     * @param debitSide whether the side the statement left open is the debit
      */
-    public ConfigModel.Mapping.Debit getMatchingDebitMapping(String description){
-        ConfigModel.Mapping.Debit matching = null;
+    public ConfigModel.Mapping.Entry getMatchingMapping(String description, boolean debitSide){
+        ConfigModel.Mapping.Entry matching = null;
         if (description == null) {
             return null;
         }
-        for (ConfigModel.Mapping.Debit mapping : getDebitMappings()){
+        for (ConfigModel.Mapping.Entry mapping : debitSide ? getDebitMappings() : getCreditMappings()){
             if (description.contains(mapping.getSubstring())){
                 matching = mapping;
             }
@@ -226,18 +238,25 @@ public class ConfigService {
      * Records that a description holding this substring is booked against this account, so that the
      * next import fills it in by itself.
      */
-    public void addDebitMapping(String substring, String account){
+    public void addMapping(String substring, String account, boolean debitSide){
         try {
             Manager<ConfigModel> manager = new ConfigManager();
             ConfigModel model = manager.retrieve();
 
-            ConfigModel.Mapping.Debit mapping = new ConfigModel.Mapping.Debit();
-            mapping.setSubstring(substring);
-            mapping.setAccount(account);
-            model.getMapping().getDebit().add(mapping);
+            if (debitSide) {
+                ConfigModel.Mapping.Debit mapping = new ConfigModel.Mapping.Debit();
+                mapping.setSubstring(substring);
+                mapping.setAccount(account);
+                model.getMapping().getDebit().add(mapping);
+            } else {
+                ConfigModel.Mapping.Credit mapping = new ConfigModel.Mapping.Credit();
+                mapping.setSubstring(substring);
+                mapping.setAccount(account);
+                model.getMapping().getCredit().add(mapping);
+            }
 
             manager.update(model);
-            Initializer.LOG.info("Debit mapping added: '" + substring + "' -> " + account);
+            Initializer.LOG.info((debitSide ? "Debit" : "Credit") + " mapping added: '" + substring + "' -> " + account);
             invalidateModel();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
@@ -250,27 +269,45 @@ public class ConfigService {
      * both. This is the correction made when an import filled in an account that is no longer the
      * right one.
      */
-    public void updateDebitMapping(String substring, String newSubstring, String account){
+    public void updateMapping(String substring, String newSubstring, String account, boolean debitSide){
         try {
             Manager<ConfigModel> manager = new ConfigManager();
             ConfigModel model = manager.retrieve();
 
-            ConfigModel.Mapping.Debit mapping = null;
-            for (ConfigModel.Mapping.Debit candidate : model.getMapping().getDebit()){
+            ConfigModel.Mapping.Entry mapping = null;
+            List<? extends ConfigModel.Mapping.Entry> mappings = debitSide
+                    ? model.getMapping().getDebit() : model.getMapping().getCredit();
+            for (ConfigModel.Mapping.Entry candidate : mappings){
                 if (candidate.getSubstring().equals(substring)) mapping = candidate;
             }
             if (mapping == null) {
-                throw new IllegalArgumentException("Debit mapping for '" + substring + "' not found!");
+                throw new IllegalArgumentException((debitSide ? "Debit" : "Credit")
+                        + " mapping for '" + substring + "' not found!");
             }
             mapping.setSubstring(newSubstring);
             mapping.setAccount(account);
 
             manager.update(model);
-            Initializer.LOG.info("Debit mapping '" + substring + "' updated: '" + newSubstring + "' -> " + account);
+            Initializer.LOG.info((debitSide ? "Debit" : "Credit") + " mapping '" + substring
+                    + "' updated: '" + newSubstring + "' -> " + account);
             invalidateModel();
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);
         }
     }
+
+    /**
+     * The statements that can be imported, as the user has configured them: what each is called,
+     * which format it is in, and the account it is about.
+     */
+    public List<ConfigModel.Imports.Source> getImportSources(){
+        try {
+            return getModel().getImports().getSource();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
 }
