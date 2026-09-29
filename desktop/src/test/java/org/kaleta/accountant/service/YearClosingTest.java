@@ -32,7 +32,8 @@ public class YearClosingTest extends TestParent {
     @Before
     public void keepBooks() {
         // the test workspace starts with classes 3, 4 and 7 only, so the books need a bank account,
-        // an expense, a revenue and somewhere for the profit to go
+        // an expense and a revenue - the accumulated earnings the profit goes onto comes with the
+        // first year, as it does in a freshly initialised app
         Service.SCHEMA.createGroup(YEAR, "2", "1", "bank accounts");
         Service.SCHEMA.createAccount(YEAR, "2", "1", "0", "current accounts", Constants.AccountType.ASSET);
         Service.SCHEMA.createGroup(YEAR, "5", "2", "services");
@@ -40,8 +41,6 @@ public class YearClosingTest extends TestParent {
         Service.SCHEMA.createAccount(YEAR, "5", "2", "1", "never used", Constants.AccountType.EXPENSE);
         Service.SCHEMA.createGroup(YEAR, "6", "0", "work");
         Service.SCHEMA.createAccount(YEAR, "6", "0", "0", "salary", Constants.AccountType.REVENUE);
-        Service.SCHEMA.createAccount(YEAR, "4", "0", "1", "accumulated earnings", Constants.AccountType.LIABILITY);
-        create(Constants.Account.ACCUMULATED_EARNINGS_ACC_ID, "accumulated earnings");
 
         create(BANK, "bank");
         create(EXPENSE_USED, "rent");

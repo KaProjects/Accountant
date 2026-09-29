@@ -1,13 +1,5 @@
 package org.kaleta.accountant;
 
-import org.kaleta.accountant.backend.manager.StatementParserManager;
-import org.kaleta.accountant.common.Constants;
-import org.kaleta.accountant.common.ErrorHandler;
-import org.kaleta.accountant.common.LogFormatter;
-import org.kaleta.accountant.frontend.AppFrame;
-import org.kaleta.accountant.service.Service;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.ConsoleHandler;
@@ -15,12 +7,20 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+
+import org.kaleta.accountant.common.Constants;
+import org.kaleta.accountant.common.ErrorHandler;
+import org.kaleta.accountant.common.LogFormatter;
+import org.kaleta.accountant.frontend.AppFrame;
+import org.kaleta.accountant.service.Service;
+
 /**
  * Performs initialization of this app. Includes data and resources checks, app. wide constants and default logger.
  */
 public class Initializer {
     public static final String NAME = "Accountant";
-    public static final String VERSION = "1.8-snapshot";
+    public static final String VERSION = "2.0";
     public static final Logger LOG = Logger.getLogger("Logger");
     public static int CONTEXT;
 
@@ -56,7 +56,7 @@ public class Initializer {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                CONTEXT = Constants.Context.DEVEL;
+                CONTEXT = Constants.Context.PRODUCTION;
                 Service.CONFIG.checkResources();
                 Service.CONFIG.checkData();
                 initLogger();

@@ -50,6 +50,8 @@ public class Constants {
         public static final String CAPITAL_GROUP_ID = "0";
         public static final String CAPITAL_PERSONAL_ACCOUNT_NAME = "personal capital";
         public static final String CAPITAL_PERSONAL_ACCOUNT_ID = "0";
+        public static final String ACCUMULATED_EARNINGS_ACCOUNT_NAME = "accumulated earnings";
+        public static final String ACCUMULATED_EARNINGS_ACCOUNT_ID = "1";
 
 
         public static final String DEPRECIATION_GROUP_NAME = "Depreciation";

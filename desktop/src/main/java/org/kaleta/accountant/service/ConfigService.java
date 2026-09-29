@@ -3,6 +3,7 @@ package org.kaleta.accountant.service;
 import org.kaleta.accountant.Initializer;
 import org.kaleta.accountant.backend.manager.*;
 import org.kaleta.accountant.backend.model.ConfigModel;
+import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 
 import java.io.File;
@@ -105,6 +106,10 @@ public class ConfigService {
 
     /**
      * Registers year in configuration and creates year's data directory and files.
+     * <p>
+     * The very first year of the books also gets the accumulated earnings account, which the
+     * closing books the profit onto. Every year after that is opened by the closing, which carries
+     * that account over from the year it closed.
      */
     public void initYearData(String newYearName){
         File yearDir = new File(Initializer.getDataSource() + newYearName + File.separator);
@@ -129,6 +134,8 @@ public class ConfigService {
             Manager<ConfigModel> manager = new ConfigManager();
             ConfigModel model = manager.retrieve();
 
+            boolean firstYear = model.getYears().getYearList().isEmpty();
+
             ConfigModel.Years.Year configYear = new ConfigModel.Years.Year();
             configYear.setName(newYearName);
             model.getYears().getYearList().add(configYear);
@@ -136,6 +143,14 @@ public class ConfigService {
             manager.update(model);
             Initializer.LOG.info("Year '" + newYearName + "' added to config");
             invalidateModel();
+
+            if (firstYear) {
+                Service.ACCOUNT.createAccount(newYearName, Constants.Account.GENERAL_ACCOUNT_NAME,
+                        Constants.Account.ACCUMULATED_EARNINGS_ACC_ID.split("\\.")[0],
+                        Constants.Account.ACCUMULATED_EARNINGS_ACC_ID.split("\\.")[1], "");
+                Initializer.LOG.info("Account '" + Constants.Account.ACCUMULATED_EARNINGS_ACC_ID
+                        + "' created for the first year '" + newYearName + "'");
+            }
         } catch (ManagerException e){
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
             throw new ServiceFailureException(e);

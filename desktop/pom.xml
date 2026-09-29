@@ -6,7 +6,7 @@
 
     <groupId>org.kaleta</groupId>
     <artifactId>accountant-desktop</artifactId>
-    <version>1.8-snapshot</version>
+    <version>2.0</version>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
