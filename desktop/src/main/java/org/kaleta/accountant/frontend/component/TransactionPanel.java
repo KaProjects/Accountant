@@ -22,6 +22,7 @@ public class TransactionPanel extends JPanel implements DocumentListener {
 
     private final JButton buttonDelete;
     private final JButton buttonUpdateProcedure;
+    private final JButton buttonMapping;
     private final DatePickerTextField tfDate;
     private final JComboBox<String> cbDescription;
     private final HintValidatedTextField tfAmount;
@@ -33,6 +34,7 @@ public class TransactionPanel extends JPanel implements DocumentListener {
     private String procedureId;
     private int procedureTransactionIndex = -1;
     private String[] asProcedureHasIt;
+    private java.util.function.BooleanSupplier mappingWorthSaving;
 
     public TransactionPanel(Configuration configuration, Map<AccountPairModel, Set<String>> accountPairDescriptionMap,
                             Map<String, List<AccountsModel.Account>> accountMap, List<SchemaModel.Class> classList,
@@ -62,17 +64,24 @@ public class TransactionPanel extends JPanel implements DocumentListener {
         buttonUpdateProcedure.setToolTipText("Update the procedure with these values");
         buttonUpdateProcedure.setEnabled(false);
         buttonUpdateProcedure.setVisible(false);
+        // shown only on a row that came from an imported statement, and only worth pressing once
+        // the import would fill that description in differently next time
+        buttonMapping = new JButton(IconLoader.getIcon(IconLoader.ADD, new Dimension(10, 10)));
+        buttonMapping.setToolTipText("Teach the import what this description is");
+        buttonMapping.setEnabled(false);
+        buttonMapping.setVisible(false);
+
         DocumentListener watchesForChanges = new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
-                refreshUpdateProcedureButton();
+                refreshRowButtons();
             }
 
             public void removeUpdate(DocumentEvent e) {
-                refreshUpdateProcedureButton();
+                refreshRowButtons();
             }
 
             public void changedUpdate(DocumentEvent e) {
-                refreshUpdateProcedureButton();
+                refreshRowButtons();
             }
         };
         tfAmount.getDocument().addDocumentListener(watchesForChanges);
@@ -93,7 +102,8 @@ public class TransactionPanel extends JPanel implements DocumentListener {
                 .addComponent(tfCredit)
                 .addGap(5)
                 .addComponent(cbDescription,200,200,Short.MAX_VALUE)
-                .addComponent(buttonUpdateProcedure,20,20,20));
+                .addComponent(buttonUpdateProcedure,20,20,20)
+                .addComponent(buttonMapping,20,20,20));
         layout.setVerticalGroup(layout.createParallelGroup()
                 .addComponent(buttonDelete,25,25,25)
                 .addComponent(tfDate,25,25,25)
@@ -101,7 +111,8 @@ public class TransactionPanel extends JPanel implements DocumentListener {
                 .addComponent(tfDebit,25,25,25)
                 .addComponent(tfCredit,25,25,25)
                 .addComponent(cbDescription,25,25,25)
-                .addComponent(buttonUpdateProcedure,25,25,25));
+                .addComponent(buttonUpdateProcedure,25,25,25)
+                .addComponent(buttonMapping,25,25,25));
     }
 
     /**
@@ -118,13 +129,32 @@ public class TransactionPanel extends JPanel implements DocumentListener {
         this.asProcedureHasIt = values();
         buttonUpdateProcedure.setVisible(true);
         buttonUpdateProcedure.addActionListener(onUpdate);
-        refreshUpdateProcedureButton();
+        refreshRowButtons();
+    }
+
+    /**
+     * Records that this row came from an imported statement, and offers to teach the import what
+     * its description means - which account it is booked against - or to correct what it already
+     * thinks it means.
+     *
+     * @param worthSaving whether the mapping would say something the import does not say already
+     */
+    public void importedFromStatement(ActionListener onMap, java.util.function.BooleanSupplier worthSaving) {
+        this.mappingWorthSaving = worthSaving;
+        buttonMapping.setVisible(true);
+        buttonMapping.addActionListener(onMap);
+        refreshRowButtons();
+    }
+
+    /** Called once the mapping has been saved, so the button settles back down. */
+    public void mappingSaved() {
+        refreshRowButtons();
     }
 
     /** Called once the procedure has been brought up to date: this row is now what it says. */
     public void procedureUpdated() {
         this.asProcedureHasIt = values();
-        refreshUpdateProcedureButton();
+        refreshRowButtons();
     }
 
     public String getProcedureId() {
@@ -139,11 +169,13 @@ public class TransactionPanel extends JPanel implements DocumentListener {
         return new String[]{getAmount(), getDebit(), getCredit(), getDescription()};
     }
 
-    private void refreshUpdateProcedureButton() {
-        if (asProcedureHasIt == null) {
-            return;
+    private void refreshRowButtons() {
+        if (asProcedureHasIt != null) {
+            buttonUpdateProcedure.setEnabled(!java.util.Arrays.equals(asProcedureHasIt, values()));
         }
-        buttonUpdateProcedure.setEnabled(!java.util.Arrays.equals(asProcedureHasIt, values()));
+        if (mappingWorthSaving != null) {
+            buttonMapping.setEnabled(mappingWorthSaving.getAsBoolean());
+        }
     }
 
     public void disableValidators(){

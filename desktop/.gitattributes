@@ -1,3 +1,3 @@
 .gitattributes !filter !diff
 
-src/main/resources/accountant-andr-servicekey.json filter=git-crypt diff=git-crypt
+src/main/resources/remote-store.json filter=git-crypt diff=git-crypt

@@ -24,7 +24,8 @@ public class Initializer {
     public static final Logger LOG = Logger.getLogger("Logger");
     public static int CONTEXT;
 
-    public static String DEFAULT_FILES_DIR = "C:/Users/stanley/Downloads";
+    /** Where the file chooser starts when a statement is imported: this machine's own downloads. */
+    public static String DEFAULT_FILES_DIR = System.getProperty("user.home") + File.separator + "Downloads";
 
     public static String getDataSource(){
         String appParentPath = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation().getPath())
@@ -65,10 +66,6 @@ public class Initializer {
                         Service.CONFIG.initYearData(name);
                         Service.CONFIG.setActiveYear(name);
                     }
-                }
-
-                if (System.getProperty("os.name").startsWith("Mac")) {
-                    DEFAULT_FILES_DIR = "/Users/stanley/Downloads";
                 }
 
                 new AppFrame().setVisible(true);

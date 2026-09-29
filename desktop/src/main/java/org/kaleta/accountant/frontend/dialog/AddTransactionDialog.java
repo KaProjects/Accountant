@@ -1,6 +1,7 @@
 package org.kaleta.accountant.frontend.dialog;
 
 import org.kaleta.accountant.backend.model.AccountsModel;
+import org.kaleta.accountant.backend.model.ConfigModel;
 import org.kaleta.accountant.backend.model.ProceduresModel;
 import org.kaleta.accountant.backend.model.SchemaModel;
 import org.kaleta.accountant.common.Constants;
@@ -188,6 +189,48 @@ public class AddTransactionDialog extends Dialog {
         transactionPanelList.add(transactionPanel);
         panelTransactions.repaint();
         panelTransactions.revalidate();
+    }
+
+    /**
+     * Adds a row that came from an imported statement. Such a row offers to teach the import what
+     * its description means: the account it was booked against, kept as a mapping for next time.
+     */
+    public void addImportedTransactionPanel(Consumer<TransactionPanel> fill) {
+        addTransactionPanel(panel -> {
+            fill.accept(panel);
+            panel.importedFromStatement(e -> mapDescriptionOf(panel), () -> mappingWouldSaySomethingNew(panel));
+        });
+    }
+
+    /** Nothing to teach while no account is chosen, or while the import already says the same. */
+    private boolean mappingWouldSaySomethingNew(TransactionPanel panel) {
+        String debit = panel.getDebit();
+        if (debit == null || debit.isEmpty()) {
+            return false;
+        }
+        ConfigModel.Mapping.Debit mapping = Service.CONFIG.getMatchingDebitMapping(panel.getDescription());
+        return mapping == null || !mapping.getAccount().equals(debit);
+    }
+
+    private void mapDescriptionOf(TransactionPanel panel) {
+        String description = panel.getDescription();
+        ConfigModel.Mapping.Debit mapping = Service.CONFIG.getMatchingDebitMapping(description);
+
+        DebitMappingDialog dialog = new DebitMappingDialog(getConfiguration(), description,
+                mapping == null ? description : mapping.getSubstring(),
+                Service.ACCOUNT.getAccountAndGroupName(getConfiguration().getSelectedYear(), panel.getDebit()),
+                mapping != null);
+        dialog.setVisible(true);
+        if (!dialog.getResult()) {
+            return;
+        }
+
+        if (mapping == null) {
+            Service.CONFIG.addDebitMapping(dialog.getSubstring(), panel.getDebit());
+        } else {
+            Service.CONFIG.updateDebitMapping(mapping.getSubstring(), dialog.getSubstring(), panel.getDebit());
+        }
+        panel.mappingSaved();
     }
 
     private void addProcedurePanel() {

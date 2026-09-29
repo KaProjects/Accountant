@@ -200,4 +200,77 @@ public class ConfigService {
             throw new ServiceFailureException(e);
         }
     }
+
+    /**
+     * The mapping that decides the debit account of an imported transaction with this description,
+     * or null when none of them matches it.
+     * <p>
+     * A mapping matches when its substring appears anywhere in the description, and the last such
+     * mapping wins - the file is read in order, and a later line is the more specific correction of
+     * an earlier one.
+     */
+    public ConfigModel.Mapping.Debit getMatchingDebitMapping(String description){
+        ConfigModel.Mapping.Debit matching = null;
+        if (description == null) {
+            return null;
+        }
+        for (ConfigModel.Mapping.Debit mapping : getDebitMappings()){
+            if (description.contains(mapping.getSubstring())){
+                matching = mapping;
+            }
+        }
+        return matching;
+    }
+
+    /**
+     * Records that a description holding this substring is booked against this account, so that the
+     * next import fills it in by itself.
+     */
+    public void addDebitMapping(String substring, String account){
+        try {
+            Manager<ConfigModel> manager = new ConfigManager();
+            ConfigModel model = manager.retrieve();
+
+            ConfigModel.Mapping.Debit mapping = new ConfigModel.Mapping.Debit();
+            mapping.setSubstring(substring);
+            mapping.setAccount(account);
+            model.getMapping().getDebit().add(mapping);
+
+            manager.update(model);
+            Initializer.LOG.info("Debit mapping added: '" + substring + "' -> " + account);
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
+     * Changes the mapping known by that substring - what it matches, or what it books against, or
+     * both. This is the correction made when an import filled in an account that is no longer the
+     * right one.
+     */
+    public void updateDebitMapping(String substring, String newSubstring, String account){
+        try {
+            Manager<ConfigModel> manager = new ConfigManager();
+            ConfigModel model = manager.retrieve();
+
+            ConfigModel.Mapping.Debit mapping = null;
+            for (ConfigModel.Mapping.Debit candidate : model.getMapping().getDebit()){
+                if (candidate.getSubstring().equals(substring)) mapping = candidate;
+            }
+            if (mapping == null) {
+                throw new IllegalArgumentException("Debit mapping for '" + substring + "' not found!");
+            }
+            mapping.setSubstring(newSubstring);
+            mapping.setAccount(account);
+
+            manager.update(model);
+            Initializer.LOG.info("Debit mapping '" + substring + "' updated: '" + newSubstring + "' -> " + account);
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
 }

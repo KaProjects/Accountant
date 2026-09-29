@@ -131,7 +131,7 @@ public class OpenImportTransactionsFromPdfDialog extends MenuAction {
                 }
             });
             for (PdfTransactionModel transactionModel : transactions) {
-                dialog.addTransactionPanel(transactionPanel -> {
+                dialog.addImportedTransactionPanel(transactionPanel -> {
                     if (transactionModel.getDate() != null){
                         transactionPanel.setDate(transactionModel.getDate());
                     }

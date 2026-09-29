@@ -13,7 +13,7 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -55,8 +55,10 @@ public class PdfParserManager {
             content = contentHandler.toString();
 
         } else if (Objects.equals(dataType, REVOLUT_CSV_PARSER_03_2023) || Objects.equals(dataType, CSOB_CREDIT_CSV_PARSER_07_2023)) {
+            // the exports are UTF-8, and a machine whose default is something else read them as
+            // mojibake, which no substring of a description ever matched
             byte[] encoded = Files.readAllBytes(file.toPath());
-            content = new String(encoded, Charset.defaultCharset());
+            content = new String(encoded, StandardCharsets.UTF_8);
         } else {
             throw new RuntimeException("Illegal data type");
         }
@@ -117,10 +119,9 @@ public class PdfParserManager {
 
             transaction.setCredit("222.0");
 
-            for (ConfigModel.Mapping.Debit mapping : Service.CONFIG.getDebitMappings()){
-                if (transaction.getDescription().contains(mapping.getSubstring())){
-                    transaction.setDebit(mapping.getAccount());
-                }
+            ConfigModel.Mapping.Debit mapping = Service.CONFIG.getMatchingDebitMapping(transaction.getDescription());
+            if (mapping != null) {
+                transaction.setDebit(mapping.getAccount());
             }
 
             transactions.add(transaction);
@@ -158,10 +159,9 @@ public class PdfParserManager {
 
                 transaction.setCredit("210.3");
 
-                for (ConfigModel.Mapping.Debit mapping : Service.CONFIG.getDebitMappings()){
-                    if (transaction.getDescription().contains(mapping.getSubstring())){
-                        transaction.setDebit(mapping.getAccount());
-                    }
+                ConfigModel.Mapping.Debit mapping = Service.CONFIG.getMatchingDebitMapping(transaction.getDescription());
+                if (mapping != null) {
+                    transaction.setDebit(mapping.getAccount());
                 }
             }
 
@@ -239,10 +239,9 @@ public class PdfParserManager {
                 transaction.setCredit("210.3");
                 transaction.setDescription(values[4]);
 
-                for (ConfigModel.Mapping.Debit mapping : Service.CONFIG.getDebitMappings()){
-                    if (transaction.getDescription().contains(mapping.getSubstring())){
-                        transaction.setDebit(mapping.getAccount());
-                    }
+                ConfigModel.Mapping.Debit mapping = Service.CONFIG.getMatchingDebitMapping(transaction.getDescription());
+                if (mapping != null) {
+                    transaction.setDebit(mapping.getAccount());
                 }
 
             } else if (values[0].equals("TRANSFER")) {
@@ -287,21 +286,36 @@ public class PdfParserManager {
         return transactions;
     }
 
+    /** The first field that says what it is, whichever column the export happens to put it in. */
+    private static String fieldStartingWith(String[] fields, String prefix) {
+        for (String field : fields) {
+            if (field.startsWith(prefix)) {
+                return field;
+            }
+        }
+        return null;
+    }
+
     private List<PdfTransactionModel> use_CSOB_CREDIT_CSV_PARSER_07_2023() {
         List<PdfTransactionModel> transactions = new ArrayList<>();
 
         for (String record: content.split("\n")) {
-            if (!record.startsWith("289260419")) continue;
+            String[] split = record.trim().split(";");
 
-            String[] split = record.split(";");
+            // a movement starts with the account it moved on; the export also carries a title line,
+            // a blank line and the column names, and any of them would be read as a transaction
+            if (split.length < 3 || !split[0].matches("\\d+/\\d{4}")) continue;
 
             if (!split[2].startsWith("-")) continue;
 
             String amount = split[2].replace("-", "").split(",")[0];
 
-            if (!split[14].startsWith("Částka:")) continue;
+            // the card's note is found by what it says rather than by which column it is in: the
+            // bank has added columns before it, and every fixed index broke the day it did
+            String note = fieldStartingWith(split, "Částka:");
+            if (note == null || !note.contains("Místo: ")) continue;
 
-            String description = split[14].split("Místo: ")[1];
+            String description = note.split("Místo: ")[1];
 
             String date = split[1].replace(".", "").substring(0,4);
 
@@ -311,10 +325,9 @@ public class PdfParserManager {
             transaction.setDescription(description);
             transaction.setCredit("222.0");
 
-            for (ConfigModel.Mapping.Debit mapping : Service.CONFIG.getDebitMappings()){
-                if (transaction.getDescription().contains(mapping.getSubstring())){
-                    transaction.setDebit(mapping.getAccount());
-                }
+            ConfigModel.Mapping.Debit mapping = Service.CONFIG.getMatchingDebitMapping(transaction.getDescription());
+            if (mapping != null) {
+                transaction.setDebit(mapping.getAccount());
             }
 
             transactions.add(transaction);
