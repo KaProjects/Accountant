@@ -1,18 +1,13 @@
 package org.kaleta.rest;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
-import org.kaleta.AccountUtils;
-import org.kaleta.Utils;
 import org.kaleta.dto.FinancialAssetsDto;
 import org.kaleta.entity.Account;
-import org.kaleta.entity.json.FinAssetsConfig;
 import org.kaleta.model.FinancialAsset;
 import org.kaleta.model.FinancialAssetsData;
+import org.kaleta.model.FinancialAssetsOverallData;
 import org.kaleta.service.FinancialService;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -20,11 +15,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
-
-import static org.kaleta.Utils.inputStreamToString;
 
 @Path("/financial")
 public class FinancialResource
@@ -71,64 +61,19 @@ public class FinancialResource
     public Response getFinancialAssetsOverallProgress()
     {
         return Endpoint.process(() -> {}, () -> {
-            FinAssetsConfig config;
-            try {
-                JsonMapper mapper = new JsonMapper();
-                String json = inputStreamToString(getClass().getClassLoader().getResourceAsStream("fin_assets_config.json"));
-                config = mapper.readValue(json, FinAssetsConfig.class);
-            } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-            }
-
-            Map<String, FinancialAssetsData> data = new TreeMap<>();
-            for (String year : config.getYears()) {
-                data.put(year, financialService.getFinancialAssetsData(year));
-            }
-
             FinancialAssetsDto dto = new FinancialAssetsDto();
 
-            for (FinAssetsConfig.Group group : config.getGroups())
+            FinancialAssetsOverallData data = financialService.getFinancialAssetsOverallData();
+
+            for (String schemaId : data.getAssetGroups())
             {
                 FinancialAssetsDto.Group groupDto = new FinancialAssetsDto.Group();
-                groupDto.setName(group.getName().toUpperCase());
+                groupDto.setName(data.getAssetGroupName(schemaId).toUpperCase());
 
-                for (FinAssetsConfig.Group.Account configAccount : group.getAccounts())
+                for (String assetId : data.getAssetIds(schemaId))
                 {
-                    FinancialAsset model = new FinancialAsset();
-                    model.setName(configAccount.getName());
-
-                    Integer[] deposits = new Integer[]{};
-                    Integer[] revaluations = new Integer[]{};
-                    Integer[] withdrawals = new Integer[]{};
-                    String[] labels = new String[]{};
-                    Integer[] balances = new Integer[]{};
-
-                    for (FinAssetsConfig.Group.Account.Record record : configAccount.getRecords())
-                    {
-                        Account account = Account.from(record, configAccount.getName());
-                        AccountUtils.validateFinAssetAccount(account);
-
-                        FinancialAsset accountModel = data.get(record.getYear()).getFinancialAsset(account);
-
-                        if (record.equals(configAccount.getRecords().get(0)))
-                        {
-                            model.setInitialValue(accountModel.getInitialValue());
-                        }
-
-                        deposits = Utils.concatArrays(deposits, accountModel.getDeposits());
-                        revaluations = Utils.concatArrays(revaluations, accountModel.getRevaluations());
-                        withdrawals = Utils.concatArrays(withdrawals, accountModel.getWithdrawals());
-                        labels = Utils.concatArrays(labels, accountModel.getLabels());
-                        balances = Utils.concatArrays(balances, accountModel.getBalances());
-                    }
-
-                    model.setDeposits(deposits);
-                    model.setRevaluations(revaluations);
-                    model.setWithdrawals(withdrawals);
-                    model.setLabels(labels);
-                    model.setBalances(balances);
-
-                    groupDto.getAccounts().add(FinancialAssetsDto.from(model));
+                    FinancialAsset asset = data.getFinancialAsset(schemaId, assetId);
+                    groupDto.getAccounts().add(FinancialAssetsDto.from(asset));
                 }
                 dto.getGroups().add(groupDto);
             }

@@ -41,22 +41,25 @@ public class SyncServiceImpl implements SyncService
 
     @Override
     @Transactional
-    public String sync(String dataSource) throws IOException
+    public String sync(String dataSource, String year) throws IOException
     {
         XmlMapper xmlMapper = new XmlMapper();
-        StringBuilder sb = new StringBuilder().append("from: " + dataSource + "\n");
+        String yearSource = dataSource + year;
+        StringBuilder sb = new StringBuilder().append("from: " + yearSource + "\n");
 
-        String transactionsXml = inputStreamToString(new FileInputStream(dataSource + "/transactions.xml"));
+        String transactionsXml = inputStreamToString(new FileInputStream(yearSource + "/transactions.xml"));
         Transactions transactions = xmlMapper.readValue(transactionsXml, Transactions.class);
         transactionDao.syncTransactions(transactions);
         sb.append("year " + transactions.getYear() + " transactions synced: " + transactions.getTransaction().size() + "\n");
 
-        String schemaXml = inputStreamToString(new FileInputStream(dataSource + "/schema.xml"));
+        // The schema is shared by all years and lives in the root of the datasource,
+        // but it is still stored per year so that every year can be queried on its own.
+        String schemaXml = inputStreamToString(new FileInputStream(dataSource + "schema.xml"));
         Schema schema = xmlMapper.readValue(schemaXml, Schema.class);
-        schemaDao.syncSchema(schema);
-        sb.append("year " + schema.getYear() + " schema classes synced: " + schema.getClazz().size() + "\n");
+        schemaDao.syncSchema(year, schema);
+        sb.append("year " + year + " schema classes synced: " + schema.getClazz().size() + "\n");
 
-        String accountsXml = inputStreamToString(new FileInputStream(dataSource + "/accounts.xml"));
+        String accountsXml = inputStreamToString(new FileInputStream(yearSource + "/accounts.xml"));
         Accounts accounts = xmlMapper.readValue(accountsXml, Accounts.class);
         accountDao.syncAccounts(accounts);
         sb.append("year " + accounts.getYear() + " accounts synced: " + accounts.getAccount().size() + "\n");

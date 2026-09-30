@@ -9,12 +9,14 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The desktop app keeps a single schema for all years, so this file carries no
+ * year of its own; the year is supplied by the caller when syncing.
+ */
 @Data
 @RegisterForReflection
 public class Schema
 {
-    private String year;
-
     @JacksonXmlElementWrapper(useWrapping = false)
     @JsonProperty("class")
     private List<Schema.Clazz> clazz = new ArrayList<>();

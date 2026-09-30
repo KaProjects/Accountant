@@ -6,13 +6,17 @@ import java.util.List;
 public interface SyncService
 {
     /**
-     * Syncs all data from desktop app datasource to the backend database.
+     * Syncs the data of a single year from the desktop app datasource to the backend database.
+     * <p>
+     * Transactions and accounts are read from the year's own sub-directory, while the schema is
+     * a single file shared by all years, kept in the root of the datasource.
      *
-     * @param dataSource full path to the directory containing single year data (xml files)
+     * @param dataSource full path to the data directory that contains config.xml and schema.xml
+     * @param year the year to sync, also the name of its sub-directory
      * @return result log of the sync
      * @throws IOException if a data file I/O error occurs
      */
-    String sync(String dataSource) throws IOException;
+    String sync(String dataSource, String year) throws IOException;
 
     /**
      * @param dataSource full path to the data directory that contains config.xml file

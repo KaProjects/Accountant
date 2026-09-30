@@ -22,11 +22,15 @@ public class AccountingData
     public GroupComponent getGroupComponent(String groupId, String... accountIdSuffixes){
         GroupComponent groupComponent = new GroupComponent();
         groupComponent.setSchemaId(groupId);
-        groupComponent.setName(schemaClass.getGroup(groupId).getName());
+
+        SchemaClass.Group schemaGroup = schemaClass.getGroup(groupId);
+        if (schemaGroup == null) return groupComponent; // a year might not have this group at all
+
+        groupComponent.setName(schemaGroup.getName());
 
         for (String schemaAccountSuffix : accountIdSuffixes)
         {
-            SchemaClass.Group.Account schemaAccount = schemaClass.getGroup(groupId).getAccountBySuffix(schemaAccountSuffix);
+            SchemaClass.Group.Account schemaAccount = schemaGroup.getAccountBySuffix(schemaAccountSuffix);
 
             if (schemaAccount == null) continue; // older years might not have some new schema accounts
 
@@ -49,7 +53,9 @@ public class AccountingData
         return groupComponent;
     }
     public GroupComponent getGroupComponent(String groupId){
-        return getGroupComponent(groupId, schemaClass.getGroup(groupId).getAccountSuffixes().toArray(new String[]{}));
+        SchemaClass.Group schemaGroup = schemaClass.getGroup(groupId);
+        if (schemaGroup == null) return getGroupComponent(groupId, new String[]{});
+        return getGroupComponent(groupId, schemaGroup.getAccountSuffixes().toArray(new String[]{}));
     }
 
     public ClassComponent getClassComponent(String... groupIdSuffixes)
@@ -79,15 +85,15 @@ public class AccountingData
                         isAsset ? transaction.getDebit().equals(account.getFullId()) && transaction.getCredit().equals(Constants.Account.INIT_ACC_ID)
                                 : transaction.getDebit().equals(Constants.Account.INIT_ACC_ID) && transaction.getCredit().equals(account.getFullId())).collect(Collectors.toList());
 
-        if (initTransactions.size() == 1){
-            return initTransactions.get(0).getAmount();
-        } else {
-            if (account.getFullId().equals(Constants.Account.ACCUMULATED_EARNINGS_ACC_ID) && initTransactions.size() == 2)
-            {
-                return initTransactions.get(0).getAmount() + initTransactions.get(1).getAmount();
-            }
-            throw new IllegalStateException("Illegal number of initial transactions '" + initTransactions.size() + "' for account '" + account.getFullId() + "'");
+        if (initTransactions.isEmpty()) {
+            throw new IllegalStateException("No initial transaction found for account '" + account.getFullId() + "'");
         }
+
+        // An account's initial value is the sum of its initiation transactions. Usually
+        // there is exactly one, but accumulated earnings are initiated twice (the opening
+        // balance and the previous year's profit), and the desktop app also happens to
+        // write duplicate zero-amount initiations for some accounts.
+        return initTransactions.stream().mapToInt(Transaction::getAmount).sum();
     }
 
     private Integer[] getMonthlyBalance(Account account, boolean isDebit){

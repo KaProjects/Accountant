@@ -14,15 +14,15 @@ public class SchemaRepositoryImpl implements SchemaRepository
     private String selectYearly = "SELECT s FROM Schema s WHERE s.yearId.year=:year";
 
     @Override
-    public void syncSchema(org.kaleta.entity.xml.Schema data)
+    public void syncSchema(String year, org.kaleta.entity.xml.Schema data)
     {
         entityManager.createNativeQuery("DELETE FROM ASchema WHERE year=?")
-                .setParameter(1, data.getYear())
+                .setParameter(1, year)
                 .executeUpdate();
 
         for (org.kaleta.entity.xml.Schema.Clazz clazz : data.getClazz()) {
             entityManager.createNativeQuery("INSERT INTO ASchema (year, id, name, type) VALUES (?,?,?,?)")
-                    .setParameter(1, data.getYear())
+                    .setParameter(1, year)
                     .setParameter(2, clazz.getId())
                     .setParameter(3, clazz.getName())
                     .setParameter(4, "")
@@ -30,7 +30,7 @@ public class SchemaRepositoryImpl implements SchemaRepository
 
             for (org.kaleta.entity.xml.Schema.Clazz.Group group : clazz.getGroup()) {
                 entityManager.createNativeQuery("INSERT INTO ASchema (year, id, name, type) VALUES (?,?,?,?)")
-                        .setParameter(1, data.getYear())
+                        .setParameter(1, year)
                         .setParameter(2, clazz.getId() + group.getId())
                         .setParameter(3, group.getName())
                         .setParameter(4, "")
@@ -38,7 +38,7 @@ public class SchemaRepositoryImpl implements SchemaRepository
 
                 for (org.kaleta.entity.xml.Schema.Clazz.Group.Account account : group.getAccount()) {
                     entityManager.createNativeQuery("INSERT INTO ASchema (year, id, name, type) VALUES (?,?,?,?)")
-                            .setParameter(1, data.getYear())
+                            .setParameter(1, year)
                             .setParameter(2, clazz.getId() + group.getId() + account.getId())
                             .setParameter(3, account.getName())
                             .setParameter(4, account.getType())

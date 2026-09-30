@@ -9,7 +9,7 @@ public interface SchemaRepository
     /**
      * Syncs schema in database from data specified
      */
-    void syncSchema(org.kaleta.entity.xml.Schema data);
+    void syncSchema(String year, org.kaleta.entity.xml.Schema data);
 
     /**
      * @return account specified by ID

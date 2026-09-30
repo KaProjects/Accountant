@@ -34,7 +34,7 @@ public class DevDataInitializer
         try {
             int years = 0;
             for (String year : syncService.getYears(dataLocation)) {
-                syncService.sync(dataLocation + year);
+                syncService.sync(dataLocation, year);
                 years++;
             }
             LOG.infof("Dev sample data synced from %s (%d years).", dataLocation, years);

@@ -16,4 +16,11 @@
     <account schemaId="630" semanticId="0" name="general" metadata=""/>
     <account schemaId="631" semanticId="0" name="general" metadata=""/>
     <account schemaId="701" semanticId="0" name="ds asd d" metadata="ssss"/>
+    <account schemaId="200" semanticId="0" name="general" metadata=""/>
+    <account schemaId="220" semanticId="0" name="general" metadata=""/>
+    <account schemaId="230" semanticId="0" name="general" metadata=""/>
+    <account schemaId="400" semanticId="0" name="general" metadata=""/>
+    <account schemaId="510" semanticId="0" name="general" metadata=""/>
+    <account schemaId="530" semanticId="0" name="general" metadata=""/>
+    <account schemaId="710" semanticId="0" name="general" metadata=""/>
 </accounts>

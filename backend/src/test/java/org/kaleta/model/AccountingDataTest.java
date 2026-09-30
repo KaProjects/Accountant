@@ -123,18 +123,32 @@ class AccountingDataTest
     }
 
     @Test
-    void aBalanceAccountWithoutExactlyOneOpeningTransactionIsRejected()
+    void severalOpeningTransactionsAreSummed()
     {
+        // The desktop app writes duplicate openings for some accounts, so the opening
+        // balance is the sum of them rather than strictly a single transaction.
         SchemaClass schema = schemaClass("2", "21", schemaAccount("210", Constants.AccountType.A));
         List<Transaction> transactions = List.of(
                 transaction(YEAR, "0101", 100, "210.0", "700.0"),
                 transaction(YEAR, "0101", 200, "210.0", "700.0"));
 
+        GroupComponent group = new AccountingData(transactions, List.of(account(YEAR, "210.0")), schema)
+                .getGroupComponent("21", "0");
+
+        assertThat(group.getAccounts().get(0).getInitialValue(), is(300));
+    }
+
+    @Test
+    void aBalanceAccountWithNoOpeningTransactionIsRejected()
+    {
+        SchemaClass schema = schemaClass("2", "21", schemaAccount("210", Constants.AccountType.A));
+        List<Transaction> transactions = List.of(transaction(YEAR, "0203", 50, "510.0", "210.0"));
+
         IllegalStateException e = assertThrows(IllegalStateException.class,
                 () -> new AccountingData(transactions, List.of(account(YEAR, "210.0")), schema)
                         .getGroupComponent("21", "0"));
 
-        assertThat(e.getMessage(), containsString("Illegal number of initial transactions"));
+        assertThat(e.getMessage(), containsString("No initial transaction found"));
     }
 
     @Test

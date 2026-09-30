@@ -2,18 +2,24 @@ package org.kaleta.entity.xml;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Only the years are read here; the desktop app owns this file and keeps adding
+ * sections to it (import sources, credit mappings, ...), so unknown elements are
+ * ignored rather than failing the sync.
+ */
 @Data
 @RegisterForReflection
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Config
 {
     private Years years;
-    private Mapping mapping;
 
     @Data
     @RegisterForReflection
@@ -29,22 +35,6 @@ public class Config
         public static class Year
         {
             private String name;
-        }
-    }
-
-    @Data
-    @RegisterForReflection
-    private static class Mapping
-    {
-        @JacksonXmlElementWrapper(useWrapping = false)
-        private List<Config.Mapping.Debit> debit = new ArrayList<>();
-
-        @Data
-        @RegisterForReflection
-        private static class Debit
-        {
-            private String substring;
-            private String account;
         }
     }
 }

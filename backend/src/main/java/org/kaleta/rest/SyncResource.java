@@ -30,8 +30,7 @@ public class SyncResource
     {
         return Endpoint.process(() -> ParamValidators.validateYear(year), () -> {
             try {
-                String dataSource = dataLocation + year;
-                return service.sync(dataSource);
+                return service.sync(dataLocation, year);
             } catch (IOException ioe) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ioe.getMessage());
             }
@@ -47,8 +46,7 @@ public class SyncResource
             try {
                 StringBuilder sb = new StringBuilder();
                 for (String year : service.getYears(dataLocation)){
-                    String dataSource = dataLocation + year;
-                    sb.append(service.sync(dataSource));
+                    sb.append(service.sync(dataLocation, year));
                 }
                 return sb.toString();
             } catch (IOException ioe) {
@@ -67,7 +65,7 @@ public class SyncResource
                 StringBuilder sb = new StringBuilder();
                 boolean hasError = false;
                 for (String year : service.getYears(dataLocation)){
-                    sb.append(service.sync(dataLocation + year));
+                    sb.append(service.sync(dataLocation, year));
                     String message = service.validate(year, service.isActive(dataLocation, year));
                     if (!message.contains("data valid")) hasError = true;
                     sb.append(message).append("\n");

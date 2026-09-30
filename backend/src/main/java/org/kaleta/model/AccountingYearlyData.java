@@ -12,24 +12,36 @@ import java.util.TreeSet;
 public class AccountingYearlyData
 {
     private List<Transaction> transactions;
+    private final Set<String> yearsWithData;
 
-    public AccountingYearlyData(List<Transaction> transactions)
+    public AccountingYearlyData(List<Transaction> transactions, List<String> yearsWithData)
     {
         this.transactions = transactions;
+        this.yearsWithData = new TreeSet<>(yearsWithData);
     }
 
+    /**
+     * The years axis of every overall view: the closed years, followed by the year
+     * that is still running.
+     * <p>
+     * A year counts as closed once it has closing transactions, and the running year
+     * is the one after the last of those. The desktop app may already have written a
+     * closing transaction into the running year, in which case that "next" year does
+     * not exist yet - it is only appended when there is actually data for it.
+     */
     public String[] getYears()
     {
-        Set<String> closingYears = new TreeSet<>();
+        TreeSet<String> closingYears = new TreeSet<>();
         transactions.forEach(transaction -> {
             closingYears.add(transaction.getYear());
         });
-        String[] years = new String[closingYears.size() + 1];
-        for (int i=0;i<closingYears.size();i++){
-            years[i] = closingYears.toArray(new String[]{})[i];
-        }
-        years[years.length - 1] = String.valueOf(Integer.parseInt(years[years.length - 2]) + 1);
-        return years;
+
+        if (closingYears.isEmpty()) return yearsWithData.toArray(new String[]{});
+
+        String nextYear = String.valueOf(Integer.parseInt(closingYears.last()) + 1);
+        if (yearsWithData.contains(nextYear)) closingYears.add(nextYear);
+
+        return closingYears.toArray(new String[]{});
     }
 
     public Integer[] getYearlyGroupValues(String groupId, String... accountIdSuffixes)

@@ -4,12 +4,14 @@ import org.kaleta.Constants;
 import org.kaleta.entity.Account;
 import org.kaleta.entity.Transaction;
 import org.kaleta.model.FinancialAssetsData;
+import org.kaleta.model.FinancialAssetsOverallData;
 import org.kaleta.model.SchemaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Service
 public class FinancialServiceImpl implements FinancialService
@@ -33,5 +35,15 @@ public class FinancialServiceImpl implements FinancialService
         SchemaClass class2 = schemaService.getClass(year, "2");
         List<Transaction> finAssetTransactions = transactionService.getFinancialAssetTransactions(year);
         return new FinancialAssetsData(finAssetAccounts, finAssetTransactions, class2.getGroup(Constants.Schema.FIN_GROUP_ID));
+    }
+
+    @Override
+    public FinancialAssetsOverallData getFinancialAssetsOverallData()
+    {
+        Map<String, FinancialAssetsData> dataByYear = new TreeMap<>();
+        for (String year : schemaService.getYears()) {
+            dataByYear.put(year, getFinancialAssetsData(year));
+        }
+        return new FinancialAssetsOverallData(dataByYear);
     }
 }

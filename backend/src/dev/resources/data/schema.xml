@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<schema year="2020">
+<schema>
     <class id="0" name="class0">
+        <group id="0" name="group00">
+            <account id="0" name="account000" type="A"/>
+            <account id="1" name="account001" type="L"/>
+            <account id="2" name="account002" type="E"/>
+            <account id="3" name="account003" type="R"/>
+        </group>
+        <group id="1" name="group01">
+            <account id="0" name="account010" type="A"/>
+        </group>
     </class>
     <class id="1" name="class1">
     </class>
@@ -8,6 +17,7 @@
         <group id="0" name="group20">
             <account id="0" name="account200" type="A"/>
             <account id="1" name="account201" type="A"/>
+            <account id="2" name="account202" type="A"/>
         </group>
         <group id="1" name="group21">
             <account id="0" name="account210" type="A"/>
@@ -17,6 +27,7 @@
         </group>
         <group id="3" name="group23">
             <account id="0" name="account230" type="A"/>
+            <account id="1" name="account231" type="A"/>
         </group>
     </class>
     <class id="3" name="class3">
@@ -32,6 +43,7 @@
     </class>
     <class id="5" name="class5">
         <group id="0" name="group50">
+            <account id="0" name="account500" type="E"/>
         </group>
         <group id="1" name="group51">
             <account id="0" name="account510" type="E"/>
@@ -40,8 +52,12 @@
             <account id="0" name="account520" type="E"/>
         </group>
         <group id="3" name="group53">
+            <account id="0" name="account530" type="E"/>
         </group>
         <group id="4" name="group54">
+            <account id="0" name="account540" type="E"/>
+            <account id="8" name="account548" type="E"/>
+            <account id="9" name="account549" type="E"/>
         </group>
         <group id="5" name="group55">
             <account id="0" name="account550" type="E"/>
@@ -52,6 +68,7 @@
             <account id="5" name="account555" type="E"/>
         </group>
         <group id="6" name="group56">
+            <account id="0" name="account560" type="E"/>
         </group>
     </class>
     <class id="6" name="class6">
@@ -59,8 +76,11 @@
             <account id="0" name="account600" type="R"/>
         </group>
         <group id="1" name="group61">
+            <account id="0" name="account610" type="R"/>
         </group>
         <group id="2" name="group62">
+            <account id="0" name="account620" type="R"/>
+            <account id="9" name="account629" type="R"/>
         </group>
         <group id="3" name="group63">
             <account id="0" name="account630" type="R"/>
@@ -72,6 +92,10 @@
     <class id="7" name="class7">
         <group id="0" name="group70">
             <account id="0" name="account700" type="X"/>
+            <account id="1" name="account701" type="X"/>
+        </group>
+        <group id="1" name="group71">
+            <account id="0" name="account710" type="X"/>
         </group>
     </class>
 </schema>
