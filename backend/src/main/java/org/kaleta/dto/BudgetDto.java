@@ -1,5 +1,6 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 
 import java.text.DateFormatSymbols;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Data
+@RegisterForReflection
 public class BudgetDto
 {
     private List<String> columns = new ArrayList<>();
@@ -53,6 +55,7 @@ public class BudgetDto
     }
 
     @Data
+    @RegisterForReflection
     public static class Row
     {
         private Type type;
@@ -99,6 +102,7 @@ public class BudgetDto
             row.setDeltaAvg(row.getActualAvg() - row.getPlannedAvgToFilledMonth());
             this.getSubRows().add(row);
         }
+        @RegisterForReflection
         public enum Type
         {
             INCOME,

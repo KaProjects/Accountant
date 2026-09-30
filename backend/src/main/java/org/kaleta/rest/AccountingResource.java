@@ -67,7 +67,7 @@ public class AccountingResource
             GroupComponent group62 = profitRevenuesData.getGroupComponent("62");
             GroupComponent group54 = profitExpensesData.getGroupComponent("54");
             GroupComponent group63b = profitRevenuesData.getGroupComponent("63", "0", "5");
-            GroupComponent group55b = profitExpensesData.getGroupComponent("55", "3", "4", "5");
+            GroupComponent group55b = profitExpensesData.getGroupComponent("55", "3", "4", "5", "6");
 
             AccountingDto profitDto = new AccountingDto(year, AccountingDto.Type.PROFIT_SUMMARY);
 
@@ -129,7 +129,7 @@ public class AccountingResource
 
             GroupComponent group60 = profitRevenuesData.getGroupComponent("60");
             GroupComponent group55a = profitExpensesData.getGroupComponent("55", "0", "1", "2");
-            GroupComponent group63a = profitRevenuesData.getGroupComponent("63", "1", "2", "3");
+            GroupComponent group63a = profitRevenuesData.getGroupComponent("63", "1", "2", "3", "4");
 
             GroupComponent group51 = profitExpensesData.getGroupComponent("51");
             GroupComponent group52 = profitExpensesData.getGroupComponent("52");
@@ -140,8 +140,8 @@ public class AccountingResource
             GroupComponent group56 = profitExpensesData.getGroupComponent("56");
             GroupComponent group62 = profitRevenuesData.getGroupComponent("62");
             GroupComponent group54 = profitExpensesData.getGroupComponent("54");
-            GroupComponent group63b = profitRevenuesData.getGroupComponent("63", "0");
-            GroupComponent group55b = profitExpensesData.getGroupComponent("55", "3", "4", "5");
+            GroupComponent group63b = profitRevenuesData.getGroupComponent("63", "0", "5");
+            GroupComponent group55b = profitExpensesData.getGroupComponent("55", "3", "4", "5", "6");
 
             AccountingDto profitDto = new AccountingDto(years, AccountingDto.Type.PROFIT_SUMMARY);
 
@@ -179,9 +179,9 @@ public class AccountingResource
             profitDto.getRows().add(row62);
             AccountingDto.Row row54 = from(group54, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("54"));
             profitDto.getRows().add(row54);
-            AccountingDto.Row row63b = from(group63b, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("63", "0"));
+            AccountingDto.Row row63b = from(group63b, AccountingDto.Type.INCOME_GROUP, yearlyData.getYearlyGroupValues("63", "0", "5"));
             profitDto.getRows().add(row63b);
-            AccountingDto.Row row55b = from(group55b, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("55", "3", "4", "5"));
+            AccountingDto.Row row55b = from(group55b, AccountingDto.Type.EXPENSE_GROUP, yearlyData.getYearlyGroupValues("55", "3", "4", "5", "6"));
             profitDto.getRows().add(row55b);
 
             AccountingDto.Row netProfitRow = new AccountingDto.Row(AccountingDto.Type.PROFIT_SUMMARY, NET_PROFIT, "np");

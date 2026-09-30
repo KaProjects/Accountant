@@ -1,5 +1,6 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 
 import java.text.DateFormatSymbols;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Data
+@RegisterForReflection
 public class AccountingDto
 {
     private List<String> columns = new ArrayList<>();
@@ -56,6 +58,7 @@ public class AccountingDto
     }
 
     @Data
+    @RegisterForReflection
     public static class Row
     {
         private Type type;
@@ -76,6 +79,7 @@ public class AccountingDto
         }
     }
 
+    @RegisterForReflection
     public enum Type
     {
         PROFIT_SUMMARY, INCOME_GROUP, INCOME_ACCOUNT, EXPENSE_GROUP, EXPENSE_ACCOUNT,

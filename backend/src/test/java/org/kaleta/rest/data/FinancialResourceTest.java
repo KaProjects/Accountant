@@ -1,10 +1,10 @@
 package org.kaleta.rest.data;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
 import io.restassured.http.ContentType;
-import org.eclipse.microprofile.config.ConfigProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
 import org.kaleta.dto.FinancialAssetsDto;
 
 import java.util.Calendar;
@@ -15,10 +15,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
+@TestProfile(DataSourceTestProfile.class)
 public class FinancialResourceTest
 {
+    // RestAssured only learns the application's port per test method, so the datasource is
+    // written and synced here rather than once for the class.
+    @BeforeEach
+    void syncGeneratedDataSource()
+    {
+        FakeDataSource.generate();
+        given().when().get("/sync/all").then().statusCode(200);
+    }
+
     @Test
-    @EnabledIf(value = "isDataLocationSet", disabledReason = "set data.location in test/resources/application.properties")
     public void testTrimFutureMonths()
     {
         given().when().get("/sync/all").then().statusCode(200);
@@ -47,8 +56,4 @@ public class FinancialResourceTest
         }
     }
 
-    boolean isDataLocationSet()
-    {
-        return !ConfigProvider.getConfig().getValue("data.location", String.class).equals("X");
-    }
 }

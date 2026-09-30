@@ -1,5 +1,6 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import org.kaleta.model.FinancialAsset;
 
@@ -11,11 +12,13 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 @Data
+@RegisterForReflection
 public class FinancialAssetsDto
 {
     private List<Group> groups = new ArrayList<>();
 
     @Data
+    @RegisterForReflection
     public static class Group
     {
         private String name;
@@ -23,6 +26,7 @@ public class FinancialAssetsDto
         private List<Account> accounts = new ArrayList<>();
 
         @Data
+        @RegisterForReflection
         public static class Account
         {
             private String name;

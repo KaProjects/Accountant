@@ -1,8 +1,10 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 
 @Data
+@RegisterForReflection
 public class YearAccountOverviewDto
 {
     private String id;

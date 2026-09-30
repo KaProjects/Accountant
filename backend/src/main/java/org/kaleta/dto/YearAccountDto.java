@@ -1,5 +1,6 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import org.kaleta.entity.Account;
 
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@RegisterForReflection
 public class YearAccountDto
 {
     private String schemaId;

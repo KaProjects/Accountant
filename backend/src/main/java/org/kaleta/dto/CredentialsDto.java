@@ -1,10 +1,12 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 @Data
+@RegisterForReflection
 public class CredentialsDto
 {
     private String username;

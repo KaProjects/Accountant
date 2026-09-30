@@ -1,5 +1,6 @@
 package org.kaleta.model;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import org.kaleta.Constants;
 import org.kaleta.Utils;
@@ -24,6 +25,7 @@ public class ChartData
 {
     private final List<Transaction> transactions;
     private final List<String> years;
+    private Map<String, String> firstYears;
 
     public ChartData(List<Transaction> transactions, List<String> years)
     {
@@ -56,13 +58,16 @@ public class ChartData
             {
                 if (transaction.getDebit().startsWith(schemaId) && notClosing(transaction.getCredit()))
                 {
-                    if (isBalance(schemaId) && transaction.getCredit().equals(Constants.Account.INIT_ACC_ID)) continue;
+                    if (isBalance(schemaId) && transaction.getCredit().equals(Constants.Account.INIT_ACC_ID)
+                            && !isOpeningBalance(transaction.getDebit(), transaction.getYear())) continue;
                     Integer amount = isBalance(schemaId) ? transaction.getAmount() : -transaction.getAmount();
                     monthlyData.put(key, monthlyData.get(key) + amount);
                 }
                 if (transaction.getCredit().startsWith(schemaId) && notClosing(transaction.getDebit()))
                 {
-                    if (isBalance(schemaId) && transaction.getDebit().equals(Constants.Account.INIT_ACC_ID) && (!transaction.getDescription().contains("Profit from") || id.equals("l"))) continue;
+                    if (isBalance(schemaId) && transaction.getDebit().equals(Constants.Account.INIT_ACC_ID)
+                            && !isOpeningBalance(transaction.getCredit(), transaction.getYear())
+                            && (!transaction.getDescription().contains("Profit from") || id.equals("l"))) continue;
                     Integer amount = isBalance(schemaId) ? -transaction.getAmount() : transaction.getAmount();
                     monthlyData.put(key, monthlyData.get(key) + amount);
                 }
@@ -74,6 +79,33 @@ public class ChartData
         } else {
             return monthlyValues;
         }
+    }
+
+    /**
+     * Every year re-initiates each balance account with the previous year's closing balance,
+     * and a cumulative series must not count those again because it already carries the
+     * movements they summarise. An initiation in the first year the account appears at all is
+     * different: nothing precedes it, so it is the opening balance the account really started
+     * from and it belongs in the series. Skipping that one as well left every cumulative chart
+     * permanently short of the ledger's starting position, which showed as negative cash.
+     */
+    private boolean isOpeningBalance(String accountId, String year)
+    {
+        if (firstYears == null)
+        {
+            firstYears = new HashMap<>();
+            for (Transaction transaction : transactions)
+            {
+                for (String account : List.of(transaction.getDebit(), transaction.getCredit()))
+                {
+                    String earliest = firstYears.get(account);
+                    if (earliest == null || transaction.getYear().compareTo(earliest) < 0) {
+                        firstYears.put(account, transaction.getYear());
+                    }
+                }
+            }
+        }
+        return year.equals(firstYears.get(accountId));
     }
 
     private boolean notClosing(String accountId)
@@ -116,8 +148,8 @@ public class ChartData
         configs.add(new Config("56", schemaNames.get("56") + " - Naklady", Config.ChartType.BALANCE, Set.of("56")));
         configs.add(new Config("62", schemaNames.get("62") + " - Vynosy", Config.ChartType.BALANCE, Set.of("62")));
         configs.add(new Config("54", schemaNames.get("54") + " - Naklady", Config.ChartType.BALANCE, Set.of("54")));
-        configs.add(new Config("63b", schemaNames.get("63") + " - Ostatne - Vynosy", Config.ChartType.BALANCE, Set.of("630")));
-        configs.add(new Config("55b", schemaNames.get("55") + " - Ostatne - Naklady", Config.ChartType.BALANCE, Set.of("553", "554", "555")));
+        configs.add(new Config("63b", schemaNames.get("63") + " - Ostatne - Vynosy", Config.ChartType.BALANCE, Set.of("630", "635")));
+        configs.add(new Config("55b", schemaNames.get("55") + " - Ostatne - Naklady", Config.ChartType.BALANCE, Set.of("553", "554", "555", "556")));
 
         configs.add(new Config("np", NET_PROFIT, Config.ChartType.BALANCE, Set.of("6", "5")));
 
@@ -147,6 +179,7 @@ public class ChartData
     }
 
     @Data
+    @RegisterForReflection
     public static class Config
     {
         private String id;
@@ -164,6 +197,7 @@ public class ChartData
             this.schemas = schemas;
         }
 
+        @RegisterForReflection
         public enum ChartType{
             BALANCE, CUMULATIVE
         }
