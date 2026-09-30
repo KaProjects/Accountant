@@ -33,7 +33,6 @@ public class BudgetResource
     BudgetingService service;
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}")
@@ -77,7 +76,6 @@ public class BudgetResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/transaction/{budgetId}/month/{month}")

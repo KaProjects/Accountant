@@ -2,6 +2,7 @@ package org.kaleta.rest;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.kaleta.service.SyncService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,6 +25,7 @@ public class SyncResource
     SyncService service;
 
     @GET
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/{year}")
     public Response syncYear(@PathParam String year)
@@ -38,6 +40,7 @@ public class SyncResource
     }
 
     @GET
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/all")
     public Response syncAll()
@@ -56,6 +59,7 @@ public class SyncResource
     }
 
     @GET
+    @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/all/validate")
     public Response syncValidateData()

@@ -6,12 +6,11 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import StorageIcon from '@mui/icons-material/Storage';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import {properties} from "../properties";
 import HomeSection from "../components/home/HomeSection";
 
 const go = (path) => () => {window.location.href = path};
@@ -77,9 +76,8 @@ const SECTIONS = [
                 caption: "Structured accounting data. Transactions for an account from a schema.",
             },
             {
-                title: "API", icon: <SettingsSuggestIcon/>,
-                onOpen: () => window.open(properties.apiDocsUrl, '_blank'),
-                caption: "A back-end API is a programming interface that helps developers to interact with back-end services.",
+                title: "Admin", icon: <AdminPanelSettingsIcon/>, onOpen: go("/admin"),
+                caption: "Operational tasks that are not part of reading the books: syncing the desktop application's data, and the back-end API reference.",
             },
         ],
     },

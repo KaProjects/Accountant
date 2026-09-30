@@ -1,6 +1,7 @@
 package org.kaleta.service;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.security.UnauthorizedException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.kaleta.model.UsersConfig;
@@ -18,7 +19,9 @@ import static org.kaleta.Utils.inputStreamToString;
 @Service
 public class AuthServiceImpl implements AuthService
 {
-    private static final String USERS_RESOURCE = "users.json";
+    /** Overridden in development so a throwaway file stands in for the encrypted one. */
+    @ConfigProperty(name = "auth.users-resource", defaultValue = "users.json")
+    String usersResource;
 
     private String token = null;
     private long expiration;
@@ -56,14 +59,14 @@ public class AuthServiceImpl implements AuthService
      */
     private List<UsersConfig.User> readUsers()
     {
-        InputStream stream = getClass().getClassLoader().getResourceAsStream(USERS_RESOURCE);
+        InputStream stream = getClass().getClassLoader().getResourceAsStream(usersResource);
         if (stream == null) {
-            throw new IllegalStateException("'" + USERS_RESOURCE + "' is not on the classpath");
+            throw new IllegalStateException("'" + usersResource + "' is not on the classpath");
         }
         try {
             return new JsonMapper().readValue(inputStreamToString(stream), UsersConfig.class).getUsers();
         } catch (IOException e) {
-            throw new RuntimeException("could not read '" + USERS_RESOURCE + "'", e);
+            throw new RuntimeException("could not read '" + usersResource + "'", e);
         }
     }
 

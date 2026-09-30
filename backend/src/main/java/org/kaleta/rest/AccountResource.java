@@ -36,7 +36,6 @@ public class AccountResource
     TransactionService transactionService;
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}")
@@ -60,7 +59,6 @@ public class AccountResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/{schemaId}")

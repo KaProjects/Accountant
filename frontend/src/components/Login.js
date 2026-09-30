@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import {properties} from "../properties";
 import {Alert, Button, Slide, Snackbar, TextField} from "@mui/material";
 import axios from "axios";
+import {describeResponseError} from "../services/errors";
 
 /** The login screen is the entire page until a token exists, so it centres itself. */
 const centeredPage = {
@@ -19,26 +20,6 @@ const loginForm = {
     gap: "10px",
 };
 
-/**
- * Turns a failed login into something readable.
- *
- * The backend answers with plain text for the errors it raises itself, but an unexpected one is
- * answered by the container's own handler with a JSON object. Concatenating that into the
- * message rendered it as "[object Object]", which said nothing at all; its "details" carries
- * the error id and the exception, while its "stack" is far too long for a toast.
- */
-export const describeLoginError = (error) => {
-    if (!error.response) return error.code + " " + error.message
-
-    const body = error.response.data
-    let detail
-    if (typeof body === "string") detail = body
-    else if (body && typeof body === "object") detail = body.details || body.message || ""
-    else detail = ""
-
-    const status = error.response.status + " " + error.response.statusText
-    return detail ? status + ": " + detail : status
-}
 
 export default function Login({ setToken}){
 
@@ -62,7 +43,7 @@ export default function Login({ setToken}){
                 setToken(response.data)
             }).catch(
                 (error) => {
-                    setError(describeLoginError(error))
+                    setError(describeResponseError(error))
                     setErrorToggle(true)
         })
     }

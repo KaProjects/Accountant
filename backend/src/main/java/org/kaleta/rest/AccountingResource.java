@@ -41,7 +41,6 @@ public class AccountingResource
     TransactionService transactionService;
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profit/{year}")
@@ -112,7 +111,6 @@ public class AccountingResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profit")
@@ -198,7 +196,6 @@ public class AccountingResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/cashflow/{year}")
@@ -232,7 +229,6 @@ public class AccountingResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/cashflow")
@@ -274,7 +270,6 @@ public class AccountingResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/balance/{year}")
@@ -336,7 +331,6 @@ public class AccountingResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/balance")
@@ -398,7 +392,6 @@ public class AccountingResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/transaction/{accountId}/month/{month}")

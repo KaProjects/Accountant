@@ -10,6 +10,8 @@ import AccountingStatement from "./views/AccountingStatement";
 import Home from "./views/Home";
 import AccountingData from "./views/AccountingData";
 import AccountingChart from "./views/AccountingChart";
+import Admin from "./views/Admin";
+import AdminSync from "./views/AdminSync";
 
 class App extends Component {
     constructor(props) {
@@ -108,6 +110,8 @@ class App extends Component {
                         <Route exact path="/accounting/:type/:overall" element={<AccountingStatement {...this.state}/> }/>
                         <Route exact path="/chart/accounting" element={<AccountingChart {...this.state}/> }/>
                         <Route exact path="/data" element={<AccountingData {...this.state}/> }/>
+                        <Route exact path="/admin" element={<Admin {...this.state}/> }/>
+                        <Route exact path="/admin/sync" element={<AdminSync {...this.state}/> }/>
                         <Route path="*" element={this.PageNotFound()} />
                     </Routes>
                 </BrowserRouter>

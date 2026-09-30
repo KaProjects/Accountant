@@ -19,7 +19,6 @@ public class SchemaResource
     SchemaService schemaService;
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}")

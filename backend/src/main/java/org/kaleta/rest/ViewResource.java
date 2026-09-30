@@ -30,7 +30,6 @@ public class ViewResource
     SchemaService schemaService;
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}/vacation")
@@ -71,7 +70,6 @@ public class ViewResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{year}")

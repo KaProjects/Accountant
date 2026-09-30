@@ -39,7 +39,7 @@ describe("Home", () => {
         renderHome();
 
         ["Accounting Chart", "Balance Sheet", "Income Statement", "Cash Flow Statement",
-            "Budgeting", "Vacations", "Views", "Financial Assets", "Data", "API"]
+            "Budgeting", "Vacations", "Views", "Financial Assets", "Data", "Admin"]
             .forEach((title) => expect(screen.getByText(title)).toBeInTheDocument());
     });
 
@@ -82,13 +82,12 @@ describe("Home", () => {
         expect(window.location.href).toBe("/accounting/balance/overall");
     });
 
-    it("opens the swagger docs on the backend port rather than through the proxy", () => {
+    // The swagger link moved onto the admin page, which is covered by Admin.test.js.
+    it("opens the admin page", () => {
         renderHome();
-        window.open = jest.fn();
 
-        fireEvent.click(screen.getByText("API"));
+        fireEvent.click(screen.getByText("Admin"));
 
-        expect(window.open).toHaveBeenCalledWith(
-            expect.stringContaining("/api/docs"), "_blank");
+        expect(window.location.href).toBe("/admin");
     });
 });

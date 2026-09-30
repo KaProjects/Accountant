@@ -30,7 +30,6 @@ public class ChartResource
     TransactionService transactionService;
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/config")
@@ -43,7 +42,6 @@ public class ChartResource
     }
 
     @GET
-    @Secured
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/data/{id}")
