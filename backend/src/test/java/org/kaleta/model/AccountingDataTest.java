@@ -139,16 +139,32 @@ class AccountingDataTest
     }
 
     @Test
-    void aBalanceAccountWithNoOpeningTransactionIsRejected()
+    void anAccountOpenedDuringTheYearStartsFromNothing()
     {
+        // An account can be created part way through a year and posted to from then on. It has no
+        // opening balance because there was nothing to carry in, which is a zero and not an error:
+        // treating it as one made the whole statement fail with a 500 rather than show the year.
         SchemaClass schema = schemaClass("2", "21", schemaAccount("210", Constants.AccountType.A));
-        List<Transaction> transactions = List.of(transaction(YEAR, "0203", 50, "510.0", "210.0"));
+        List<Transaction> transactions = List.of(transaction(YEAR, "0203", 50, "210.0", "510.0"));
 
-        IllegalStateException e = assertThrows(IllegalStateException.class,
-                () -> new AccountingData(transactions, List.of(account(YEAR, "210.0")), schema)
-                        .getGroupComponent("21", "0"));
+        GroupComponent group = new AccountingData(transactions, List.of(account(YEAR, "210.0")), schema)
+                .getGroupComponent("21", "0");
 
-        assertThat(e.getMessage(), containsString("No initial transaction found"));
+        assertThat(group.getInitialValue(), is(0));
+        assertThat(group.getBalance(), is(50));
+    }
+
+    @Test
+    void anAccountThatWasNeverPostedToStartsFromNothingAsWell()
+    {
+        // Declared in the chart of accounts and not used that year, which is ordinary bookkeeping.
+        SchemaClass schema = schemaClass("2", "21", schemaAccount("210", Constants.AccountType.A));
+
+        GroupComponent group = new AccountingData(List.of(), List.of(account(YEAR, "210.0")), schema)
+                .getGroupComponent("21", "0");
+
+        assertThat(group.getInitialValue(), is(0));
+        assertThat(group.getBalance(), is(0));
     }
 
     @Test

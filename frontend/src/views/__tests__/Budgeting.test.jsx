@@ -1,4 +1,4 @@
-import {fireEvent, render, screen, within} from "@testing-library/react";
+import {fireEvent, screen, within} from "@testing-library/react";
 import Budgeting from "../Budgeting";
 import {useData} from "../../fetch";
 import realBudget from "../../__tests__/fixtures/budget-2020.json";

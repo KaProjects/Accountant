@@ -18,8 +18,7 @@ const AccountingData = () => {
 
     useEffect(() => {
         setYearly(true)
-        // eslint-disable-next-line
-    }, []);
+    }, [setYearly]);
 
     const [expanded, setExpanded] = useState([]);
     const [schemaId, setSchemaId] = useState(null);

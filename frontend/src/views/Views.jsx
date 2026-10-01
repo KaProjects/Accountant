@@ -18,8 +18,7 @@ const Views = () => {
     useEffect(() => {
         setYearly(true)
         setOpenIndex(null)
-        // eslint-disable-next-line
-    }, [data]);
+    }, [data, setYearly]);
 
     /** Opening a view closes any other. */
     const toggle = (index) => setOpenIndex(openIndex === index ? null : index)

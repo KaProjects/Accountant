@@ -68,7 +68,7 @@ public class AccountingResource
             GroupComponent group63b = profitRevenuesData.getGroupComponent("63", "0", "5");
             GroupComponent group55b = profitExpensesData.getGroupComponent("55", "3", "4", "5", "6");
 
-            AccountingDto profitDto = new AccountingDto(year, AccountingDto.Type.PROFIT_SUMMARY);
+            AccountingDto profitDto = new AccountingDto(AccountingDto.Type.PROFIT_SUMMARY);
 
             profitDto.getRows().add(from(group60, AccountingDto.Type.INCOME_GROUP));
             profitDto.getRows().add(from(group55a, AccountingDto.Type.EXPENSE_GROUP));
@@ -121,6 +121,10 @@ public class AccountingResource
             AccountingYearlyData yearlyData = service.getYearlyProfitData();
 
             String[] years = yearlyData.getYears();
+
+            // No years means nothing has been synced yet. The statement is then simply empty,
+            // rather than an attempt to read the last of no years at all.
+            if (years.length == 0) return new AccountingDto(years, AccountingDto.Type.PROFIT_SUMMARY);
 
             AccountingData profitExpensesData = service.getProfitExpensesData(years[years.length - 1]);
             AccountingData profitRevenuesData = service.getProfitRevenuesData(years[years.length - 1]);
@@ -211,7 +215,7 @@ public class AccountingResource
             GroupComponent group23 = cashFlowData.getGroupComponent("23");
             GroupComponent group22 = cashFlowData.getGroupComponent("22").inverted();
 
-            AccountingDto cashFlowDto = new AccountingDto(year, AccountingDto.Type.CASH_FLOW_SUMMARY);
+            AccountingDto cashFlowDto = new AccountingDto(AccountingDto.Type.CASH_FLOW_SUMMARY);
 
             cashFlowDto.getRows().add(from(group20, AccountingDto.Type.CASH_FLOW_GROUP));
             cashFlowDto.getRows().add(from(group21, AccountingDto.Type.CASH_FLOW_GROUP));
@@ -238,6 +242,10 @@ public class AccountingResource
             AccountingYearlyData yearlyData = service.getYearlyClosingData();
 
             String[] years = yearlyData.getYears();
+
+            // No years means nothing has been synced yet. The statement is then simply empty,
+            // rather than an attempt to read the last of no years at all.
+            if (years.length == 0) return new AccountingDto(years, AccountingDto.Type.CASH_FLOW_SUMMARY);
 
             AccountingData cashFlowData = service.getCashFlowData(years[years.length - 1]);
             GroupComponent group20 = cashFlowData.getGroupComponent("20");
@@ -289,7 +297,7 @@ public class AccountingResource
             ClassComponent class3l = balanceData.get("3").getClassComponent("1");
             ClassComponent class4 = balanceData.get("4").getClassComponent();
 
-            AccountingDto balanceSheetDto = new AccountingDto(year, AccountingDto.Type.BALANCE_SUMMARY);
+            AccountingDto balanceSheetDto = new AccountingDto(AccountingDto.Type.BALANCE_SUMMARY);
 
             AccountingDto.Row rowClass0 = from(class0);
             AccountingDto.Row rowClass1 = from(class1);
@@ -342,6 +350,10 @@ public class AccountingResource
             AccountingYearlyData yearlyProfitData = service.getYearlyProfitData();
 
             String[] years = yearlyClosingData.getYears();
+
+            // No years means nothing has been synced yet. The statement is then simply empty,
+            // rather than an attempt to read the last of no years at all.
+            if (years.length == 0) return new AccountingDto(years, AccountingDto.Type.BALANCE_SUMMARY);
 
             Map<String, AccountingData> balanceData = service.getBalanceData(years[years.length - 1]);
 

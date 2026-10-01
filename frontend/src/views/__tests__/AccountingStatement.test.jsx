@@ -1,4 +1,4 @@
-import {fireEvent, render, screen, within} from "@testing-library/react";
+import {fireEvent, screen, within} from "@testing-library/react";
 import AccountingStatement from "../AccountingStatement";
 import {useData} from "../../fetch";
 import {useParams} from "react-router-dom";
@@ -44,7 +44,7 @@ const row = (overrides = {}) => ({
 });
 
 const payload = (rows) => ({
-    columns: ["Balance Sheet 2020", "Initial", "January", "February", "March", "April",
+    columns: ["Balance Sheet", "Initial", "January", "February", "March", "April",
         "May", "June", "July", "August", "September", "October", "November", "December", "Total"],
     rows,
 });
@@ -107,7 +107,8 @@ describe("AccountingStatement", () => {
 
         const headers = screen.getAllByRole("columnheader");
         expect(headers).toHaveLength(15);
-        expect(headers[0]).toHaveTextContent("Balance Sheet 2020");
+        // The year is in the bar and in the address, so the title does not repeat it.
+        expect(headers[0]).toHaveTextContent("Balance Sheet");
         expect(headers[1]).toHaveTextContent("Initial");
         expect(headers[14]).toHaveTextContent("Total");
     });

@@ -157,7 +157,8 @@ frontend_dependencies() {
 frontend_lint() {
   require_frontend_environment || return $?
   cd "$FRONTEND_DIR" || return 1
-  ./node_modules/.bin/eslint src
+  # Without --ext, ESLint only looks at .js, which would silently skip every component.
+  ./node_modules/.bin/eslint src --ext .js,.jsx
 }
 
 frontend_component_tests() {

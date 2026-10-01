@@ -1,4 +1,4 @@
-import {render, screen} from "@testing-library/react";
+import {screen} from "@testing-library/react";
 import AccountingChart from "../AccountingChart";
 import {useData} from "../../fetch";
 import {renderWithAppState} from "../../testUtils";

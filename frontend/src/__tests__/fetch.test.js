@@ -7,7 +7,6 @@ jest.mock("axios");
 describe("useData", () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        window.sessionStorage.clear();
     });
 
     it("requests the given path behind the /api prefix", async () => {

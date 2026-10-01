@@ -18,8 +18,7 @@ const AccountingChart = () => {
 
     useEffect(() => {
         setYearly(false)
-        // eslint-disable-next-line
-    }, []);
+    }, [setYearly]);
 
     return (
         <DataView loaded={loaded} error={error}>

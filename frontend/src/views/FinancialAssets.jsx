@@ -34,8 +34,7 @@ const FinancialAssets = () => {
 
     useEffect(() => {
         setYearly(!isOverall)
-        // eslint-disable-next-line
-    }, []);
+    }, [isOverall, setYearly]);
 
     // Note: this initialises the flags during render when they are still empty,
     // which is how the original behaved. It would be better done from a state

@@ -1,4 +1,4 @@
-import {fireEvent, render, screen, within} from "@testing-library/react";
+import {fireEvent, screen, within} from "@testing-library/react";
 import Home from "../Home";
 import {renderWithAppState} from "../../testUtils";
 

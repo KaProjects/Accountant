@@ -10,7 +10,6 @@ const application = () => screen.findByRole("button", {name: "open drawer"});
 
 describe("App", () => {
     beforeEach(() => {
-        window.sessionStorage.clear();
         jest.clearAllMocks();
         // The suite runs as a test build, where there is no automatic login.
         isDevelopment.mockReturnValue(false);

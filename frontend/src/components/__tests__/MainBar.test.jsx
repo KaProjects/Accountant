@@ -1,4 +1,4 @@
-import {fireEvent, render, screen} from "@testing-library/react";
+import {fireEvent, screen} from "@testing-library/react";
 import MainBar from "../MainBar";
 import {renderWithAppState} from "../../testUtils";
 
@@ -27,7 +27,6 @@ const renderBar = (props = {}) => {
 };
 
 describe("MainBar", () => {
-    beforeEach(() => window.sessionStorage.clear());
 
     it("steps the year back and forward", () => {
         const {setYear} = renderBar({year: 2020});
@@ -60,13 +59,11 @@ describe("MainBar", () => {
         expect(screen.queryByTestId("ArrowRightIcon")).not.toBeInTheDocument();
     });
 
-    it("forgets the year being looked at and returns to the start", () => {
-        // Without a page reload the year has to be set back, not merely cleared.
-        const {setYear} = renderBar({year: 2020});
+    it("returns to the start, which drops the year from the address", () => {
+        renderBar({year: 2020});
 
         fireEvent.click(screen.getByLabelText("open drawer"));
 
-        expect(setYear).toHaveBeenCalledWith(new Date().getFullYear());
         expect(mockNavigate).toHaveBeenCalledWith("/");
     });
 

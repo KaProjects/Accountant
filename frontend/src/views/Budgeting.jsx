@@ -21,8 +21,7 @@ const Budgeting = () => {
 
     useEffect(() => {
         setYearly(true)
-        // eslint-disable-next-line
-    }, []);
+    }, [setYearly]);
 
     const [showSubRows, setShowSubRows] = React.useState([]);
     const [showDeltas, setShowDeltas] = React.useState([]);

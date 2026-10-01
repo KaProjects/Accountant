@@ -43,8 +43,7 @@ const AdminSync = () => {
 
     useEffect(() => {
         setYearly(false)
-        // eslint-disable-next-line
-    }, []);
+    }, [setYearly]);
 
     const run = (action) => async () => {
         setRunning(action.id)

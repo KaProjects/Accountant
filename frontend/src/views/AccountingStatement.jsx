@@ -9,11 +9,11 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import StatementRow from "../components/statement/StatementRow";
 import {statementHeaderStyle} from "../theme/tableStyles";
 import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
-import {useAppState} from "../state/appState";
+import {useAppState, yearlyPath} from "../state/appState";
 import {useGoTo} from "../services/navigation";
 
 const AccountingStatement = () => {
-    const {year, setYear, setYearly} = useAppState();
+    const {year, setYearly} = useAppState();
     const goTo = useGoTo();
     const {type, overall} = useParams();
     const isOverall = overall !== undefined;
@@ -22,8 +22,7 @@ const AccountingStatement = () => {
 
     useEffect(() => {
         setYearly(!isOverall)
-        // eslint-disable-next-line
-    }, []);
+    }, [isOverall, setYearly]);
 
     const [showChildren, setShowChildren] = React.useState([]);
     const [showGrandChild, setShowGrandChild] = React.useState(null);
@@ -43,8 +42,7 @@ const AccountingStatement = () => {
 
     const redirectToYear = () => {
         // Setting the year used to mean writing it down and letting the reload read it back.
-        setYear(parseInt(data.columns[redirectYearIndex]))
-        goTo('/accounting/' + type)()
+        goTo(yearlyPath('/accounting/' + type, data.columns[redirectYearIndex]))()
     }
 
     const hasInitial = () => data.columns[1] === "Initial"

@@ -1,5 +1,4 @@
 import {useNavigate} from "react-router-dom";
-import {useAppState} from "../state/appState";
 
 /**
  * Moves within the application.
@@ -15,18 +14,10 @@ export const useGoTo = () => {
 };
 
 /**
- * Returns to the start and forgets the year being looked at.
- *
- * The year was previously forgotten by clearing it from session storage and letting the reload
- * read the default back out. Without a reload it has to be set, or the bar would keep showing the
- * old year.
+ * Returns to the start, which also forgets the year being looked at: the year is a query
+ * parameter and the start has none.
  */
 export const useGoHome = () => {
     const navigate = useNavigate();
-    const {setYear} = useAppState();
-
-    return () => {
-        setYear(new Date().getFullYear());
-        navigate("/");
-    };
+    return () => navigate("/");
 };

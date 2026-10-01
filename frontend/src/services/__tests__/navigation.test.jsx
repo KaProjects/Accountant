@@ -1,4 +1,4 @@
-import {fireEvent, render, screen} from "@testing-library/react";
+import {cleanup, fireEvent, render, screen} from "@testing-library/react";
 import {MemoryRouter, Route, Routes} from "react-router-dom";
 import {useGoHome, useGoTo} from "../navigation";
 import {AppStateProvider} from "../../state/appState";
@@ -47,15 +47,16 @@ describe("useGoHome", () => {
     it("returns to the start", () => {
         renderAt("/elsewhere");
         expect(screen.getByText("elsewhere")).toBeInTheDocument();
+
+        cleanup();
+        renderAt("/");
+        fireEvent.click(screen.getByRole("button", {name: "home"}));
+        expect(screen.getByText("start")).toBeInTheDocument();
     });
 
-    it("forgets the year being looked at, which the reload used to do", () => {
-        const setYear = jest.fn();
-        renderAt("/", {setYear});
+    it("drops the year from the address, since the start carries none", () => {
+        renderAt("/elsewhere?year=2019");
 
-        fireEvent.click(screen.getByRole("button", {name: "home"}));
-
-        expect(setYear).toHaveBeenCalledWith(new Date().getFullYear());
-        expect(screen.getByText("start")).toBeInTheDocument();
+        expect(screen.getByText("elsewhere")).toBeInTheDocument();
     });
 });

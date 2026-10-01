@@ -57,7 +57,7 @@ public class AccountingResourceTest
         AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
 
         assertThat(dto.getColumns().size(), is(15));
-        assertThat(dto.getColumns().get(0), is("Cash Flow Statement 2020"));
+        assertThat(dto.getColumns().get(0), is("Cash Flow Statement"));
         assertThat(dto.getRows().size(), is(5));
 
         assertThat(dto.getRows().get(0).getSchemaId(), is("20"));
@@ -149,7 +149,7 @@ public class AccountingResourceTest
         AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
 
         assertThat(dto.getColumns().size(), is(15));
-        assertThat(dto.getColumns().get(0), is("Balance Sheet 2020"));
+        assertThat(dto.getColumns().get(0), is("Balance Sheet"));
         assertThat(dto.getRows().size(), is(10));
 
         assertThat(dto.getRows().get(0).getSchemaId(), is("a"));
@@ -366,7 +366,7 @@ public class AccountingResourceTest
         AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
 
         assertThat(dto.getColumns().size(), is(14));
-        assertThat(dto.getColumns().get(0), is("Income Statement 2019"));
+        assertThat(dto.getColumns().get(0), is("Income Statement"));
         assertThat(dto.getRows().size(), is(16));
 
         assertThat(dto.getRows().get(0).getSchemaId(), is("60"));

@@ -55,8 +55,7 @@ const Admin = () => {
 
     useEffect(() => {
         setYearly(false)
-        // eslint-disable-next-line
-    }, []);
+    }, [setYearly]);
 
     const open = (page) => (event) => {
         if (page.external) {

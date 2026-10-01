@@ -14,13 +14,7 @@ import Admin from "./views/Admin";
 import AdminSync from "./views/AdminSync";
 import {devLogin, isDevelopment} from "./services/devLogin";
 import {hasSession} from "./services/session";
-import {AppStateProvider} from "./state/appState";
-
-/** The year last looked at in this tab, or the current one on a first visit. */
-const retrieveYear = () => {
-    const storedYear = sessionStorage.getItem('year');
-    return storedYear !== null ? parseInt(storedYear) : new Date().getFullYear();
-};
+import AppState from "./state/appState";
 
 const PageNotFound = () => (
     <div style={{position: "absolute", top: "25%", left: "50%", transform: "translate(-50%, -50%)"}}>
@@ -33,10 +27,6 @@ const App = () => {
     // Nothing is rendered while this is set, so the login form does not flash for somebody who
     // already has a session.
     const [checkingSession, setCheckingSession] = useState(true);
-    const [year, rememberYear] = useState(retrieveYear);
-    const [isYearly, setIsYearly] = useState(false); // toggles year's switch in MainBar
-    const [selectValues, rememberSelectValues] = useState(null);
-    const [selectedValue, setSelectedValue] = useState("");
 
     /**
      * The session is an HttpOnly cookie, so the page cannot look at it and has to ask. Asking also
@@ -58,27 +48,6 @@ const App = () => {
         establishSession();
     }, []);
 
-    const setYear = (value) => {
-        sessionStorage.setItem('year', value);
-        rememberYear(value);
-    };
-
-    const setYearly = (yearly) => {
-        rememberSelectValues(null);
-        setSelectedValue("");
-        setIsYearly(yearly);
-    };
-
-    const setSelectValues = (values) => {
-        setIsYearly(false);
-        rememberSelectValues(values);
-    };
-
-    const state = {
-        year, isYearly, selectValues, selectedValue,
-        setYear, setYearly, setSelectedValue, setSelectValues,
-    };
-
     if (checkingSession) {
         return null;
     }
@@ -91,7 +60,7 @@ const App = () => {
         <div>
             {/* Inside the router, so the bar can navigate without reloading the page. */}
             <BrowserRouter>
-                <AppStateProvider value={state}>
+                <AppState>
                 <MainBar/>
                 <Routes>
                     <Route exact path="/" element={<Home/> }/>
@@ -108,7 +77,7 @@ const App = () => {
                     <Route exact path="/admin/sync" element={<AdminSync/> }/>
                     <Route path="*" element={<PageNotFound/>} />
                 </Routes>
-                </AppStateProvider>
+                </AppState>
             </BrowserRouter>
         </div>
     );

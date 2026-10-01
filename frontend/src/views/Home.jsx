@@ -88,8 +88,7 @@ const Home = () => {
 
     useEffect(() => {
         setYearly(false)
-        // eslint-disable-next-line
-    }, []);
+    }, [setYearly]);
 
     return (
         <>

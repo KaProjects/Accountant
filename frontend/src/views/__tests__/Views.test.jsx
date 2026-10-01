@@ -1,4 +1,4 @@
-import {fireEvent, render, screen, within} from "@testing-library/react";
+import {fireEvent, screen, within} from "@testing-library/react";
 import Views from "../Views";
 import {useData} from "../../fetch";
 import {useParams} from "react-router-dom";

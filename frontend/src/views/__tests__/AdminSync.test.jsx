@@ -1,4 +1,4 @@
-import {fireEvent, render, screen, waitFor, within} from "@testing-library/react";
+import {fireEvent, screen, waitFor, within} from "@testing-library/react";
 import AdminSync from "../AdminSync";
 import {runSync} from "../../services/sync";
 import {renderWithAppState} from "../../testUtils";

@@ -1,4 +1,4 @@
-import {fireEvent, render, screen} from "@testing-library/react";
+import {fireEvent, screen} from "@testing-library/react";
 import FinancialAssets from "../FinancialAssets";
 import {useData} from "../../fetch";
 import {useParams} from "react-router-dom";

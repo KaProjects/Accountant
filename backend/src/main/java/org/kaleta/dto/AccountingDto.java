@@ -16,23 +16,27 @@ public class AccountingDto
     private List<Row> rows = new ArrayList<>();
 
     public AccountingDto() {}
-    public AccountingDto(String year, Type type)
+    /**
+     * The title carries no year: the page already shows which year it is, in the bar and in its
+     * own address, so repeating it in the first cell of the table said the same thing a third time.
+     */
+    public AccountingDto(Type type)
     {
         if (type == Type.PROFIT_SUMMARY) {
-            columns.add("Income Statement " + year);
+            columns.add("Income Statement");
             columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
             columns.remove(13);
             columns.add("Total");
         }
         if (type == Type.CASH_FLOW_SUMMARY) {
-            columns.add("Cash Flow Statement " + year);
+            columns.add("Cash Flow Statement");
             columns.add("Initial");
             columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
             columns.remove(14);
             columns.add("Total");
         }
         if (type == Type.BALANCE_SUMMARY) {
-            columns.add("Balance Sheet " + year);
+            columns.add("Balance Sheet");
             columns.add("Initial");
             columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
             columns.remove(14);

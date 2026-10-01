@@ -1,4 +1,4 @@
-import {fireEvent, render, screen, within} from "@testing-library/react";
+import {fireEvent, screen, within} from "@testing-library/react";
 import AccountingData from "../AccountingData";
 import {useData} from "../../fetch";
 import {renderWithAppState} from "../../testUtils";
