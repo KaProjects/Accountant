@@ -2,23 +2,26 @@ import React, {useEffect} from "react";
 import {useData} from "../fetch";
 import DataView from "../components/common/DataView";
 import Paper from "@mui/material/Paper";
-import PropTypes from "prop-types";
 import {IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
-import TransactionsDialog from "../components/TransactionsDialog";
+import TransactionsDialog from "../components/dialog/TransactionsDialog";
 import {useParams} from "react-router-dom";
 import LaunchIcon from '@mui/icons-material/Launch';
 import StatementRow from "../components/statement/StatementRow";
 import {statementHeaderStyle} from "../theme/tableStyles";
 import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
+import {useAppState} from "../state/appState";
+import {useGoTo} from "../services/navigation";
 
-const AccountingStatement = props => {
+const AccountingStatement = () => {
+    const {year, setYear, setYearly} = useAppState();
+    const goTo = useGoTo();
     const {type, overall} = useParams();
     const isOverall = overall !== undefined;
 
-    const {data, loaded, error} = useData("/accounting/" + type + "/" + (isOverall ? "" : props.year))
+    const {data, loaded, error} = useData("/accounting/" + type + "/" + (isOverall ? "" : year))
 
     useEffect(() => {
-        props.setYearly(!isOverall)
+        setYearly(!isOverall)
         // eslint-disable-next-line
     }, []);
 
@@ -39,8 +42,9 @@ const AccountingStatement = props => {
     }
 
     const redirectToYear = () => {
-        sessionStorage.setItem('year', data.columns[redirectYearIndex])
-        window.location.href='/accounting/' + type
+        // Setting the year used to mean writing it down and letting the reload read it back.
+        setYear(parseInt(data.columns[redirectYearIndex]))
+        goTo('/accounting/' + type)()
     }
 
     const hasInitial = () => data.columns[1] === "Initial"
@@ -79,14 +83,18 @@ const AccountingStatement = props => {
                                     key={index}
                                     row={row}
                                     id={index}
-                                    type={type}
-                                    isOverall={isOverall}
-                                    hasInitial={hasInitial()}
-                                    hasTotal={hasTotal()}
-                                    showChildren={Boolean(showChildren[index])}
-                                    onToggleChildren={toggleChildren}
-                                    showGrandChild={showGrandChild}
-                                    onToggleGrandChild={toggleGrandChild}
+                                    columns={{
+                                        type,
+                                        isOverall,
+                                        hasInitial: hasInitial(),
+                                        hasTotal: hasTotal(),
+                                    }}
+                                    expansion={{
+                                        showChildren: Boolean(showChildren[index]),
+                                        onToggleChildren: toggleChildren,
+                                        showGrandChild,
+                                        onToggleGrandChild: toggleGrandChild,
+                                    }}
                                     transactionsDialog={transactionsDialog}
                                 />
                             ))}
@@ -96,7 +104,7 @@ const AccountingStatement = props => {
                 <TransactionsDialog
                     open={transactionsDialog.open}
                     onClose={transactionsDialog.close}
-                    year={props.year}
+                    year={year}
                     row={transactionsDialog.rowName}
                     rowId={transactionsDialog.rowId}
                     month={transactionsDialog.month}
@@ -108,9 +116,5 @@ const AccountingStatement = props => {
     )
 }
 
-AccountingStatement.propTypes = {
-    year: PropTypes.number.isRequired,
-    setYearly: PropTypes.func.isRequired,
-}
 
 export default AccountingStatement;

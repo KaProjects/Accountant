@@ -1,23 +1,38 @@
 import {fireEvent, render, screen, waitFor, within} from "@testing-library/react";
 import AdminSync from "../AdminSync";
 import {runSync} from "../../services/sync";
+import {renderWithAppState} from "../../testUtils";
+
+const mockNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+    ...jest.requireActual("react-router-dom"),
+    useNavigate: () => mockNavigate,
+}));
 
 jest.mock("../../services/sync", () => ({
     ...jest.requireActual("../../services/sync"),
     runSync: jest.fn(),
 }));
 
-const renderView = () => {
+const mountView = () => {
     const setYearly = jest.fn();
-    render(<AdminSync year={2020} setYearly={setYearly}/>);
+    renderWithAppState(<AdminSync/>, {year: 2020, setYearly});
     return {setYearly};
 };
 
 describe("AdminSync", () => {
     beforeEach(() => jest.clearAllMocks());
 
+    it("goes back to the admin page", () => {
+        mountView();
+
+        fireEvent.click(screen.getByRole("button", {name: /Admin/}));
+
+        expect(mockNavigate).toHaveBeenCalledWith("/admin");
+    });
+
     it("offers each sync action, naming the selected year", () => {
-        renderView();
+        mountView();
 
         expect(screen.getByText("Sync 2020")).toBeInTheDocument();
         expect(screen.getByText("Sync All Years")).toBeInTheDocument();
@@ -25,14 +40,14 @@ describe("AdminSync", () => {
     });
 
     it("shows nothing until an action has been run", () => {
-        renderView();
+        mountView();
 
         expect(screen.queryByTestId("result-all")).not.toBeInTheDocument();
     });
 
     it("runs the endpoint of the action that was clicked", async () => {
         runSync.mockResolvedValue({ok: true, status: "200 OK", body: "2020 synced"});
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByTestId("run-year"));
 
@@ -41,7 +56,7 @@ describe("AdminSync", () => {
 
     it("reports the status and the response body of a successful run", async () => {
         runSync.mockResolvedValue({ok: true, status: "200 OK", body: "2020 synced\n2021 synced"});
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByTestId("run-all"));
 
@@ -54,7 +69,7 @@ describe("AdminSync", () => {
         // A year that fails its checks arrives as 406 whose body is the report, so the body
         // matters more than the status and must not be swallowed.
         runSync.mockResolvedValue({ok: false, status: "406 Not Acceptable", body: "2019: data invalid"});
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByTestId("run-validate"));
 
@@ -66,7 +81,7 @@ describe("AdminSync", () => {
 
     it("keeps the results of different actions apart", async () => {
         runSync.mockResolvedValueOnce({ok: true, status: "200 OK", body: "all synced"});
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByTestId("run-all"));
         await screen.findByTestId("result-all");
@@ -78,7 +93,7 @@ describe("AdminSync", () => {
     it("blocks the other actions while one is running, so two do not rebuild at once", async () => {
         let finish;
         runSync.mockReturnValue(new Promise((resolve) => {finish = resolve}));
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByTestId("run-all"));
 

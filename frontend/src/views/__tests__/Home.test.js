@@ -1,26 +1,22 @@
 import {fireEvent, render, screen, within} from "@testing-library/react";
 import Home from "../Home";
+import {renderWithAppState} from "../../testUtils";
+
+const mockNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+    ...jest.requireActual("react-router-dom"),
+    useNavigate: () => mockNavigate,
+}));
+
 
 const renderHome = () => {
     const setYearly = jest.fn();
-    render(<Home setYearly={setYearly}/>);
+    renderWithAppState(<Home/>, {setYearly});
     return {setYearly};
 };
 
 describe("Home", () => {
-    const originalLocation = window.location;
-
-    beforeEach(() => {
-        Object.defineProperty(window, "location", {
-            value: {href: ""}, writable: true, configurable: true,
-        });
-    });
-
-    afterEach(() => {
-        Object.defineProperty(window, "location", {
-            value: originalLocation, writable: true, configurable: true,
-        });
-    });
+    beforeEach(() => jest.clearAllMocks());
 
     it("leaves yearly mode off, since the menu is not year specific", () => {
         const {setYearly} = renderHome();
@@ -48,7 +44,7 @@ describe("Home", () => {
 
         fireEvent.click(screen.getByText("Accounting Chart"));
 
-        expect(window.location.href).toBe("/chart/accounting");
+        expect(mockNavigate).toHaveBeenCalledWith("/chart/accounting");
     });
 
     it("offers yearly and overall for the statements", () => {
@@ -70,7 +66,7 @@ describe("Home", () => {
 
         fireEvent.click(yearlyButtons[0]);
 
-        expect(window.location.href).toBe("/accounting/balance");
+        expect(mockNavigate).toHaveBeenCalledWith("/accounting/balance");
     });
 
     it("navigates to the overall balance sheet", () => {
@@ -79,7 +75,7 @@ describe("Home", () => {
 
         fireEvent.click(overallButtons[0]);
 
-        expect(window.location.href).toBe("/accounting/balance/overall");
+        expect(mockNavigate).toHaveBeenCalledWith("/accounting/balance/overall");
     });
 
     // The swagger link moved onto the admin page, which is covered by Admin.test.js.
@@ -88,6 +84,6 @@ describe("Home", () => {
 
         fireEvent.click(screen.getByText("Admin"));
 
-        expect(window.location.href).toBe("/admin");
+        expect(mockNavigate).toHaveBeenCalledWith("/admin");
     });
 });

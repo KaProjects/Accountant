@@ -1,12 +1,16 @@
 import PropTypes from "prop-types";
 import {Card, CardContent, Typography} from "@mui/material";
 
+const cardStyle = {width: 150};
+const cardBoxStyle = {backgroundColor: "white", display: "inline-block", verticalAlign: "middle", marginLeft: 10};
+const labelStyle = {fontSize: 14};
+
 const returnColor = (currentReturn) =>
     currentReturn > 0 ? "#158615" : currentReturn < 0 ? "#b93333" : "black";
 
 const Figure = ({label, children}) => (
     <>
-        <Typography sx={{fontSize: 14}} color="text.secondary" align={"center"}>
+        <Typography sx={labelStyle} color="text.secondary" align={"center"}>
             {label}
         </Typography>
         <Typography color="text.secondary" align={"center"}>
@@ -22,10 +26,10 @@ Figure.propTypes = {
 
 /** The headline figures for one asset account, beside its chart. */
 const AssetSummaryCard = ({account}) => (
-    <Card sx={{width: 150}}
-          style={{backgroundColor: "white", display: "inline-block", verticalAlign: "middle", marginLeft: 10}}>
+    <Card sx={cardStyle}
+          style={cardBoxStyle}>
         <CardContent>
-            <Typography sx={{fontSize: 14}} color="text.secondary" align={"center"}>
+            <Typography sx={labelStyle} color="text.secondary" align={"center"}>
                 Current Return
             </Typography>
             <Typography variant="h5" component="div" align={"center"}

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import {Area, Bar, CartesianGrid, ComposedChart, LabelList, Tooltip, XAxis, YAxis} from "recharts";
 import {Card, CardContent, Dialog, DialogTitle, Typography} from "@mui/material";
@@ -49,9 +50,6 @@ const BarLabel = (props) => {
 };
 
 const BudgetChartDialog = props => {
-
-
-
     return (
         <Dialog
             open={props.open}
@@ -83,5 +81,32 @@ const BudgetChartDialog = props => {
         </Dialog>
     )
 }
+
+export {CustomTooltip, BarLabel};
+BudgetChartDialog.propTypes = {
+    open: PropTypes.bool,
+    onClose: PropTypes.func.isRequired,
+    /** The budget row being charted. */
+    name: PropTypes.string,
+    data: PropTypes.array,
+    /** Over-spending reads as a loss on an expense row and a gain on an income one. */
+    isExpense: PropTypes.bool,
+};
+
+CustomTooltip.propTypes = {
+    active: PropTypes.bool,
+    payload: PropTypes.array,
+    label: PropTypes.string,
+};
+
+BarLabel.propTypes = {
+    value: PropTypes.number,
+    sign: PropTypes.string,
+    fill: PropTypes.string,
+    x: PropTypes.number,
+    y: PropTypes.number,
+    width: PropTypes.number,
+    offset: PropTypes.number,
+};
 
 export default BudgetChartDialog;

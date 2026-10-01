@@ -2,6 +2,7 @@ import {fireEvent, render, screen} from "@testing-library/react";
 import FinancialAssets from "../FinancialAssets";
 import {useData} from "../../fetch";
 import {useParams} from "react-router-dom";
+import {renderWithAppState} from "../../testUtils";
 
 jest.mock("../../fetch");
 jest.mock("react-router-dom", () => ({
@@ -30,11 +31,11 @@ const account = (overrides = {}) => ({
 
 const payload = (accounts) => ({groups: [{name: "Investments", accounts}]});
 
-const renderView = (data, {loaded = true, params = {}} = {}) => {
+const mountView = (data, {loaded = true, params = {}} = {}) => {
     useParams.mockReturnValue(params);
     useData.mockReturnValue({data, loaded, error: null});
     const setYearly = jest.fn();
-    render(<FinancialAssets year={2020} setYearly={setYearly}/>);
+    renderWithAppState(<FinancialAssets/>, {year: 2020, setYearly});
     return {setYearly};
 };
 
@@ -42,27 +43,27 @@ describe("FinancialAssets", () => {
     beforeEach(() => jest.clearAllMocks());
 
     it("requests the year's assets and switches to yearly mode", () => {
-        const {setYearly} = renderView(payload([account()]));
+        const {setYearly} = mountView(payload([account()]));
 
         expect(useData).toHaveBeenCalledWith("/financial/assets/2020");
         expect(setYearly).toHaveBeenCalledWith(true);
     });
 
     it("requests all years without a year on the overall route", () => {
-        const {setYearly} = renderView(payload([account()]), {params: {all: "all"}});
+        const {setYearly} = mountView(payload([account()]), {params: {all: "all"}});
 
         expect(useData).toHaveBeenCalledWith("/financial/assets/");
         expect(setYearly).toHaveBeenCalledWith(false);
     });
 
     it("shows the loader until the data arrives", () => {
-        renderView(null, {loaded: false});
+        mountView(null, {loaded: false});
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
     });
 
     it("lists each group and the accounts inside it", () => {
-        renderView(payload([account(), account({name: "Brokerage"})]));
+        mountView(payload([account(), account({name: "Brokerage"})]));
 
         expect(screen.getByText("Investments")).toBeInTheDocument();
         expect(screen.getByText("Pension fund")).toBeInTheDocument();
@@ -70,13 +71,13 @@ describe("FinancialAssets", () => {
     });
 
     it("keeps the chart collapsed until the account is opened", () => {
-        renderView(payload([account()]));
+        mountView(payload([account()]));
 
         expect(screen.queryByTestId("financial-chart")).not.toBeInTheDocument();
     });
 
     it("opens the chart and the summary figures for the chosen account", () => {
-        renderView(payload([account()]));
+        mountView(payload([account()]));
 
         fireEvent.click(screen.getByText("Pension fund"));
 
@@ -87,7 +88,7 @@ describe("FinancialAssets", () => {
     });
 
     it("shows a negative return without a plus sign", () => {
-        renderView(payload([account({currentReturn: -5})]));
+        mountView(payload([account({currentReturn: -5})]));
 
         fireEvent.click(screen.getByText("Pension fund"));
 
@@ -97,7 +98,7 @@ describe("FinancialAssets", () => {
     it("opening one account marks any other as closed", () => {
         // the collapse animates out, so the expand icons are what update
         // synchronously - exactly one account is ever marked open
-        renderView(payload([account(), account({name: "Brokerage"})]));
+        mountView(payload([account(), account({name: "Brokerage"})]));
         expect(screen.queryAllByTestId("ExpandLessIcon")).toHaveLength(0);
 
         fireEvent.click(screen.getByText("Pension fund"));
@@ -109,7 +110,7 @@ describe("FinancialAssets", () => {
     });
 
     it("toggles the funding decomposition", () => {
-        renderView(payload([account()]));
+        mountView(payload([account()]));
         fireEvent.click(screen.getByText("Pension fund"));
 
         const chart = screen.getByTestId("financial-chart");
@@ -121,7 +122,7 @@ describe("FinancialAssets", () => {
     });
 
     it("defaults the decomposition on when the account is fully withdrawn", () => {
-        renderView(payload([account({balances: [1000, 500, 0]})]));
+        mountView(payload([account({balances: [1000, 500, 0]})]));
 
         fireEvent.click(screen.getByText("Pension fund"));
 

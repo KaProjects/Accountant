@@ -28,11 +28,16 @@ const AccountTreeItem = styled(TreeItem)`
   & > .MuiTreeItem-content.Mui-selected:hover {background: #f6edc5;}
 `;
 
+const treeStyle = {marginTop: "10px", marginBottom: "100px", width: "300px"};
+const labelRowStyle = {display: "flex", alignItems: "center"};
+const labelGapStyle = {mr: 1};
+const labelTextStyle = {fontWeight: "inherit", fontSize: "inherit", flexGrow: 1};
+
 /** An account node, marked with a chevron while it is the selected one. */
 const AccountLabel = ({account, isSelected}) => (
-    <Box sx={{display: "flex", alignItems: "center"}}>
-        <Box color="inherit" sx={{mr: 1}}/>
-        <Typography variant="body2" sx={{fontWeight: "inherit", fontSize: "inherit", flexGrow: 1}}>
+    <Box sx={labelRowStyle}>
+        <Box color="inherit" sx={labelGapStyle}/>
+        <Typography variant="body2" sx={labelTextStyle}>
             {account.name}
         </Typography>
         {isSelected && <ChevronRightIcon/>}
@@ -52,7 +57,7 @@ const SchemaTree = ({classes, expanded, onToggle, selectedSchemaId, onSelectAcco
         defaultExpandIcon={<ChevronRightIcon/>}
         expanded={expanded}
         onNodeToggle={onToggle}
-        style={{marginTop: "10px", marginBottom: "100px", width: "300px"}}
+        style={treeStyle}
     >
         {classes.map((clazz, cIndex) => (
             <ClassTreeItem nodeId={"c" + cIndex}

@@ -1,6 +1,7 @@
 import {fireEvent, render, screen, within} from "@testing-library/react";
 import AccountingData from "../AccountingData";
 import {useData} from "../../fetch";
+import {renderWithAppState} from "../../testUtils";
 
 jest.mock("../../fetch");
 
@@ -33,9 +34,9 @@ const respond = ({schemaLoaded = true} = {}) => {
     });
 };
 
-const renderView = () => {
+const mountView = () => {
     const setYearly = jest.fn();
-    render(<AccountingData year={2020} setYearly={setYearly}/>);
+    renderWithAppState(<AccountingData/>, {year: 2020, setYearly});
     return {setYearly};
 };
 
@@ -44,7 +45,7 @@ describe("AccountingData", () => {
 
     it("requests the schema for the selected year and switches to yearly mode", () => {
         respond();
-        const {setYearly} = renderView();
+        const {setYearly} = mountView();
 
         expect(useData).toHaveBeenCalledWith("/schema/2020");
         expect(setYearly).toHaveBeenCalledWith(true);
@@ -52,7 +53,7 @@ describe("AccountingData", () => {
 
     it("shows the loader until the schema arrives", () => {
         respond({schemaLoaded: false});
-        renderView();
+        mountView();
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
         expect(screen.queryByRole("tree")).not.toBeInTheDocument();
@@ -60,7 +61,7 @@ describe("AccountingData", () => {
 
     it("renders the schema classes as a tree", () => {
         respond();
-        renderView();
+        mountView();
 
         expect(screen.getByRole("tree")).toBeInTheDocument();
         expect(screen.getByText("Class 2")).toBeInTheDocument();
@@ -68,7 +69,7 @@ describe("AccountingData", () => {
 
     it("reveals groups and accounts as the tree is expanded", () => {
         respond();
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByText("Class 2"));
         expect(screen.getByText("Group 21")).toBeInTheDocument();
@@ -80,14 +81,14 @@ describe("AccountingData", () => {
 
     it("shows no account table until an account is picked", () => {
         respond();
-        renderView();
+        mountView();
 
         expect(screen.queryByText("Current account")).not.toBeInTheDocument();
     });
 
     it("loads the accounts for the picked schema account", () => {
         respond();
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByText("Class 2"));
         fireEvent.click(screen.getByText("Group 21"));
@@ -100,7 +101,7 @@ describe("AccountingData", () => {
 
     it("labels the account table with a balance column for the current year", () => {
         respond();
-        render(<AccountingData year={new Date().getFullYear()} setYearly={jest.fn()}/>);
+        renderWithAppState(<AccountingData/>, {year: new Date().getFullYear()});
 
         fireEvent.click(screen.getByText("Class 2"));
         fireEvent.click(screen.getByText("Group 21"));
@@ -112,7 +113,7 @@ describe("AccountingData", () => {
 
     it("labels it a closure column for a past year", () => {
         respond();
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByText("Class 2"));
         fireEvent.click(screen.getByText("Group 21"));
@@ -124,7 +125,7 @@ describe("AccountingData", () => {
 
     it("loads the transactions for the selected account row", () => {
         respond();
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByText("Class 2"));
         fireEvent.click(screen.getByText("Group 21"));
@@ -145,7 +146,7 @@ describe("AccountingData", () => {
             }
             return {data: [], loaded: true, error: null};
         });
-        renderView();
+        mountView();
 
         fireEvent.click(screen.getByText("Class 2"));
         fireEvent.click(screen.getByText("Group 21"));
@@ -161,7 +162,7 @@ describe("AccountingData", () => {
 
     it("renders each account row with its figures", () => {
         respond();
-        renderView();
+        mountView();
         fireEvent.click(screen.getByText("Class 2"));
         fireEvent.click(screen.getByText("Group 21"));
         fireEvent.click(screen.getByText("Bank"));

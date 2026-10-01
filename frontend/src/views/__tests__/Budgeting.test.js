@@ -2,6 +2,7 @@ import {fireEvent, render, screen, within} from "@testing-library/react";
 import Budgeting from "../Budgeting";
 import {useData} from "../../fetch";
 import realBudget from "../../__tests__/fixtures/budget-2020.json";
+import {renderWithAppState} from "../../testUtils";
 
 jest.mock("../../fetch");
 
@@ -35,10 +36,13 @@ const payload = (rows) => ({
     rows,
 });
 
-const renderView = (data, {loaded = true, error = null} = {}) => {
-    useData.mockReturnValue({data, loaded, error});
+const mountView = (data, {loaded = true, error = null} = {}) => {
+    // The view and the transactions dialog inside it both fetch, so the mock answers by path
+    // rather than returning the view's payload to whoever asks.
+    useData.mockImplementation((path) =>
+        path.startsWith("/budget/2020/transaction") ? {data: [], loaded: true, error: null} : {data, loaded, error});
     const setYearly = jest.fn();
-    render(<Budgeting year={2020} setYearly={setYearly}/>);
+    renderWithAppState(<Budgeting/>, {year: 2020, setYearly});
     return {setYearly};
 };
 
@@ -46,26 +50,26 @@ describe("Budgeting", () => {
     beforeEach(() => jest.clearAllMocks());
 
     it("requests the budget for the selected year", () => {
-        renderView(payload([row()]));
+        mountView(payload([row()]));
 
         expect(useData).toHaveBeenCalledWith("/budget/2020");
     });
 
     it("switches the main bar into yearly mode", () => {
-        const {setYearly} = renderView(payload([row()]));
+        const {setYearly} = mountView(payload([row()]));
 
         expect(setYearly).toHaveBeenCalledWith(true);
     });
 
     it("shows the loader instead of the table until the data arrives", () => {
-        renderView(null, {loaded: false});
+        mountView(null, {loaded: false});
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
         expect(screen.queryByRole("table")).not.toBeInTheDocument();
     });
 
     it("renders every column heading", () => {
-        renderView(payload([row()]));
+        mountView(payload([row()]));
 
         const headers = screen.getAllByRole("columnheader");
         expect(headers).toHaveLength(17);
@@ -75,7 +79,7 @@ describe("Budgeting", () => {
     });
 
     it("shows actual figures up to the last filled month and planned ones after it", () => {
-        renderView(payload([row()]));
+        mountView(payload([row()]));
 
         const cells = screen.getAllByRole("cell");
         // first cell is the row label, then 12 month cells
@@ -86,7 +90,7 @@ describe("Budgeting", () => {
     });
 
     it("shows the summary figures at the end of the row", () => {
-        renderView(payload([row()]));
+        mountView(payload([row()]));
 
         const cells = screen.getAllByRole("cell");
         expect(cells[13]).toHaveTextContent("600"); // actualSum
@@ -99,7 +103,7 @@ describe("Budgeting", () => {
         const parent = row({
             subRows: [row({id: "e1.1", name: "Supermarket", subRows: undefined})],
         });
-        renderView(payload([parent]));
+        mountView(payload([parent]));
 
         expect(screen.queryByText("Supermarket")).not.toBeInTheDocument();
 
@@ -109,7 +113,7 @@ describe("Budgeting", () => {
     });
 
     it("reveals the planned and difference rows from the row toggle", () => {
-        renderView(payload([row()]));
+        mountView(payload([row()]));
 
         expect(screen.queryByText("Planned")).not.toBeInTheDocument();
 
@@ -120,7 +124,7 @@ describe("Budgeting", () => {
     });
 
     it("computes the difference row as actual minus planned", () => {
-        renderView(payload([row()]));
+        mountView(payload([row()]));
         fireEvent.click(screen.getAllByRole("button", {name: "expand row"})[0]);
 
         const differenceRow = screen.getAllByRole("row")
@@ -133,14 +137,14 @@ describe("Budgeting", () => {
     });
 
     it("renders one row per budget line", () => {
-        renderView(payload([row({id: "e1", name: "Groceries"}), row({id: "e2", name: "Fuel"})]));
+        mountView(payload([row({id: "e1", name: "Groceries"}), row({id: "e2", name: "Fuel"})]));
 
         expect(screen.getByText(/Groceries/)).toBeInTheDocument();
         expect(screen.getByText(/Fuel/)).toBeInTheDocument();
     });
 
     it("renders the real backend payload without error", () => {
-        renderView(realBudget);
+        mountView(realBudget);
 
         expect(screen.getAllByRole("columnheader")).toHaveLength(realBudget.columns.length);
         // one table row per budget line, before any expansion

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import {PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer} from "recharts";
 
@@ -58,5 +59,15 @@ const VacationChart = props => {
         </ResponsiveContainer>
     )
 }
+
+export {getColor, renderCustomizedLabel};
+VacationChart.propTypes = {
+    data: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        value: PropTypes.number.isRequired,
+    })).isRequired,
+    /** The same chart is placed below the table and beside it, laid out differently. */
+    isBottom: PropTypes.bool,
+};
 
 export default VacationChart;

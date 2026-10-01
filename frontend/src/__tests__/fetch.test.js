@@ -74,6 +74,24 @@ describe("useData", () => {
         expect(result.current.error.message).toBe("Session expired! Redirecting...");
     });
 
+    it("fetches nothing while it is not wanted", () => {
+        axios.get.mockResolvedValue({data: {}});
+
+        renderHook(() => useData("/budget/2020", false));
+
+        expect(axios.get).not.toHaveBeenCalled();
+    });
+
+    it("fetches once it becomes wanted", async () => {
+        axios.get.mockResolvedValue({data: {}});
+        const {rerender} = renderHook(({enabled}) => useData("/budget/2020", enabled),
+            {initialProps: {enabled: false}});
+
+        rerender({enabled: true});
+
+        await waitFor(() => expect(axios.get).toHaveBeenCalledWith("/api/budget/2020", {withCredentials: true}));
+    });
+
     it("refetches when the path changes", async () => {
         axios.get.mockResolvedValue({data: {}});
 

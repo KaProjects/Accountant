@@ -1,32 +1,33 @@
 import {fireEvent, render, screen} from "@testing-library/react";
 import MainBar from "../MainBar";
+import {renderWithAppState} from "../../testUtils";
+
+const mockNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+    ...jest.requireActual("react-router-dom"),
+    useNavigate: () => mockNavigate,
+}));
+
 
 const currentYear = new Date().getFullYear();
 
 const renderBar = (props = {}) => {
     const setYear = jest.fn();
     const setSelectedValue = jest.fn();
-    render(<MainBar
-        isYearly={true}
-        year={currentYear - 1}
-        setYear={setYear}
-        selectValues={null}
-        selectedValue={null}
-        setSelectedValue={setSelectedValue}
-        {...props}/>);
+    renderWithAppState(<MainBar/>, {
+        isYearly: true,
+        year: currentYear - 1,
+        setYear,
+        selectValues: null,
+        selectedValue: null,
+        setSelectedValue,
+        ...props,
+    });
     return {setYear, setSelectedValue};
 };
 
 describe("MainBar", () => {
-    const originalLocation = window.location;
-
     beforeEach(() => window.sessionStorage.clear());
-
-    afterEach(() => {
-        Object.defineProperty(window, "location", {
-            value: originalLocation, writable: true, configurable: true,
-        });
-    });
 
     it("steps the year back and forward", () => {
         const {setYear} = renderBar({year: 2020});
@@ -59,17 +60,14 @@ describe("MainBar", () => {
         expect(screen.queryByTestId("ArrowRightIcon")).not.toBeInTheDocument();
     });
 
-    it("forgets the remembered year when the menu button is used", () => {
-        window.sessionStorage.setItem("year", "2020");
-        Object.defineProperty(window, "location", {
-            value: {href: ""}, writable: true, configurable: true,
-        });
-        renderBar();
+    it("forgets the year being looked at and returns to the start", () => {
+        // Without a page reload the year has to be set back, not merely cleared.
+        const {setYear} = renderBar({year: 2020});
 
         fireEvent.click(screen.getByLabelText("open drawer"));
 
-        expect(window.sessionStorage.getItem("year")).toBeNull();
-        expect(window.location.href).toBe("/");
+        expect(setYear).toHaveBeenCalledWith(new Date().getFullYear());
+        expect(mockNavigate).toHaveBeenCalledWith("/");
     });
 
     it("renders no selector when no values are supplied", () => {

@@ -2,6 +2,7 @@ import {fireEvent, render, screen, within} from "@testing-library/react";
 import Views from "../Views";
 import {useData} from "../../fetch";
 import {useParams} from "react-router-dom";
+import {renderWithAppState} from "../../testUtils";
 
 jest.mock("../../fetch");
 jest.mock("react-router-dom", () => ({
@@ -25,11 +26,11 @@ const payload = (views) => ({
     views,
 });
 
-const renderView = (data, {loaded = true, params = {}} = {}) => {
+const mountView = (data, {loaded = true, params = {}} = {}) => {
     useParams.mockReturnValue(params);
     useData.mockReturnValue({data, loaded, error: null});
     const setYearly = jest.fn();
-    render(<Views year={2020} setYearly={setYearly}/>);
+    renderWithAppState(<Views/>, {year: 2020, setYearly});
     return {setYearly};
 };
 
@@ -37,38 +38,38 @@ describe("Views", () => {
     beforeEach(() => jest.clearAllMocks());
 
     it("requests the year's views and switches to yearly mode", () => {
-        const {setYearly} = renderView(payload([view()]));
+        const {setYearly} = mountView(payload([view()]));
 
         expect(useData).toHaveBeenCalledWith("/view/2020");
         expect(setYearly).toHaveBeenCalledWith(true);
     });
 
     it("requests the vacation views on the vacation route", () => {
-        renderView(payload([view()]), {params: {vacation: "vacation"}});
+        mountView(payload([view()]), {params: {vacation: "vacation"}});
 
         expect(useData).toHaveBeenCalledWith("/view/2020/vacation");
     });
 
     it("shows the loader until the data arrives", () => {
-        renderView(null, {loaded: false});
+        mountView(null, {loaded: false});
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
     });
 
     it("splits a run-together view name into words", () => {
-        renderView(payload([view()]));
+        mountView(payload([view()]));
 
         expect(screen.getByText("Summer Trip 2 0 2 0")).toBeInTheDocument();
     });
 
     it("keeps the transactions collapsed until the view is opened", () => {
-        renderView(payload([view()]));
+        mountView(payload([view()]));
 
         expect(screen.queryByText("hotel")).not.toBeInTheDocument();
     });
 
     it("opens the transactions, total and charts for a view", () => {
-        renderView(payload([view()]));
+        mountView(payload([view()]));
 
         fireEvent.click(screen.getByText("Summer Trip 2 0 2 0"));
 
@@ -78,7 +79,7 @@ describe("Views", () => {
     });
 
     it("renders the column headings and a row per transaction", () => {
-        renderView(payload([view()]));
+        mountView(payload([view()]));
         fireEvent.click(screen.getByText("Summer Trip 2 0 2 0"));
 
         expect(screen.getAllByRole("columnheader")).toHaveLength(5);
@@ -90,7 +91,7 @@ describe("Views", () => {
     });
 
     it("opening one view marks any other as closed", () => {
-        renderView(payload([view(), view({name: "WinterTrip"})]));
+        mountView(payload([view(), view({name: "WinterTrip"})]));
 
         fireEvent.click(screen.getByText("Summer Trip 2 0 2 0"));
         expect(screen.getAllByTestId("ExpandLessIcon")).toHaveLength(1);

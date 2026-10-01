@@ -4,17 +4,20 @@ import {IconButton, TableCell, TableRow} from "@mui/material";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import {statementRowStyle} from "../../theme/tableStyles";
 
+const iconStyle = {width: 18};
+const cellButtonStyle = {height: "2px", width: "25px"};
+
 /**
  * One statement line, with the child and grandchild levels it expands into.
  *
  * Only the balance sheet goes three levels deep; the other statements stop at
  * children.
  */
-const StatementRow = ({
-    row, id, type, isOverall, hasInitial, hasTotal,
-    showChildren, onToggleChildren, showGrandChild, onToggleGrandChild,
-    transactionsDialog,
-}) => (
+const StatementRow = ({row, id, columns, expansion, transactionsDialog}) => {
+    const {type, isOverall, hasInitial, hasTotal} = columns;
+    const {showChildren, onToggleChildren, showGrandChild, onToggleGrandChild} = expansion;
+
+    return (
             <React.Fragment>
                 <TableRow key={id} onClick={() => onToggleChildren(id)}>
                     <TableCell key={-1} style={statementRowStyle(row.type, true, true)}>
@@ -71,10 +74,10 @@ const StatementRow = ({
                                 {month}
                                 {child.children.length === 0 && transactionsDialog.isTargeting(child.schemaId, index + 1) &&
                                     <IconButton
-                                        style={{height: "2px", width: "25px", color: statementRowStyle(child.type).color}}
+                                        style={{...cellButtonStyle, color: statementRowStyle(child.type).color}}
                                         onClick={() => transactionsDialog.setOpen(true)}
                                     >
-                                        <ReceiptLongIcon sx={{width: 18}}/>
+                                        <ReceiptLongIcon sx={iconStyle}/>
                                     </IconButton>
                                 }
                             </TableCell>
@@ -101,10 +104,10 @@ const StatementRow = ({
                                     {month}
                                     {grandchild.children.length === 0 && transactionsDialog.isTargeting(grandchild.schemaId, index + 1) &&
                                         <IconButton
-                                            style={{height: "2px", width: "25px", color: statementRowStyle(grandchild.type).color}}
+                                            style={{...cellButtonStyle, color: statementRowStyle(grandchild.type).color}}
                                             onClick={() => transactionsDialog.setOpen(true)}
                                         >
-                                            <ReceiptLongIcon sx={{width: 18}}/>
+                                            <ReceiptLongIcon sx={iconStyle}/>
                                         </IconButton>
                                     }
                                 </TableCell>
@@ -115,19 +118,26 @@ const StatementRow = ({
                     </React.Fragment>
                 ))}
             </React.Fragment>
-        );
+    );
+};
 
 StatementRow.propTypes = {
     row: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
-    type: PropTypes.string.isRequired,
-    isOverall: PropTypes.bool,
-    hasInitial: PropTypes.bool,
-    hasTotal: PropTypes.bool,
-    showChildren: PropTypes.bool,
-    onToggleChildren: PropTypes.func.isRequired,
-    showGrandChild: PropTypes.string,
-    onToggleGrandChild: PropTypes.func.isRequired,
+    /** Which columns this statement has, and whether it reports months or years. */
+    columns: PropTypes.shape({
+        type: PropTypes.string.isRequired,
+        isOverall: PropTypes.bool,
+        hasInitial: PropTypes.bool,
+        hasTotal: PropTypes.bool,
+    }).isRequired,
+    /** Which levels are open, and how to open them. */
+    expansion: PropTypes.shape({
+        showChildren: PropTypes.bool,
+        onToggleChildren: PropTypes.func.isRequired,
+        showGrandChild: PropTypes.string,
+        onToggleGrandChild: PropTypes.func.isRequired,
+    }).isRequired,
     transactionsDialog: PropTypes.object.isRequired,
 };
 

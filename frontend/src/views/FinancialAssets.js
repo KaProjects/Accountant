@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import PropTypes from "prop-types";
 import {useParams} from "react-router-dom";
 import {
     Checkbox,
@@ -17,22 +16,24 @@ import FinancialChart from "../components/FinancialChart";
 import AssetSummaryCard from "../components/financial/AssetSummaryCard";
 import {assetTitleStyle} from "../theme/tableStyles";
 import {closedFlagsFor, isFullyWithdrawn, toAssetChartSeries} from "../services/financialAssets";
+import {useAppState} from "../state/appState";
 
 const subheaderStyle = {
     fontWeight: "bold", boxShadow: "0 0 8px 0", fontSize: "18px", fontFamily: "Copperplate",
 };
 
-const FinancialAssets = props => {
+const FinancialAssets = () => {
+    const {year, setYearly} = useAppState();
     const {all} = useParams();
     const isOverall = all !== undefined;
 
     const [chartFlags, setChartFlags] = useState([])
     const [chartOptions, setChartOptions] = useState([false])
 
-    const {data, loaded, error} = useData("/financial/assets/" + (isOverall ? "" : props.year))
+    const {data, loaded, error} = useData("/financial/assets/" + (isOverall ? "" : year))
 
     useEffect(() => {
-        props.setYearly(!isOverall)
+        setYearly(!isOverall)
         // eslint-disable-next-line
     }, []);
 
@@ -112,9 +113,5 @@ const FinancialAssets = props => {
     )
 }
 
-FinancialAssets.propTypes = {
-    year: PropTypes.number.isRequired,
-    setYearly: PropTypes.func.isRequired,
-}
 
 export default FinancialAssets;

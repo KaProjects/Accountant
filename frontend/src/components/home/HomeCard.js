@@ -3,6 +3,15 @@ import {Button, ButtonBase, Card, CardActions, CardContent, Typography} from "@m
 
 const CARD_BACKGROUND = "#ffc107";
 
+const plainCardStyle = {backgroundColor: CARD_BACKGROUND};
+const actionCardStyle = {
+    backgroundColor: CARD_BACKGROUND,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+};
+const actionsStyle = {justifyContent: "center"};
+
 /**
  * One menu tile.
  *
@@ -27,9 +36,9 @@ const HomeCard = ({title, icon, caption, height, onOpen, actions}) => {
     if (actions) {
         return (
             <Card sx={{width: 300, height}} raised
-                  style={{backgroundColor: CARD_BACKGROUND, display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
+                  style={actionCardStyle}>
                 {body}
-                <CardActions style={{justifyContent: "center"}}>
+                <CardActions style={actionsStyle}>
                     {actions.map((action) => (
                         <Button key={action.label} size="small" onClick={action.onSelect}>
                             {action.label}
@@ -42,7 +51,7 @@ const HomeCard = ({title, icon, caption, height, onOpen, actions}) => {
 
     return (
         <ButtonBase onClick={onOpen}>
-            <Card sx={{width: 300, height}} raised style={{backgroundColor: CARD_BACKGROUND}}>
+            <Card sx={{width: 300, height}} raised style={plainCardStyle}>
                 {body}
             </Card>
         </ButtonBase>

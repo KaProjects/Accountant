@@ -1,8 +1,17 @@
 import React, {useEffect, useState} from "react";
-import PropTypes from "prop-types";
 import {Alert, AlertTitle, Box, Button, CircularProgress, Paper, Typography} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {runSync, syncActions} from "../services/sync";
+import {useAppState} from "../state/appState";
+import {useGoTo} from "../services/navigation";
+
+const pageStyle = {width: "100%", maxWidth: 640, margin: {xs: "8px auto", sm: "24px auto"}, padding: "0 8px"};
+const backStyle = {marginBottom: 1};
+const actionStyle = {padding: "12px 14px", marginBottom: 2};
+const actionLabelStyle = {fontSize: 15, fontWeight: 600};
+const actionCaptionStyle = {fontSize: 13, marginBottom: 1};
+const resultStyle = {marginTop: 1.5};
+const statusStyle = {marginBottom: 0};
 
 /** The response bodies are plain text and the validation one is a report, so it is shown as written. */
 const responseStyle = {
@@ -25,13 +34,15 @@ const responseStyle = {
  * trigger one. Now that every endpoint requires a session, the application itself is the place
  * to run them from, because it already has one.
  */
-const AdminSync = props => {
+const AdminSync = () => {
+    const {year, setYearly} = useAppState();
+    const goTo = useGoTo();
 
     const [results, setResults] = useState({});
     const [running, setRunning] = useState(null);
 
     useEffect(() => {
-        props.setYearly(false)
+        setYearly(false)
         // eslint-disable-next-line
     }, []);
 
@@ -46,16 +57,16 @@ const AdminSync = props => {
     };
 
     return (
-        <Box sx={{width: "100%", maxWidth: 640, margin: {xs: "8px auto", sm: "24px auto"}, padding: "0 8px"}}>
-            <Button startIcon={<ArrowBackIcon/>} size="small" sx={{marginBottom: 1}}
-                    onClick={() => {window.location.href = "/admin"}}>
+        <Box sx={pageStyle}>
+            <Button startIcon={<ArrowBackIcon/>} size="small" sx={backStyle}
+                    onClick={goTo("/admin")}>
                 Admin
             </Button>
 
-            {syncActions(props.year).map((action) => (
-                <Paper key={action.id} variant="outlined" sx={{padding: "12px 14px", marginBottom: 2}}>
-                    <Typography sx={{fontSize: 15, fontWeight: 600}}>{action.label}</Typography>
-                    <Typography color="text.secondary" sx={{fontSize: 13, marginBottom: 1}}>
+            {syncActions(year).map((action) => (
+                <Paper key={action.id} variant="outlined" sx={actionStyle}>
+                    <Typography sx={actionLabelStyle}>{action.label}</Typography>
+                    <Typography color="text.secondary" sx={actionCaptionStyle}>
                         {action.caption}
                     </Typography>
 
@@ -68,9 +79,9 @@ const AdminSync = props => {
 
                     {results[action.id] && (
                         <Alert severity={results[action.id].ok ? "success" : "error"}
-                               sx={{marginTop: 1.5}}
+                               sx={resultStyle}
                                data-testid={"result-" + action.id}>
-                            <AlertTitle sx={{marginBottom: 0}}>{results[action.id].status}</AlertTitle>
+                            <AlertTitle sx={statusStyle}>{results[action.id].status}</AlertTitle>
                             {results[action.id].body && (
                                 <Box sx={responseStyle}>{results[action.id].body}</Box>
                             )}
@@ -82,9 +93,5 @@ const AdminSync = props => {
     )
 }
 
-AdminSync.propTypes = {
-    year: PropTypes.number.isRequired,
-    setYearly: PropTypes.func.isRequired,
-}
 
 export default AdminSync;

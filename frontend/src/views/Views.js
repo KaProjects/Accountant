@@ -1,21 +1,22 @@
 import React, {useEffect, useState} from "react";
-import PropTypes from "prop-types";
 import '../viewsContainer.css';
 import {List} from "@mui/material";
 import {useParams} from "react-router-dom";
 import {useData} from "../fetch";
 import DataView from "../components/common/DataView";
 import ViewPanel from "../components/views/ViewPanel";
+import {useAppState} from "../state/appState";
 
-const Views = props => {
+const Views = () => {
+    const {year, setYearly} = useAppState();
     const {vacation} = useParams();
 
     const [openIndex, setOpenIndex] = useState(null)
 
-    const {data, loaded, error} = useData("/view/" + props.year + (vacation === undefined ? "" : "/vacation"))
+    const {data, loaded, error} = useData("/view/" + year + (vacation === undefined ? "" : "/vacation"))
 
     useEffect(() => {
-        props.setYearly(true)
+        setYearly(true)
         setOpenIndex(null)
         // eslint-disable-next-line
     }, [data]);
@@ -42,9 +43,5 @@ const Views = props => {
     )
 }
 
-Views.propTypes = {
-    year: PropTypes.number.isRequired,
-    setYearly: PropTypes.func.isRequired,
-}
 
 export default Views;

@@ -9,6 +9,11 @@ import VacationChart from "../VacationChart";
 import {viewHeaderStyle, viewTitleStyle} from "../../theme/tableStyles";
 import {formatViewTitle} from "../../services/viewTitle";
 
+const tableBoxStyle = {height: 350};
+const tableStyle = {minWidth: 650};
+const amountStyle = {textAlign: "right"};
+const totalStyle = {fontWeight: "bold", margin: 15};
+
 const titleTypography = {
     style: {fontWeight: "bold", fontFamily: "Copperplate", marginLeft: "10px"},
 };
@@ -23,8 +28,8 @@ const ViewPanel = ({view, columns, isOpen, onToggle}) => (
         <Collapse in={isOpen} timeout="auto" unmountOnExit>
             <div className={"parent"}>
                 <div>
-                    <TableContainer component={Paper} style={{height: 350}}>
-                        <Table sx={{minWidth: 650}} size="small" aria-label="a dense table" stickyHeader>
+                    <TableContainer component={Paper} style={tableBoxStyle}>
+                        <Table sx={tableStyle} size="small" aria-label="a dense table" stickyHeader>
                             <TableHead>
                                 <TableRow>
                                     {columns.map((column, index) => (
@@ -36,7 +41,7 @@ const ViewPanel = ({view, columns, isOpen, onToggle}) => (
                                 {view.transactions.map((transaction, index) => (
                                     <TableRow key={index}>
                                         <TableCell>{transaction.date}</TableCell>
-                                        <TableCell style={{textAlign: "right"}}>{transaction.amount}</TableCell>
+                                        <TableCell style={amountStyle}>{transaction.amount}</TableCell>
                                         <TableCell>{transaction.debit}</TableCell>
                                         <TableCell>{transaction.credit}</TableCell>
                                         <TableCell>{transaction.description}</TableCell>
@@ -45,7 +50,7 @@ const ViewPanel = ({view, columns, isOpen, onToggle}) => (
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    <Typography style={{fontWeight: "bold", margin: 15}}>
+                    <Typography style={totalStyle}>
                         Total Expenses: {view.expenses}
                     </Typography>
                 </div>

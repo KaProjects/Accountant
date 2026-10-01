@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import PropTypes from "prop-types";
 import {Grid} from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {useData} from "../fetch";
@@ -8,15 +7,17 @@ import SchemaTree from "../components/data/SchemaTree";
 import AccountTable from "../components/data/AccountTable";
 import TransactionTable from "../components/data/TransactionTable";
 import {keepReachableNodes} from "../services/schemaTree";
+import {useAppState} from "../state/appState";
 
 const columnStyle = {marginTop: "10px", marginBottom: "100px"};
 
-const AccountingData = props => {
+const AccountingData = () => {
+    const {year, setYearly} = useAppState();
 
-    const {data, loaded, error} = useData("/schema/" + props.year)
+    const {data, loaded, error} = useData("/schema/" + year)
 
     useEffect(() => {
-        props.setYearly(true)
+        setYearly(true)
         // eslint-disable-next-line
     }, []);
 
@@ -55,7 +56,7 @@ const AccountingData = props => {
                     <div style={columnStyle}>
                         {schemaId !== null &&
                             <AccountTable
-                                year={props.year}
+                                year={year}
                                 schemaId={schemaId}
                                 selectedAccountId={accountId}
                                 onSelectAccount={setAccountId}
@@ -66,7 +67,7 @@ const AccountingData = props => {
                         {accountId !== null && <ChevronRightIcon style={{marginTop: "18px"}}/>}
                     </div>
                     <div style={columnStyle}>
-                        {accountId !== null && <TransactionTable year={props.year} accountId={accountId}/>}
+                        {accountId !== null && <TransactionTable year={year} accountId={accountId}/>}
                     </div>
                 </Grid>
             )}
@@ -74,9 +75,5 @@ const AccountingData = props => {
     )
 }
 
-AccountingData.propTypes = {
-    year: PropTypes.number.isRequired,
-    setYearly: PropTypes.func.isRequired,
-}
 
 export default AccountingData;

@@ -1,6 +1,7 @@
 import {render, screen} from "@testing-library/react";
 import AccountingChart from "../AccountingChart";
 import {useData} from "../../fetch";
+import {renderWithAppState} from "../../testUtils";
 
 jest.mock("../../fetch");
 jest.mock("recharts", () => ({
@@ -21,16 +22,17 @@ const respond = ({configLoaded = true} = {}) => {
     });
 };
 
-const renderView = (props = {}) => {
+const mountView = (props = {}) => {
     const setYearly = jest.fn();
     const setSelectedValue = jest.fn();
     const setSelectValues = jest.fn();
-    render(<AccountingChart
-        setYearly={setYearly}
-        selectedValue={null}
-        setSelectedValue={setSelectedValue}
-        setSelectValues={setSelectValues}
-        {...props}/>);
+    renderWithAppState(<AccountingChart/>, {
+        setYearly,
+        selectedValue: null,
+        setSelectedValue,
+        setSelectValues,
+        ...props,
+    });
     return {setYearly, setSelectedValue, setSelectValues};
 };
 
@@ -39,7 +41,7 @@ describe("AccountingChart", () => {
 
     it("requests the chart configuration and leaves yearly mode off", () => {
         respond();
-        const {setYearly} = renderView();
+        const {setYearly} = mountView();
 
         expect(useData).toHaveBeenCalledWith("/chart/config");
         expect(setYearly).toHaveBeenCalledWith(false);
@@ -47,14 +49,14 @@ describe("AccountingChart", () => {
 
     it("shows the loader until the configuration arrives", () => {
         respond({configLoaded: false});
-        renderView();
+        mountView();
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
     });
 
     it("offers a dataset selector while nothing is selected", () => {
         respond();
-        renderView();
+        mountView();
 
         expect(screen.getByLabelText("Select a dataset")).toBeInTheDocument();
         expect(screen.queryByTestId("chart")).not.toBeInTheDocument();
@@ -62,7 +64,7 @@ describe("AccountingChart", () => {
 
     it("draws the chart for the selected dataset instead of the selector", () => {
         respond();
-        renderView({selectedValue: configs[0]});
+        mountView({selectedValue: configs[0]});
 
         expect(useData).toHaveBeenCalledWith("/chart/data/60");
         expect(screen.getByTestId("chart")).toBeInTheDocument();

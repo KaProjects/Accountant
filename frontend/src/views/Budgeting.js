@@ -1,25 +1,26 @@
 import React, {useEffect} from "react";
 import Paper from '@mui/material/Paper';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
-import PropTypes from "prop-types";
 import DataView from "../components/common/DataView";
 import {useData} from "../fetch";
-import TransactionsDialog from "../components/TransactionsDialog";
-import BudgetChartDialog from "../components/BudgetChartDialog";
+import TransactionsDialog from "../components/dialog/TransactionsDialog";
+import BudgetChartDialog from "../components/dialog/BudgetChartDialog";
 import BudgetRow from "../components/budgeting/BudgetRow";
 import {budgetHeaderStyle} from "../theme/tableStyles";
 import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
 import {useBudgetChartDialog} from "../hooks/useBudgetChartDialog";
+import {useAppState} from "../state/appState";
 
 /** Summary rows aggregate other rows, so they have no transactions of their own. */
 const AGGREGATE_ROW_IDS = ["i", "me", "e", "ntme", "bcf", "dcf"];
 
-const Budgeting = props => {
+const Budgeting = () => {
+    const {year, setYearly} = useAppState();
 
-    const {data, loaded, error} = useData("/budget/" + props.year)
+    const {data, loaded, error} = useData("/budget/" + year)
 
     useEffect(() => {
-        props.setYearly(true)
+        setYearly(true)
         // eslint-disable-next-line
     }, []);
 
@@ -54,10 +55,12 @@ const Budgeting = props => {
                             key={index}
                             row={row}
                             id={index}
-                            showSubRows={Boolean(showSubRows[index])}
-                            showDeltas={Boolean(showDeltas[index])}
-                            onToggleSubRows={toggleAt(showSubRows, setShowSubRows)}
-                            onToggleDeltas={toggleAt(showDeltas, setShowDeltas)}
+                            expansion={{
+                                showSubRows: Boolean(showSubRows[index]),
+                                showDeltas: Boolean(showDeltas[index]),
+                                onToggleSubRows: toggleAt(showSubRows, setShowSubRows),
+                                onToggleDeltas: toggleAt(showDeltas, setShowDeltas),
+                            }}
                             transactionsDialog={transactionsDialog}
                             budgetChart={budgetChart}
                         />
@@ -68,7 +71,7 @@ const Budgeting = props => {
         <TransactionsDialog
             open={transactionsDialog.open}
             onClose={transactionsDialog.close}
-            year={props.year}
+            year={year}
             row={transactionsDialog.rowName}
             rowId={transactionsDialog.rowId}
             month={transactionsDialog.month}
@@ -87,9 +90,5 @@ const Budgeting = props => {
     )
 }
 
-Budgeting.propTypes = {
-    year: PropTypes.number.isRequired,
-    setYearly: PropTypes.func.isRequired,
-}
 
 export default Budgeting;

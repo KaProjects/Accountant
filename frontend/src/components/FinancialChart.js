@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import {Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 
@@ -29,5 +30,12 @@ const FinancialChart = props => {
         </ResponsiveContainer>
     )
 }
+
+FinancialChart.propTypes = {
+    data: PropTypes.array.isRequired,
+    width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** Splits funding into deposits and withdrawals instead of showing it as one band. */
+    decomposedFunding: PropTypes.bool,
+};
 
 export default FinancialChart;

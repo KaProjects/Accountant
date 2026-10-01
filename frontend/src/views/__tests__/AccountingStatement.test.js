@@ -3,10 +3,13 @@ import AccountingStatement from "../AccountingStatement";
 import {useData} from "../../fetch";
 import {useParams} from "react-router-dom";
 import realBalance from "../../__tests__/fixtures/accounting-balance-2020.json";
+import {renderWithAppState} from "../../testUtils";
 
 jest.mock("../../fetch");
+const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
     ...jest.requireActual("react-router-dom"),
+    useNavigate: () => mockNavigate,
     useParams: jest.fn(),
 }));
 
@@ -46,11 +49,14 @@ const payload = (rows) => ({
     rows,
 });
 
-const renderView = (data, {loaded = true, error = null, params = {type: "balance"}} = {}) => {
+const mountView = (data, {loaded = true, error = null, params = {type: "balance"}} = {}) => {
     useParams.mockReturnValue(params);
-    useData.mockReturnValue({data, loaded, error});
+    // The view and the transactions dialog inside it both fetch, so the mock answers by path
+    // rather than returning the view's payload to whoever asks.
+    useData.mockImplementation((path) =>
+        path.startsWith("/accounting/2020/transaction") ? {data: [], loaded: true, error: null} : {data, loaded, error});
     const setYearly = jest.fn();
-    render(<AccountingStatement year={2020} setYearly={setYearly}/>);
+    renderWithAppState(<AccountingStatement/>, {year: 2020, setYearly});
     return {setYearly};
 };
 
@@ -58,31 +64,31 @@ describe("AccountingStatement", () => {
     beforeEach(() => jest.clearAllMocks());
 
     it("requests the statement for the routed type and selected year", () => {
-        renderView(payload([row()]));
+        mountView(payload([row()]));
 
         expect(useData).toHaveBeenCalledWith("/accounting/balance/2020");
     });
 
     it("requests the overall statement without a year when the overall route is used", () => {
-        renderView(payload([row()]), {params: {type: "balance", overall: "overall"}});
+        mountView(payload([row()]), {params: {type: "balance", overall: "overall"}});
 
         expect(useData).toHaveBeenCalledWith("/accounting/balance/");
     });
 
     it("switches the main bar into yearly mode for a single year", () => {
-        const {setYearly} = renderView(payload([row()]));
+        const {setYearly} = mountView(payload([row()]));
 
         expect(setYearly).toHaveBeenCalledWith(true);
     });
 
     it("leaves yearly mode off for the overall view", () => {
-        const {setYearly} = renderView(payload([row()]), {params: {type: "balance", overall: "overall"}});
+        const {setYearly} = mountView(payload([row()]), {params: {type: "balance", overall: "overall"}});
 
         expect(setYearly).toHaveBeenCalledWith(false);
     });
 
     it("renders yearly figures instead of monthly ones on the overall view", () => {
-        renderView(payload([row()]), {params: {type: "balance", overall: "overall"}});
+        mountView(payload([row()]), {params: {type: "balance", overall: "overall"}});
 
         const cells = screen.getAllByRole("cell");
         expect(cells[2]).toHaveTextContent("1000");
@@ -90,14 +96,14 @@ describe("AccountingStatement", () => {
     });
 
     it("shows the loader until the data arrives", () => {
-        renderView(null, {loaded: false});
+        mountView(null, {loaded: false});
 
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
         expect(screen.queryByRole("table")).not.toBeInTheDocument();
     });
 
     it("renders every column heading", () => {
-        renderView(payload([row()]));
+        mountView(payload([row()]));
 
         const headers = screen.getAllByRole("columnheader");
         expect(headers).toHaveLength(15);
@@ -107,7 +113,7 @@ describe("AccountingStatement", () => {
     });
 
     it("renders the initial column, the monthly values and the total", () => {
-        renderView(payload([row()]));
+        mountView(payload([row()]));
 
         const cells = screen.getAllByRole("cell");
         expect(cells[0]).toHaveTextContent("Assets");
@@ -117,7 +123,7 @@ describe("AccountingStatement", () => {
     });
 
     it("keeps children hidden until the row is clicked", () => {
-        renderView(payload([row({children: [child()]})]));
+        mountView(payload([row({children: [child()]})]));
 
         expect(screen.queryByText("Bank accounts")).not.toBeInTheDocument();
 
@@ -127,7 +133,7 @@ describe("AccountingStatement", () => {
     });
 
     it("renders a child row with its own initial, months and total", () => {
-        renderView(payload([row({children: [child()]})]));
+        mountView(payload([row({children: [child()]})]));
         fireEvent.click(screen.getByText(/Assets/));
 
         const childRow = screen.getAllByRole("row")
@@ -140,7 +146,7 @@ describe("AccountingStatement", () => {
     it("expands a balance sheet child down to its grandchildren", () => {
         const grandchild = child({schemaId: "210", name: "Current account", type: "BALANCE_ACCOUNT"});
         const parent = child({children: [grandchild]});
-        renderView(payload([row({children: [parent]})]));
+        mountView(payload([row({children: [parent]})]));
 
         fireEvent.click(screen.getByText(/Assets/));
         expect(screen.queryByText("Current account")).not.toBeInTheDocument();
@@ -153,7 +159,7 @@ describe("AccountingStatement", () => {
     it("keeps grandchildren collapsed on statements other than the balance sheet", () => {
         const grandchild = child({schemaId: "510", name: "Consumption detail"});
         const parent = child({name: "Consumption", children: [grandchild]});
-        renderView(payload([row({children: [parent]})]), {params: {type: "profit"}});
+        mountView(payload([row({children: [parent]})]), {params: {type: "profit"}});
 
         fireEvent.click(screen.getByText(/Assets/));
         fireEvent.click(screen.getByText("Consumption"));
@@ -162,7 +168,7 @@ describe("AccountingStatement", () => {
     });
 
     it("renders the real backend payload without error", () => {
-        renderView(realBalance);
+        mountView(realBalance);
 
         expect(screen.getAllByRole("columnheader")).toHaveLength(realBalance.columns.length);
         expect(screen.getAllByRole("row")).toHaveLength(realBalance.rows.length + 1);

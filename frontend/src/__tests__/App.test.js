@@ -76,6 +76,16 @@ describe("App", () => {
         expect(devLogin).not.toHaveBeenCalled();
     });
 
+    it("shows a not-found page for a route that matches nothing", async () => {
+        hasSession.mockResolvedValue(true);
+        window.history.pushState({}, "", "/no-such-page");
+
+        render(<App/>);
+
+        expect(await screen.findByText("404 Page not found")).toBeInTheDocument();
+        window.history.pushState({}, "", "/");
+    });
+
     it("falls back to the login form when the automatic login is refused", async () => {
         isDevelopment.mockReturnValue(true);
         devLogin.mockResolvedValue(false);

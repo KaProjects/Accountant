@@ -8,9 +8,13 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import {budgetPlannedRowStyle, budgetRowStyle} from "../../theme/tableStyles";
 
 /** Opens the transactions dialog for the cell currently pointed at. */
+const iconStyle = {width: 18};
+const cellButtonStyle = {height: "2px", width: "25px"};
+const expandButtonStyle = {height: "2px", width: "10px"};
+
 const TransactionsButton = ({color, onOpen}) => (
-    <IconButton style={{height: "2px", width: "25px", color}} onClick={onOpen}>
-        <ReceiptLongIcon sx={{width: 18}}/>
+    <IconButton style={{...cellButtonStyle, color}} onClick={onOpen}>
+        <ReceiptLongIcon sx={iconStyle}/>
     </IconButton>
 );
 
@@ -23,16 +27,16 @@ TransactionsButton.propTypes = {
  * One budget line, plus the sub rows and the planned/difference breakdown it can
  * expand into.
  */
-const BudgetRow = ({
-    row, id, showSubRows, showDeltas, onToggleSubRows, onToggleDeltas,
-    transactionsDialog, budgetChart,
-}) => (
+const BudgetRow = ({row, id, expansion, transactionsDialog, budgetChart}) => {
+    const {showSubRows, showDeltas, onToggleSubRows, onToggleDeltas} = expansion;
+
+    return (
     <React.Fragment>
         <TableRow key={id} onClick={() => {if (row.subRows.length !== 0) onToggleSubRows(id)}}>
             <TableCell style={budgetRowStyle(row.type, false, true)} key={-1}>
                 <IconButton
                     aria-label="expand row"
-                    style={{height: "2px", width: "10px"}}
+                    style={expandButtonStyle}
                     onClick={(e) => {onToggleDeltas(id);e.stopPropagation();}}
                 >
                     {showDeltas ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -40,7 +44,7 @@ const BudgetRow = ({
                 {" " + row.name}
                 {(row.subRows.length !== 0) && <IconButton
                     aria-label="expand row"
-                    style={{height: "2px", width: "25px"}}
+                    style={cellButtonStyle}
                     onClick={(e) => {onToggleSubRows(id);e.stopPropagation();}}
                 >
                     {showSubRows ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -117,10 +121,10 @@ const BudgetRow = ({
                         Difference
                         {budgetChart.isPreviewing(row.name) &&
                             <IconButton
-                                style={{height: "2px", width: "25px"}}
+                                style={cellButtonStyle}
                                 onClick={() => budgetChart.setOpen(true)}
                             >
-                                <BarChartIcon sx={{width: 18}}/>
+                                <BarChartIcon sx={iconStyle}/>
                             </IconButton>
                         }
                     </TableCell>
@@ -137,15 +141,19 @@ const BudgetRow = ({
             </>
         }
     </React.Fragment>
-);
+    );
+};
 
 BudgetRow.propTypes = {
     row: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
-    showSubRows: PropTypes.bool,
-    showDeltas: PropTypes.bool,
-    onToggleSubRows: PropTypes.func.isRequired,
-    onToggleDeltas: PropTypes.func.isRequired,
+    /** Which of the row's breakdowns are open, and how to open them. */
+    expansion: PropTypes.shape({
+        showSubRows: PropTypes.bool,
+        showDeltas: PropTypes.bool,
+        onToggleSubRows: PropTypes.func.isRequired,
+        onToggleDeltas: PropTypes.func.isRequired,
+    }).isRequired,
     transactionsDialog: PropTypes.object.isRequired,
     budgetChart: PropTypes.object.isRequired,
 };
