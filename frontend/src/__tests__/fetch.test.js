@@ -19,14 +19,13 @@ describe("useData", () => {
         expect(axios.get.mock.calls[0][0]).toBe("/api/schema/2020");
     });
 
-    it("sends the stored token as a bearer header", async () => {
-        window.sessionStorage.setItem("token", "abc-123");
+    it("sends the session cookie, which the page itself cannot read", async () => {
         axios.get.mockResolvedValue({data: {}});
 
         renderHook(() => useData("/budget/2020"));
 
         await waitFor(() => expect(axios.get).toHaveBeenCalled());
-        expect(axios.get.mock.calls[0][1]).toEqual({headers: {Authorization: "Bearer abc-123"}});
+        expect(axios.get.mock.calls[0][1]).toEqual({withCredentials: true});
     });
 
     it("exposes the payload and marks the request loaded", async () => {
@@ -63,7 +62,7 @@ describe("useData", () => {
         expect(result.current.data).toBeNull();
     });
 
-    it("reports an expired token when the backend answers 401", async () => {
+    it("reports an expired session when the backend answers 401", async () => {
         const unauthorized = new Error("Request failed with status code 401");
         unauthorized.response = {status: 401};
         axios.get.mockRejectedValue(unauthorized);
@@ -72,7 +71,7 @@ describe("useData", () => {
         const {result} = renderHook(() => useData("/budget/2020"));
 
         await waitFor(() => expect(result.current.error).not.toBeNull());
-        expect(result.current.error.message).toBe("Token expired! Redirecting...");
+        expect(result.current.error.message).toBe("Session expired! Redirecting...");
     });
 
     it("refetches when the path changes", async () => {

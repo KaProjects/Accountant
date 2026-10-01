@@ -5,18 +5,16 @@ const currentYear = new Date().getFullYear();
 
 const renderBar = (props = {}) => {
     const setYear = jest.fn();
-    const setToken = jest.fn();
     const setSelectedValue = jest.fn();
     render(<MainBar
         isYearly={true}
         year={currentYear - 1}
         setYear={setYear}
-        setToken={setToken}
         selectValues={null}
         selectedValue={null}
         setSelectedValue={setSelectedValue}
         {...props}/>);
-    return {setYear, setToken, setSelectedValue};
+    return {setYear, setSelectedValue};
 };
 
 describe("MainBar", () => {
@@ -59,14 +57,6 @@ describe("MainBar", () => {
 
         expect(screen.queryByTestId("ArrowLeftIcon")).not.toBeInTheDocument();
         expect(screen.queryByTestId("ArrowRightIcon")).not.toBeInTheDocument();
-    });
-
-    it("clears the token when logging out", () => {
-        const {setToken} = renderBar();
-
-        fireEvent.click(screen.getByRole("button", {name: "Logout"}));
-
-        expect(setToken).toHaveBeenCalledWith(null);
     });
 
     it("forgets the remembered year when the menu button is used", () => {

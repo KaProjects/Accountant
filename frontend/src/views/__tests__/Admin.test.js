@@ -1,6 +1,9 @@
 import {fireEvent, render, screen} from "@testing-library/react";
 import Admin from "../Admin";
 import {properties} from "../../properties";
+import {isDevelopment} from "../../services/devLogin";
+
+jest.mock("../../services/devLogin");
 
 const renderView = () => {
     const setYearly = jest.fn();
@@ -9,7 +12,10 @@ const renderView = () => {
 };
 
 describe("Admin", () => {
-    beforeEach(() => jest.clearAllMocks());
+    beforeEach(() => {
+        jest.clearAllMocks();
+        isDevelopment.mockReturnValue(true);
+    });
 
     it("offers the sync page and the API reference, grouped", () => {
         renderView();
@@ -18,6 +24,16 @@ describe("Admin", () => {
         expect(screen.getByText("Reference")).toBeInTheDocument();
         expect(screen.getByText("Sync")).toBeInTheDocument();
         expect(screen.getByText("API Docs")).toBeInTheDocument();
+    });
+
+    it("hides the API reference outside development, where it is not built at all", () => {
+        isDevelopment.mockReturnValue(false);
+
+        renderView();
+
+        expect(screen.queryByText("API Docs")).not.toBeInTheDocument();
+        expect(screen.queryByText("Reference")).not.toBeInTheDocument();
+        expect(screen.getByText("Sync")).toBeInTheDocument();
     });
 
     it("leaves yearly mode, because nothing here is reported per year", () => {

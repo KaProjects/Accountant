@@ -1,6 +1,7 @@
 import axios from "axios";
 import {properties} from "../properties";
 import {errorDetail} from "./errors";
+import {credentialed} from "./session";
 
 /**
  * The sync actions the admin page offers.
@@ -38,10 +39,8 @@ export const syncActions = (year) => [
  * did not pass. Both outcomes are therefore reported the same way, and neither throws.
  */
 export const runSync = async (path) => {
-    const headers = {headers: {Authorization: "Bearer " + sessionStorage.getItem("token")}};
-
     try {
-        const response = await axios.get(properties.backend + path, headers);
+        const response = await axios.get(properties.backend + path, credentialed);
         return {
             ok: true,
             status: response.status + " " + response.statusText,

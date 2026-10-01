@@ -43,11 +43,12 @@ import static org.hamcrest.Matchers.not;
 public class AuthorizationCoverageTest
 {
     /**
-     * The only endpoint that answers an unauthenticated caller, because it is how a caller stops
-     * being unauthenticated. Everything else, including the temporary sync endpoints, requires a
-     * token.
+     * The only request an unauthenticated caller may make, because it is how a caller stops being
+     * unauthenticated. Everything else needs a session - including the temporary sync endpoints,
+     * and including the GET to this same path, which is how the page asks whether its session is
+     * still good.
      */
-    private static final List<String> PUBLIC_PATHS = List.of("/authenticate");
+    private static final List<String> PUBLIC_ENDPOINTS = List.of("POST /authenticate");
 
     /** Any value will do: authentication is decided before a parameter is ever looked at. */
     private static final Map<String, String> PARAMETER_VALUES = Map.of("year", "2023", "month", "1");
@@ -59,7 +60,7 @@ public class AuthorizationCoverageTest
 
         for (Endpoint endpoint : endpoints())
         {
-            if (isPublic(endpoint.path)) continue;
+            if (isPublic(endpoint)) continue;
 
             Response response = given().noFiltersOfType(TestAuthentication.class)
                     .when().request(endpoint.httpMethod, endpoint.path);
@@ -76,13 +77,13 @@ public class AuthorizationCoverageTest
      * as the caller was not turned away.
      */
     @Test
-    public void everyPathDeclaredPublicAnswersACallerWithoutCredentials() throws Exception
+    public void everyEndpointDeclaredPublicAnswersACallerWithoutCredentials() throws Exception
     {
         List<String> refused = new ArrayList<>();
 
         for (Endpoint endpoint : endpoints())
         {
-            if (!isPublic(endpoint.path)) continue;
+            if (!isPublic(endpoint)) continue;
 
             Response response = given().noFiltersOfType(TestAuthentication.class)
                     .when().request(endpoint.httpMethod, endpoint.path);
@@ -93,10 +94,9 @@ public class AuthorizationCoverageTest
         assertThat("declared public but refused: " + refused, refused, is(empty()));
     }
 
-    private boolean isPublic(String path)
+    private boolean isPublic(Endpoint endpoint)
     {
-        return PUBLIC_PATHS.stream().anyMatch(publicPath ->
-                path.equals(publicPath) || path.startsWith(publicPath + "/"));
+        return PUBLIC_ENDPOINTS.contains(endpoint.toString());
     }
 
     private record Endpoint(String httpMethod, String path)

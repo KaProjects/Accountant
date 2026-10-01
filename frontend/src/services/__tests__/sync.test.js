@@ -14,18 +14,14 @@ describe("syncActions", () => {
 });
 
 describe("runSync", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        sessionStorage.setItem("token", "a-token");
-    });
+    beforeEach(() => jest.clearAllMocks());
 
-    it("sends the stored token, because every endpoint now requires one", async () => {
+    it("sends the session cookie, because every endpoint now requires one", async () => {
         axios.get.mockResolvedValue({status: 200, statusText: "OK", data: "done"});
 
         await runSync("/sync/all");
 
-        expect(axios.get).toHaveBeenCalledWith("/api/sync/all",
-            {headers: {Authorization: "Bearer a-token"}});
+        expect(axios.get).toHaveBeenCalledWith("/api/sync/all", {withCredentials: true});
     });
 
     it("reports the status and body of a successful run", async () => {

@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {properties} from "./properties";
-import {wait} from "@testing-library/user-event/dist/utils";
+import {credentialed} from "./services/session";
 
 export const useData = (path) => {
 
@@ -11,22 +11,20 @@ export const useData = (path) => {
 
     useEffect(() => {
         const dataFetch = async () => {
-            const url = properties.backend + path;
-            const headers = { headers: {Authorization: 'Bearer ' + sessionStorage.getItem('token')}};
-            await axios.get(url, headers)
+            await axios.get(properties.backend + path, credentialed)
                 .then((response) => {
                     setData(response.data)
                     setError(null)
                     setLoaded(true)
                 }).catch((error) => {
                     console.error(error)
-                    if (error.response.status === 401){
-                        error.message = "Token expired! Redirecting..."
-                        wait(1000).then(() => {
-                            sessionStorage.removeItem('token')
-                            // eslint-disable-next-line no-restricted-globals
-                            location.reload()
-                        })
+                    // A transport failure has no response at all, and reading a status off it
+                    // threw, which replaced the real error with a TypeError.
+                    if (error.response && error.response.status === 401) {
+                        error.message = "Session expired! Redirecting..."
+                        // Reloading is enough: the page asks the backend for its session on
+                        // startup, and will be shown the login form.
+                        setTimeout(() => window.location.reload(), 1000)
                     }
                     setError(error)
                     setLoaded(false)

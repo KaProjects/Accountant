@@ -14,8 +14,8 @@ describe("Login", () => {
     beforeEach(() => jest.clearAllMocks());
 
     it("posts the credentials to the authenticate endpoint", async () => {
-        axios.mockResolvedValue({data: "a-token"});
-        render(<Login setToken={jest.fn()}/>);
+        axios.mockResolvedValue({status: 204});
+        render(<Login onAuthenticated={jest.fn()}/>);
 
         submitCredentials("stanley", "secret");
 
@@ -24,36 +24,40 @@ describe("Login", () => {
             method: "post",
             url: "/api/authenticate",
             data: {username: "stanley", password: "secret"},
+            // The session travels as a cookie, and the header is what tells the backend the
+            // request came from this page rather than from somebody else's.
+            withCredentials: true,
+            headers: {"Content-Type": "application/json", "X-Accountant-Client": "web"},
         }));
     });
 
-    it("hands the returned token to the parent", async () => {
-        const setToken = jest.fn();
-        axios.mockResolvedValue({data: "a-token"});
-        render(<Login setToken={setToken}/>);
+    it("tells the parent it is authenticated, there being no token to hand over", async () => {
+        const onAuthenticated = jest.fn();
+        axios.mockResolvedValue({status: 204});
+        render(<Login onAuthenticated={onAuthenticated}/>);
 
         submitCredentials("stanley", "secret");
 
-        await waitFor(() => expect(setToken).toHaveBeenCalledWith("a-token"));
+        await waitFor(() => expect(onAuthenticated).toHaveBeenCalled());
     });
 
     it("reports a rejected login using the response status and body", async () => {
-        const setToken = jest.fn();
+        const onAuthenticated = jest.fn();
         axios.mockRejectedValue({
             response: {status: 401, statusText: "Unauthorized", data: "bad credentials"},
         });
-        render(<Login setToken={setToken}/>);
+        render(<Login onAuthenticated={onAuthenticated}/>);
 
         submitCredentials("stanley", "wrong");
 
         expect(await screen.findByRole("alert"))
             .toHaveTextContent("401 Unauthorized: bad credentials");
-        expect(setToken).not.toHaveBeenCalled();
+        expect(onAuthenticated).not.toHaveBeenCalled();
     });
 
     it("reports a transport failure when there is no response at all", async () => {
         axios.mockRejectedValue({code: "ERR_NETWORK", message: "Network Error"});
-        render(<Login setToken={jest.fn()}/>);
+        render(<Login onAuthenticated={jest.fn()}/>);
 
         submitCredentials("stanley", "secret");
 
@@ -63,7 +67,7 @@ describe("Login", () => {
     it("centres the page on both axes over the full viewport height", () => {
         // jsdom does not lay out, so this guards the styling intent rather than the
         // rendered geometry - enough to catch a reintroduced left margin
-        render(<Login setToken={jest.fn()}/>);
+        render(<Login onAuthenticated={jest.fn()}/>);
 
         expect(screen.getByTestId("login-page")).toHaveStyle({
             display: "flex",
@@ -74,7 +78,7 @@ describe("Login", () => {
     });
 
     it("does not submit anything until the form is submitted", () => {
-        render(<Login setToken={jest.fn()}/>);
+        render(<Login onAuthenticated={jest.fn()}/>);
 
         fireEvent.change(screen.getByLabelText("Username"), {target: {value: "stanley"}});
 

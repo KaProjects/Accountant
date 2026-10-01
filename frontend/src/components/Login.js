@@ -4,8 +4,9 @@ import {properties} from "../properties";
 import {Alert, Button, Slide, Snackbar, TextField} from "@mui/material";
 import axios from "axios";
 import {describeResponseError} from "../services/errors";
+import {mutatingJson} from "../services/session";
 
-/** The login screen is the entire page until a token exists, so it centres itself. */
+/** The login screen is the entire page until there is a session, so it centres itself. */
 const centeredPage = {
     display: "flex",
     alignItems: "center",
@@ -21,7 +22,7 @@ const loginForm = {
 };
 
 
-export default function Login({ setToken}){
+export default function Login({ onAuthenticated}){
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -36,11 +37,11 @@ export default function Login({ setToken}){
         axios({
             method: 'post',
             url: properties.backend + "/authenticate",
-            headers: {'Content-Type': 'application/json'},
+            ...mutatingJson,
             data: {username, password}
         }).then(
-            (response) => {
-                setToken(response.data)
+            () => {
+                onAuthenticated()
             }).catch(
                 (error) => {
                     setError(describeResponseError(error))
@@ -74,5 +75,5 @@ export default function Login({ setToken}){
 }
 
 Login.propTypes = {
-    setToken: PropTypes.func.isRequired
+    onAuthenticated: PropTypes.func.isRequired
 }

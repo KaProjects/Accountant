@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import Loader from "./Loader";
 import {Dialog, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import {properties} from "../properties";
+import {credentialed} from "../services/session";
 import axios from "axios";
 import Paper from "@mui/material/Paper";
 
@@ -29,8 +30,7 @@ const TransactionsDialog = props => {
 
         const dataFetch = async () => {
             const url = properties.backend + path;
-            const headers = { headers: {Authorization: 'Bearer ' + sessionStorage.getItem('token')}};
-            await axios.get(url, headers).then(
+            await axios.get(url, credentialed).then(
                 (response) => {
                     setData(response.data)
                     setError(null)

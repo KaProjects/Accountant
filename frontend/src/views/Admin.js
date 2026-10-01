@@ -6,21 +6,28 @@ import ApiIcon from "@mui/icons-material/Api";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {properties} from "../properties";
+import {isDevelopment} from "../services/devLogin";
 
-const ADMIN_GROUPS = [
-    {
-        title: "Data",
-        pages: [
-            {title: "Sync", icon: CloudSyncIcon, path: "/admin/sync"},
-        ],
-    },
-    {
-        title: "Reference",
-        pages: [
-            {title: "API Docs", icon: ApiIcon, external: true},
-        ],
-    },
-];
+const DATA_GROUP = {
+    title: "Data",
+    pages: [
+        {title: "Sync", icon: CloudSyncIcon, path: "/admin/sync"},
+    ],
+};
+
+const REFERENCE_GROUP = {
+    title: "Reference",
+    pages: [
+        {title: "API Docs", icon: ApiIcon, external: true},
+    ],
+};
+
+/**
+ * The API description is a development tool. It is deliberately left out of the production build,
+ * because it was a complete, unauthenticated map of every endpoint - so the link to it is only
+ * offered where it leads somewhere.
+ */
+const adminGroups = () => isDevelopment() ? [DATA_GROUP, REFERENCE_GROUP] : [DATA_GROUP];
 
 /** Operational tasks, kept off the main view because none of them is part of reading the books. */
 const Admin = props => {
@@ -46,7 +53,7 @@ const Admin = props => {
             padding: {xs: 0, sm: "0 8px"},
         }}>
             <Paper variant="outlined" sx={{borderRadius: {xs: 0, sm: 1}, borderWidth: {xs: "1px 0", sm: "1px"}}}>
-                {ADMIN_GROUPS.map((group, groupIndex) => (
+                {adminGroups().map((group, groupIndex) => (
                     <Box key={group.title}>
                         {groupIndex > 0 && <Divider/>}
                         <Typography sx={{

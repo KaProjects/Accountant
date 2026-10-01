@@ -12,6 +12,8 @@ import AccountingData from "./views/AccountingData";
 import AccountingChart from "./views/AccountingChart";
 import Admin from "./views/Admin";
 import AdminSync from "./views/AdminSync";
+import {devLogin, isDevelopment} from "./services/devLogin";
+import {hasSession} from "./services/session";
 
 class App extends Component {
     constructor(props) {
@@ -27,7 +29,10 @@ class App extends Component {
         }
 
         this.state = {
-            token: null,
+            authenticated: false,
+            // Nothing is rendered while this is set, so the login form does not flash for
+            // somebody who already has a session.
+            checkingSession: true,
             year: retrieveYear(),
             isYearly: false, // toggles year's switch in MainBar
             setYearly: this.setYearly.bind(this),
@@ -37,28 +42,33 @@ class App extends Component {
             setSelectValues: this.setSelectValues.bind(this)
         }
 
-        this.setToken = this.setToken.bind(this);
-        this.getToken = this.getToken.bind(this);
+        this.onAuthenticated = this.onAuthenticated.bind(this);
         this.setYear = this.setYear.bind(this);
         this.setSelectedValue = this.setSelectedValue.bind(this);
         this.setSelectValues = this.setSelectValues.bind(this);
     }
 
-    setToken(token){
-        if (token == null){
-            sessionStorage.removeItem('token')
-        } else {
-            sessionStorage.setItem('token', token);
-        }
-        this.setState({token: token})
+    componentDidMount() {
+        this.establishSession()
     }
 
-    getToken() {
-        if (this.state.token != null) {
-            return this.state.token
-        } else {
-            return sessionStorage.getItem('token');
+    /**
+     * The session is an HttpOnly cookie, so the page cannot look at it and has to ask. Asking also
+     * settles the two cases a stored token used to get wrong: a session the backend forgot because
+     * it restarted, and one that has expired.
+     */
+    async establishSession() {
+        let authenticated = await hasSession()
+
+        if (!authenticated && isDevelopment()) {
+            authenticated = await devLogin()
         }
+
+        this.setState({authenticated: authenticated, checkingSession: false})
+    }
+
+    onAuthenticated() {
+        this.setState({authenticated: true})
     }
 
     setYear(year){
@@ -91,13 +101,17 @@ class App extends Component {
 
     render() {
 
-        if (!this.getToken()) {
-            return <Login setToken={this.setToken}/>
+        if (this.state.checkingSession) {
+            return null
+        }
+
+        if (!this.state.authenticated) {
+            return <Login onAuthenticated={this.onAuthenticated}/>
         }
 
         return (
             <div>
-                <MainBar setYear={this.setYear} setToken={this.setToken} {...this.state} />
+                <MainBar setYear={this.setYear} {...this.state} />
                 <BrowserRouter>
                     <Routes>
                         <Route exact path="/" element={<Home {...this.state}/> }/>

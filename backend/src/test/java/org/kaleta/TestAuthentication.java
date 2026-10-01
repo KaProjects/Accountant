@@ -6,12 +6,14 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
-import jakarta.ws.rs.core.HttpHeaders;
 
 import static io.restassured.RestAssured.given;
+import static org.kaleta.rest.AuthenticationFilter.SESSION_COOKIE;
+import static org.kaleta.rest.CsrfFilter.CLIENT_HEADER;
+import static org.kaleta.rest.CsrfFilter.CLIENT_HEADER_VALUE;
 
 /**
- * Logs the test suite in, so that every request carries a real token.
+ * Logs the test suite in, so that every request carries a real session cookie.
  * <p>
  * The suite used to set an {@code auth.bypass} property instead, which meant the tests never
  * exercised the code that decides whether a caller may proceed - and could therefore not tell a
@@ -27,47 +29,70 @@ public class TestAuthentication implements Filter
     private static final String USERNAME = "user1";
     private static final String PASSWORD = "abcd";
 
-    private static String token;
+    /** Matches auth.frontend-origin in the test configuration. */
+    public static final String ORIGIN = "http://accountant.test";
+
+    private static final java.util.Set<String> UNSAFE_METHODS =
+            java.util.Set.of("POST", "PUT", "PATCH", "DELETE");
+
+    private static String session;
 
     @Override
     public Response filter(FilterableRequestSpecification requestSpec,
                            FilterableResponseSpecification responseSpec,
                            FilterContext context)
     {
-        if (issuesTokens(requestSpec)) return context.next(requestSpec, responseSpec);
+        sameOrigin(requestSpec);
+
+        if (issuesSession(requestSpec)) return context.next(requestSpec, responseSpec);
 
         Response response = context.next(authenticated(requestSpec), responseSpec);
         if (response.statusCode() != 401) return response;
 
-        // Each test profile runs its own application instance, and the token lives in the memory
+        // Each test profile runs its own application instance, and the session lives in the memory
         // of the service that issued it, so one cached from an earlier instance is a stranger.
-        token = null;
+        session = null;
         return context.next(authenticated(requestSpec), responseSpec);
+    }
+
+    /** The cross-site request guard turns away an unsafe request that does not look like the app. */
+    private void sameOrigin(FilterableRequestSpecification requestSpec)
+    {
+        if (!UNSAFE_METHODS.contains(requestSpec.getMethod())) return;
+
+        requestSpec.removeHeader("Origin");
+        requestSpec.removeHeader(CLIENT_HEADER);
+        requestSpec.header("Origin", ORIGIN);
+        requestSpec.header(CLIENT_HEADER, CLIENT_HEADER_VALUE);
     }
 
     private FilterableRequestSpecification authenticated(FilterableRequestSpecification requestSpec)
     {
-        requestSpec.removeHeader(HttpHeaders.AUTHORIZATION);
-        requestSpec.header(HttpHeaders.AUTHORIZATION, "Bearer " + token());
+        requestSpec.removeCookie(SESSION_COOKIE);
+        requestSpec.cookie(SESSION_COOKIE, session());
         return requestSpec;
     }
 
-    private boolean issuesTokens(FilterableRequestSpecification requestSpec)
+    /** Posting credentials is the one request that is made without a session. */
+    private boolean issuesSession(FilterableRequestSpecification requestSpec)
     {
-        return requestSpec.getURI().contains("/authenticate");
+        return "POST".equals(requestSpec.getMethod()) && requestSpec.getURI().contains("/authenticate");
     }
 
-    private static synchronized String token()
+    private static synchronized String session()
     {
-        if (token == null)
+        if (session == null)
         {
-            token = given().noFilters()
+            // noFilters() also skips this one, so the login has to carry them itself.
+            session = given().noFilters()
+                    .header("Origin", ORIGIN)
+                    .header(CLIENT_HEADER, CLIENT_HEADER_VALUE)
                     .contentType(ContentType.JSON)
                     .body("{\"username\":\"" + USERNAME + "\",\"password\":\"" + PASSWORD + "\"}")
                     .when().post("/authenticate")
-                    .then().statusCode(200)
-                    .extract().body().asString();
+                    .then().statusCode(204)
+                    .extract().cookie(SESSION_COOKIE);
         }
-        return token;
+        return session;
     }
 }

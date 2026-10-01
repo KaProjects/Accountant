@@ -13,15 +13,14 @@ public interface AuthService
     boolean authenticateUser(String username, String password);
 
     /**
-     * generate and store token for authorized user
+     * issues a signed session token for an authorized user
      * @return generated token
      */
     String generateToken(String username, String password);
 
     /**
-     * checks the validity of provided token
-     * @param token
-     * @return true if token is valid, false otherwise
+     * @return the user the token was issued to, or null if it is not a token this application
+     * signed, or it has expired
      */
-    boolean validateToken(String token);
+    String authenticatedUser(String token);
 }

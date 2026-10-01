@@ -58,11 +58,6 @@ const MainBar = props => {
                     }
                 </Box>
                 <Box sx={{ flexGrow: 1 }} />
-                <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                    <Button color="inherit" onClick={() => props.setToken(null)}>
-                        Logout
-                    </Button>
-                </Box>
             </Toolbar>
         </AppBar>
         </Box>
