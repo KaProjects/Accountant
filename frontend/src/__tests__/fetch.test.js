@@ -91,6 +91,25 @@ describe("useData", () => {
         await waitFor(() => expect(axios.get).toHaveBeenCalledWith("/api/budget/2020", {withCredentials: true}));
     });
 
+    it("stops being loaded while a new path is fetched, so no view renders stale data", async () => {
+        // Otherwise a view whose address changed renders the previous payload against the new
+        // parameters for one frame - which crashed the statement when it moved from the overall
+        // view to a single year, because the rows it still held had no monthly values.
+        axios.get.mockResolvedValue({data: {first: true}});
+        const {result, rerender} = renderHook(({path}) => useData(path), {initialProps: {path: "/a"}});
+        await waitFor(() => expect(result.current.loaded).toBe(true));
+
+        let arrive;
+        axios.get.mockReturnValue(new Promise((resolve) => {arrive = resolve}));
+        rerender({path: "/b"});
+
+        expect(result.current.loaded).toBe(false);
+
+        arrive({data: {second: true}});
+        await waitFor(() => expect(result.current.loaded).toBe(true));
+        expect(result.current.data).toEqual({second: true});
+    });
+
     it("refetches when the path changes", async () => {
         axios.get.mockResolvedValue({data: {}});
 

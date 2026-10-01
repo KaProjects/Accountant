@@ -122,7 +122,7 @@ describe("StatementRow", () => {
         const props = mountRow({showChildren: true});
         const cell = within(rowNamed("Bank")).getAllByRole("cell")[1];
 
-        fireEvent.click(cell);
+        fireEvent.mouseEnter(cell);
         expect(props.transactionsDialog.target).toHaveBeenCalledWith("Bank", "21", 1);
 
         fireEvent.mouseLeave(cell);
@@ -132,7 +132,7 @@ describe("StatementRow", () => {
     it("points the transactions dialog at a grandchild's month", () => {
         const props = mountRow({showChildren: true, showGrandChild: "21"});
 
-        fireEvent.click(within(rowNamed("Current account")).getAllByRole("cell")[2]);
+        fireEvent.mouseEnter(within(rowNamed("Current account")).getAllByRole("cell")[2]);
 
         expect(props.transactionsDialog.target).toHaveBeenCalledWith("Current account", "210", 2);
     });
@@ -164,5 +164,20 @@ describe("StatementRow", () => {
         fireEvent.click(within(rowNamed("Cash")).getAllByRole("button")[0]);
 
         expect(transactionsDialog.setOpen).toHaveBeenCalledWith(true);
+    });
+
+    it("offers the dialog to the left of the figure, not after it", () => {
+        const transactionsDialog = dialog({isTargeting: jest.fn().mockReturnValue(true)});
+        mountRow({
+            row: {...row, children: [childWithoutChildren]},
+            showChildren: true,
+            transactionsDialog,
+        });
+
+        const cell = within(rowNamed("Cash")).getAllByRole("cell")[1];
+        const button = within(cell).getByRole("button");
+        // Which side it sits on is a question about order, which the query API cannot ask.
+        // eslint-disable-next-line testing-library/no-node-access
+        expect(button.parentElement.firstElementChild).toBe(button);
     });
 });

@@ -9,7 +9,17 @@ import {budgetPlannedRowStyle, budgetRowStyle} from "../../theme/tableStyles";
 
 /** Opens the transactions dialog for the cell currently pointed at. */
 const iconStyle = {width: 18};
-const cellButtonStyle = {height: "2px", width: "25px"};
+/** Laid out over the cell, so appearing under the pointer does not widen the column. */
+const cellButtonStyle = {
+    position: "absolute",
+    left: 0,
+    top: "50%",
+    transform: "translateY(-50%)",
+    height: "2px",
+    width: "25px",
+};
+/** Positioned inside the cell, so the cell keeps painting behind its neighbours' shadows. */
+const offerHostStyle = {position: "relative", display: "block"};
 const expandButtonStyle = {height: "2px", width: "10px"};
 
 const TransactionsButton = ({color, onOpen}) => (
@@ -54,16 +64,18 @@ const BudgetRow = ({row, id, expansion, transactionsDialog, budgetChart}) => {
                 (index < row.lastFilledMonth)
                     ? <TableCell
                         style={budgetRowStyle(row.type, false, false)} align="right" key={index}
-                        onClick={() => {if (row.subRows.length === 0) transactionsDialog.target(row.name, row.id, index + 1)}}
+                        onMouseEnter={() => {if (row.subRows.length === 0) transactionsDialog.target(row.name, row.id, index + 1)}}
                         onMouseLeave={() => transactionsDialog.clearTarget()}
                       >
-                        {month}
-                        {transactionsDialog.isTargeting(row.id, index + 1) &&
-                            <TransactionsButton
-                                color={budgetRowStyle(row.type).color}
-                                onOpen={() => transactionsDialog.setOpen(true)}
-                            />
-                        }
+                        <span style={offerHostStyle}>
+                            {transactionsDialog.isTargeting(row.id, index + 1) &&
+                                <TransactionsButton
+                                    color={budgetRowStyle(row.type).color}
+                                    onOpen={() => transactionsDialog.setOpen(true)}
+                                />
+                            }
+                            {month}
+                        </span>
                       </TableCell>
                     : <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={index}>{row.planned[index]}</TableCell>
             ))}
@@ -82,13 +94,15 @@ const BudgetRow = ({row, id, expansion, transactionsDialog, budgetChart}) => {
                     (monthIndex < row.lastFilledMonth)
                         ? <TableCell
                             align="right" key={monthIndex}
-                            onClick={() => transactionsDialog.target(subrow.name, subrow.id, monthIndex + 1)}
+                            onMouseEnter={() => transactionsDialog.target(subrow.name, subrow.id, monthIndex + 1)}
                             onMouseLeave={() => transactionsDialog.clearTarget()}
                         >
-                            {month}
-                            {transactionsDialog.isTargeting(subrow.id, monthIndex + 1) &&
-                                <TransactionsButton onOpen={() => transactionsDialog.setOpen(true)}/>
-                            }
+                            <span style={offerHostStyle}>
+                                {transactionsDialog.isTargeting(subrow.id, monthIndex + 1) &&
+                                    <TransactionsButton onOpen={() => transactionsDialog.setOpen(true)}/>
+                                }
+                                {month}
+                            </span>
                         </TableCell>
                         : <TableCell align="right" key={monthIndex}>{subrow.planned[monthIndex]}</TableCell>
                 ))}

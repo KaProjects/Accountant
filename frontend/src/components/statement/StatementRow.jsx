@@ -5,7 +5,28 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import {statementRowStyle} from "../../theme/tableStyles";
 
 const iconStyle = {width: 18};
-const cellButtonStyle = {height: "2px", width: "25px"};
+
+/**
+ * Laid out over the cell rather than inside it: appearing in the flow widened the column under the
+ * pointer, which shifted every column after it.
+ */
+const cellButtonStyle = {
+    position: "absolute",
+    left: 0,
+    top: "50%",
+    transform: "translateY(-50%)",
+    height: "2px",
+    width: "25px",
+};
+/**
+ * The offer is positioned against this, not against the cell.
+ *
+ * The lines between cells are box shadows, which bleed into the neighbouring cell. A positioned
+ * cell paints above its siblings, so its own background covered the shadows they were casting onto
+ * it and the table lost its borders. An inner block leaves the cell itself unpositioned, so the
+ * painting order is untouched.
+ */
+const offerHostStyle = {position: "relative", display: "block"};
 
 /**
  * One statement line, with the child and grandchild levels it expands into.
@@ -68,18 +89,20 @@ const StatementRow = ({row, id, columns, expansion, transactionsDialog}) => {
                             <TableCell
                                 align="right" key={index}
                                 style={statementRowStyle(child.type, false, child.monthlyValues.length -1 === index)}
-                                onClick={() => transactionsDialog.target(child.name, child.schemaId, index + 1)}
+                                onMouseEnter={() => transactionsDialog.target(child.name, child.schemaId, index + 1)}
                                 onMouseLeave={() => transactionsDialog.clearTarget()}
                             >
-                                {month}
-                                {child.children.length === 0 && transactionsDialog.isTargeting(child.schemaId, index + 1) &&
-                                    <IconButton
-                                        style={{...cellButtonStyle, color: statementRowStyle(child.type).color}}
-                                        onClick={() => transactionsDialog.setOpen(true)}
-                                    >
-                                        <ReceiptLongIcon sx={iconStyle}/>
-                                    </IconButton>
-                                }
+                                <span style={offerHostStyle}>
+                                    {child.children.length === 0 && transactionsDialog.isTargeting(child.schemaId, index + 1) &&
+                                        <IconButton
+                                            style={{...cellButtonStyle, color: statementRowStyle(child.type).color}}
+                                            onClick={() => transactionsDialog.setOpen(true)}
+                                        >
+                                            <ReceiptLongIcon sx={iconStyle}/>
+                                        </IconButton>
+                                    }
+                                    {month}
+                                </span>
                             </TableCell>
                         ))}
                         {hasTotal &&
@@ -98,18 +121,20 @@ const StatementRow = ({row, id, columns, expansion, transactionsDialog}) => {
                                 <TableCell
                                     align="right" key={index}
                                     style={statementRowStyle(grandchild.type, false, grandchild.monthlyValues.length -1 === index)}
-                                    onClick={() => transactionsDialog.target(grandchild.name, grandchild.schemaId, index + 1)}
+                                    onMouseEnter={() => transactionsDialog.target(grandchild.name, grandchild.schemaId, index + 1)}
                                     onMouseLeave={() => transactionsDialog.clearTarget()}
                                 >
-                                    {month}
-                                    {grandchild.children.length === 0 && transactionsDialog.isTargeting(grandchild.schemaId, index + 1) &&
-                                        <IconButton
-                                            style={{...cellButtonStyle, color: statementRowStyle(grandchild.type).color}}
-                                            onClick={() => transactionsDialog.setOpen(true)}
-                                        >
-                                            <ReceiptLongIcon sx={iconStyle}/>
-                                        </IconButton>
-                                    }
+                                    <span style={offerHostStyle}>
+                                        {grandchild.children.length === 0 && transactionsDialog.isTargeting(grandchild.schemaId, index + 1) &&
+                                            <IconButton
+                                                style={{...cellButtonStyle, color: statementRowStyle(grandchild.type).color}}
+                                                onClick={() => transactionsDialog.setOpen(true)}
+                                            >
+                                                <ReceiptLongIcon sx={iconStyle}/>
+                                            </IconButton>
+                                        }
+                                        {month}
+                                    </span>
                                 </TableCell>
                             ))}
                             <TableCell align="right" key={-3} style={statementRowStyle(grandchild.type, true, true)}>{grandchild.total}</TableCell>

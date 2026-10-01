@@ -12,6 +12,27 @@ import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
 import {useAppState, yearlyPath} from "../state/appState";
 import {useGoTo} from "../services/navigation";
 
+/**
+ * Offered on hover, to the left of the year, so it reads as "open this year".
+ *
+ * It is laid out over the cell rather than inside it: appearing and disappearing in the flow made
+ * the column widen and narrow under the pointer, which moved every column after it.
+ */
+const openYearStyle = {
+    position: "absolute",
+    left: 0,
+    top: "50%",
+    transform: "translateY(-50%)",
+    height: "2px",
+    width: "25px",
+};
+const openYearIconStyle = {width: 18};
+/**
+ * The offer is positioned against this block, not against the header cell: the lines between cells
+ * are box shadows, and a positioned cell paints over the ones its neighbours cast onto it.
+ */
+const yearHeaderStyle = {position: "relative", display: "block"};
+
 const AccountingStatement = () => {
     const {year, setYearly} = useAppState();
     const goTo = useGoTo();
@@ -59,18 +80,20 @@ const AccountingStatement = () => {
                                 {data.columns.map((column, index) => (
                                     <TableCell key={index}
                                                style={statementHeaderStyle(index, {columnCount: data.columns.length, hasInitial: hasInitial(), hasTotal: hasTotal()})}
-                                               onClick={() => {if (index !== 0) setRedirectYearIndex(index)}}
+                                               onMouseEnter={() => {if (index !== 0) setRedirectYearIndex(index)}}
                                                onMouseLeave={() => setRedirectYearIndex(-1)}
                                     >
-                                        {column}
-                                        {isOverall && index === redirectYearIndex &&
-                                            <IconButton
-                                                style={{height: "2px", width: "25px"}}
-                                                onClick={() => redirectToYear()}
-                                            >
-                                                <LaunchIcon sx={{width: 18}}/>
-                                            </IconButton>
-                                        }
+                                        <span style={yearHeaderStyle}>
+                                            {isOverall && index === redirectYearIndex &&
+                                                <IconButton
+                                                    style={openYearStyle}
+                                                    onClick={() => redirectToYear()}
+                                                >
+                                                    <LaunchIcon sx={openYearIconStyle}/>
+                                                </IconButton>
+                                            }
+                                            {column}
+                                        </span>
                                     </TableCell>
                                 ))}
                             </TableRow>

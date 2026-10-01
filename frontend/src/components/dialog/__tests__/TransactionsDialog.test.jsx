@@ -53,7 +53,13 @@ describe("TransactionsDialog", () => {
 
         const row = await screen.findByRole("row", {name: "hotel" instanceof RegExp ? "hotel" : new RegExp("hotel")});
         expect(within(row).getAllByRole("cell").map((cell) => cell.textContent))
-            .toEqual(["0101", "100", "500.0", "210.0", "hotel"]);
+            .toEqual(["1.1.", "100", "500.0", "210.0", "hotel"]);
+    });
+
+    it("renders the stored date as d.m.", async () => {
+        render(<TransactionsDialog {...props()}/>);
+
+        expect(await screen.findByText("2.2.")).toBeInTheDocument();
     });
 
     it("totals the amounts", async () => {
@@ -61,6 +67,24 @@ describe("TransactionsDialog", () => {
 
         const total = await screen.findByRole("row", {name: /Total:/ instanceof RegExp ? /Total:/ : new RegExp(/Total:/)});
         expect(within(total).getAllByRole("cell")[1]).toHaveTextContent("350");
+    });
+
+    it("pins the head and the total row so only the transactions scroll", async () => {
+        render(<TransactionsDialog {...props()}/>);
+
+        const total = await screen.findByRole("row", {name: /Total:/});
+        expect(within(total).getAllByRole("cell")[0]).toHaveStyle({position: "sticky", bottom: "0px"});
+
+        const header = screen.getByRole("columnheader", {name: "Date"});
+        expect(header).toHaveStyle({position: "sticky", top: "0px"});
+    });
+
+    it("keeps the total row out of the scrolling body", async () => {
+        render(<TransactionsDialog {...props()}/>);
+
+        const total = await screen.findByRole("row", {name: /Total:/});
+        // eslint-disable-next-line testing-library/no-node-access -- the section a row sits in is not queryable by role
+        expect(total.closest("tfoot")).not.toBeNull();
     });
 
     it("fetches nothing while it is closed", () => {

@@ -1,4 +1,4 @@
-import {fireEvent, screen} from "@testing-library/react";
+import {cleanup, fireEvent, screen} from "@testing-library/react";
 import MainBar from "../MainBar";
 import {renderWithAppState} from "../../testUtils";
 
@@ -38,18 +38,31 @@ describe("MainBar", () => {
         expect(setYear).toHaveBeenCalledWith(2021);
     });
 
-    it("hides the back arrow at the earliest supported year", () => {
+    it("hides the back arrow at the earliest supported year, without moving the rest", () => {
         renderBar({year: 2015});
 
-        expect(screen.queryByTestId("ArrowLeftIcon")).not.toBeInTheDocument();
-        expect(screen.getByTestId("ArrowRightIcon")).toBeInTheDocument();
+        // Still laid out, so the year and the other arrow stay where they were.
+        expect(screen.getByTestId("ArrowLeftIcon")).toBeInTheDocument();
+        expect(screen.getByTestId("ArrowLeftIcon")).not.toBeVisible();
+        expect(screen.getByTestId("ArrowRightIcon")).toBeVisible();
     });
 
-    it("hides the forward arrow once the current year is reached", () => {
+    it("hides the forward arrow once the current year is reached, without moving the rest", () => {
         renderBar({year: currentYear});
 
-        expect(screen.queryByTestId("ArrowRightIcon")).not.toBeInTheDocument();
-        expect(screen.getByTestId("ArrowLeftIcon")).toBeInTheDocument();
+        expect(screen.getByTestId("ArrowRightIcon")).toBeInTheDocument();
+        expect(screen.getByTestId("ArrowRightIcon")).not.toBeVisible();
+        expect(screen.getByTestId("ArrowLeftIcon")).toBeVisible();
+    });
+
+    it("keeps both arrows laid out at every year, so the selector never shifts", () => {
+        const widths = [2015, 2016, currentYear - 1, currentYear].map((year) => {
+            cleanup();
+            renderBar({year});
+            return screen.getAllByTestId(/Arrow(Left|Right)Icon/).length;
+        });
+
+        expect(widths).toEqual([2, 2, 2, 2]);
     });
 
     it("omits the year controls entirely when the view is not yearly", () => {

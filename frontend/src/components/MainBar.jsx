@@ -12,6 +12,13 @@ const titleStyle = {display: {xs: 'none', sm: 'block'}};
 const centreStyle = {display: {xs: 'none', md: 'flex'}};
 const drawerButtonStyle = {mr: 2};
 
+/**
+ * An arrow that cannot be used is hidden but keeps its place, so that reaching the first or the
+ * last year does not shift the year and the other arrow sideways. Hidden this way it is also out
+ * of the tab order and cannot be clicked, so it is unavailable in every sense but the layout.
+ */
+const unavailableStepStyle = {visibility: "hidden"};
+
 /** The selector sits on the coloured bar, so it has to be drawn in white rather than the default. */
 const selectorStyle = {
     color: "white",
@@ -40,20 +47,20 @@ const MainBar = () => {
 
                     {isYearly &&
                     <>
-                        {2015 < year &&
-                            <Button color="inherit" onClick={() => setYear(year - 1)}>
-                                <ArrowLeftIcon/>
-                            </Button>
-                        }
+                        <Button color="inherit"
+                                style={2015 < year ? undefined : unavailableStepStyle}
+                                onClick={() => setYear(year - 1)}>
+                            <ArrowLeftIcon/>
+                        </Button>
                         <Typography variant="h6" noWrap component="div">
                             {year}
                         </Typography>
 
-                        {year < new Date().getFullYear() &&
-                            <Button color="inherit" onClick={() => setYear(year + 1)}>
-                                <ArrowRightIcon/>
-                            </Button>
-                        }
+                        <Button color="inherit"
+                                style={year < new Date().getFullYear() ? undefined : unavailableStepStyle}
+                                onClick={() => setYear(year + 1)}>
+                            <ArrowRightIcon/>
+                        </Button>
                     </>
                     }
                     {selectValues !== null &&

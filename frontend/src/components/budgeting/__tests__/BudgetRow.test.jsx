@@ -158,7 +158,7 @@ describe("BudgetRow", () => {
         const props = mountRow();
         const cell = within(rowNamed(/Salary/)).getAllByRole("cell")[2];
 
-        fireEvent.click(cell);
+        fireEvent.mouseEnter(cell);
         expect(props.transactionsDialog.target).toHaveBeenCalledWith("Salary", "600", 2);
 
         fireEvent.mouseLeave(cell);
@@ -168,7 +168,7 @@ describe("BudgetRow", () => {
     it("offers no transactions dialog on a row that only aggregates its sub rows", () => {
         const props = mountRow({row: withSubRow});
 
-        fireEvent.click(within(rowNamed(/Salary/)).getAllByRole("cell")[2]);
+        fireEvent.mouseEnter(within(rowNamed(/Salary/)).getAllByRole("cell")[2]);
 
         expect(props.transactionsDialog.target).not.toHaveBeenCalled();
     });
@@ -197,5 +197,18 @@ describe("BudgetRow", () => {
 
         fireEvent.mouseLeave(cell);
         expect(budgetChart.preview).toHaveBeenCalledWith(null);
+    });
+
+    it("offers the dialog to the left of the figure, not after it", () => {
+        const transactionsDialog = dialog({
+            isTargeting: jest.fn((id, month) => id === "600" && month === 1),
+        });
+        mountRow({transactionsDialog});
+
+        const cell = within(rowNamed(/Salary/)).getAllByRole("cell")[1];
+        const button = within(cell).getByRole("button");
+        // Which side it sits on is a question about order, which the query API cannot ask.
+        // eslint-disable-next-line testing-library/no-node-access
+        expect(button.parentElement.firstElementChild).toBe(button);
     });
 });

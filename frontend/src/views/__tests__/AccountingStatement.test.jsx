@@ -43,6 +43,11 @@ const row = (overrides = {}) => ({
     ...overrides,
 });
 
+const overallPayload = (rows) => ({
+    columns: ["Yearly Balance Sheet", "2018", "2019", "2020"],
+    rows,
+});
+
 const payload = (rows) => ({
     columns: ["Balance Sheet", "Initial", "January", "February", "March", "April",
         "May", "June", "July", "August", "September", "October", "November", "December", "Total"],
@@ -173,5 +178,73 @@ describe("AccountingStatement", () => {
 
         expect(screen.getAllByRole("columnheader")).toHaveLength(realBalance.columns.length);
         expect(screen.getAllByRole("row")).toHaveLength(realBalance.rows.length + 1);
+    });
+
+    describe("opening a single year from the overall view", () => {
+        const mountOverall = () => mountView(overallPayload([row()]),
+            {params: {type: "balance", overall: "overall"}});
+
+        const header = (text) => screen.getByRole("columnheader", {name: new RegExp(text)});
+
+        it("offers nothing until the reader points at a year", () => {
+            mountOverall();
+
+            expect(within(header("2019")).queryByRole("button")).not.toBeInTheDocument();
+        });
+
+        it("offers to open the year being pointed at", () => {
+            mountOverall();
+
+            fireEvent.mouseEnter(header("2019"));
+
+            expect(within(header("2019")).getByRole("button")).toBeInTheDocument();
+        });
+
+        it("puts the offer before the year, not after it", () => {
+            mountOverall();
+
+            fireEvent.mouseEnter(header("2019"));
+
+            const button = within(header("2019")).getByRole("button");
+            // Which side the offer sits on is a question about order, and the query API has no way
+            // to ask it - so this one assertion reads the structure directly.
+            // eslint-disable-next-line testing-library/no-node-access
+            expect(button.parentElement.firstElementChild).toBe(button);
+        });
+
+        it("withdraws the offer when the reader points away", () => {
+            mountOverall();
+            fireEvent.mouseEnter(header("2019"));
+
+            fireEvent.mouseLeave(header("2019"));
+
+            expect(within(header("2019")).queryByRole("button")).not.toBeInTheDocument();
+        });
+
+        it("offers nothing on the heading, which names no year", () => {
+            mountOverall();
+
+            fireEvent.mouseEnter(header("Yearly Balance Sheet"));
+
+            expect(within(header("Yearly Balance Sheet")).queryByRole("button")).not.toBeInTheDocument();
+        });
+
+        it("opens that year's statement, carrying the year in the address", () => {
+            mountOverall();
+            fireEvent.mouseEnter(header("2019"));
+
+            fireEvent.click(within(header("2019")).getByRole("button"));
+
+            expect(mockNavigate).toHaveBeenCalledWith("/accounting/balance?year=2019");
+        });
+
+        it("offers nothing in the single-year view, which has no years to open", () => {
+            mountView(payload([row()]));
+
+            fireEvent.mouseEnter(screen.getByRole("columnheader", {name: /January/}));
+
+            expect(within(screen.getByRole("columnheader", {name: /January/})).queryByRole("button"))
+                .not.toBeInTheDocument();
+        });
     });
 });

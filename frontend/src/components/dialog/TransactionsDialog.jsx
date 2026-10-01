@@ -1,13 +1,28 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Loader from "../Loader";
-import {Dialog, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {Dialog, DialogTitle, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow} from "@mui/material";
 import Paper from "@mui/material/Paper";
 import {useData} from "../../fetch";
+import {formatTransactionDate} from "../../services/transactionDate";
 
+// The container is what scrolls, so the sticky head and foot stay put while the
+// transactions move between them.
+const containerStyle = {maxHeight: "70vh"};
 const tableStyle = {minWidth: 700};
 const accountCellStyle = {minWidth: "150px"};
-const totalCellStyle = {fontWeight: "bold"};
+const dateCellStyle = {whiteSpace: "nowrap"};
+// The footer keeps the body typography it had before it became a footer; only
+// the pinning and the dividing line above it are new.
+const totalCellStyle = {
+    fontWeight: "bold",
+    position: "sticky",
+    bottom: 0,
+    zIndex: 2,
+    backgroundColor: "background.default",
+    borderTop: "1px solid",
+    borderTopColor: "divider",
+};
 
 const COLUMNS = ["Date", "Amount", "Debit", "Credit", "Description"];
 
@@ -34,8 +49,8 @@ const TransactionsDialog = ({open, onClose, type, year, row, rowId, month}) => {
 
             {!loaded && <Loader error={unknownType ?? error}/>}
             {loaded &&
-                <TableContainer component={Paper}>
-                    <Table sx={tableStyle} size="small" aria-label="a dense table">
+                <TableContainer component={Paper} sx={containerStyle}>
+                    <Table stickyHeader sx={tableStyle} size="small" aria-label="a dense table">
                         <TableHead>
                             <TableRow>
                                 {COLUMNS.map((column, index) => (
@@ -46,21 +61,23 @@ const TransactionsDialog = ({open, onClose, type, year, row, rowId, month}) => {
                         <TableBody>
                             {data.map((transaction, index) => (
                                 <TableRow key={index}>
-                                    <TableCell align="center">{transaction.date}</TableCell>
+                                    <TableCell align="center" style={dateCellStyle}>{formatTransactionDate(transaction.date)}</TableCell>
                                     <TableCell align="right">{transaction.amount}</TableCell>
                                     <TableCell align="left" style={accountCellStyle}>{transaction.debit}</TableCell>
                                     <TableCell align="left" style={accountCellStyle}>{transaction.credit}</TableCell>
                                     <TableCell align="left" style={accountCellStyle}>{transaction.description}</TableCell>
                                 </TableRow>
                             ))}
-                            <TableRow key={-1}>
-                                <TableCell align="center" style={totalCellStyle}>Total: </TableCell>
-                                <TableCell align="right" style={totalCellStyle}>{total()}</TableCell>
-                                <TableCell/>
-                                <TableCell/>
-                                <TableCell/>
-                            </TableRow>
                         </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell variant="body" align="center" sx={totalCellStyle}>Total: </TableCell>
+                                <TableCell variant="body" align="right" sx={totalCellStyle}>{total()}</TableCell>
+                                <TableCell variant="body" sx={totalCellStyle}/>
+                                <TableCell variant="body" sx={totalCellStyle}/>
+                                <TableCell variant="body" sx={totalCellStyle}/>
+                            </TableRow>
+                        </TableFooter>
                     </Table>
                 </TableContainer>
             }
