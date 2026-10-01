@@ -42,6 +42,11 @@ public class Service {
     public static final AnalysisService ANALYSIS = new AnalysisService();
 
     /**
+     * Instance of the service that keeps the invoices of the fixed assets
+     */
+    public static final InvoiceService INVOICE = new InvoiceService();
+
+    /**
      * Instance of Firebase service class
      */
     public static final FirebaseService FIREBASE = new FirebaseService();

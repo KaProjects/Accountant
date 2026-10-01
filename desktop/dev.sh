@@ -63,13 +63,28 @@ fi
 
 # The fat jar supplies the dependencies; the class snapshot comes first on the
 # classpath so the code being developed always wins over the packaged copy.
+
+# Whether this jar was packaged with the 'dev' profile, which is the only thing that puts
+# jackson-databind - the dependency the fakes in src/dev need - into it.
+has_dev_deps() {
+    unzip -l "$1" 2>/dev/null | grep -q 'com/fasterxml/jackson/databind/ObjectMapper.class'
+}
+
+# A jar left behind by build_deploy.sh or by a plain './mvnw package' carries no dev
+# dependencies, and its timestamp says nothing about that. Comparing it against pom.xml alone
+# let such a jar stay in place whenever pom.xml happened to be the older of the two, and the app
+# then died at startup complaining that the dev sources were missing - which they were not. So
+# the jar's contents decide here, not only its age.
 ensure_deps() {
-    if [ -z "$JAR_DEPS" ] || [ pom.xml -nt "$JAR_DEPS" ]; then
-        log "packaging (dependencies changed or jar missing) ..."
+    if [ -z "$JAR_DEPS" ] || [ pom.xml -nt "$JAR_DEPS" ] || ! has_dev_deps "$JAR_DEPS"; then
+        log "packaging (jar missing, outdated, or built without the 'dev' profile) ..."
         ./mvnw -B -q -Pdev package -DskipTests || { err "package failed"; return 1; }
         JAR_DEPS=$(ls target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
     fi
-    [ -n "$JAR_DEPS" ]
+    if [ -z "$JAR_DEPS" ] || ! has_dev_deps "$JAR_DEPS"; then
+        err "the packaged jar carries no dev dependencies - the app would fail at startup"
+        return 1
+    fi
 }
 
 # Serialises the watcher's compiles against the restart's snapshot copy.

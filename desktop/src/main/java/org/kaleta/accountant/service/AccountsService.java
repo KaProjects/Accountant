@@ -318,6 +318,34 @@ public class AccountsService {
     }
 
     /**
+     * Replaces the metadata of the account with this full id. The metadata is a bag of values the
+     * account's own kind gives meaning to - a depreciation schedule, the file name of an invoice -
+     * so it is written whole, by whoever understands it, rather than merged here.
+     */
+    public void setMetadata(String year, String fullId, String metadata){
+        try {
+            Manager<AccountsModel> manager = new AccountsManager(year);
+            AccountsModel model = manager.retrieve();
+
+            AccountsModel.Account account = null;
+            for (AccountsModel.Account candidate : model.getAccount()) {
+                if (candidate.getFullId().equals(fullId)) account = candidate;
+            }
+            if (account == null) {
+                throw new IllegalArgumentException("Account with id='" + fullId + "' not found!");
+            }
+            account.setMetadata(metadata);
+
+            manager.update(model);
+            Initializer.LOG.info("Account id=" + fullId + " metadata set to '" + metadata + "'");
+            invalidateModel();
+        } catch (ManagerException e){
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
      * Renames the account and, with it, every account that is named after it: the consumption
      * account of a resource, the accumulated depreciation and depreciation accounts of an asset,
      * the creation and revaluation accounts of a financial asset. Each of those is created as a

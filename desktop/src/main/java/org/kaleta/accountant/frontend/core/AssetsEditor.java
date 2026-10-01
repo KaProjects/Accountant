@@ -8,10 +8,14 @@ import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.action.listener.AttachInvoiceAction;
 import org.kaleta.accountant.frontend.action.listener.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenDepreciateDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenExcludeDialog;
 import org.kaleta.accountant.frontend.action.listener.RenameAccountAction;
+import org.kaleta.accountant.frontend.action.listener.RevealInvoiceAction;
+import org.kaleta.accountant.frontend.common.IconLoader;
+import org.kaleta.accountant.frontend.component.LeadingIconButton;
 import org.kaleta.accountant.frontend.component.card.CardStyle;
 import org.kaleta.accountant.service.Service;
 
@@ -24,6 +28,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AssetsEditor extends JPanel implements Configurable {
+
+    private static final String REVEAL_INVOICE_LABEL = "Invoice";
+    private static final String ATTACH_INVOICE_LABEL = "Add Invoice";
+    private static final int INVOICE_ICON_SIZE = 11;
+
+    /**
+     * Both states of the invoice button are given this one width, so that a row does not shift
+     * sideways the moment an asset gains an invoice.
+     */
+    private static final int INVOICE_BUTTON_WIDTH = Math.max(
+            revealInvoiceButton().getPreferredSize().width,
+            new JButton(ATTACH_INVOICE_LABEL).getPreferredSize().width);
+
+    /** The invoice button of an asset that has one: the icon says that it leads out of the app. */
+    private static LeadingIconButton revealInvoiceButton() {
+        return new LeadingIconButton(REVEAL_INVOICE_LABEL,
+                IconLoader.getIcon(IconLoader.EXTERNAL, new Dimension(INVOICE_ICON_SIZE, INVOICE_ICON_SIZE)), 5);
+    }
+
     private Configuration configuration;
     private final JPanel panelItems;
     private final JButton buttonDepreciateAll;
@@ -185,9 +208,11 @@ public class AssetsEditor extends JPanel implements Configurable {
         private final JSeparator separator;
         private final JPanel depPanel;
         private final JLabel labelDepInfo;
+        private final JButton buttonInvoice;
         private final JButton buttonExclude;
         private final JButton buttonDep;
 
+        private final boolean hasInvoice;
         private boolean isActive;
         private final AccountsModel.Account account;
 
@@ -234,6 +259,30 @@ public class AssetsEditor extends JPanel implements Configurable {
             depPanel.add(Box.createVerticalStrut(3));
             depPanel.add(labelDepInfo);
 
+            // The invoice is the document that says what the asset cost. The asset either has one
+            // and the button hands it over to the file manager, or it has none and the button asks
+            // for it - a file whose name is recorded but which is no longer in the invoices folder
+            // counts as none, so that a wrong one can be replaced by deleting it.
+            //
+            // The name of the file is not shown. An invoice is named by whoever issued it and
+            // carries the account's id on top of that, so it is nearly always too long to read in
+            // a row of this width; the tooltip says which file it is.
+            hasInvoice = Service.INVOICE.getInvoice(account) != null;
+            String invoiceName = Service.INVOICE.getInvoiceName(account);
+
+            buttonInvoice = hasInvoice ? revealInvoiceButton() : new JButton(ATTACH_INVOICE_LABEL);
+            buttonInvoice.addActionListener(hasInvoice
+                    ? new RevealInvoiceAction(AssetsEditor.this, account)
+                    : new AttachInvoiceAction(AssetsEditor.this, account));
+            if (hasInvoice) {
+                buttonInvoice.setToolTipText("Show '" + invoiceName + "' in the file manager");
+            } else if (invoiceName != null) {
+                buttonInvoice.setToolTipText("'" + invoiceName
+                        + "' is no longer in the invoices folder - choose the invoice again");
+            } else {
+                buttonInvoice.setToolTipText("Attach the invoice of this asset");
+            }
+
             JPanel panelSeparator = new JPanel();
             panelSeparator.setOpaque(false);
 
@@ -254,6 +303,8 @@ public class AssetsEditor extends JPanel implements Configurable {
                     .addComponent(separator, 5, 5, 5)
                     .addComponent(depPanel, 200, 200, 200)
                     .addComponent(panelSeparator)
+                    .addComponent(buttonInvoice, INVOICE_BUTTON_WIDTH, INVOICE_BUTTON_WIDTH, INVOICE_BUTTON_WIDTH)
+                    .addGap(5)
                     .addComponent(buttonExclude)
                     .addGap(25));
             layout.setVerticalGroup(layout.createSequentialGroup().addGap(5)
@@ -268,6 +319,8 @@ public class AssetsEditor extends JPanel implements Configurable {
                             .addComponent(separator, 60, 60, 60)
                             .addComponent(depPanel, 50, 50, 50)
                             .addComponent(panelSeparator, 50, 50, 50)
+                            .addComponent(buttonInvoice, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(buttonExclude))
                     .addGap(5));
             update();
@@ -316,6 +369,9 @@ public class AssetsEditor extends JPanel implements Configurable {
                 separator.setVisible(false);
                 depPanel.setVisible(false);
                 buttonExclude.setVisible(false);
+                // an asset no longer owned is not carried into the next year, so there is nothing
+                // to attach an invoice to - but the invoice it already has is still its receipt
+                buttonInvoice.setVisible(hasInvoice);
             }
             AssetPanel.this.revalidate();
             AssetPanel.this.repaint();

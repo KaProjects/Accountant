@@ -13,7 +13,8 @@
 
 ## 2.1
 Released: TBD
-    
+
+    invoices for the fixed assets
 
 ## 2.0
 Released: 29.9.2026

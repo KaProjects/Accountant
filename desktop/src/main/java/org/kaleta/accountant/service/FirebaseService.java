@@ -39,9 +39,18 @@ public class FirebaseService {
             FirebaseStore fake = (FirebaseStore) Class.forName(IN_MEMORY_STORE).getDeclaredConstructor().newInstance();
             Initializer.LOG.info("Firebase: using the in-memory store (-D" + MODE_PROPERTY + "=" + MODE_FAKE + ")");
             return fake;
-        } catch (ReflectiveOperationException e) {
+        } catch (ClassNotFoundException e) {
             throw new ManagerException(new IllegalStateException(
                     "'" + MODE_PROPERTY + "=" + MODE_FAKE + "' requires the dev sources; build with the 'dev' profile.", e));
+        } catch (ReflectiveOperationException | LinkageError e) {
+            // The fake is on the classpath, so the dev sources are compiled in; something they
+            // need is not. That is what a fat jar packaged without the 'dev' profile looks like,
+            // since the profile is also what adds jackson-databind. Reporting the absent dev
+            // sources here instead sent the search in the wrong direction.
+            throw new ManagerException(new IllegalStateException(
+                    "The in-memory store is on the classpath but could not be created, which means a"
+                            + " dependency it needs is absent from the build. Repackage with"
+                            + " './mvnw -Pdev package -DskipTests'.", e));
         }
     }
 
