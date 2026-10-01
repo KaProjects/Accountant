@@ -15,6 +15,11 @@
 # its data directory relative to the classes it was loaded from, and both resolve to
 # target/DEVEL-DATA.
 #
+# The app is started with -Daccountant.context=devel, which is what puts it on DEVEL-DATA.
+# Nothing in the sources says which data directory to use, so the branch is never carrying an
+# edit that has to be undone before it is merged: a release jar started without the flag opens
+# the production data, and the tests ask for their own.
+#
 # Runs against the fakes in src/dev (Maven profile 'dev'), so it needs neither the
 # network nor the Firebase service key. Set FIREBASE_MODE=real to talk to the real
 # database instead.
@@ -39,7 +44,9 @@ PID_FILE=target/.dev-loop.pid
 # a file, not a variable: with fswatch the compiles happen in a subshell of their own
 PENDING_FILE=target/.dev-pending
 
-JAR_DEPS=$(ls target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
+# -t, so that a version bump leaves the previous version's jar behind without it winning:
+# "2.0" sorts before "2.1", and the loop would go on running against the older one
+JAR_DEPS=$(ls -t target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
 APP_PID=""
 WATCH_PID=""
 FIREBASE_MODE=${FIREBASE_MODE:-fake}
@@ -79,7 +86,7 @@ ensure_deps() {
     if [ -z "$JAR_DEPS" ] || [ pom.xml -nt "$JAR_DEPS" ] || ! has_dev_deps "$JAR_DEPS"; then
         log "packaging (jar missing, outdated, or built without the 'dev' profile) ..."
         ./mvnw -B -q -Pdev package -DskipTests || { err "package failed"; return 1; }
-        JAR_DEPS=$(ls target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
+        JAR_DEPS=$(ls -t target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
     fi
     if [ -z "$JAR_DEPS" ] || ! has_dev_deps "$JAR_DEPS"; then
         err "the packaged jar carries no dev dependencies - the app would fail at startup"
@@ -111,7 +118,8 @@ stop_app() {
 
 start_app() {
     rsync -a --delete target/classes/ "$RUN_CLASSES"/
-    java -Dfirebase.mode="$FIREBASE_MODE" ${JAVA_OPTS:-} -cp "$RUN_CLASSES:$JAR_DEPS" org.kaleta.accountant.Initializer &
+    java -Daccountant.context=devel -Dfirebase.mode="$FIREBASE_MODE" ${JAVA_OPTS:-} \
+        -cp "$RUN_CLASSES:$JAR_DEPS" org.kaleta.accountant.Initializer &
     APP_PID=$!
     echo 0 > "$PENDING_FILE"
     log "app started (pid $APP_PID, firebase=$FIREBASE_MODE)"
