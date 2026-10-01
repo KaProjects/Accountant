@@ -39,7 +39,13 @@ public class OpenAddAssetDialog extends MenuAction {
         if (dialog.getResult()) {
             String semanticId = Service.ACCOUNT.getNextSemanticId(getConfiguration().getSelectedYear(), dialog.getSchemaId());
 
-            Service.ACCOUNT.createAccount(year, dialog.getAccName(), dialog.getSchemaId(), semanticId, "");
+            AccountsModel.Account assetAccount = Service.ACCOUNT.createAccount(year,
+                    dialog.getAccName(), dialog.getSchemaId(), semanticId, "");
+
+            // the invoice is filed under the account, so it waits until the account has an id
+            if (dialog.getInvoiceFile() != null) {
+                Service.INVOICE.attachInvoice(year, assetAccount, dialog.getInvoiceFile());
+            }
 
             String accId = dialog.getSchemaId() + "." + semanticId;
             Service.TRANSACTIONS.addTransaction(year, dialog.getDate(), "0", accId, Constants.Account.INIT_ACC_ID, Constants.Transaction.OPEN_DESCRIPTION);

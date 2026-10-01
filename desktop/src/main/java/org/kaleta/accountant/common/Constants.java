@@ -9,6 +9,14 @@ public class Constants {
     }
 
     /**
+     * Names of things inside the data directory.
+     */
+    public static class Data {
+        /** Where the invoices of the fixed assets are kept, next to the year directories. */
+        public static final String INVOICES_DIR = "invoices";
+    }
+
+    /**
      * Default values for schema.
      */
     public static class Schema {
@@ -100,6 +108,13 @@ public class Constants {
         public static final String ACCUMULATED_EARNINGS_ACC_ID = "401.0";
 
         public static final String GENERAL_ACCOUNT_NAME = "general";
+
+        /**
+         * The metadata key under which an asset account keeps the file name of its invoice. Only
+         * the assets of class 0 carry one, which is why this lives in the metadata rather than in
+         * an attribute of its own: an attribute would be empty on nearly every account in the books.
+         */
+        public static final String INVOICE_METADATA_KEY = "invoice";
     }
 
     public static class Color {

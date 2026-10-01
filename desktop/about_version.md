@@ -1,19 +1,18 @@
 ## release workflow:
 
-    before release: 
-        pom.xml: x.y-snapshot -> x.y
-        Initializer.VERSION: x.y-snapshot -> x.y
-        Initializer.CONTEXT = PRODUCTION
-    after release:
-        create tag
-        pom.xml: x.y -> x.y+1-snapshot
-        Initializer.VERSION: x.y -> x.y+1-snapshot
-        Initializer.CONTEXT = DEVEL
+    before release - bump version: 
+        - pom.xml
+        - Initializer.VERSION
+
+
+## 2.2
+Released: TBD
 
 
 ## 2.1
-Released: TBD
-    
+Released: 2.10.2026
+
+    invoices for the fixed assets
 
 ## 2.0
 Released: 29.9.2026

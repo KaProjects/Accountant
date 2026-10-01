@@ -48,6 +48,17 @@ public class ConfigService {
                 throw new ServiceFailureException("Data directory creation failed!");
             }
         }
+        /*checks whether the invoices dir is present, creates it if not*/
+        File invoicesDir = new File(Initializer.getDataSource() + Constants.Data.INVOICES_DIR);
+        if (!invoicesDir.exists()) {
+            boolean result = invoicesDir.mkdir();
+            if (result) {
+                System.out.println("# Invoices directory '%DATA_DIR%/" + invoicesDir.getName() + "' created!");
+            } else {
+                System.err.println("ERROR: Invoices directory creation failed!");
+                throw new ServiceFailureException("Invoices directory creation failed!");
+            }
+        }
         /*checks whether log file is present, creates it if not*/
         File logFile = new File(Initializer.getDataSource() + "log.log");
         if (!logFile.exists()) {

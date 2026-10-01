@@ -20,12 +20,38 @@ import org.kaleta.accountant.service.Service;
  */
 public class Initializer {
     public static final String NAME = "Accountant";
-    public static final String VERSION = "2.0";
+    public static final String VERSION = "2.1";
     public static final Logger LOG = Logger.getLogger("Logger");
+
+    /**
+     * The property that says which books the app opens: "production", "devel" or "test". Left
+     * unsaid it is the production ones, so a released jar is started with no argument at all,
+     * while dev.sh asks for the devel ones. The tests set {@link #CONTEXT} themselves.
+     */
+    public static final String CONTEXT_PROPERTY = "accountant.context";
+
     public static int CONTEXT;
 
     /** Where the file chooser starts when a statement is imported: this machine's own downloads. */
     public static String DEFAULT_FILES_DIR = System.getProperty("user.home") + File.separator + "Downloads";
+
+    /**
+     * Reads the context out of the system property.
+     * <p>
+     * A value that is not one of the three is an error rather than something to fall back from:
+     * the fallback would be production, and a mistyped flag would quietly have the app open the
+     * real books and write into them.
+     */
+    static int contextFromProperty(){
+        String value = System.getProperty(CONTEXT_PROPERTY, "production").trim().toLowerCase();
+        switch (value) {
+            case "production": return Constants.Context.PRODUCTION;
+            case "devel": return Constants.Context.DEVEL;
+            case "test": return Constants.Context.TEST;
+            default: throw new IllegalArgumentException("Unknown -D" + CONTEXT_PROPERTY + "='" + value
+                    + "'; it is one of 'production', 'devel' or 'test'.");
+        }
+    }
 
     public static String getDataSource(){
         String appParentPath = new File(Initializer.class.getProtectionDomain().getCodeSource().getLocation().getPath())
@@ -56,7 +82,7 @@ public class Initializer {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                CONTEXT = Constants.Context.PRODUCTION;
+                CONTEXT = contextFromProperty();
                 Service.CONFIG.checkResources();
                 Service.CONFIG.checkData();
                 initLogger();

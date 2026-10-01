@@ -15,6 +15,11 @@
 # its data directory relative to the classes it was loaded from, and both resolve to
 # target/DEVEL-DATA.
 #
+# The app is started with -Daccountant.context=devel, which is what puts it on DEVEL-DATA.
+# Nothing in the sources says which data directory to use, so the branch is never carrying an
+# edit that has to be undone before it is merged: a release jar started without the flag opens
+# the production data, and the tests ask for their own.
+#
 # Runs against the fakes in src/dev (Maven profile 'dev'), so it needs neither the
 # network nor the Firebase service key. Set FIREBASE_MODE=real to talk to the real
 # database instead.
@@ -39,7 +44,9 @@ PID_FILE=target/.dev-loop.pid
 # a file, not a variable: with fswatch the compiles happen in a subshell of their own
 PENDING_FILE=target/.dev-pending
 
-JAR_DEPS=$(ls target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
+# -t, so that a version bump leaves the previous version's jar behind without it winning:
+# "2.0" sorts before "2.1", and the loop would go on running against the older one
+JAR_DEPS=$(ls -t target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
 APP_PID=""
 WATCH_PID=""
 FIREBASE_MODE=${FIREBASE_MODE:-fake}
@@ -63,13 +70,28 @@ fi
 
 # The fat jar supplies the dependencies; the class snapshot comes first on the
 # classpath so the code being developed always wins over the packaged copy.
+
+# Whether this jar was packaged with the 'dev' profile, which is the only thing that puts
+# jackson-databind - the dependency the fakes in src/dev need - into it.
+has_dev_deps() {
+    unzip -l "$1" 2>/dev/null | grep -q 'com/fasterxml/jackson/databind/ObjectMapper.class'
+}
+
+# A jar left behind by build_deploy.sh or by a plain './mvnw package' carries no dev
+# dependencies, and its timestamp says nothing about that. Comparing it against pom.xml alone
+# let such a jar stay in place whenever pom.xml happened to be the older of the two, and the app
+# then died at startup complaining that the dev sources were missing - which they were not. So
+# the jar's contents decide here, not only its age.
 ensure_deps() {
-    if [ -z "$JAR_DEPS" ] || [ pom.xml -nt "$JAR_DEPS" ]; then
-        log "packaging (dependencies changed or jar missing) ..."
+    if [ -z "$JAR_DEPS" ] || [ pom.xml -nt "$JAR_DEPS" ] || ! has_dev_deps "$JAR_DEPS"; then
+        log "packaging (jar missing, outdated, or built without the 'dev' profile) ..."
         ./mvnw -B -q -Pdev package -DskipTests || { err "package failed"; return 1; }
-        JAR_DEPS=$(ls target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
+        JAR_DEPS=$(ls -t target/*-jar-with-dependencies.jar 2>/dev/null | head -1)
     fi
-    [ -n "$JAR_DEPS" ]
+    if [ -z "$JAR_DEPS" ] || ! has_dev_deps "$JAR_DEPS"; then
+        err "the packaged jar carries no dev dependencies - the app would fail at startup"
+        return 1
+    fi
 }
 
 # Serialises the watcher's compiles against the restart's snapshot copy.
@@ -96,7 +118,8 @@ stop_app() {
 
 start_app() {
     rsync -a --delete target/classes/ "$RUN_CLASSES"/
-    java -Dfirebase.mode="$FIREBASE_MODE" ${JAVA_OPTS:-} -cp "$RUN_CLASSES:$JAR_DEPS" org.kaleta.accountant.Initializer &
+    java -Daccountant.context=devel -Dfirebase.mode="$FIREBASE_MODE" ${JAVA_OPTS:-} \
+        -cp "$RUN_CLASSES:$JAR_DEPS" org.kaleta.accountant.Initializer &
     APP_PID=$!
     echo 0 > "$PENDING_FILE"
     log "app started (pid $APP_PID, firebase=$FIREBASE_MODE)"
