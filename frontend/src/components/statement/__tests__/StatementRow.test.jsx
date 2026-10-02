@@ -62,6 +62,13 @@ describe("StatementRow", () => {
             .toEqual([" ASSETS", "300", "11", "12", "13", "400"]);
     });
 
+    it("sets the thousands of every figure apart", () => {
+        mountRow({row: {...row, initial: 1234567, monthlyValues: [-25000, 999, 0], total: 13775706}});
+
+        expect(within(rowNamed("ASSETS")).getAllByRole("cell").map((cell) => cell.textContent))
+            .toEqual([" ASSETS", "1,234,567", "-25,000", "999", "0", "13,775,706"]);
+    });
+
     it("omits the initial and total columns when the statement has none", () => {
         mountRow({hasInitial: false, hasTotal: false});
 
@@ -74,6 +81,31 @@ describe("StatementRow", () => {
 
         expect(within(rowNamed("ASSETS")).getAllByRole("cell").map((cell) => cell.textContent))
             .toEqual([" ASSETS", "300", "71", "72", "400"]);
+    });
+
+    it("paints the row in a shade of its own when it is given one", () => {
+        mountRow({shade: {fill: "#3B6D11", ink: "#EAF3DE", edge: "#27500A"}});
+
+        within(rowNamed("ASSETS")).getAllByRole("cell").forEach((cell) => {
+            expect(cell).toHaveStyle({background: "#3B6D11", color: "#EAF3DE"});
+        });
+    });
+
+    it("paints the rows it expands into in the fainter shade that goes with its own", () => {
+        mountRow({showChildren: true, shade: {
+            fill: "#7FBB4F", ink: "#173404", edge: "#27500A",
+            accounts: {fill: "#F3F9EC", ink: "#3B6D11", edge: "#3B6D11"},
+        }});
+
+        within(rowNamed("Bank")).getAllByRole("cell").forEach((cell) => {
+            expect(cell).toHaveStyle({background: "#F3F9EC", color: "#3B6D11"});
+        });
+    });
+
+    it("leaves the rows it expands into alone when its shade has none for them", () => {
+        mountRow({showChildren: true, shade: {fill: "#7FBB4F", ink: "#173404", edge: "#27500A"}});
+
+        expect(within(rowNamed("Bank")).getAllByRole("cell")[0]).not.toHaveStyle({background: "#7FBB4F"});
     });
 
     it("expands children when the row is clicked", () => {

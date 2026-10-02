@@ -101,6 +101,22 @@ export function statementRowStyle(type, hasLeftBorder, hasRightBorder) {
     };
 }
 
+/**
+ * A statement row painted in a shade of its own rather than the colour of its type, so that it
+ * matches its part of the chart beneath the table. The cell borders are shadows drawn in the text
+ * colour, so they are given the shade's edge explicitly; a pale ink would otherwise draw pale
+ * borders around a dark row.
+ */
+export function shadedStatementRowStyle(style, shade) {
+    if (shade === null || shade === undefined) return style;
+    return {
+        ...style,
+        background: shade.fill,
+        color: shade.ink,
+        boxShadow: "0 0 8px 0 " + shade.edge,
+    };
+}
+
 export const isExpenseRow = (type) => expenseBudgetRows.includes(type);
 
 /** An asset list entry, highlighted while its chart is open. */

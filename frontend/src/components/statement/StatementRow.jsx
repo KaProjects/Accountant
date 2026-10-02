@@ -2,7 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import {IconButton, TableCell, TableRow} from "@mui/material";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import {statementRowStyle} from "../../theme/tableStyles";
+import {shadedStatementRowStyle, statementRowStyle} from "../../theme/tableStyles";
+import {formatAmount} from "../../services/amount";
 
 const iconStyle = {width: 18};
 
@@ -34,9 +35,17 @@ const offerHostStyle = {position: "relative", display: "block"};
  * Only the balance sheet goes three levels deep; the other statements stop at
  * children.
  */
-const StatementRow = ({row, id, columns, expansion, transactionsDialog}) => {
+const StatementRow = ({row, id, columns, expansion, transactionsDialog, shade = null}) => {
     const {type, isOverall, hasInitial, hasTotal} = columns;
     const {showChildren, onToggleChildren, showGrandChild, onToggleGrandChild} = expansion;
+
+    /** The row's own cells, in a shade of their own when it is given one. */
+    const rowStyle = (hasLeftBorder, hasRightBorder) =>
+        shadedStatementRowStyle(statementRowStyle(row.type, hasLeftBorder, hasRightBorder), shade);
+
+    /** The rows it expands into, in the fainter shade that goes with the row's own. */
+    const accountStyle = (node, hasLeftBorder, hasRightBorder) => shadedStatementRowStyle(
+        statementRowStyle(node.type, hasLeftBorder, hasRightBorder), shade === null ? null : shade.accounts);
 
     /** An overall statement reports years where a yearly one reports months. */
     const valuesOf = (node) => isOverall ? node.yearlyValues : node.monthlyValues;
@@ -63,90 +72,90 @@ const StatementRow = ({row, id, columns, expansion, transactionsDialog}) => {
     return (
             <React.Fragment>
                 <TableRow key={id} onClick={() => onToggleChildren(id)}>
-                    <TableCell key={-1} style={statementRowStyle(row.type, true, true)}>
+                    <TableCell key={-1} style={rowStyle(true, true)}>
                         {" " + row.name}
                     </TableCell>
                     {hasInitial &&
-                        <TableCell key={-2} align="right" style={statementRowStyle(row.type, false, true)}>
-                            {row.initial}
+                        <TableCell key={-2} align="right" style={rowStyle(false, true)}>
+                            {formatAmount(row.initial)}
                         </TableCell>
                     }
                     {!isOverall && row.monthlyValues.map((month, index) => (
                         <TableCell
                             align="right" key={index}
-                            style={statementRowStyle(row.type, false, row.monthlyValues.length -1 === index)}
+                            style={rowStyle(false, row.monthlyValues.length -1 === index)}
                         >
-                            {month}
+                            {formatAmount(month)}
                         </TableCell>
                     ))}
                     {isOverall && row.yearlyValues.map((year, index) => (
                         <TableCell
                             align="right" key={index}
-                            style={statementRowStyle(row.type, false, row.yearlyValues.length -1 === index)}
+                            style={rowStyle(false, row.yearlyValues.length -1 === index)}
                         >
-                            {year}
+                            {formatAmount(year)}
                         </TableCell>
                     ))}
                     {hasTotal &&
                         <TableCell
                             align="right" key={-3}
-                            style={statementRowStyle(row.type, false, true)}
+                            style={rowStyle(false, true)}
                         >
-                            {row.total}
+                            {formatAmount(row.total)}
                         </TableCell>
                     }
                 </TableRow>
                 {showChildren && row.children.map((child, index) => (
                     <React.Fragment key={child.schemaId + "f" + index}>
                     <TableRow key={child.schemaId + "x" + index} onClick={() => onToggleGrandChild(child.schemaId)}>
-                        <TableCell component="th" scope="row" key={-1} style={statementRowStyle(child.type, true, true)}>
+                        <TableCell component="th" scope="row" key={-1} style={accountStyle(child, true, true)}>
                             {child.name}
                         </TableCell>
                         {hasInitial &&
-                            <TableCell key={-2} align="right" style={statementRowStyle(child.type, false, true)}>
-                                {child.initial}
+                            <TableCell key={-2} align="right" style={accountStyle(child, false, true)}>
+                                {formatAmount(child.initial)}
                             </TableCell>
                         }
                         {valuesOf(child).map((value, index) => (
                             <TableCell
                                 align="right" key={index}
-                                style={statementRowStyle(child.type, false, valuesOf(child).length -1 === index)}
+                                style={accountStyle(child, false, valuesOf(child).length -1 === index)}
                                 {...hoverProps(child, index)}
                             >
                                 <span style={offerHostStyle}>
                                     {transactionsOffer(child, index)}
-                                    {value}
+                                    {formatAmount(value)}
                                 </span>
                             </TableCell>
                         ))}
                         {hasTotal &&
-                            <TableCell align="right" key={-3} style={statementRowStyle(child.type, true, true)}>{child.total}</TableCell>
+                            <TableCell align="right" key={-3} style={accountStyle(child, true, true)}>{formatAmount(child.total)}</TableCell>
                         }
                     </TableRow>
                     {type === "balance" && (showGrandChild === child.schemaId) && child.children.map((grandchild, index) => (
                         <TableRow key={grandchild.schemaId + "x" + index}>
-                            <TableCell component="th" scope="row" key={-1} style={statementRowStyle(grandchild.type, true, true)}>
+                            <TableCell component="th" scope="row" key={-1} style={accountStyle(grandchild, true, true)}>
                                 {grandchild.name}
                             </TableCell>
                             {hasInitial &&
-                                <TableCell key={-2} align="right" style={statementRowStyle(grandchild.type, false, true)}>
-                                    {grandchild.initial}
+                                <TableCell key={-2} align="right" style={accountStyle(grandchild, false, true)}>
+                                    {formatAmount(grandchild.initial)}
                                 </TableCell>
                             }
                             {valuesOf(grandchild).map((value, index) => (
                                 <TableCell
                                     align="right" key={index}
-                                    style={statementRowStyle(grandchild.type, false, valuesOf(grandchild).length -1 === index)}
+                                    style={accountStyle(grandchild, false, valuesOf(grandchild).length -1 === index)}
                                     {...hoverProps(grandchild, index)}
                                 >
                                     <span style={offerHostStyle}>
                                         {transactionsOffer(grandchild, index)}
-                                        {value}
+                                        {formatAmount(value)}
                                     </span>
                                 </TableCell>
                             ))}
                             {hasTotal &&
-                                <TableCell align="right" key={-3} style={statementRowStyle(grandchild.type, true, true)}>{grandchild.total}</TableCell>
+                                <TableCell align="right" key={-3} style={accountStyle(grandchild, true, true)}>{formatAmount(grandchild.total)}</TableCell>
                             }
                         </TableRow>
                     ))}
@@ -174,6 +183,16 @@ StatementRow.propTypes = {
         onToggleGrandChild: PropTypes.func.isRequired,
     }).isRequired,
     transactionsDialog: PropTypes.object.isRequired,
+    /**
+     * A shade to paint the row in instead of the colour of its type: {fill, ink, edge}, with the
+     * fainter shade for the rows it expands into under `accounts`.
+     */
+    shade: PropTypes.shape({
+        fill: PropTypes.string.isRequired,
+        ink: PropTypes.string.isRequired,
+        edge: PropTypes.string.isRequired,
+        accounts: PropTypes.object,
+    }),
 };
 
 export default StatementRow;

@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import {useData} from "../fetch";
 import DataView from "../components/common/DataView";
 import Paper from "@mui/material/Paper";
@@ -10,9 +10,10 @@ import StatementRow from "../components/statement/StatementRow";
 import StatementChart from "../components/chart/StatementChart";
 import {statementHeaderStyle} from "../theme/tableStyles";
 import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
+import {useColumnLayout} from "../hooks/useColumnLayout";
 import {useAppState, yearlyPath} from "../state/appState";
 import {useGoTo} from "../services/navigation";
-import {statementCharts} from "../services/statementCharts";
+import {statementCharts, statementRowShades} from "../services/statementCharts";
 
 /**
  * Offered on hover, to the left of the year, so it reads as "open this year".
@@ -53,6 +54,10 @@ const AccountingStatement = () => {
 
     const transactionsDialog = useTransactionsDialog();
 
+    // A chart lined up with the table is drawn from where the table actually put its columns.
+    const tableRef = useRef(null);
+    const measured = useColumnLayout(tableRef, data);
+
     const toggleChildren = (id) => {
         const updated = showChildren.slice()
         updated[id] = !showChildren[id]
@@ -70,13 +75,21 @@ const AccountingStatement = () => {
 
     const hasInitial = () => data.columns[1] === "Initial"
     const hasTotal = () => data.columns[data.columns.length - 1] === "Total"
+    // Below an overall table sits its chart, and a row painted like its part of the chart is one
+    // less thing to match up by eye.
+    const rowShades = () => statementRowShades(type, data, isOverall)
+    const charts = () => statementCharts(type, data, isOverall)
+    const tableLayout = () => measured === null ? null : {
+        width: measured.width,
+        columns: measured.columns.map((column, index) => ({...column, name: data.columns[index]})),
+    }
 
     return (
         <DataView loaded={loaded} error={error}>
             {() => (
                 <>
                 <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                    <Table ref={tableRef} sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                         <TableHead>
                             <TableRow key={-1}>
                                 {data.columns.map((column, index) => (
@@ -119,16 +132,22 @@ const AccountingStatement = () => {
                                         onToggleGrandChild: toggleGrandChild,
                                     }}
                                     transactionsDialog={transactionsDialog}
+                                    shade={rowShades()[index]}
                                 />
                             ))}
                         </TableBody>
                     </Table>
+                    {/* A chart lined up with the table sits inside its scroll, so that the two
+                        move together when the table is wider than the window. */}
+                    {tableLayout() !== null && charts().filter((chart) => chart.alignToTable).map((chart) => (
+                        <StatementChart key={chart.key} chart={chart} layout={tableLayout()} titled={charts().length > 1}/>
+                    ))}
                 </TableContainer>
 
-                {/* The overall views leave the page half empty below the table, which is where
-                    the shape of all those years is easiest to read. */}
-                {isOverall && statementCharts(type, data).map((chart) => (
-                    <StatementChart key={chart.key} chart={chart}/>
+                {/* The page is half empty below the table, which is where the shape of the
+                    figures is easiest to read. */}
+                {charts().filter((chart) => !chart.alignToTable).map((chart) => (
+                    <StatementChart key={chart.key} chart={chart} titled={charts().length > 1}/>
                 ))}
 
                 <TransactionsDialog

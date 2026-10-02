@@ -1,4 +1,8 @@
-import {abbreviateAmount, statementCharts} from "../statementCharts";
+import {abbreviateAmount, statementCharts, statementRowShades} from "../statementCharts";
+import {aboveZeroShades, belowZeroShades} from "../../theme/palette";
+
+const greens = aboveZeroShades.map((shade) => shade.fill);
+const reds = belowZeroShades.map((shade) => shade.fill);
 
 const balance = {
     columns: ["Yearly Balance Sheet", "2019", "2020"],
@@ -46,8 +50,8 @@ describe("statementCharts", () => {
         expect(assets.form).toBe("stacked");
         expect(assets.line.name).toBe("Assets");
         expect(assets.points).toEqual([
-            {year: "2019", s0: 10, s1: 20, summary: 30},
-            {year: "2020", s0: 15, s1: 25, summary: 40},
+            {period: "2019", s0: 10, s1: 20, summary: 30},
+            {period: "2020", s0: 15, s1: 25, summary: 40},
         ]);
     });
 
@@ -57,7 +61,50 @@ describe("statementCharts", () => {
         expect(chart.form).toBe("stacked");
         expect(chart.series.map((series) => series.name)).toEqual(["Cash", "Credit"]);
         expect(chart.line.name).toBe("Cash Flow");
-        expect(chart.points[0]).toEqual({year: "2019", s0: 5, s1: -2, summary: 3});
+        expect(chart.points[0]).toEqual({period: "2019", s0: 5, s1: -2, summary: 3});
+    });
+
+    it("colours the cash flow by side: green for what is held, red for what is owed", () => {
+        const [chart] = statementCharts("cashflow", cashFlow);
+
+        expect(greens).toContain(chart.series[0].color);
+        expect(reds).toContain(chart.series[1].color);
+    });
+
+    it("gives every component on one side a shade of its own, the first one the deepest", () => {
+        const threeHeld = {...cashFlow, rows: [
+            {type: "CASH_FLOW_GROUP", schemaId: "20", name: "Cash", yearlyValues: [5, 6]},
+            {type: "CASH_FLOW_GROUP", schemaId: "21", name: "Bank", yearlyValues: [7, 8]},
+            {type: "CASH_FLOW_GROUP", schemaId: "23", name: "Funds", yearlyValues: [9, 9]},
+            {type: "CASH_FLOW_GROUP", schemaId: "22", name: "Credit", yearlyValues: [-2, -3]},
+            {type: "CASH_FLOW_SUMMARY", schemaId: "cf", name: "Cash Flow", yearlyValues: [19, 20]},
+        ]};
+
+        const [chart] = statementCharts("cashflow", threeHeld);
+        const held = chart.series.slice(0, 3).map((series) => greens.indexOf(series.color));
+
+        // the shades run from palest to deepest, and the table's first group takes the deepest
+        expect(new Set(held).size).toBe(3);
+        expect(held).toEqual(held.slice().sort((one, other) => other - one));
+    });
+
+    it("draws the cash flow's line heavier than the totals of the other charts", () => {
+        const [cashFlowChart] = statementCharts("cashflow", cashFlow);
+        const [assets] = statementCharts("balance", balance);
+
+        expect(cashFlowChart.line.width).toBeGreaterThan(assets.line.width);
+    });
+
+    it("draws a lone component in the pale shade that sits against the axis", () => {
+        const [chart] = statementCharts("cashflow", cashFlow);
+
+        expect(chart.series[1].color).toBe(reds[1]);
+    });
+
+    it("leaves the other statements in hues of their own", () => {
+        const [assets] = statementCharts("balance", balance);
+
+        expect(greens).not.toContain(assets.series[0].color);
     });
 
     it("charts the income statement twice: its groups, then its profit levels", () => {
@@ -72,8 +119,8 @@ describe("statementCharts", () => {
         expect(groups.series.map((series) => series.name)).toEqual(["Work", "Consumption"]);
         expect(groups.line.name).toBe("Net Profit");
         expect(groups.points).toEqual([
-            {year: "2019", s0: 100, s1: -30, summary: -10},
-            {year: "2020", s0: 120, s1: -40, summary: 70},
+            {period: "2019", s0: 100, s1: -30, summary: -10},
+            {period: "2020", s0: 120, s1: -40, summary: 70},
         ]);
     });
 
@@ -111,15 +158,15 @@ describe("statementCharts", () => {
         expect(levels.series.map((series) => series.name))
             .toEqual(["Net Income", "Operating Profit", "Net Profit"]);
         expect(levels.points).toEqual([
-            {year: "2019", s0: 90, s1: 60, s2: -10},
-            {year: "2020", s0: 110, s1: 70, s2: 70},
+            {period: "2019", s0: 90, s1: 60, s2: -10},
+            {period: "2020", s0: 110, s1: 70, s2: 70},
         ]);
     });
 
     it("leaves the income statement's Total column off the years axis", () => {
         const [groups] = statementCharts("profit", profit);
 
-        expect(groups.points.map((point) => point.year)).toEqual(["2019", "2020"]);
+        expect(groups.points.map((point) => point.period)).toEqual(["2019", "2020"]);
     });
 
     it("gives each component its own colour, and the line the colour of its row", () => {
@@ -135,6 +182,161 @@ describe("statementCharts", () => {
 
     it("charts nothing for a statement it does not know", () => {
         expect(statementCharts("nonsense", balance)).toEqual([]);
+    });
+});
+
+describe("statementCharts on a yearly statement", () => {
+    const months = ["January", "February", "March", "April", "May", "June", "July",
+        "August", "September", "October", "November", "December"];
+    const yearlyCashFlow = {
+        columns: ["Cash Flow Statement", "Initial", ...months, "Total"],
+        rows: [
+            {type: "CASH_FLOW_GROUP", schemaId: "20", name: "Cash",
+                initial: 100, monthlyValues: [10, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5], total: 95},
+            {type: "CASH_FLOW_GROUP", schemaId: "22", name: "Credit",
+                initial: -50, monthlyValues: [-5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], total: -55},
+            {type: "CASH_FLOW_SUMMARY", schemaId: "cf", name: "Cash Flow",
+                initial: 50, monthlyValues: [5, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5], total: 40},
+        ],
+    };
+
+    const only = () => {
+        const charts = statementCharts("cashflow", yearlyCashFlow, false);
+        expect(charts).toHaveLength(1);
+        return charts[0];
+    };
+
+    it("charts the year once, as its months' changes measured from the opening balance", () => {
+        expect(only().form).toBe("changes");
+        expect(only().baseline).toBe(50);
+    });
+
+    it("is drawn under the table, each point under its own column", () => {
+        expect(only().alignToTable).toBe(true);
+    });
+
+    it("names its points as the table's header names its columns", () => {
+        expect(only().points.map((point) => point.period)).toEqual(["Initial", ...months]);
+    });
+
+    it("sets the line off from the baseline under Initial, with nothing else drawn there", () => {
+        expect(only().points[0]).toEqual({period: "Initial", summary: 50, opening: true});
+    });
+
+    it("reports each group's change for the month, as the table does", () => {
+        const monthPoints = only().points.slice(1);
+
+        expect(monthPoints.map((point) => point.s0)).toEqual([10, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5]);
+        expect(monthPoints.map((point) => point.s1)).toEqual([-5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    });
+
+    it("draws where the cash flow actually stood, from the opening through each month end", () => {
+        expect(only().points.map((point) => point.summary))
+            .toEqual([50, 55, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 40]);
+    });
+
+    describe("in a year that is still running", () => {
+        // recorded until April; the table still carries May to December, as noughts
+        const running = {...yearlyCashFlow, rows: [
+            {type: "CASH_FLOW_GROUP", schemaId: "20", name: "Cash",
+                initial: 100, monthlyValues: [10, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0]},
+            {type: "CASH_FLOW_GROUP", schemaId: "22", name: "Credit",
+                initial: -50, monthlyValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+            {type: "CASH_FLOW_SUMMARY", schemaId: "cf", name: "Cash Flow",
+                initial: 50, monthlyValues: [10, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0]},
+        ]};
+        const points = () => statementCharts("cashflow", running, false)[0].points;
+
+        it("ends the line at the last month anything moved in", () => {
+            expect(points().map((point) => point.summary))
+                .toEqual([50, 60, 60, 60, 55, null, null, null, null, null, null, null, null]);
+        });
+
+        it("still counts a quiet month that has a recorded one after it", () => {
+            expect(points()[2]).toMatchObject({period: "February", summary: 60, spacer: 50});
+        });
+
+        it("draws nothing at all in the months the year has not reached", () => {
+            expect(points()[5]).toEqual({period: "May", summary: null});
+        });
+
+        it("keeps every month on the axis, under its column of the table", () => {
+            expect(points().map((point) => point.period)).toEqual(["Initial", ...months]);
+        });
+    });
+
+    it("stacks a month's losses down from the baseline and its gains up from it", () => {
+        // January: Cash gains 10, Credit loses 5, measured from the opening 50
+        const january = only().points[1];
+
+        expect(january.spacer).toBe(45);
+        expect(january.s1_below).toBe(5);
+        expect(january.s0_above).toBe(10);
+        expect([january.s0_below, january.s1_above]).toEqual([null, null]);
+        // so the losses reach exactly back up to the baseline, where the gains begin
+        expect(january.spacer + january.s1_below).toBe(only().baseline);
+    });
+
+    it("colours a group by where its balance stands, not by which way the year moved it", () => {
+        // Cash ends the year lower than it began, but it is still cash held
+        const dwindling = {...yearlyCashFlow, rows: yearlyCashFlow.rows.map((row) => row.schemaId === "20"
+            ? {...row, monthlyValues: [-30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], total: 70}
+            : row)};
+
+        expect(greens).toContain(statementCharts("cashflow", dwindling, false)[0].series[0].color);
+    });
+
+    it("colours and paints a yearly cash flow the way it does the overall one", () => {
+        const [chart] = statementCharts("cashflow", yearlyCashFlow, false);
+        const shades = statementRowShades("cashflow", yearlyCashFlow, false);
+
+        expect(greens).toContain(chart.series[0].color);
+        expect(reds).toContain(chart.series[1].color);
+        expect(shades[0].fill).toBe(chart.series[0].color);
+        expect(shades[1].fill).toBe(chart.series[1].color);
+        expect(shades[2].ink).toBe(chart.line.color);
+    });
+
+    it("leaves the other yearly statements without a chart, for now", () => {
+        const yearly = {...yearlyCashFlow, columns: ["Balance Sheet", "Initial", ...months, "Total"]};
+
+        expect(statementCharts("balance", yearly, false)).toEqual([]);
+        expect(statementCharts("profit", yearly, false)).toEqual([]);
+    });
+});
+
+describe("statementRowShades", () => {
+    it("paints each cash flow group in the shade of its part of the chart", () => {
+        const [chart] = statementCharts("cashflow", cashFlow);
+        const shades = statementRowShades("cashflow", cashFlow);
+
+        expect(shades[0].fill).toBe(chart.series[0].color);
+        expect(shades[1].fill).toBe(chart.series[1].color);
+    });
+
+    it("writes the total in the colour the chart draws its line in", () => {
+        const [chart] = statementCharts("cashflow", cashFlow);
+
+        expect(statementRowShades("cashflow", cashFlow)[2].ink).toBe(chart.line.color);
+    });
+
+    it("gives each group a faint shade of its own side for the accounts it expands into", () => {
+        const [held, owed] = statementRowShades("cashflow", cashFlow);
+
+        expect(held.accounts.fill).not.toBe(held.fill);
+        expect(owed.accounts.fill).not.toBe(owed.fill);
+        expect(held.accounts.fill).not.toBe(owed.accounts.fill);
+    });
+
+    it("leaves every row of the other statements alone", () => {
+        expect(statementRowShades("balance", balance)).toEqual(balance.rows.map(() => null));
+        expect(statementRowShades("profit", profit)).toEqual(profit.rows.map(() => null));
+    });
+
+    it("paints nothing when no year has been synced yet", () => {
+        const empty = {columns: ["Yearly Cash Flow Statement"], rows: []};
+
+        expect(statementRowShades("cashflow", empty)).toEqual([]);
     });
 });
 

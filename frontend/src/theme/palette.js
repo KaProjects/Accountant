@@ -72,6 +72,47 @@ export const statementRowColors = {
 export const summaryLineColor = neutral.text;
 
 /**
+ * Shades for a chart whose components fall on either side of nought, from palest to deepest.
+ * Every component on one side takes a shade of that side's hue, so the parts of a column are told
+ * apart from one another but the side each belongs to is plain at a glance: what is held in green,
+ * what is owed in red.
+ *
+ * The rows of the table the chart sits under are painted in the same shades, so each shade also
+ * carries the ink its text is written in, and the edge its cell borders are drawn in, which is the
+ * deepest shade of its side for all of them. The greens stop short of the deep end of the hue so
+ * that even the deepest of them still takes dark text like the rest of the table.
+ */
+export const aboveZeroShades = [
+    {fill: "#E4F2D2", ink: "#173404", edge: "#27500A"},
+    {fill: "#C6E3A3", ink: "#173404", edge: "#27500A"},
+    {fill: "#A3D07A", ink: "#173404", edge: "#27500A"},
+    {fill: "#7FBB4F", ink: "#173404", edge: "#27500A"},
+    {fill: "#5E9E2E", ink: "#0B2101", edge: "#27500A"},
+];
+/**
+ * The accounts a painted group expands into: the same side's hue, but fainter than the plain
+ * account rows of the table, so the group still stands out from what it is made of. The edge is
+ * kept soft as well: the cell borders are shadows that bleed several pixels into the cell, and a
+ * strong edge darkened the whole of a pale row.
+ */
+export const aboveZeroAccountShade = {fill: "#F8FCF3", ink: "#3B6D11", edge: "#A3D07A"};
+export const belowZeroAccountShade = {fill: "#FEF6F6", ink: "#A32D2D", edge: "#F09595"};
+
+/**
+ * The cash flow's own total, a step lighter than the statement's usual summary row. The chart
+ * draws the same total as its line in the row's ink, so the two are matched up at a glance.
+ */
+export const cashFlowSummaryShade = {fill: "#B877AF", ink: "#3a0032", edge: "#3a0032"};
+
+export const belowZeroShades = [
+    {fill: "#F7C1C1", ink: "#791F1F", edge: "#791F1F"},
+    {fill: "#F09595", ink: "#501313", edge: "#791F1F"},
+    {fill: "#E24B4A", ink: "#501313", edge: "#791F1F"},
+    {fill: "#A32D2D", ink: "#FCEBEB", edge: "#791F1F"},
+    {fill: "#791F1F", ink: "#FCEBEB", edge: "#791F1F"},
+];
+
+/**
  * Series colours for the overall statement charts, in a fixed order so that a component keeps
  * its colour as the statement grows. One hue per component, and the hues are ordered so that the
  * first few are as far apart as the palette allows, for the charts that only use a few. The

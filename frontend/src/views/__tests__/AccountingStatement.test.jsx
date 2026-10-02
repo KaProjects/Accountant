@@ -96,8 +96,8 @@ describe("AccountingStatement", () => {
         mountView(payload([row()]), {params: {type: "balance", overall: "overall"}});
 
         const cells = screen.getAllByRole("cell");
-        expect(cells[2]).toHaveTextContent("1000");
-        expect(cells[3]).toHaveTextContent("2000");
+        expect(cells[2]).toHaveTextContent("1,000");
+        expect(cells[3]).toHaveTextContent("2,000");
     });
 
     it("shows the loader until the data arrives", () => {
@@ -123,7 +123,7 @@ describe("AccountingStatement", () => {
 
         const cells = screen.getAllByRole("cell");
         expect(cells[0]).toHaveTextContent("Assets");
-        expect(cells[1]).toHaveTextContent("1000"); // initial
+        expect(cells[1]).toHaveTextContent("1,000"); // initial
         expect(cells[2]).toHaveTextContent("100");  // January
         expect(cells[14]).toHaveTextContent("600"); // total
     });
