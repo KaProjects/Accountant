@@ -45,7 +45,7 @@ public class AccountingData
                 if (hasInitialValue(schemaAccount)) {
                     accountComponent.addInitialValue(getInitialValue(account, isAsset(schemaAccount)));
                 }
-                accountComponent.addMonthlyBalance(getMonthlyBalance(account, isDebit(schemaAccount)));
+                accountComponent.addMonthlyBalance(getMonthlyBalance(account, isDebit(schemaAccount), hasInitialValue(schemaAccount)));
             }
             groupComponent.getAccounts().add(accountComponent);
         }
@@ -85,11 +85,6 @@ public class AccountingData
     }
 
     private Integer getInitialValue(Account account, boolean isAsset){
-        List<Transaction> initTransactions = transactions.stream()
-                .filter(transaction ->
-                        isAsset ? transaction.getDebit().equals(account.getFullId()) && transaction.getCredit().equals(Constants.Account.INIT_ACC_ID)
-                                : transaction.getDebit().equals(Constants.Account.INIT_ACC_ID) && transaction.getCredit().equals(account.getFullId())).collect(Collectors.toList());
-
         // An account with no initiation opens at nothing. That is ordinary: an account declared in
         // the chart of accounts but not used that year has none, and so does one created part way
         // through the year, because there was nothing to carry in. This used to be treated as a
@@ -100,15 +95,44 @@ public class AccountingData
         // there is exactly one, but accumulated earnings are initiated twice (the opening
         // balance and the previous year's profit), and the desktop app also happens to
         // write duplicate zero-amount initiations for some accounts.
-        return initTransactions.stream().mapToInt(Transaction::getAmount).sum();
+        //
+        // Both directions count. An account that opens below zero is written the other way round
+        // with a positive amount - 2017 opens a bank account with "700.0 -> 210.0 zostatok" - and
+        // reading only the usual direction lost it, so the year no longer added up to its closing.
+        int initialValue = 0;
+        for (Transaction transaction : transactions)
+        {
+            if (transaction.getDebit().equals(account.getFullId()) && transaction.getCredit().equals(Constants.Account.INIT_ACC_ID)) {
+                initialValue += isAsset ? transaction.getAmount() : -transaction.getAmount();
+            }
+            if (transaction.getDebit().equals(Constants.Account.INIT_ACC_ID) && transaction.getCredit().equals(account.getFullId())) {
+                initialValue += isAsset ? -transaction.getAmount() : transaction.getAmount();
+            }
+        }
+        return initialValue;
     }
 
-    private Integer[] getMonthlyBalance(Account account, boolean isDebit){
+    /**
+     * How the account moved in each month: every transaction it takes part in, except the ones
+     * the statement shows elsewhere or not at all.
+     * <ul>
+     * <li>The year-end closing to 701.0 and 710.0 is not a movement, it is the year's result.</li>
+     * <li>An account with an opening balance has its 700.0 transactions in that opening balance.
+     * An expense or revenue account has none, so a correction booked against 700.0 is an
+     * ordinary movement in the month it is dated - the desktop app closes it into the year the
+     * same way.</li>
+     * <li>A transaction from an account to itself moves nothing. It used to be counted once, on
+     * the debit side, so a reposting such as "626.0 -> 626.0 preuctovanie" shifted the year.</li>
+     * </ul>
+     */
+    private Integer[] getMonthlyBalance(Account account, boolean isDebit, boolean hasInitialValue){
         Integer[] monthlySums = new Integer[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         for (Transaction transaction : transactions.stream()
                 .filter(transaction -> transaction.getDebit().equals(account.getFullId()) || transaction.getCredit().equals(account.getFullId()))
-                .filter(transaction -> !transaction.getDebit().startsWith("7") && !transaction.getCredit().startsWith("7"))
+                .filter(transaction -> !transaction.getDebit().equals(transaction.getCredit()))
+                .filter(transaction -> !isClosing(transaction))
+                .filter(transaction -> !(hasInitialValue && isInitiation(transaction)))
                 .collect(Collectors.toList()))
         {
             int month = Integer.parseInt(transaction.getDate().substring(2, 4));
@@ -120,6 +144,15 @@ public class AccountingData
             }
         }
         return monthlySums;
+    }
+
+    private static boolean isClosing(Transaction transaction){
+        return List.of(Constants.Account.CLOSING_ACC_ID, Constants.Account.PROFIT_ACC_ID).contains(transaction.getDebit())
+                || List.of(Constants.Account.CLOSING_ACC_ID, Constants.Account.PROFIT_ACC_ID).contains(transaction.getCredit());
+    }
+
+    private static boolean isInitiation(Transaction transaction){
+        return transaction.getDebit().equals(Constants.Account.INIT_ACC_ID) || transaction.getCredit().equals(Constants.Account.INIT_ACC_ID);
     }
 
     private boolean hasInitialValue(SchemaClass.Group.Account schemaAccount){

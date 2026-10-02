@@ -95,7 +95,8 @@ public interface TransactionRepository
     /**
      * @return list of transactions that have debit or credit of profit account ID (e.i. 5x or 6x).
      *
-     * Note: off-balance transactions excluded
+     * Note: the year-end closing (701.0, 710.0) is excluded, but a correction booked against the
+     * initial account 700.0 is not: it moves the year's profit like any other transaction.
      */
     List<Transaction> listProfitTransactions(String year);
 
