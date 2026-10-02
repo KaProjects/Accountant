@@ -7,10 +7,12 @@ import TransactionsDialog from "../components/dialog/TransactionsDialog";
 import {useParams} from "react-router-dom";
 import LaunchIcon from '@mui/icons-material/Launch';
 import StatementRow from "../components/statement/StatementRow";
+import StatementChart from "../components/chart/StatementChart";
 import {statementHeaderStyle} from "../theme/tableStyles";
 import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
 import {useAppState, yearlyPath} from "../state/appState";
 import {useGoTo} from "../services/navigation";
+import {statementCharts} from "../services/statementCharts";
 
 /**
  * Offered on hover, to the left of the year, so it reads as "open this year".
@@ -122,6 +124,13 @@ const AccountingStatement = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                {/* The overall views leave the page half empty below the table, which is where
+                    the shape of all those years is easiest to read. */}
+                {isOverall && statementCharts(type, data).map((chart) => (
+                    <StatementChart key={chart.key} chart={chart}/>
+                ))}
+
                 <TransactionsDialog
                     open={transactionsDialog.open}
                     onClose={transactionsDialog.close}

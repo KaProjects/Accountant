@@ -64,6 +64,24 @@ export const statementRowColors = {
     BALANCE_ACCOUNT: {background: "#fdfcf3", foreground: "#797746"},
 }
 
+/**
+ * The total of a stacked statement chart is drawn over its components in plain ink rather than
+ * in a colour of its own: it took the colour of its row in the table until that turned out to be
+ * a near match for one of the components it was drawn over.
+ */
+export const summaryLineColor = neutral.text;
+
+/**
+ * Series colours for the overall statement charts, in a fixed order so that a component keeps
+ * its colour as the statement grows. One hue per component, and the hues are ordered so that the
+ * first few are as far apart as the palette allows, for the charts that only use a few. The
+ * summary drawn over them takes the foreground colour of its own row in the table instead.
+ */
+export const statementSeriesColors = [
+    "#2a78d6", "#eb6834", "#1baf7a", "#eda100",
+    "#e87ba4", "#6250d6", "#e34948", "#888780",
+];
+
 /** Statement row types drawn bold with heavier borders. */
 export const emphasisedStatementRows = [
     "INCOME_GROUP", "EXPENSE_GROUP", "PROFIT_SUMMARY",

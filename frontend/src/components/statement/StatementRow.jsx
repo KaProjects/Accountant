@@ -38,6 +38,28 @@ const StatementRow = ({row, id, columns, expansion, transactionsDialog}) => {
     const {type, isOverall, hasInitial, hasTotal} = columns;
     const {showChildren, onToggleChildren, showGrandChild, onToggleGrandChild} = expansion;
 
+    /** An overall statement reports years where a yearly one reports months. */
+    const valuesOf = (node) => isOverall ? node.yearlyValues : node.monthlyValues;
+
+    /**
+     * The transactions behind a cell are offered on the yearly statements only. A year's worth of
+     * them already fills the dialog; all the years at once would be no use to anybody.
+     */
+    const hoverProps = (node, index) => isOverall ? {} : {
+        onMouseEnter: () => transactionsDialog.target(node.name, node.schemaId, index + 1),
+        onMouseLeave: () => transactionsDialog.clearTarget(),
+    };
+
+    const transactionsOffer = (node, index) => !isOverall
+        && node.children.length === 0
+        && transactionsDialog.isTargeting(node.schemaId, index + 1)
+        && <IconButton
+                style={{...cellButtonStyle, color: statementRowStyle(node.type).color}}
+                onClick={() => transactionsDialog.setOpen(true)}
+            >
+                <ReceiptLongIcon sx={iconStyle}/>
+            </IconButton>;
+
     return (
             <React.Fragment>
                 <TableRow key={id} onClick={() => onToggleChildren(id)}>
@@ -85,23 +107,15 @@ const StatementRow = ({row, id, columns, expansion, transactionsDialog}) => {
                                 {child.initial}
                             </TableCell>
                         }
-                        {child.monthlyValues.map((month, index) => (
+                        {valuesOf(child).map((value, index) => (
                             <TableCell
                                 align="right" key={index}
-                                style={statementRowStyle(child.type, false, child.monthlyValues.length -1 === index)}
-                                onMouseEnter={() => transactionsDialog.target(child.name, child.schemaId, index + 1)}
-                                onMouseLeave={() => transactionsDialog.clearTarget()}
+                                style={statementRowStyle(child.type, false, valuesOf(child).length -1 === index)}
+                                {...hoverProps(child, index)}
                             >
                                 <span style={offerHostStyle}>
-                                    {child.children.length === 0 && transactionsDialog.isTargeting(child.schemaId, index + 1) &&
-                                        <IconButton
-                                            style={{...cellButtonStyle, color: statementRowStyle(child.type).color}}
-                                            onClick={() => transactionsDialog.setOpen(true)}
-                                        >
-                                            <ReceiptLongIcon sx={iconStyle}/>
-                                        </IconButton>
-                                    }
-                                    {month}
+                                    {transactionsOffer(child, index)}
+                                    {value}
                                 </span>
                             </TableCell>
                         ))}
@@ -114,30 +128,26 @@ const StatementRow = ({row, id, columns, expansion, transactionsDialog}) => {
                             <TableCell component="th" scope="row" key={-1} style={statementRowStyle(grandchild.type, true, true)}>
                                 {grandchild.name}
                             </TableCell>
-                            <TableCell key={-2} align="right" style={statementRowStyle(grandchild.type, false, true)}>
-                                {grandchild.initial}
-                            </TableCell>
-                            {grandchild.monthlyValues.map((month, index) => (
+                            {hasInitial &&
+                                <TableCell key={-2} align="right" style={statementRowStyle(grandchild.type, false, true)}>
+                                    {grandchild.initial}
+                                </TableCell>
+                            }
+                            {valuesOf(grandchild).map((value, index) => (
                                 <TableCell
                                     align="right" key={index}
-                                    style={statementRowStyle(grandchild.type, false, grandchild.monthlyValues.length -1 === index)}
-                                    onMouseEnter={() => transactionsDialog.target(grandchild.name, grandchild.schemaId, index + 1)}
-                                    onMouseLeave={() => transactionsDialog.clearTarget()}
+                                    style={statementRowStyle(grandchild.type, false, valuesOf(grandchild).length -1 === index)}
+                                    {...hoverProps(grandchild, index)}
                                 >
                                     <span style={offerHostStyle}>
-                                        {grandchild.children.length === 0 && transactionsDialog.isTargeting(grandchild.schemaId, index + 1) &&
-                                            <IconButton
-                                                style={{...cellButtonStyle, color: statementRowStyle(grandchild.type).color}}
-                                                onClick={() => transactionsDialog.setOpen(true)}
-                                            >
-                                                <ReceiptLongIcon sx={iconStyle}/>
-                                            </IconButton>
-                                        }
-                                        {month}
+                                        {transactionsOffer(grandchild, index)}
+                                        {value}
                                     </span>
                                 </TableCell>
                             ))}
-                            <TableCell align="right" key={-3} style={statementRowStyle(grandchild.type, true, true)}>{grandchild.total}</TableCell>
+                            {hasTotal &&
+                                <TableCell align="right" key={-3} style={statementRowStyle(grandchild.type, true, true)}>{grandchild.total}</TableCell>
+                            }
                         </TableRow>
                     ))}
                     </React.Fragment>

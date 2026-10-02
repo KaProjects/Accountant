@@ -88,6 +88,35 @@ public class AccountingYearlyData
         return getYearlyClassValues(classId, "0","1","2","3","4","5","6","7","8","9");
     }
 
+    /**
+     * The year-by-year value of everything whose account id starts with the given prefix: one
+     * schema account ("200"), or a whole group ("20").
+     * <p>
+     * This is what the overall statements expand into. The group and class methods above answer
+     * the same question for a selection of groups or accounts; this one answers it for a single
+     * branch of the schema, so a row and the rows it expands into are read off the same
+     * transactions and still add up.
+     * <p>
+     * The accumulated depreciation group reduces the class it sits in, so its entries count
+     * negative here exactly as they do in {@link #getYearlyClassValues}.
+     */
+    public Integer[] getYearlyValues(String schemaIdPrefix)
+    {
+        Map<String, Integer> yearlyData = new TreeMap<>();
+        for (String year : getYears()){
+            yearlyData.put(year, 0);
+        }
+        for (Transaction transaction : transactions){
+            if (transaction.getDebit().startsWith(schemaIdPrefix) || transaction.getCredit().startsWith(schemaIdPrefix))
+            {
+                Integer amount = transaction.getAmount();
+                if (transaction.getDebit().startsWith(Constants.Schema.ACCUMULATED_DEP_GROUP_ID)) amount = -amount;
+                yearlyData.put(transaction.getYear(), yearlyData.get(transaction.getYear()) + amount);
+            }
+        }
+        return yearlyData.values().toArray(new Integer[]{});
+    }
+
     public Integer[] getYearlyOverallValues()
     {
         Map<String, Integer> yearlyData = new TreeMap<>();

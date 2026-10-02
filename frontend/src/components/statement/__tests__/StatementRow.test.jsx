@@ -4,17 +4,17 @@ import StatementRow from "../StatementRow";
 
 const grandchild = {
     schemaId: "210", name: "Current account", type: "ASSET",
-    initial: 310, monthlyValues: [41, 42, 43], total: 440, children: [],
+    initial: 310, monthlyValues: [41, 42, 43], yearlyValues: [91, 92], total: 440, children: [],
 };
 
 const child = {
     schemaId: "21", name: "Bank", type: "ASSET",
-    initial: 320, monthlyValues: [51, 52, 53], total: 450, children: [grandchild],
+    initial: 320, monthlyValues: [51, 52, 53], yearlyValues: [81, 82], total: 450, children: [grandchild],
 };
 
 const childWithoutChildren = {
     schemaId: "22", name: "Cash", type: "ASSET",
-    initial: 330, monthlyValues: [61, 62, 63], total: 460, children: [],
+    initial: 330, monthlyValues: [61, 62, 63], yearlyValues: [66, 67], total: 460, children: [],
 };
 
 const row = {
@@ -151,6 +151,40 @@ describe("StatementRow", () => {
             transactionsDialog,
         });
         expect(within(rowNamed("Cash")).getAllByRole("button")).not.toHaveLength(0);
+    });
+
+    it("expands into yearly figures in the overall view", () => {
+        mountRow({isOverall: true, showChildren: true, hasInitial: false, hasTotal: false});
+
+        // the row's name is a header cell, so the figures are all the plain cells there are
+        expect(within(rowNamed("Bank")).getAllByRole("cell").map((cell) => cell.textContent))
+            .toEqual(["81", "82"]);
+    });
+
+    it("expands to the third level in the overall view as well", () => {
+        mountRow({
+            isOverall: true, showChildren: true, showGrandChild: "21",
+            hasInitial: false, hasTotal: false,
+        });
+
+        expect(within(rowNamed("Current account")).getAllByRole("cell").map((cell) => cell.textContent))
+            .toEqual(["91", "92"]);
+    });
+
+    it("offers no transactions dialog in the overall view", () => {
+        // A single year already fills that dialog; every year at once would be no use.
+        const transactionsDialog = dialog({isTargeting: jest.fn().mockReturnValue(true)});
+        mountRow({
+            row: {...row, children: [childWithoutChildren]},
+            isOverall: true, showChildren: true, hasInitial: false, hasTotal: false,
+            transactionsDialog,
+        });
+
+        const cell = within(rowNamed("Cash")).getAllByRole("cell")[1];
+        expect(within(cell).queryByRole("button")).not.toBeInTheDocument();
+
+        fireEvent.mouseEnter(cell);
+        expect(transactionsDialog.target).not.toHaveBeenCalled();
     });
 
     it("opens the transactions dialog from the cell being pointed at", () => {
