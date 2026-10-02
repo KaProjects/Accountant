@@ -105,24 +105,42 @@ describe("StackTooltip", () => {
         const split = {
             form: "split",
             series: [
-                {key: "s0", name: "Net Income", color: "#5D9DE6"},
-                {key: "s1", name: "consumption", color: "#F4B6B6"},
-                {key: "s2", name: "services", color: "#EF9999"},
+                {key: "s0", name: "Net Income", color: "#5D9DE6", layer: "behind"},
+                {key: "s1", name: "consumption", color: "#F4B6B6", layer: "taken"},
+                {key: "s2", name: "services", color: "#EF9999", layer: "taken"},
             ],
             line: {key: "summary", name: "Operating Profit", color: "#000"},
         };
 
-        it("reads like the column, from the top: the parts, the total under them, then the line", () => {
+        it("reads in the order of the key: the total, the parts laid over it, then the line", () => {
             const {container} = render(
-                <StackTooltip active label="2022" chart={split} payload={[{payload: {s0: 100, s0_lift: -20, s1: 40, s2: 80, summary: -20}}]}/>);
+                <StackTooltip active label="2022" chart={split} payload={[{payload: {s0: 100, lift: -20, s1: 40, s2: 80, summary: -20}}]}/>);
 
             expect(readOut(container)).toEqual([
                 "2022",
-                "consumption : 40", "services : 80",
-                "--------",
                 "Net Income : 100",
-                "--------",
+                "consumption : 40", "services : 80",
                 "Operating Profit : -20",
+            ]);
+        });
+
+        it("lists the layers in the order of the table, leaving out any part laid over that came to nothing", () => {
+            const incomes = {
+                form: "split",
+                series: [
+                    {key: "s0", name: "work", color: "#7CBC42", layer: "behind"},
+                    {key: "s1", name: "office (cost)", color: "#EF9999", layer: "taken"},
+                    {key: "s2", name: "office (income)", color: "#C4E3A0", layer: "given"},
+                ],
+                line: {key: "summary", name: "Net Income", color: "#000"},
+            };
+            const read = (point) => readOut(render(<StackTooltip active label="2020" chart={incomes} payload={[{payload: point}]}/>).container);
+
+            expect(read({s0: 120, s1: 20, s2: 5, lift: 100, summary: 105})).toEqual([
+                "2020", "work : 120", "office (cost) : 20", "office (income) : 5", "Net Income : 105",
+            ]);
+            expect(read({s0: 120, s1: 20, s2: 0, lift: 100, summary: 100})).toEqual([
+                "2020", "work : 120", "office (cost) : 20", "Net Income : 100",
             ]);
         });
     });

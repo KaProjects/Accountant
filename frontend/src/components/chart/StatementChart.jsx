@@ -1,14 +1,13 @@
 import PropTypes from "prop-types";
 import {
     Bar, Brush, CartesianGrid, ComposedChart, Legend, Line,
-    ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
+    Rectangle, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import Paper from "@mui/material/Paper";
 import {neutral} from "../../theme/palette";
 import {abbreviateAmount} from "../../services/statementCharts";
-import {formatAmount} from "../../services/amount";
 import {columnScale} from "./columnScale";
-import ChangesTooltip from "./ChangesTooltip";
+import StackTooltip from "./StackTooltip";
 
 // The chart sits on the same surface as the table above it, rather than on the bare page, and
 // keeps clear of the bottom edge of it.
@@ -18,16 +17,14 @@ const chartStyle = {height: chartHeight + "px", width: "100%"};
 // Under the table, on its surface and inside its scroll, set off from the rows by a rule.
 const alignedStyle = {borderTop: "1px solid " + neutral.headerBorder, paddingBottom: "20px"};
 const titleStyle = {margin: 0, padding: "16px 0 0 16px", fontSize: "1rem"};
+// a title and a control share the line above the chart: the title at the left, the control at the
+// right, over the far end of the plot
+const headerStyle = {display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 30px 0 0"};
 const axisStyle = {fontSize: "12px"};
 const margin = {top: 10, right: 30, left: 10, bottom: 5};
 // Lined up with the table, the chart spans it from edge to edge, keeping just clear of either side.
 // Its points stay under their columns whatever the margins, since their places are measured.
 const alignedMargin = {top: 20, right: 20, left: 20, bottom: 5};
-/**
- * A chart of lines carries only three of them, and they are the whole chart rather than a reading
- * over the top of columns, so they are drawn heavier than the summary line of a stacked chart.
- */
-const lineWidth = 3;
 const brushHeight = 24;
 
 /**
@@ -44,24 +41,12 @@ const brushHeight = 24;
  * cross nought from one year to the next and is still drawn at one place in the order.
  */
 const drawingOrder = (chart) => {
-    const total = (series) => chart.points.reduce((sum, point) => sum + point[series.key], 0);
-    const above = chart.series.filter((series) => total(series) >= 0);
-    const below = chart.series.filter((series) => total(series) < 0);
+    const total = (key) => chart.points.reduce((sum, point) => sum + (point[key] ?? 0), 0);
+    const above = [];
+    const below = [];
+    chart.series.forEach((series) => (total(series.key) >= 0 ? above : below).push(series));
     return above.reverse().concat(below);
 };
-
-/**
- * The tooltip lists whatever is under the pointer in the order the marks were drawn, which is
- * not the order of the table for a stack. It is put back into that order, so that the tooltip,
- * the key and the stack itself all read the same way. The total comes last, as it does in the key.
- */
-const tooltipOrder = (chart) => (item) => {
-    const index = chart.series.findIndex((series) => series.key === seriesKeyOf(item.dataKey));
-    return index === -1 ? chart.series.length : index;
-};
-
-/** The series a mark belongs to: a chart of changes draws each series in two halves. */
-const seriesKeyOf = (dataKey) => String(dataKey).split("_")[0];
 
 /**
  * The stack of a chart of changes, from the bottom up: the spacer that lifts it off nought, the
@@ -90,14 +75,45 @@ const namedTicks = (chart) => {
     return {ticks: chart.ticks.map((tick) => tick.value), tickFormatter: (value) => labels.get(value) ?? value, interval: 0};
 };
 
+/**
+ * A whole with parts laid over it is drawn in layers. Behind, the whole as a column of its own. In
+ * front, what was taken from it, as a stack on an axis of its own, which the reader never sees but
+ * which puts it in exactly the place of the whole's column, with its width; and in front of that,
+ * on a third such axis, whatever was given back. Each part in front is drawn short of the column's
+ * left edge, so that the whole shows down the whole of that edge, and wherever the parts leave it
+ * uncovered: the column reads as all of the whole, with the parts laid over most of it.
+ *
+ * The parts used to be a narrower stack beside an undrawn strip, sized in percentages of the
+ * column; recharts gave the two equal halves of it whatever they asked for, and the strip left the
+ * whole showing down half the column.
+ */
+const totalShowing = 0.15;
+const takenAxis = "taken";
+const givenAxis = "given";
+
+const partShape = ({x, width, ...rest}) => (
+    <Rectangle {...rest} x={x + width * totalShowing} width={width * (1 - totalShowing)}/>
+);
+// what was given back is drawn short of the right edge as well, so that the costs it covers show
+// down that edge to their full length, and plainly run on behind it
+const givenShape = ({x, width, ...rest}) => (
+    <Rectangle {...rest} x={x + width * totalShowing} width={width * (1 - 2 * totalShowing)}/>
+);
+
+/**
+ * One layer of a whole with parts laid over it, from the bottom up, given backwards so that the
+ * table's first is on top; the layers in front stand on an undrawn spacer lifting them to where
+ * the costs end.
+ */
+const layerInDrawingOrder = (chart, layer) => {
+    const marks = chart.series.filter((series) => series.layer === layer).reverse();
+    return layer === "behind" ? marks : [{key: "lift", name: "lift", color: "transparent", spacer: true}].concat(marks);
+};
+const hasLayer = (chart, layer) => chart.series.some((series) => series.layer === layer);
+
 /** The key, in the order of the table rather than in the order the marks happen to be drawn. */
 const legend = (chart) => {
-    const marks = chart.series.map((series) => ({
-        value: series.name,
-        color: series.color,
-        id: series.key,
-        type: chart.form === "lines" ? "line" : "rect",
-    }));
+    const marks = chart.series.map((series) => ({value: series.name, color: series.color, id: series.key, type: "rect"}));
     if (chart.line !== null) {
         marks.push({value: chart.line.name, color: chart.line.color, type: "line"});
     }
@@ -106,8 +122,9 @@ const legend = (chart) => {
 
 /**
  * One chart of a statement: its components as columns stacked on one another, with the row that
- * totals them drawn as a line over the top; the same, but each period's columns stacked on a
- * fixed baseline other than nought; or a line apiece where the figures do not add up to anything.
+ * totals them drawn as a line over the top - stacked on nought, or each period's columns stacked on
+ * a fixed baseline other than nought - or a total split into the parts taken from it and what was
+ * left of it.
  *
  * The line at nought is drawn in full, not left to the grid: these statements go below it - a
  * year of losses, the credit accounts of the cash flow - and where a column turns around is the
@@ -129,26 +146,25 @@ const legend = (chart) => {
  * its points out from under their columns.
  *
  * A chart is titled only when it is `titled`, which a view asks for when it shows more than one
- * and they need telling apart.
+ * and they need telling apart. A `control`, such as a switch between variants of the chart, is set
+ * on the same line, at its right.
  */
-const StatementChart = ({chart, layout = null, titled = true}) => {
+const StatementChart = ({chart, layout = null, titled = true, control = null}) => {
     if (layout !== null && layout.width === 0) return null;
+
+    // every category axis of a chart lined up with the table - the one shown, and those the layers
+    // of a split column are drawn on - puts each point under its column
+    const alignedTo = (table) => ({scale: columnScale(chart.points.map((point) => point.period), table)});
 
     const plot = (size) => (
         <ComposedChart
             {...size} data={chart.points} margin={layout === null ? margin : alignedMargin}
-            stackOffset={chart.form === "changes" ? "none" : "sign"}
+            stackOffset={chart.form === "stacked" ? "sign" : "none"}
         >
             <CartesianGrid strokeDasharray="3 3"/>
-            {layout === null
-                ? <XAxis dataKey="period" style={axisStyle} {...namedTicks(chart)}/>
-                : <XAxis dataKey="period" style={axisStyle} scale={columnScale(chart.points.map((point) => point.period), layout)}/>
-            }
+            <XAxis dataKey="period" style={axisStyle} {...(layout === null ? namedTicks(chart) : alignedTo(layout))}/>
             <YAxis tickFormatter={abbreviateAmount} style={axisStyle}/>
-            {chart.form === "changes"
-                ? <Tooltip content={<ChangesTooltip chart={chart}/>}/>
-                : <Tooltip formatter={formatAmount} itemSorter={tooltipOrder(chart)}/>
-            }
+            <Tooltip content={<StackTooltip chart={chart}/>}/>
             <Legend payload={legend(chart)}/>
             <ReferenceLine y={0} stroke={neutral.text} strokeWidth={1.5}/>
             {chart.form === "stacked" && drawingOrder(chart).map((series) => (
@@ -158,6 +174,22 @@ const StatementChart = ({chart, layout = null, titled = true}) => {
                     isAnimationActive={false}
                 />
             ))}
+            {chart.form === "split" && layerInDrawingOrder(chart, "behind").map((series) => (
+                <Bar
+                    key={series.key} dataKey={series.key} name={series.name} fill={series.color}
+                    stackId="behind" isAnimationActive={false} legendType="none"
+                />
+            ))}
+            {chart.form === "split" && [takenAxis, givenAxis].filter((layer) => hasLayer(chart, layer)).map((layer) => [
+                <XAxis key={layer} xAxisId={layer} dataKey="period" hide {...(layout === null ? {} : alignedTo(layout))}/>,
+                ...layerInDrawingOrder(chart, layer).map((mark) => (
+                    <Bar
+                        key={layer + mark.key} xAxisId={layer} dataKey={mark.key} name={mark.name} fill={mark.color}
+                        stackId={layer} shape={layer === givenAxis ? givenShape : partShape} isAnimationActive={false}
+                        legendType="none" tooltipType={mark.spacer ? "none" : undefined}
+                    />
+                )),
+            ])}
             {chart.form === "changes" && changesInDrawingOrder(chart).map((half) => (
                 <Bar
                     key={half.key} dataKey={half.key} name={half.name} fill={half.color}
@@ -176,13 +208,6 @@ const StatementChart = ({chart, layout = null, titled = true}) => {
                     }}
                 />
             }
-            {chart.form === "lines" && chart.series.map((series) => (
-                <Line
-                    key={series.key} type="linear" dataKey={series.key} name={series.name}
-                    stroke={series.color} strokeWidth={lineWidth} dot={false}
-                    isAnimationActive={false}
-                />
-            ))}
             {chart.line !== null &&
                 <Line
                     type="linear" dataKey={chart.line.key} name={chart.line.name}
@@ -207,9 +232,10 @@ const StatementChart = ({chart, layout = null, titled = true}) => {
             </div>
         );
     }
+    const title = titled ? <h3 style={titleStyle}>{chart.title}</h3> : null;
     return (
         <Paper style={paperStyle}>
-            {titled && <h3 style={titleStyle}>{chart.title}</h3>}
+            {control === null ? title : <div style={headerStyle}>{title ?? <span/>}{control}</div>}
             <div style={chartStyle}>
                 <ResponsiveContainer width="100%" height="100%">
                     {plot({})}
@@ -222,7 +248,7 @@ const StatementChart = ({chart, layout = null, titled = true}) => {
 StatementChart.propTypes = {
     chart: PropTypes.shape({
         title: PropTypes.string.isRequired,
-        form: PropTypes.oneOf(["stacked", "changes", "lines"]).isRequired,
+        form: PropTypes.oneOf(["stacked", "changes", "split"]).isRequired,
         /** For a chart of changes: the figure every period's changes are stacked on. */
         baseline: PropTypes.number,
         /** The only points to name on the axis, each with its own label: [{value, label}]. */
@@ -235,8 +261,6 @@ StatementChart.propTypes = {
      * Where the table above the chart laid its columns out, to line the points up under them:
      * {width, columns: [{name, left, width}]}.
      */
-    /** Whether to name the chart: only needed where a view shows more than one. */
-    titled: PropTypes.bool,
     layout: PropTypes.shape({
         width: PropTypes.number.isRequired,
         columns: PropTypes.arrayOf(PropTypes.shape({
@@ -245,6 +269,10 @@ StatementChart.propTypes = {
             width: PropTypes.number.isRequired,
         })).isRequired,
     }),
+    /** Whether to name the chart: only needed where a view shows more than one. */
+    titled: PropTypes.bool,
+    /** Set beside the title, at the right: a switch between variants of the chart, say. */
+    control: PropTypes.node,
 };
 
 export default StatementChart;

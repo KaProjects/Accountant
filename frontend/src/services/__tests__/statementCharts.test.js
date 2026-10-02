@@ -1,5 +1,5 @@
-import {abbreviateAmount, monthlyCashFlowChart, statementCharts, statementRowShades} from "../statementCharts";
-import {aboveZeroShades, belowZeroShades} from "../../theme/palette";
+import {abbreviateAmount, monthlyCashFlowChart, monthlyProfitCharts, statementCharts, statementRowShades} from "../statementCharts";
+import {aboveZeroShades, belowZeroShades, netIncomeColor, profitGainShades, profitGroupColors, profitLossShades, startingLevelColor} from "../../theme/palette";
 
 const greens = aboveZeroShades.map((shade) => shade.fill);
 const reds = belowZeroShades.map((shade) => shade.fill);
@@ -107,66 +107,171 @@ describe("statementCharts", () => {
         expect(greens).not.toContain(assets.series[0].color);
     });
 
-    it("charts the income statement twice: its groups, then its profit levels", () => {
-        expect(statementCharts("profit", profit).map((chart) => chart.title))
-            .toEqual(["Income and costs", "Profit"]);
-    });
+    describe("the income statement", () => {
+        // shaped like the real statement: three rows to net income, three costs to operating
+        // profit, then depreciation and pairs of income and cost of one name to net profit
+        const row = (type, schemaId, name, values) => ({type, schemaId, name, yearlyValues: values});
+        const income = {
+            columns: ["Yearly Income Statement", "2019", "2020", "Total"],
+            rows: [
+                row("INCOME_GROUP", "60", "work", [100, 120]),
+                row("EXPENSE_GROUP", "55", "office", [10, 20]),
+                row("INCOME_GROUP", "63", "office", [5, 0]),
+                row("PROFIT_SUMMARY", "ni", "Net Income", [95, 100]),
+                row("EXPENSE_GROUP", "51", "consumption", [30, 40]),
+                row("EXPENSE_GROUP", "52", "services", [5, 10]),
+                row("PROFIT_SUMMARY", "op", "Operating Profit", [60, 50]),
+                row("EXPENSE_GROUP", "50", "depreciation", [8, 6]),
+                row("INCOME_GROUP", "62", "finance", [10, 70]),
+                row("EXPENSE_GROUP", "54", "finance", [30, 20]),
+                row("PROFIT_SUMMARY", "np", "Net Profit", [32, 94]),
+            ],
+        };
+        const charts = () => statementCharts("profit", income);
+        const names = (chart) => chart.series.map((series) => series.name);
 
-    it("stacks income above nought and costs below it, under the net profit line", () => {
-        const [groups] = statementCharts("profit", profit);
+        it("charts each profit level, and nothing else", () => {
+            expect(charts().map((chart) => chart.title)).toEqual(["Net Income", "Operating Profit", "Net Profit"]);
+            expect(charts().map((chart) => chart.form)).toEqual(["split", "split", "stacked"]);
+        });
 
-        expect(groups.form).toBe("stacked");
-        expect(groups.series.map((series) => series.name)).toEqual(["Work", "Consumption"]);
-        expect(groups.line.name).toBe("Net Profit");
-        expect(groups.points).toEqual([
-            {period: "2019", s0: 100, s1: -30, summary: -10},
-            {period: "2020", s0: 120, s1: -40, summary: 70},
-        ]);
-    });
+        describe("net income, as the work income with the other groups of the first rows laid over it", () => {
+            const netIncome = () => charts()[0];
+            const layers = (chart) => chart.series.map((series) => series.name + ": " + series.layer);
 
-    it("adds up a group the statement reports on two lines", () => {
-        // 63 is split around a subtotal in the table; in a chart of composition it is one group.
-        const split = {...profit, rows: [
-            ...profit.rows,
-            {type: "INCOME_GROUP", schemaId: "60", name: "Work", yearlyValues: [5, 5]},
-        ]};
+            it("draws the work income as the column, and net income as the line", () => {
+                expect(netIncome().series[0]).toMatchObject({name: "work", layer: "behind"});
+                expect(netIncome().points[0].s0).toBe(100);
+                expect(netIncome().line.name).toBe("Net Income");
+                expect(netIncome().points.map((point) => point.summary)).toEqual([95, 100]);
+            });
 
-        const [groups] = statementCharts("profit", split);
+            it("takes the costs from it and gives the other incomes back, in the order of the table", () => {
+                expect(layers(netIncome())).toEqual(["work: behind", "office (cost): taken", "office (income): given"]);
+                expect(netIncome().points[0]).toMatchObject({s1: 10, s2: 5});
+            });
 
-        expect(groups.series.map((series) => series.name)).toEqual(["Work", "Consumption"]);
-        expect(groups.points[0].s0).toBe(105);
-    });
+            it("ends the costs where what was given back starts, so that it reaches up to net income", () => {
+                // 100 of work, 10 to office, 5 back from it: the costs reach from 90 up to 100,
+                // and the 5 given back from 90 up to the 95 left
+                expect(netIncome().points[0].lift).toBe(90);
+                expect(netIncome().points[0].lift + 10).toBe(100);
+                expect(netIncome().points[0].lift + 5).toBe(95);
+            });
 
-    it("qualifies a name that appears on both sides of nought", () => {
-        const bothSides = {...profit, rows: [
-            ...profit.rows,
-            {type: "EXPENSE_GROUP", schemaId: "54", name: "Work", yearlyValues: [7, 8]},
-        ]};
+            it("lays a cost over as the accounts it is made of, lighter to darker in the order of the table", () => {
+                const account = (schemaId, name, values) => ({type: "EXPENSE_ACCOUNT", schemaId, name, yearlyValues: values, children: []});
+                const detailed = {...income, rows: income.rows.map((row) => row.schemaId === "55"
+                    ? {...row, children: [account("550", "tax", [6, 12]), account("551", "health", [3, 5]), account("552", "social", [1, 3])]}
+                    : row)};
 
-        const [groups] = statementCharts("profit", bothSides);
+                const [netIncome] = statementCharts("profit", detailed);
 
-        expect(groups.series.map((series) => series.name))
-            .toEqual(["Work (income)", "Consumption", "Work (cost)"]);
-    });
+                expect(layers(netIncome)).toEqual([
+                    "work: behind", "tax: taken", "health: taken", "social: taken", "office: given",
+                ]);
+                expect(netIncome.points[0]).toMatchObject({s1: 6, s2: 3, s3: 1, lift: 90});
+                const reds = netIncome.series.slice(1, 4).map((series) => profitLossShades.indexOf(series.color));
+                expect(reds).toEqual([...reds].sort());
+                expect(new Set(reds).size).toBe(3);
+                expect(reds.every((index) => index > 0)).toBe(true);
+            });
 
-    it("draws the three profit levels as lines, not as a stack", () => {
-        // They are the same figure read at three depths, so stacking would double count.
-        const levels = statementCharts("profit", profit)[1];
+            it("colours the work income the lighter green, the rest of the income the darker, and the costs red", () => {
+                const [work, cost, office] = netIncome().series;
 
-        expect(levels.form).toBe("lines");
-        expect(levels.line).toBeNull();
-        expect(levels.series.map((series) => series.name))
-            .toEqual(["Net Income", "Operating Profit", "Net Profit"]);
-        expect(levels.points).toEqual([
-            {period: "2019", s0: 90, s1: 60, s2: -10},
-            {period: "2020", s0: 110, s1: 70, s2: 70},
-        ]);
-    });
+                expect(profitGainShades.indexOf(work.color)).toBeLessThan(profitGainShades.indexOf(office.color));
+                expect(profitGainShades).toContain(office.color);
+                expect(profitLossShades).toContain(cost.color);
+                // darker than the palest red, which hardly showed over the pale green
+                expect(profitLossShades.indexOf(cost.color)).toBeGreaterThan(profitLossShades.indexOf(charts()[1].series[1].color));
+            });
+        });
 
-    it("leaves the income statement's Total column off the years axis", () => {
-        const [groups] = statementCharts("profit", profit);
+        it("draws in blue the level a chart starts from: net income under its costs, operating profit before net profit", () => {
+            const [, operating, net] = charts();
 
-        expect(groups.points.map((point) => point.period)).toEqual(["2019", "2020"]);
+            expect(operating.series[0]).toMatchObject({name: "Net Income", color: netIncomeColor, layer: "behind"});
+            expect(net.series[0]).toMatchObject({name: "Operating Profit", color: startingLevelColor});
+        });
+
+        describe("operating profit, as the running costs laid over net income", () => {
+            const operating = () => charts()[1];
+
+            it("draws net income as the column, and operating profit as the line", () => {
+                expect(operating().line.name).toBe("Operating Profit");
+                expect(operating().points.map((point) => point.s0)).toEqual([95, 100]);
+                expect(operating().points.map((point) => point.summary)).toEqual([60, 50]);
+            });
+
+            it("lays the running costs over it, as the amounts they came to", () => {
+                // 95 of net income: 30 to consumption, 5 to services, 60 left
+                expect(names(operating())).toEqual(["Net Income", "consumption", "services"]);
+                expect(operating().points[0]).toMatchObject({s0: 95, s1: 30, s2: 5});
+            });
+
+            it("stacks the costs from the operating profit up, so they end at net income", () => {
+                expect(operating().points[0].lift).toBe(60);
+                expect(operating().points[0].lift + 30 + 5).toBe(95);
+            });
+
+            it("starts the costs below nought in a year they overran net income", () => {
+                const overrun = {...income, rows: income.rows.map((row) => {
+                    if (row.schemaId === "52") return {...row, yearlyValues: [5, 80]};
+                    if (row.schemaId === "op") return {...row, yearlyValues: [60, -20]};
+                    return row;
+                })};
+
+                const year = statementCharts("profit", overrun)[1].points[1];
+
+                // 100 of net income, 120 of costs: the costs reach from -20 up to 100
+                expect(year).toMatchObject({s0: 100, lift: -20, s1: 40, s2: 80, summary: -20});
+            });
+
+            it("colours the costs red", () => {
+                operating().series.slice(1).forEach((cost) => expect(profitLossShades).toContain(cost.color));
+            });
+        });
+
+
+        it("nets each pair after operating profit into the one figure it comes to", () => {
+            const [, , net] = charts();
+
+            expect(names(net)).toEqual(["Operating Profit", "depreciation", "finance"]);
+            // finance: 10 - 30 in 2019, a loss; 70 - 20 in 2020, a gain
+            expect(net.points.map((point) => point.s2)).toEqual([-20, 50]);
+        });
+
+        it("gives every group after operating profit one colour of its own, in the order of the table", () => {
+            // a netted pair adds one year and takes away the next, so green and red would change
+            // with the year; its place above or below nought says that instead
+            const [, , net] = charts();
+            const groups = net.series.slice(1);
+
+            expect(groups.map((group) => group.color)).toEqual(profitGroupColors.slice(0, groups.length));
+        });
+
+        it("names each group once, plainly, with no word for the netting", () => {
+            const [, , net] = charts();
+
+            expect(names(net)).toEqual(["Operating Profit", "depreciation", "finance"]);
+        });
+
+        it("keeps a lone group after operating profit as it is, a cost below nought", () => {
+            const [, , net] = charts();
+
+            expect(net.points.map((point) => point.s1)).toEqual([-8, -6]);
+        });
+
+        it("draws in a lighter range than the cash flow, with no near-black red", () => {
+            charts().forEach((chart) => chart.series.forEach((series) => {
+                expect(belowZeroShades.map((shade) => shade.fill)).not.toContain(series.color);
+            }));
+        });
+
+        it("leaves the Total column off the years axis", () => {
+            expect(charts()[0].points.map((point) => point.period)).toEqual(["2019", "2020"]);
+        });
     });
 
     it("gives each component its own colour, and the line the colour of its row", () => {
@@ -205,6 +310,62 @@ describe("statementCharts on a yearly statement", () => {
         expect(charts).toHaveLength(1);
         return charts[0];
     };
+
+    describe("an income statement", () => {
+        const row = (type, schemaId, name, values) => ({type, schemaId, name, monthlyValues: values.concat(values.reduce((a, b) => a + b, 0))});
+        const quiet = Array(9).fill(0);
+        const yearlyIncome = {
+            columns: ["Income Statement", ...months, "Total"],
+            rows: [
+                row("INCOME_GROUP", "60", "work", [100, 120, 110].concat(quiet)),
+                row("EXPENSE_GROUP", "55", "office", [10, 20, 0].concat(quiet)),
+                row("PROFIT_SUMMARY", "ni", "Net Income", [90, 100, 110].concat(quiet)),
+                row("EXPENSE_GROUP", "51", "consumption", [30, 40, 50].concat(quiet)),
+                row("PROFIT_SUMMARY", "op", "Operating Profit", [60, 60, 60].concat(quiet)),
+                row("EXPENSE_GROUP", "50", "depreciation", [5, 5, 5].concat(quiet)),
+                row("PROFIT_SUMMARY", "np", "Net Profit", [55, 55, 55].concat(quiet)),
+            ],
+        };
+        const charts = () => statementCharts("profit", yearlyIncome, false);
+
+        it("charts the same three profit levels as over all the years", () => {
+            expect(charts().map((chart) => chart.title)).toEqual(["Net Income", "Operating Profit", "Net Profit"]);
+            expect(charts().map((chart) => chart.form)).toEqual(["split", "split", "stacked"]);
+        });
+
+        it("charts each month as it was, under its column of the table", () => {
+            const [netIncome] = charts();
+
+            expect(netIncome.alignToTable).toBe(true);
+            expect(netIncome.points.map((point) => point.period)).toEqual(months);
+            // what each month earned, not run on from the month before
+            expect(netIncome.points.slice(0, 3).map((point) => point.summary)).toEqual([90, 100, 110]);
+            expect(netIncome.points[1]).toMatchObject({s0: 120, s1: 20});
+        });
+
+        it("only names the months still to come", () => {
+            charts().forEach((chart) => {
+                expect(chart.points[3]).toEqual({period: "April", summary: null});
+            });
+        });
+
+        it("ends each chart at the last month its own figures moved in", () => {
+            // something booked for December below operating profit
+            const booked = {...yearlyIncome, rows: yearlyIncome.rows.map((each) => {
+                if (each.schemaId === "50") return row("EXPENSE_GROUP", "50", "depreciation", [5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 200]);
+                if (each.schemaId === "np") return row("PROFIT_SUMMARY", "np", "Net Profit", [55, 55, 55, 0, 0, 0, 0, 0, 0, 0, 0, -200]);
+                return each;
+            })};
+
+            const [netIncome, operating, net] = statementCharts("profit", booked, false);
+
+            expect(netIncome.points[11]).toEqual({period: "December", summary: null});
+            expect(operating.points[11]).toEqual({period: "December", summary: null});
+            expect(net.points[11].summary).toBe(-200);
+            // a quiet month before one that moved still happened
+            expect(net.points[5].summary).toBe(0);
+        });
+    });
 
     it("charts the year once, as its months' changes measured from the opening balance", () => {
         expect(only().form).toBe("changes");
@@ -302,6 +463,94 @@ describe("statementCharts on a yearly statement", () => {
 
         expect(statementCharts("balance", yearly, false)).toEqual([]);
         expect(statementCharts("profit", yearly, false)).toEqual([]);
+    });
+});
+
+describe("monthlyProfitCharts", () => {
+    const months = ["January", "February", "March", "April", "May", "June", "July",
+        "August", "September", "October", "November", "December"];
+    const monthly = (...values) => [...values, ...Array(12 - values.length).fill(0)];
+    const leaf = (type, schemaId, name, values) => ({type, schemaId, name, monthlyValues: values, children: []});
+    // net income is work less office, which is made of tax; operating profit nets consumption off;
+    // after it, office appears again under the same ids, as the real statement's groups do
+    const year = (work, tax, consumption, later) => ({
+        columns: ["Income Statement", ...months, "Total"],
+        rows: [
+            leaf("INCOME_GROUP", "60", "work", work),
+            {...leaf("EXPENSE_GROUP", "55", "office", tax), children: [leaf("EXPENSE_ACCOUNT", "550", "tax", tax)]},
+            leaf("PROFIT_SUMMARY", "ni", "Net Income", work.map((value, month) => value - tax[month])),
+            leaf("EXPENSE_GROUP", "51", "consumption", consumption),
+            leaf("PROFIT_SUMMARY", "op", "Operating Profit", work.map((value, month) => value - tax[month] - consumption[month])),
+            leaf("EXPENSE_GROUP", "55", "office", later),
+            leaf("PROFIT_SUMMARY", "np", "Net Profit", work.map((value, month) => value - tax[month] - consumption[month] - later[month])),
+        ],
+    });
+    const overall = {
+        columns: ["Yearly Income Statement", "2019", "2020", "Total"],
+        rows: [
+            {type: "INCOME_GROUP", schemaId: "60", name: "work", yearlyValues: [300, 100, 400], children: []},
+            {type: "EXPENSE_GROUP", schemaId: "55", name: "office", yearlyValues: [30, 10, 40],
+                children: [{type: "EXPENSE_ACCOUNT", schemaId: "550", name: "tax", yearlyValues: [30, 10, 40], children: []}]},
+            {type: "PROFIT_SUMMARY", schemaId: "ni", name: "Net Income", yearlyValues: [270, 90, 360], children: []},
+            {type: "EXPENSE_GROUP", schemaId: "51", name: "consumption", yearlyValues: [60, 20, 80], children: []},
+            {type: "PROFIT_SUMMARY", schemaId: "op", name: "Operating Profit", yearlyValues: [210, 70, 280], children: []},
+            {type: "EXPENSE_GROUP", schemaId: "55", name: "office", yearlyValues: [7, 0, 7], children: []},
+            {type: "PROFIT_SUMMARY", schemaId: "np", name: "Net Profit", yearlyValues: [203, 70, 273], children: []},
+        ],
+    };
+    const years = [
+        {year: "2019", data: year(monthly(100, 100, 100, ...Array(9).fill(0)), monthly(10, 10, 10), monthly(20, 20, 20), monthly(0, 0, 7))},
+        {year: "2020", data: year(monthly(100), monthly(10), monthly(20), monthly())},
+    ];
+    const charts = () => monthlyProfitCharts(overall, years);
+
+    it("charts the same three profit levels as the years, by month", () => {
+        expect(charts().map((chart) => chart.title)).toEqual(["Net Income", "Operating Profit", "Net Profit"]);
+        expect(charts().map((chart) => chart.form)).toEqual(["split", "split", "stacked"]);
+        // keyed after the chart of the years each is a variant of
+        expect(charts().map((chart) => chart.key)).toEqual(["level0-monthly", "level1-monthly", "level2-monthly"]);
+    });
+
+    it("runs every year's months one after another, naming the years at their Januaries", () => {
+        const [netIncome] = charts();
+
+        expect(netIncome.points.map((point) => point.period).slice(10, 14))
+            .toEqual(["November 2019", "December 2019", "January 2020", "February 2020"]);
+        expect(netIncome.ticks).toEqual([{value: "January 2019", label: "2019"}, {value: "January 2020", label: "2020"}]);
+    });
+
+    it("reads each month from its own year's statement", () => {
+        const [netIncome] = charts();
+
+        expect(netIncome.points[0]).toMatchObject({period: "January 2019", s0: 100, s1: 10, summary: 90});
+        expect(netIncome.points[12]).toMatchObject({period: "January 2020", s0: 100, s1: 10, summary: 90});
+        // the quiet months of a year that went on still happened
+        expect(netIncome.points[5]).toMatchObject({s0: 0, summary: 0});
+    });
+
+    it("lays a cost over as its accounts, read from the account of the same place in each year", () => {
+        const [netIncome] = charts();
+
+        expect(netIncome.series.map((series) => series.name)).toEqual(["work", "tax"]);
+        expect(netIncome.points[1].s1).toBe(10);
+    });
+
+    it("matches a year's rows to the overall ones by their place, as a schema id comes up twice", () => {
+        const [, , net] = charts();
+
+        // the second office, after operating profit, took 7 in March 2019 - not the first one's 10
+        expect(net.series.map((series) => series.name)).toEqual(["Operating Profit", "office"]);
+        expect(net.points[2]).toMatchObject({s1: -7, summary: 63});
+    });
+
+    it("ends each chart at the last month its own figures moved in", () => {
+        const [netIncome] = charts();
+
+        expect(netIncome.points[13]).toEqual({period: "February 2020", summary: null});
+    });
+
+    it("charts nothing without a year to chart", () => {
+        expect(monthlyProfitCharts(overall, [])).toEqual([]);
     });
 });
 

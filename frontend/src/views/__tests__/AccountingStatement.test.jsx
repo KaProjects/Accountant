@@ -97,13 +97,24 @@ describe("AccountingStatement", () => {
             expect(useEachData).toHaveBeenCalledWith(["/accounting/cashflow/2019", "/accounting/cashflow/2020"], true);
         });
 
-        it("charts the months below the chart of the years, neither of them titled", () => {
+        it("charts the years, with a switch to the months of them, untitled", () => {
             mountCashFlow((paths) => paths.map(yearOf));
 
             // jsdom lays nothing out, so a chart shows only as its surface, which has no role
             // eslint-disable-next-line testing-library/no-node-access
-            expect(document.querySelectorAll(".recharts-responsive-container")).toHaveLength(2);
+            expect(document.querySelectorAll(".recharts-responsive-container")).toHaveLength(1);
             expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+            expect(screen.getByRole("button", {name: "Yearly"})).toHaveAttribute("aria-pressed", "true");
+
+            fireEvent.click(screen.getByRole("button", {name: "Monthly"}));
+
+            expect(screen.getByRole("button", {name: "Monthly"})).toHaveAttribute("aria-pressed", "true");
+        });
+
+        it("offers no switch until the months have come", () => {
+            mountCashFlow(undefined);
+
+            expect(screen.queryByRole("button", {name: "Monthly"})).not.toBeInTheDocument();
         });
 
         it("shows no loader and no chart of months when the statement has no years", () => {
@@ -120,6 +131,37 @@ describe("AccountingStatement", () => {
             mountView(overallPayload([row()]), {params: {type: "balance", overall: "overall"}});
 
             expect(useEachData).toHaveBeenCalledWith([], false);
+        });
+    });
+
+    describe("the overall income statement", () => {
+        const overallProfit = {
+            columns: ["Yearly Income Statement", "2019", "2020", "Total"],
+            rows: [
+                {type: "INCOME_GROUP", schemaId: "60", name: "work", yearlyValues: [10, 20, 30], children: []},
+                {type: "PROFIT_SUMMARY", schemaId: "ni", name: "Net Income", yearlyValues: [10, 20, 30], children: []},
+                {type: "PROFIT_SUMMARY", schemaId: "op", name: "Operating Profit", yearlyValues: [10, 20, 30], children: []},
+                {type: "PROFIT_SUMMARY", schemaId: "np", name: "Net Profit", yearlyValues: [10, 20, 30], children: []},
+            ],
+        };
+        const yearOf = () => ({
+            columns: ["Income Statement", "January", "February", "March", "April", "May",
+                "June", "July", "August", "September", "October", "November", "December", "Total"],
+            rows: overallProfit.rows.map((each) => ({...each, yearlyValues: undefined, monthlyValues: months(10)})),
+        });
+
+        it("asks for every year's own statement, leaving out the total", () => {
+            mountView(overallProfit, {params: {type: "profit", overall: "overall"}, each: (paths) => paths.map(yearOf)});
+
+            expect(useEachData).toHaveBeenCalledWith(["/accounting/profit/2019", "/accounting/profit/2020"], true);
+        });
+
+        it("charts each profit level once, titled, with a switch to its months", () => {
+            mountView(overallProfit, {params: {type: "profit", overall: "overall"}, each: (paths) => paths.map(yearOf)});
+
+            expect(screen.getAllByRole("heading").map((heading) => heading.textContent))
+                .toEqual(["Net Income", "Operating Profit", "Net Profit"]);
+            expect(screen.getAllByRole("button", {name: "Monthly"})).toHaveLength(3);
         });
     });
 

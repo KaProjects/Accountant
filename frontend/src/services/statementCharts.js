@@ -1,10 +1,8 @@
 import {
     aboveZeroAccountShade, aboveZeroShades, belowZeroAccountShade, belowZeroShades,
-    cashFlowSummaryShade, statementSeriesColors, summaryLineColor,
+    cashFlowSummaryShade, netIncomeColor, profitGainShades, profitGroupColors, profitLossShades, startingLevelColor,
+    statementSeriesColors, summaryLineColor,
 } from "../theme/palette";
-
-/** How many groups a side of the income statement names before the rest become "Other". */
-const GROUPS_PER_SIDE = 3;
 
 /**
  * The charts a statement is drawn with, derived from the very payload the table above them is
@@ -15,16 +13,20 @@ const GROUPS_PER_SIDE = 3;
  * Every overall statement is charted. Of the yearly ones only the cash flow is, so far.
  *
  * Each chart is {key, title, form, series, line, points}, where form is "stacked" for columns
- * stacked on one another, "lines" for a line apiece, and "changes" for each period's changes
- * stacked on a fixed baseline other than nought (which such a chart also carries, as
- * `baseline`). A point is one period - a year, or a month - carrying a figure under every series
+ * stacked on one another, "changes" for each period's changes stacked on a fixed baseline other
+ * than nought (which such a chart also carries, as `baseline`), and "split" for a total split into
+ * the parts taken from it and what was left of it. A point is one period - a year, or a month - carrying a figure under every series
  * key. A chart that sets `alignToTable` is drawn with each point under the table column it is
  * named after, rather than spaced evenly.
  */
 export function statementCharts(type, data, overall = true) {
     const axis = axisOf(data, overall);
     if (axis.labels.length === 0) return [];
-    if (!overall) return type === "cashflow" ? yearlyCashFlowCharts(data) : [];
+    if (!overall) {
+        if (type === "cashflow") return yearlyCashFlowCharts(data);
+        if (type === "profit") return yearlyProfitCharts(data);
+        return [];
+    }
     if (type === "balance") return balanceCharts(data, axis);
     if (type === "cashflow") return cashFlowCharts(data, axis);
     if (type === "profit") return profitCharts(data, axis);
@@ -202,7 +204,7 @@ export function monthlyCashFlowChart(overall, years) {
 
     return {
         key: "cf-monthly",
-        title: readableName(summary.name) + " by month",
+        title: readableName(summary.name),
         form: "changes",
         series: groups.map((row, index) => ({key: "s" + index, name: nameOf(row, groups), color: colours[index]})),
         line: cashFlowLine(summary),
@@ -276,105 +278,238 @@ function untilLastRecorded(points, recorded) {
 }
 
 /**
- * The income statement gets two charts, because it answers two different questions.
+ * The income statement is charted level by level, one chart for each of the three profits it
+ * works down to. Their lines are the three profit levels, so between them the charts also show how
+ * the levels move against one another, which a chart of the three alone used to show.
  *
- * The first is where the money came from and went: income stacked above nought, costs below it,
- * and the year's net profit as the line that runs between them.
+ * Net income and operating profit are each drawn as what came in with the costs laid over it: net
+ * income as the income of the first rows, in greens, under the costs of those rows, and operating
+ * profit as net income, in blue, under the running costs. The line is the profit they come to.
  *
- * The second is the three profit levels. They are the same quantity read at three depths - net
- * income is what came in, operating profit is that less the cost of running, net profit is that
- * less everything else - so the gap between the lines is the cost of getting from one level to
- * the next. They run close together and cross, so each takes a colour of its own rather than a
- * shade of one colour. They are not stacked: that would claim they add up, and they do not,
- * because each one contains the one before it.
+ * After operating profit the statement lists its groups in pairs, an income and a cost of the same
+ * name, and those are charted as the one figure the pair comes to, which can be a gain one year and
+ * a loss the next: operating profit as a blue column, each group added above nought or taken below
+ * it, and net profit as the line. Green and red would change with the year there, so each group of
+ * that chart keeps one colour of its own instead - neighbouring hues, as light as the blue beside
+ * them - and its place above or below nought says which way the year went.
  */
 function profitCharts(data, axis) {
-    const charts = [];
+    const sections = profitSections(data.rows);
+    const isIncome = (row) => row.type === "INCOME_GROUP";
 
-    const income = sideOf(data.rows, "INCOME_GROUP", 1, axis, "Other income");
-    const costs = sideOf(data.rows, "EXPENSE_GROUP", -1, axis, "Other costs");
-    const levels = data.rows.filter((row) => row.type === "PROFIT_SUMMARY");
-
-    if (income.length + costs.length > 0) {
-        charts.push(chart({
-            key: "groups",
-            title: "Income and costs",
-            form: "stacked",
-            entries: disambiguated(income, "income").concat(disambiguated(costs, "cost")),
-            summary: levels[levels.length - 1],
+    return sections.map((section, index) => {
+        if (index === 0) {
+            // the work income is the column; the other groups are laid over it, the costs taken
+            // from its top and the other incomes given back from where those end. A cost is laid
+            // over as the accounts it is made of - the taxes and the insurances - which say more
+            // than their sum.
+            const rows = section.rows.flatMap((row) => isIncome(row) || !row.children?.length
+                ? [row]
+                : row.children.map((child) => ({...child, type: row.type}))).map(sided);
+            const incomes = rows.filter(isIncome);
+            const costs = rows.filter((row) => !isIncome(row));
+            // palest first: the work income fills most of the column, and the incomes given back are
+            // thin bands over the red, which a stronger green makes out
+            const greens = spreadOver(profitGainShades, incomes.length);
+            // lighter to darker, from a shade darker than the running costs' palest: over the pale
+            // work income that one hardly showed
+            const reds = costs.length <= 3
+                ? profitLossShades.slice(2, 2 + costs.length)
+                : spreadOver(profitLossShades, costs.length);
+            const colourOf = (row) => isIncome(row) ? greens[incomes.indexOf(row)] : reds[costs.indexOf(row)];
+            return laidOver({
+                key: "level" + index,
+                parts: rows.map((row, at) => ({
+                    name: nameOf(row, rows), values: axis.valuesOf(row), color: colourOf(row),
+                    layer: at === 0 ? "behind" : isIncome(row) ? "given" : "taken",
+                })),
+                left: section.summary,
+                axis,
+            });
+        }
+        if (index === 1) {
+            const total = sections[0].summary;
+            const reds = spreadOver(profitLossShades, section.rows.length);
+            return laidOver({
+                key: "level" + index,
+                parts: [{name: readableName(total.name), values: axis.valuesOf(total), color: netIncomeColor, layer: "behind"}]
+                    .concat(section.rows.map((row, at) => ({name: row.name, values: axis.valuesOf(row), color: reds[at], layer: "taken"}))),
+                left: section.summary,
+                axis,
+            });
+        }
+        return netProfitChart({
+            key: "level" + index,
+            base: sections[index - 1].summary,
+            rows: section.rows,
+            summary: section.summary,
             axis,
-        }));
-    }
-
-    if (levels.length > 0) {
-        charts.push({
-            key: "profit",
-            title: "Profit",
-            form: "lines",
-            series: levels.map((row, index) => ({
-                key: "s" + index,
-                name: row.name,
-                color: statementSeriesColors[index % statementSeriesColors.length],
-            })),
-            line: null,
-            points: pointsOf(axis, entriesOf(levels, axis), null),
         });
-    }
-
-    return charts;
-}
-
-/**
- * One side of the income statement.
- *
- * A group can be reported on two lines - the statement splits one of them around a subtotal -
- * and for a chart of composition that is one group, so the lines are added back together. Costs
- * are negated, so that what was spent hangs below nought rather than standing on top of what was
- * earned.
- */
-function sideOf(rows, type, sign, axis, otherName) {
-    const entries = [];
-    rows.filter((row) => row.type === type).forEach((row) => {
-        const values = axis.valuesOf(row).map((value) => sign * value);
-        const sameGroup = entries.find((entry) => entry.schemaId === row.schemaId);
-        if (sameGroup === undefined) entries.push({schemaId: row.schemaId, name: row.name, values});
-        else sameGroup.values = sameGroup.values.map((value, index) => value + values[index]);
     });
-    return folded(entries, otherName);
+}
+
+/** A row of the first section, with the side of the statement it is on, to tell a pair apart by. */
+function sided(row) {
+    return {...row, side: row.type === "INCOME_GROUP" ? "income" : "cost"};
 }
 
 /**
- * A dozen groups in one chart is a dozen colours nobody can tell apart, so only the largest few
- * are named and the rest are gathered up. Nothing is gathered unless there are at least two of
- * them, because folding a single group only renames it.
+ * A profit as what was left of what came in once the costs were paid, drawn in layers: what came in
+ * as a column behind, the costs taken from it laid over its top, anything given back laid over the
+ * foot of the costs, and the profit that was `left` as the line.
+ *
+ * The costs take most of what came in every year, so drawn as costs below nought against an income
+ * above it, the chart grew both ways while the profit between them barely moved. Laid over the
+ * income instead, they show what part of it went where, and the chart grows one way only.
+ *
+ * The costs reach down from the top of the column, so whatever of it they leave uncovered, at its
+ * foot, is what was left - and what was given back, laid over the foot of the costs, wins back that
+ * much of them, up to the line. In a year whose costs came to more than came in they cover all of
+ * the column and reach on down past nought. Both are stood on an undrawn spacer, kept in each point
+ * as `lift`: where the costs end, which is the profit less what was given back.
+ *
+ * Each part says which `layer` it is on - "behind", "taken" or "given" - and they are listed in the
+ * order of the table.
  */
-function folded(entries, otherName) {
-    if (entries.length <= GROUPS_PER_SIDE + 1) return entries;
+function laidOver({key, parts, left, axis}) {
+    const leftOver = axis.valuesOf(left);
+    const given = parts.filter((part) => part.layer === "given");
 
-    const largest = entries.slice()
-        .sort((one, other) => magnitude(other) - magnitude(one))
-        .slice(0, GROUPS_PER_SIDE);
-    const rest = entries.filter((entry) => !largest.includes(entry));
-    const other = {
-        schemaId: "other",
-        name: otherName,
-        values: rest[0].values.map((value, index) =>
-            rest.reduce((sum, entry) => sum + entry.values[index], 0)),
+    return {
+        key,
+        title: readableName(left.name),
+        form: "split",
+        series: parts.map((part, index) => ({key: "s" + index, name: part.name, color: part.color, layer: part.layer})),
+        line: {key: "summary", name: readableName(left.name), color: summaryLineColor, width: 2},
+        points: axis.labels.map((period, periodIndex) => {
+            const givenBack = given.reduce((sum, part) => sum + part.values[periodIndex], 0);
+            const point = {period, lift: leftOver[periodIndex] - givenBack, summary: leftOver[periodIndex]};
+            parts.forEach((part, index) => {
+                point["s" + index] = part.values[periodIndex];
+            });
+            return point;
+        }),
     };
-
-    return entries.filter((entry) => largest.includes(entry)).concat([other]);
-}
-
-function magnitude(entry) {
-    return entry.values.reduce((sum, value) => sum + Math.abs(value), 0);
 }
 
 /**
- * Income and costs are named after the same schema groups, so a chart that shows both sides
- * would otherwise have two entries called the same thing.
+ * The income statement of a single year: the same three charts as over all the years, month by
+ * month, each month under its column of the table.
+ *
+ * Unlike a balance, a profit is not carried from one month to the next - each month's figure is
+ * what was earned and spent in it - so the months are charted as they are, not run together. The
+ * months still to come are only named, as on the year's cash flow, rather than charted as noughts.
+ *
+ * Each chart decides for itself which months those are, by its own figures: a month counts once
+ * anything in that chart moved in it, or in any month after it. Something booked for the end of
+ * the year below operating profit used to carry every chart's line on to December, the first two
+ * sitting on nought across months that had not happened yet.
  */
-function disambiguated(entries, side) {
-    return entries.map((entry) => ({...entry, name: entry.name, side}));
+function yearlyProfitCharts(data) {
+    return profitCharts(data, monthlyChangesAxis(data.columns)).map((chart) => ({
+        ...untilOwnLastRecorded(chart),
+        alignToTable: true,
+    }));
+}
+
+/** A chart of months, whose months after the last one its own figures moved in are only named. */
+function untilOwnLastRecorded(chart) {
+    const moved = (point) => point.summary !== 0 || chart.series.some((series) => point[series.key] !== 0);
+    return {...chart, points: untilLastRecorded(chart.points, chart.points.map(moved))};
+}
+
+/**
+ * The overall income statement month by month: the same three charts as over the years, with
+ * every year's months one after another, from the first year on. The axis names the years, at
+ * their Januaries; a month itself is named in full in its tooltip.
+ *
+ * Each year's own statement lists the same rows as the overall one, in the same order, and that
+ * order is what matches them up - a schema id alone does not, as the groups after operating profit
+ * reuse the ids of the ones before it. A row a year does not have where the overall one has it is
+ * charted as noughts for that year.
+ *
+ * Each chart's months after the last one its own figures moved in are only named, as on a single
+ * year. Takes the overall statement and every year's own statement, as [{year, data}].
+ */
+export function monthlyProfitCharts(overall, years) {
+    const statements = years.filter(({data}) => data.rows.length > 0);
+    if (statements.length === 0) return [];
+
+    const rowAt = (rows, [index, ...deeper]) => {
+        const row = rows[index];
+        return row === undefined || deeper.length === 0 ? row : rowAt(row.children ?? [], deeper);
+    };
+    const monthsOf = (row, path) => statements.flatMap(({data}) => {
+        const own = rowAt(data.rows, path);
+        return monthlyChangesAxis(data.columns).valuesOf(own !== undefined && own.schemaId === row.schemaId ? own : null);
+    });
+    const merged = (rows, path) => rows.map((row, index) => ({
+        ...row,
+        monthlyValues: monthsOf(row, path.concat(index)),
+        children: merged(row.children ?? [], path.concat(index)),
+    }));
+
+    const axis = {
+        labels: statements.flatMap(({year, data}) => monthlyChangesAxis(data.columns).labels.map((month) => month + " " + year)),
+        valuesOf: (row) => row.monthlyValues,
+    };
+    const ticks = statements.map(({year, data}) => ({value: monthlyChangesAxis(data.columns).labels[0] + " " + year, label: String(year)}));
+
+    return profitCharts({...overall, rows: merged(overall.rows, [])}, axis).map((chart) => ({
+        ...untilOwnLastRecorded(chart),
+        key: chart.key + "-monthly",
+        ticks,
+    }));
+}
+
+/** The statement's rows split at its profit levels: each level, and the groups that lead to it. */
+function profitSections(rows) {
+    const sections = [];
+    let pending = [];
+    rows.forEach((row) => {
+        if (row.type === "PROFIT_SUMMARY") {
+            sections.push({rows: pending, summary: row});
+            pending = [];
+        } else {
+            pending.push(row);
+        }
+    });
+    return sections;
+}
+
+/**
+ * Net profit: operating profit in blue, the groups that lead from it, and net profit as the line.
+ * Each group is the income and the cost of the same name netted into one figure, in a colour of
+ * its own.
+ *
+ * Costs are negated, so that they hang below nought.
+ */
+function netProfitChart({key, base, rows, summary, axis}) {
+    const signed = (row) => axis.valuesOf(row).map((value) => row.type === "INCOME_GROUP" ? value : -value);
+    const sum = (series) => series.reduce((total, values) => total.map((value, index) => value + values[index]));
+
+    const groups = [...new Set(rows.map((row) => row.name))].map((name) => ({
+        name, values: sum(rows.filter((row) => row.name === name).map(signed)),
+    }));
+    const parts = [{name: readableName(base.name), values: axis.valuesOf(base), color: startingLevelColor}]
+        .concat(groups.map((group, index) => ({...group, color: profitGroupColors[index % profitGroupColors.length]})));
+
+    const totals = axis.valuesOf(summary);
+    return {
+        key,
+        title: readableName(summary.name),
+        form: "stacked",
+        series: parts.map((part, index) => ({key: "s" + index, name: part.name, color: part.color})),
+        line: {key: "summary", name: readableName(summary.name), color: summaryLineColor, width: 2},
+        points: axis.labels.map((period, periodIndex) => {
+            const point = {period};
+            parts.forEach((part, index) => {
+                point["s" + index] = part.values[periodIndex];
+            });
+            point.summary = totals[periodIndex];
+            return point;
+        }),
+    };
 }
 
 function chart({

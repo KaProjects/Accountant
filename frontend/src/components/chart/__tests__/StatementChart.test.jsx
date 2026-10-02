@@ -94,6 +94,138 @@ describe("StatementChart", () => {
         expect(headOf("#eb6834")).toBeGreaterThan(headOf("#2a78d6"));
     });
 
+    it("draws a series that gains one year and loses the next on either side of nought, in its one colour", () => {
+        const crossing = chart({
+            series: [{key: "s0", name: "finance", color: "#F5BB6E"}],
+            line: null,
+            points: [{period: "2019", s0: -20}, {period: "2020", s0: 50}],
+        });
+        const {container} = render(<StatementChart chart={crossing}/>);
+
+        const zero = Math.round(Number(container.querySelector(".recharts-reference-line line").getAttribute("y1")));
+        const [loss, gain] = Array.from(container.querySelectorAll(".recharts-rectangle"))
+            .filter((rectangle) => rectangle.getAttribute("fill") === "#F5BB6E")
+            .map((rectangle) => {
+                const [, y, height] = /M\s*[-\d.]+,([-\d.]+) h [-\d.]+ v ([-\d.]+)/.exec(rectangle.getAttribute("d"));
+                const ends = [Number(y), Number(y) + Number(height)];
+                return {top: Math.round(Math.min(...ends)), bottom: Math.round(Math.max(...ends))};
+            });
+
+        expect(loss.top).toBe(zero);
+        expect(gain.bottom).toBe(zero);
+        expect(screen.getAllByText("finance")).toHaveLength(1);
+    });
+
+    describe("a total with its parts laid over it", () => {
+        const split = () => chart({
+            form: "split",
+            series: [
+                {key: "s0", name: "Net Income", color: "#000010", layer: "behind"},
+                {key: "s1", name: "consumption", color: "#000011", layer: "taken"},
+                {key: "s2", name: "services", color: "#000012", layer: "taken"},
+            ],
+            line: {key: "summary", name: "Operating Profit", color: "#000"},
+            points: [
+                // net income 100: 30 and 10 taken, 60 left
+                {period: "2019", s0: 100, lift: 60, s1: 30, s2: 10, summary: 60},
+                // net income 100: 40 and 80 taken, 20 more than there was
+                {period: "2020", s0: 100, lift: -20, s1: 40, s2: 80, summary: -20},
+            ],
+        });
+        const boxes = (container, color) => Array.from(container.querySelectorAll(".recharts-rectangle"))
+            .filter((rectangle) => rectangle.getAttribute("fill") === color)
+            .map((rectangle) => {
+                const [, x, y, width, height] = /M\s*([-\d.]+),([-\d.]+) h ([-\d.]+) v ([-\d.]+)/.exec(rectangle.getAttribute("d"));
+                const ends = [Number(y), Number(y) + Number(height)];
+                return {
+                    left: Math.round(Number(x)), right: Math.round(Number(x) + Number(width)),
+                    top: Math.round(Math.min(...ends)), bottom: Math.round(Math.max(...ends)),
+                };
+            });
+        const zeroOf = (container) => Math.round(Number(container.querySelector(".recharts-reference-line line").getAttribute("y1")));
+
+        it("draws the total as a whole column, from nought up", () => {
+            const {container} = render(<StatementChart chart={split()}/>);
+            const [total] = boxes(container, "#000010");
+            const [topCost] = boxes(container, "#000011");
+
+            expect(total.bottom).toBe(zeroOf(container));
+            expect(total.top).toBe(topCost.top);
+        });
+
+        it("lays the parts over it from the right, leaving the total showing down its left edge", () => {
+            const {container} = render(<StatementChart chart={split()}/>);
+            const [total] = boxes(container, "#000010");
+            const [cost] = boxes(container, "#000011");
+
+            expect(cost.left).toBeGreaterThan(total.left);
+            expect(cost.right).toBe(total.right);
+            // a strip down the edge, with the parts over most of the column - not half of it each
+            expect(cost.right - cost.left).toBeGreaterThan(0.8 * (total.right - total.left));
+        });
+
+        it("leaves the foot of the total uncovered in a year with something left", () => {
+            const {container} = render(<StatementChart chart={split()}/>);
+            const [total] = boxes(container, "#000010");
+            const [lowestCost] = boxes(container, "#000012");
+
+            expect(lowestCost.bottom).toBeLessThan(total.bottom);
+            // the table's first part is on top
+            expect(boxes(container, "#000011")[0].bottom).toBe(lowestCost.top);
+        });
+
+        it("lets the parts reach on down past nought in a year they overran the total", () => {
+            const {container} = render(<StatementChart chart={split()}/>);
+            const lowestCost2020 = boxes(container, "#000012")[1];
+
+            expect(lowestCost2020.bottom).toBeGreaterThan(zeroOf(container));
+            expect(lowestCost2020.top).toBeLessThan(zeroOf(container));
+        });
+
+        it("never draws the spacer that lifts the parts", () => {
+            const {container} = render(<StatementChart chart={split()}/>);
+
+            const drawn = Array.from(container.querySelectorAll(".recharts-rectangle"))
+                .map((rectangle) => rectangle.getAttribute("fill"))
+                .filter((fill) => fill !== "transparent");
+            // per year: the total and two parts
+            expect(drawn).toHaveLength(6);
+        });
+
+        it("gives back from the foot of the costs what came in besides, up to the line", () => {
+            const incomes = chart({
+                form: "split",
+                series: [
+                    {key: "s0", name: "work", color: "#000020", layer: "behind"},
+                    {key: "s1", name: "office (cost)", color: "#000022", layer: "taken"},
+                    {key: "s2", name: "office (income)", color: "#000021", layer: "given"},
+                ],
+                line: {key: "summary", name: "Net Income", color: "#000"},
+                // 100 of work, 40 to office, 10 back from it: 70 left, the costs ending at 60
+                points: [{period: "2019", s0: 100, s1: 40, s2: 10, lift: 60, summary: 70}],
+            });
+            const {container} = render(<StatementChart chart={incomes}/>);
+            const [work] = boxes(container, "#000020");
+            const [cost] = boxes(container, "#000022");
+            const [back] = boxes(container, "#000021");
+            const lineAt = (value) => zeroOf(container) - (zeroOf(container) - work.top) * value / 100;
+
+            expect(work.bottom).toBe(zeroOf(container));
+            // the cost from the top of the work income down
+            expect(cost.top).toBe(work.top);
+            expect(cost.bottom).toBe(Math.round(lineAt(60)));
+            // and what came back over its foot, up to what was left
+            expect(back.bottom).toBe(cost.bottom);
+            expect(back.top).toBe(Math.round(lineAt(70)));
+            // short of the right edge too, so the cost shows down it to its full length
+            expect(back.left).toBe(cost.left);
+            expect(back.right).toBeLessThan(cost.right);
+            // drawn in front of the cost it covers
+            const fills = Array.from(container.querySelectorAll(".recharts-rectangle")).map((r) => r.getAttribute("fill"));
+            expect(fills.indexOf("#000021")).toBeGreaterThan(fills.indexOf("#000022"));
+        });
+    });
+
     it("keys the chart in the order of the table, not the order the columns are drawn", () => {
         render(<StatementChart chart={chart()}/>);
 
@@ -306,18 +438,35 @@ describe("StatementChart", () => {
             expect(container.querySelector(".recharts-brush")).not.toBeInTheDocument();
         });
 
+        it("puts every layer of a split column under the table column, not only the one behind", () => {
+            const split = chart({
+                form: "split",
+                series: [
+                    {key: "s0", name: "Net Income", color: "#000030", layer: "behind"},
+                    {key: "s1", name: "consumption", color: "#000031", layer: "taken"},
+                ],
+                line: {key: "summary", name: "Operating Profit", color: "#000"},
+                points: [
+                    {period: "Jan", s0: 100, s1: 30, lift: 70, summary: 70},
+                    {period: "Feb", s0: 100, s1: 40, lift: 60, summary: 60},
+                ],
+            });
+            const {container} = render(<StatementChart chart={split} layout={layout}/>);
+            const rightEdges = (color) => Array.from(container.querySelectorAll(".recharts-rectangle"))
+                .filter((rectangle) => rectangle.getAttribute("fill") === color)
+                .map((rectangle) => {
+                    const [, x, width] = /M\s*([-\d.]+),[-\d.]+ h ([-\d.]+)/.exec(rectangle.getAttribute("d"));
+                    return Math.round(Number(x) + Number(width));
+                });
+
+            expect(rightEdges("#000031")).toEqual(rightEdges("#000030"));
+        });
+
         it("draws nothing until the table has been laid out", () => {
             const {container} = render(<StatementChart chart={aligned()} layout={{width: 0, columns: []}}/>);
 
             expect(container).toBeEmptyDOMElement();
         });
-    });
-
-    it("draws a line per series instead of columns when the chart is of lines", () => {
-        const {container} = render(<StatementChart chart={chart({form: "lines", line: null})}/>);
-
-        expect(container.querySelectorAll(".recharts-line")).toHaveLength(2);
-        expect(container.querySelectorAll(".recharts-bar")).toHaveLength(0);
     });
 
     it("draws the line at nought itself, so a column crossing it can be read", () => {

@@ -46,16 +46,14 @@ const StackTooltip = ({active, payload, label, chart}) => {
     const stackedOnBaseline = chart.form === "changes";
 
     if (chart.form === "split") {
-        // a total with parts laid over it: the parts as the column reads them from the top, then the
-        // total they are laid over, then the line - what the total came to once they were taken
-        const [total, ...parts] = chart.series.map((series) => ({...series, value: point[series.key]}));
+        // a whole with parts laid over it, in the order of the key, which is the table's, then the
+        // line - what the whole came to once they were taken.
+        // Nothing stands above or below a line here, so there is nothing to separate.
+        const valued = chart.series.map((series) => ({...series, value: point[series.key]}));
         return (
             <div style={boxStyle}>
                 <p style={titleStyle}>{label}</p>
-                {parts.filter((part) => part.value !== 0).map(entry)}
-                <div role="separator" style={separatorStyle("#ccc", false)}/>
-                {entry(total)}
-                <div role="separator" style={separatorStyle("#ccc", false)}/>
+                {valued.filter((series) => series.value !== 0 || series.layer === "behind").map(entry)}
                 <p style={{...itemStyle, color: chart.line.color}}>
                     {chart.line.name} : {formatAmount(point[chart.line.key])}
                 </p>

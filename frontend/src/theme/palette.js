@@ -106,6 +106,36 @@ export const belowZeroAccountShade = {fill: "#FEF6F6", ink: "#A32D2D", edge: "#F
  */
 export const cashFlowSummaryShade = {fill: "#B877AF", ink: "#3a0032", edge: "#3a0032"};
 
+/**
+ * The income statement's charts, in a lighter range than the cash flow's: palest first. A profit
+ * level can carry four reds at once, and the cash flow's range runs down to near black, which
+ * those charts reached and made heavy. These stop at a middling red and green.
+ */
+export const profitGainShades = ["#DCEFC6", "#C4E3A0", "#ABD67C", "#93C95C", "#7CBC42"];
+export const profitLossShades = ["#F9D4D4", "#F4B6B6", "#EF9999", "#EA7D7D", "#E46565"];
+/**
+ * The groups that lead from operating profit to net profit, which can add one year and take away
+ * the next, and are told apart by a colour each rather than by green and red: their place above or
+ * below nought already says which way a year went.
+ *
+ * Soft, light colours, each its own hue, all equally light and equally strong - measured in OKLCH,
+ * where lightness is what the eye sees, so that none of them stands out or fades against the others
+ * - and lighter than the blue of the operating profit they stand beside, which they would otherwise
+ * crowd. Lightness 0.80, chroma 0.09.
+ *
+ * They follow the order the statement always lists these groups in: depreciation is a lavender,
+ * majetkove a sand, financne - mostly a gain - a sage green, and institucie a soft coral.
+ */
+export const profitGroupColors = ["#CBAFED", "#DCB87A", "#94CF9F", "#F2A7A1"];
+/** The level a profit chart starts from, in blue. */
+export const startingLevelColor = "#5D9DE6";
+/**
+ * The net income the costs are laid over, in a lighter blue than the starting level: most of its
+ * column is covered by the costs' light reds, and the full blue stood out heavily against them in
+ * the strip left showing. About as light as the middle of those reds (OKLCH lightness 0.78).
+ */
+export const netIncomeColor = "#8CBAEE";
+
 export const belowZeroShades = [
     {fill: "#F7C1C1", ink: "#791F1F", edge: "#791F1F"},
     {fill: "#F09595", ink: "#501313", edge: "#791F1F"},

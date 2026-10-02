@@ -8,13 +8,14 @@ import {useParams} from "react-router-dom";
 import LaunchIcon from '@mui/icons-material/Launch';
 import StatementRow from "../components/statement/StatementRow";
 import StatementChart from "../components/chart/StatementChart";
+import VariantChart from "../components/chart/VariantChart";
 import {highlightedCell, statementHeaderStyle} from "../theme/tableStyles";
 import CornerMark from "../components/common/CornerMark";
 import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
 import {useColumnLayout} from "../hooks/useColumnLayout";
 import {useAppState, yearlyPath} from "../state/appState";
 import {useGoTo} from "../services/navigation";
-import {monthlyCashFlowChart, statementCharts, statementRowShades} from "../services/statementCharts";
+import {monthlyCashFlowChart, monthlyProfitCharts, statementCharts, statementRowShades} from "../services/statementCharts";
 
 /**
  * The corner mark of a year is positioned against this block, not against the header cell: the
@@ -49,10 +50,11 @@ const AccountingStatement = () => {
 
     const transactionsDialog = useTransactionsDialog();
 
-    // The overall cash flow is also charted month by month, which takes every year's own statement.
-    const monthsOfEveryYear = isOverall && type === "cashflow" && loaded;
-    const everyYear = monthsOfEveryYear ? data.columns.slice(1) : [];
-    const yearly = useEachData(everyYear.map((each) => "/accounting/cashflow/" + each), monthsOfEveryYear);
+    // The overall cash flow and income statement are also charted month by month, which takes every
+    // year's own statement.
+    const monthsOfEveryYear = isOverall && (type === "cashflow" || type === "profit") && loaded;
+    const everyYear = monthsOfEveryYear ? data.columns.slice(1).filter((column) => /^\d{4}$/.test(column)) : [];
+    const yearly = useEachData(everyYear.map((each) => "/accounting/" + type + "/" + each), monthsOfEveryYear);
 
     // An overall statement too wide for the screen opens scrolled to its latest year, at the right.
     // A single year is left at its start: its right end is the total and the months still to come.
@@ -108,12 +110,16 @@ const AccountingStatement = () => {
     // Below an overall table sits its chart, and a row painted like its part of the chart is one
     // less thing to match up by eye.
     const rowShades = () => statementRowShades(type, data, isOverall)
-    const monthly = () => yearly.loaded
-        ? monthlyCashFlowChart(data, everyYear.map((each, index) => ({year: each, data: yearly.data[index]})))
-        : null
+    const monthly = () => {
+        if (!yearly.loaded) return [];
+        const years = everyYear.map((each, index) => ({year: each, data: yearly.data[index]}));
+        if (type === "profit") return monthlyProfitCharts(data, years);
+        const cashFlow = monthlyCashFlowChart(data, years);
+        return cashFlow === null ? [] : [cashFlow];
+    }
     const charts = () => statementCharts(type, data, isOverall)
     // A view showing two charts names them so they can be told apart - the two sides of the balance
-    // sheet, say. The cash flow's two are plain enough without: the years, and the months of them.
+    // sheet, say. The cash flow's one is plain enough without.
     const titled = () => type !== "cashflow" && charts().length > 1
     const tableLayout = () => measured === null ? null : {
         width: measured.width,
@@ -170,15 +176,14 @@ const AccountingStatement = () => {
                 </TableContainer>
 
                 {/* The page is half empty below the table, which is where the shape of the
-                    figures is easiest to read. */}
+                    figures is easiest to read. An overall chart can also be switched to every
+                    year's months, once those have come. */}
                 {charts().filter((chart) => !chart.alignToTable).map((chart) => (
-                    <StatementChart key={chart.key} chart={chart} titled={titled()}/>
+                    <VariantChart
+                        key={chart.key} chart={chart} titled={titled()}
+                        monthly={monthly().find((each) => each.key === chart.key + "-monthly") ?? null}
+                    />
                 ))}
-                {monthsOfEveryYear &&
-                    <DataView loaded={yearly.loaded} error={yearly.error}>
-                        {() => monthly() !== null && <StatementChart chart={monthly()} titled={titled()}/>}
-                    </DataView>
-                }
 
                 <TransactionsDialog
                     open={transactionsDialog.open}
