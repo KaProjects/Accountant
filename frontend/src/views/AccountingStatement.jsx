@@ -1,43 +1,30 @@
 import React, {useEffect, useRef} from "react";
-import {useData} from "../fetch";
+import {useData, useEachData} from "../fetch";
 import DataView from "../components/common/DataView";
 import Paper from "@mui/material/Paper";
-import {IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import TransactionsDialog from "../components/dialog/TransactionsDialog";
 import {useParams} from "react-router-dom";
 import LaunchIcon from '@mui/icons-material/Launch';
 import StatementRow from "../components/statement/StatementRow";
 import StatementChart from "../components/chart/StatementChart";
-import {statementHeaderStyle} from "../theme/tableStyles";
+import {highlightedCell, statementHeaderStyle} from "../theme/tableStyles";
+import CornerMark from "../components/common/CornerMark";
 import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
 import {useColumnLayout} from "../hooks/useColumnLayout";
 import {useAppState, yearlyPath} from "../state/appState";
 import {useGoTo} from "../services/navigation";
-import {statementCharts, statementRowShades} from "../services/statementCharts";
+import {monthlyCashFlowChart, statementCharts, statementRowShades} from "../services/statementCharts";
 
 /**
- * Offered on hover, to the left of the year, so it reads as "open this year".
- *
- * It is laid out over the cell rather than inside it: appearing and disappearing in the flow made
- * the column widen and narrow under the pointer, which moved every column after it.
- */
-const openYearStyle = {
-    position: "absolute",
-    left: 0,
-    top: "50%",
-    transform: "translateY(-50%)",
-    height: "2px",
-    width: "25px",
-};
-const openYearIconStyle = {width: 18};
-/**
- * The offer is positioned against this block, not against the header cell: the lines between cells
- * are box shadows, and a positioned cell paints over the ones its neighbours cast onto it.
+ * The corner mark of a year is positioned against this block, not against the header cell: the
+ * lines between cells are box shadows, and a positioned cell paints over the ones its neighbours
+ * cast onto it.
  */
 const yearHeaderStyle = {position: "relative", display: "block"};
 
 const AccountingStatement = () => {
-    const {year, setYearly} = useAppState();
+    const {year, setYearly, setOverallPath} = useAppState();
     const goTo = useGoTo();
     const {type, overall} = useParams();
     const isOverall = overall !== undefined;
@@ -48,11 +35,32 @@ const AccountingStatement = () => {
         setYearly(!isOverall)
     }, [isOverall, setYearly]);
 
+    // A single year can be left for the overall view of the same statement from the main bar, which
+    // the overall view only offered the other way round, from its headers. Withdrawn on leaving, so
+    // no other page offers a way to a statement it is not showing.
+    useEffect(() => {
+        setOverallPath(isOverall ? null : "/accounting/" + type + "/overall");
+        return () => setOverallPath(null);
+    }, [isOverall, type, setOverallPath]);
+
     const [showChildren, setShowChildren] = React.useState([]);
     const [showGrandChild, setShowGrandChild] = React.useState(null);
     const [redirectYearIndex, setRedirectYearIndex] = React.useState(-1);
 
     const transactionsDialog = useTransactionsDialog();
+
+    // The overall cash flow is also charted month by month, which takes every year's own statement.
+    const monthsOfEveryYear = isOverall && type === "cashflow" && loaded;
+    const everyYear = monthsOfEveryYear ? data.columns.slice(1) : [];
+    const yearly = useEachData(everyYear.map((each) => "/accounting/cashflow/" + each), monthsOfEveryYear);
+
+    // An overall statement too wide for the screen opens scrolled to its latest year, at the right.
+    // A single year is left at its start: its right end is the total and the months still to come.
+    const containerRef = useRef(null);
+    useEffect(() => {
+        if (!isOverall || !loaded || containerRef.current === null) return;
+        containerRef.current.scrollLeft = containerRef.current.scrollWidth;
+    }, [isOverall, loaded, data]);
 
     // A chart lined up with the table is drawn from where the table actually put its columns.
     const tableRef = useRef(null);
@@ -68,9 +76,31 @@ const AccountingStatement = () => {
         setShowGrandChild(showGrandChild === schemaId ? null : schemaId)
     }
 
-    const redirectToYear = () => {
+    // Only a column that is a year opens one: not the statement's name, nor the income statement's
+    // Total, which used to be offered too and led to a year called "Total".
+    const opensYear = (index) => isOverall && /^\d{4}$/.test(String(data.columns[index]))
+
+    const openYear = (index) => {
         // Setting the year used to mean writing it down and letting the reload read it back.
-        goTo(yearlyPath('/accounting/' + type, data.columns[redirectYearIndex]))()
+        goTo(yearlyPath('/accounting/' + type, data.columns[index]))()
+    }
+
+    /**
+     * What the header of a year does on the overall view: pointing at it shades and marks it, and a
+     * click anywhere on it - or Enter, from the keyboard - opens that year.
+     */
+    const yearHeaderProps = (index) => !opensYear(index) ? {} : {
+        tabIndex: 0,
+        onMouseEnter: () => setRedirectYearIndex(index),
+        onMouseLeave: () => setRedirectYearIndex(-1),
+        onClick: () => openYear(index),
+        onKeyDown: (event) => {
+            if (event.key === "Enter") openYear(index);
+        },
+    }
+    const headerStyle = (index) => {
+        const style = statementHeaderStyle(index, {columnCount: data.columns.length, hasInitial: hasInitial(), hasTotal: hasTotal()})
+        return opensYear(index) && index === redirectYearIndex ? highlightedCell(style) : style
     }
 
     const hasInitial = () => data.columns[1] === "Initial"
@@ -78,7 +108,13 @@ const AccountingStatement = () => {
     // Below an overall table sits its chart, and a row painted like its part of the chart is one
     // less thing to match up by eye.
     const rowShades = () => statementRowShades(type, data, isOverall)
+    const monthly = () => yearly.loaded
+        ? monthlyCashFlowChart(data, everyYear.map((each, index) => ({year: each, data: yearly.data[index]})))
+        : null
     const charts = () => statementCharts(type, data, isOverall)
+    // A view showing two charts names them so they can be told apart - the two sides of the balance
+    // sheet, say. The cash flow's two are plain enough without: the years, and the months of them.
+    const titled = () => type !== "cashflow" && charts().length > 1
     const tableLayout = () => measured === null ? null : {
         width: measured.width,
         columns: measured.columns.map((column, index) => ({...column, name: data.columns[index]})),
@@ -88,25 +124,14 @@ const AccountingStatement = () => {
         <DataView loaded={loaded} error={error}>
             {() => (
                 <>
-                <TableContainer component={Paper}>
+                <TableContainer component={Paper} ref={containerRef}>
                     <Table ref={tableRef} sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                         <TableHead>
                             <TableRow key={-1}>
                                 {data.columns.map((column, index) => (
-                                    <TableCell key={index}
-                                               style={statementHeaderStyle(index, {columnCount: data.columns.length, hasInitial: hasInitial(), hasTotal: hasTotal()})}
-                                               onMouseEnter={() => {if (index !== 0) setRedirectYearIndex(index)}}
-                                               onMouseLeave={() => setRedirectYearIndex(-1)}
-                                    >
+                                    <TableCell key={index} style={headerStyle(index)} {...yearHeaderProps(index)}>
                                         <span style={yearHeaderStyle}>
-                                            {isOverall && index === redirectYearIndex &&
-                                                <IconButton
-                                                    style={openYearStyle}
-                                                    onClick={() => redirectToYear()}
-                                                >
-                                                    <LaunchIcon sx={openYearIconStyle}/>
-                                                </IconButton>
-                                            }
+                                            {opensYear(index) && index === redirectYearIndex && <CornerMark icon={LaunchIcon} corner="top-right"/>}
                                             {column}
                                         </span>
                                     </TableCell>
@@ -140,15 +165,20 @@ const AccountingStatement = () => {
                     {/* A chart lined up with the table sits inside its scroll, so that the two
                         move together when the table is wider than the window. */}
                     {tableLayout() !== null && charts().filter((chart) => chart.alignToTable).map((chart) => (
-                        <StatementChart key={chart.key} chart={chart} layout={tableLayout()} titled={charts().length > 1}/>
+                        <StatementChart key={chart.key} chart={chart} layout={tableLayout()} titled={titled()}/>
                     ))}
                 </TableContainer>
 
                 {/* The page is half empty below the table, which is where the shape of the
                     figures is easiest to read. */}
                 {charts().filter((chart) => !chart.alignToTable).map((chart) => (
-                    <StatementChart key={chart.key} chart={chart} titled={charts().length > 1}/>
+                    <StatementChart key={chart.key} chart={chart} titled={titled()}/>
                 ))}
+                {monthsOfEveryYear &&
+                    <DataView loaded={yearly.loaded} error={yearly.error}>
+                        {() => monthly() !== null && <StatementChart chart={monthly()} titled={titled()}/>}
+                    </DataView>
+                }
 
                 <TransactionsDialog
                     open={transactionsDialog.open}

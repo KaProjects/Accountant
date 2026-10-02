@@ -3,13 +3,16 @@ import {AppBar, Box, Button, IconButton, MenuItem, Select, Toolbar, Typography} 
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import AllYearsIcon from "./common/AllYearsIcon";
 import {getChartConfigStyle} from "../theme/palette";
 import {useAppState} from "../state/appState";
-import {useGoHome} from "../services/navigation";
+import {useGoHome, useGoTo} from "../services/navigation";
 
 const spacerStyle = {flexGrow: 1};
 const titleStyle = {display: {xs: 'none', sm: 'block'}};
-const centreStyle = {display: {xs: 'none', md: 'flex'}};
+// The year, its arrows and the way to every year sit on one line. Left to stretch, the year was set
+// at the top of a box as tall as the tallest button beside it, a few pixels above the icons.
+const centreStyle = {display: {xs: 'none', md: 'flex'}, alignItems: 'center'};
 const drawerButtonStyle = {mr: 2};
 
 /**
@@ -28,8 +31,9 @@ const selectorStyle = {
 };
 
 const MainBar = () => {
-    const {year, isYearly, selectValues, selectedValue, setYear, setSelectedValue} = useAppState();
+    const {year, isYearly, selectValues, selectedValue, overallPath, setYear, setSelectedValue} = useAppState();
     const goHome = useGoHome();
+    const goTo = useGoTo();
 
     return (
         <Box sx={spacerStyle}>
@@ -61,6 +65,14 @@ const MainBar = () => {
                                 onClick={() => setYear(year + 1)}>
                             <ArrowRightIcon/>
                         </Button>
+                        {/* every year at once, where the page has such a view; its address carries
+                            no year, so the year is left behind with the page */}
+                        {overallPath !== null &&
+                            <IconButton color="inherit" aria-label="all years" title="All years"
+                                        onClick={goTo(overallPath)}>
+                                <AllYearsIcon/>
+                            </IconButton>
+                        }
                     </>
                     }
                     {selectValues !== null &&

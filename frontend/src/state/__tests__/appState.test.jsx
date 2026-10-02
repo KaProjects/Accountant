@@ -1,5 +1,5 @@
 import {fireEvent, render, screen} from "@testing-library/react";
-import {MemoryRouter, useLocation} from "react-router-dom";
+import {MemoryRouter, useLocation, useNavigate} from "react-router-dom";
 import {useEffect} from "react";
 import AppState, {AppStateProvider, useAppState, yearlyPath} from "../appState";
 
@@ -94,6 +94,51 @@ describe("a yearly page", () => {
         expect(await screen.findByText("?year=2019")).toBeInTheDocument();
     });
 
+    it("writes no year into the address of a page it is left for", async () => {
+        // leaving a single year for the overall view used to arrive at .../overall?year=2026: the
+        // year was written back in before the overall view had said it was not yearly
+        const OverallPage = () => {
+            const {setYearly} = useAppState();
+            useEffect(() => setYearly(false), [setYearly]);
+            return <span>overall page</span>;
+        };
+        const Pages = () => {
+            const navigate = useNavigate();
+            return useLocation().pathname === "/accounting/profit"
+                ? <><YearlyPage/><button onClick={() => navigate("/accounting/profit/overall")}>all years</button></>
+                : <OverallPage/>;
+        };
+        render(
+            <MemoryRouter initialEntries={["/accounting/profit?year=2024"]}>
+                <AppState><Pages/><Address/></AppState>
+            </MemoryRouter>
+        );
+
+        fireEvent.click(screen.getByText("all years"));
+
+        expect(await screen.findByText("overall page")).toBeInTheDocument();
+        expect(screen.getByTestId("address")).toBeEmptyDOMElement();
+    });
+
+    it("is yearly no longer once it has been left", async () => {
+        const Pages = () => {
+            const navigate = useNavigate();
+            const {isYearly} = useAppState();
+            return useLocation().pathname === "/budgeting"
+                ? <><YearlyPage/><button onClick={() => navigate("/admin")}>leave</button></>
+                : <span>{isYearly ? "still yearly" : "not yearly"}</span>;
+        };
+        render(
+            <MemoryRouter initialEntries={["/budgeting?year=2024"]}>
+                <AppState><Pages/></AppState>
+            </MemoryRouter>
+        );
+
+        fireEvent.click(screen.getByText("leave"));
+
+        expect(await screen.findByText("not yearly")).toBeInTheDocument();
+    });
+
     it("leaves a page that is not yearly without one", () => {
         render(
             <MemoryRouter initialEntries={["/admin"]}>
@@ -102,6 +147,37 @@ describe("a yearly page", () => {
         );
 
         expect(screen.getByTestId("address")).toBeEmptyDOMElement();
+    });
+});
+
+describe("the way to an overall view", () => {
+    const Offering = () => {
+        const {overallPath, setOverallPath} = useAppState();
+        return (
+            <>
+                <span>overall {String(overallPath)}</span>
+                <button onClick={() => setOverallPath("/accounting/balance/overall")}>offer</button>
+            </>
+        );
+    };
+    const renderOffering = () => render(
+        <MemoryRouter initialEntries={["/accounting/balance"]}>
+            <AppState><Offering/></AppState>
+        </MemoryRouter>
+    );
+
+    it("is offered by no page until one says it has an overall view", () => {
+        renderOffering();
+
+        expect(screen.getByText("overall null")).toBeInTheDocument();
+    });
+
+    it("holds the overall view a page says it has", () => {
+        renderOffering();
+
+        fireEvent.click(screen.getByText("offer"));
+
+        expect(screen.getByText("overall /accounting/balance/overall")).toBeInTheDocument();
     });
 });
 

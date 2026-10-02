@@ -24,11 +24,49 @@ const headerStyle = (hasLeftBorder, hasRightBorder) => ({
 export const budgetHeaderStyle = (index) =>
     headerStyle(index === 13, index === 0 || index === 13 || index === 14);
 
-export const statementHeaderStyle = (index, {columnCount, hasInitial, hasTotal}) =>
-    headerStyle(
+/**
+ * A cell of the column of row names, which stays in view while a statement too wide for the screen
+ * scrolls under it. The cell needs a background of its own, or the cells scrolling underneath would
+ * show through it.
+ *
+ * The table collapses its borders, and collapsed borders are the table's rather than the cell's: the
+ * pinned cell's left and right borders stayed behind with the table as it scrolled, and the cells
+ * passing underneath showed through the gap they left. So those two are drawn as inset shadows
+ * instead, which belong to the cell and travel with it. Its top and bottom borders are left to the
+ * table: the cells passing under them have the same borders, so the lines read unbroken.
+ *
+ * Being pinned also lifts the cell above its neighbours, and the lines between the cells of these
+ * tables are glows that spill from each cell into the next: a lifted cell covered the glow its
+ * neighbours spilled into it, and a row with no borders of its own - an account a group expands
+ * into - lost every line around its name. So the pinned cell draws that glow on its inside itself.
+ */
+export function pinnedFirstColumn(style) {
+    const edge = style.borderColor ?? "currentColor";
+    const widthOf = (side) => parseInt(side ?? "0", 10) || 0;
+    const insets = [];
+    if (widthOf(style.borderLeft) > 0) insets.push("inset " + widthOf(style.borderLeft) + "px 0 0 0 " + edge);
+    if (widthOf(style.borderRight) > 0) insets.push("inset -" + widthOf(style.borderRight) + "px 0 0 0 " + edge);
+
+    const glows = style.boxShadow ? ["inset " + style.boxShadow, style.boxShadow] : [];
+
+    return {
+        ...style,
+        position: "sticky",
+        left: 0,
+        zIndex: 1,
+        borderLeft: "0px",
+        borderRight: "0px",
+        boxShadow: insets.concat(glows).join(", "),
+    };
+}
+
+export const statementHeaderStyle = (index, {columnCount, hasInitial, hasTotal}) => {
+    const style = headerStyle(
         index === 0 || (index === columnCount - 1 && hasTotal),
         index === 0 || (hasInitial && index === 1) || index === columnCount - 1,
     );
+    return index === 0 ? pinnedFirstColumn({...style, background: neutral.white}) : style;
+};
 
 export function budgetRowStyle(type, hasLeftBorder, hasRightBorder) {
     const palette = budgetRowColors[type];
@@ -116,6 +154,21 @@ export function shadedStatementRowStyle(style, shade) {
         boxShadow: "0 0 8px 0 " + shade.edge,
     };
 }
+
+/**
+ * A cell that does something when clicked, while the pointer is over it: a step darker, and with a
+ * pointer to say it can be clicked.
+ *
+ * The shade is an inset shadow laid over the cell's own colour, so it suits every row colour, and
+ * it leaves the cell where it is in the painting order. A filter or an overlay would lift the cell
+ * above its neighbours, and a lifted cell covers the glow they spill into it, which is what draws
+ * the lines of these tables.
+ */
+export const highlightedCell = (style) => ({
+    ...style,
+    cursor: "pointer",
+    boxShadow: [style.boxShadow, "inset 0 0 0 100vmax " + neutral.highlight].filter(Boolean).join(", "),
+});
 
 export const isExpenseRow = (type) => expenseBudgetRows.includes(type);
 

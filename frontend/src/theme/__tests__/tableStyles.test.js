@@ -2,9 +2,11 @@ import {
     budgetHeaderStyle,
     budgetPlannedRowStyle,
     budgetRowStyle,
+    pinnedFirstColumn,
     statementHeaderStyle,
     statementRowStyle,
 } from "../tableStyles";
+import {neutral} from "../palette";
 
 // The expected values are transcribed from the inline style functions these
 // replaced, so any drift in the extraction shows up here.
@@ -137,9 +139,18 @@ describe("statementRowStyle", () => {
 describe("statementHeaderStyle", () => {
     const layout = {columnCount: 15, hasInitial: true, hasTotal: true};
 
-    it("borders the label column on both sides", () => {
-        expect(statementHeaderStyle(0, layout).borderLeft).toBe("2px solid");
-        expect(statementHeaderStyle(0, layout).borderRight).toBe("2px solid");
+    it("edges the label column on both sides, in the header's own colour", () => {
+        // pinned, so its side edges are shadows that travel with it rather than the table's borders
+        const style = statementHeaderStyle(0, layout);
+
+        expect(style.boxShadow).toContain("inset 2px 0 0 0 " + neutral.headerBorder);
+        expect(style.boxShadow).toContain("inset -2px 0 0 0 " + neutral.headerBorder);
+        expect([style.borderLeft, style.borderRight]).toEqual(["0px", "0px"]);
+    });
+
+    it("pins the label column, on a background of its own", () => {
+        expect(statementHeaderStyle(0, layout)).toMatchObject({position: "sticky", left: 0, background: neutral.white});
+        expect(statementHeaderStyle(1, layout).position).toBeUndefined();
     });
 
     it("closes off the initial column when there is one", () => {
@@ -151,5 +162,36 @@ describe("statementHeaderStyle", () => {
         expect(statementHeaderStyle(14, layout).borderLeft).toBe("2px solid");
         expect(statementHeaderStyle(14, {...layout, hasTotal: false}).borderLeft).toBe("0px");
         expect(statementHeaderStyle(14, layout).borderRight).toBe("2px solid");
+    });
+});
+
+describe("pinnedFirstColumn", () => {
+    const cell = {borderLeft: "2px solid", borderRight: "2px solid", boxShadow: "0 0 8px 0", background: "#fff"};
+
+    it("keeps the cell in view at the left edge while the rest scrolls under it", () => {
+        expect(pinnedFirstColumn(cell)).toMatchObject({position: "sticky", left: 0, background: "#fff"});
+    });
+
+    it("draws its side edges as inset shadows, which travel with the cell", () => {
+        const pinned = pinnedFirstColumn(cell);
+
+        expect(pinned.boxShadow).toMatch(/^inset 2px 0 0 0 currentColor, inset -2px 0 0 0 currentColor, /);
+        expect([pinned.borderLeft, pinned.borderRight]).toEqual(["0px", "0px"]);
+    });
+
+    it("draws only the edges the cell had", () => {
+        expect(pinnedFirstColumn({...cell, borderLeft: "0px"}).boxShadow).toMatch(/^inset -2px 0 0 0 currentColor, inset 0/);
+    });
+
+    it("draws inside itself the glow its neighbours can no longer spill into it", () => {
+        // lifted above its neighbours, it would cover their glow, and a row without borders of its
+        // own would lose every line around its name
+        expect(pinnedFirstColumn(cell).boxShadow).toContain("inset 0 0 8px 0, 0 0 8px 0");
+        expect(pinnedFirstColumn({...cell, boxShadow: "0 0 8px 0 #A3D07A"}).boxShadow)
+            .toContain("inset 0 0 8px 0 #A3D07A, 0 0 8px 0 #A3D07A");
+    });
+
+    it("leaves the top and bottom borders to the table", () => {
+        expect(pinnedFirstColumn({...cell, borderTop: "2px solid"}).borderTop).toBe("2px solid");
     });
 });

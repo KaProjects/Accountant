@@ -1,6 +1,6 @@
 import {renderHook, waitFor} from "@testing-library/react";
 import axios from "axios";
-import {useData} from "../fetch";
+import {useData, useEachData} from "../fetch";
 
 jest.mock("axios");
 
@@ -122,5 +122,60 @@ describe("useData", () => {
 
         await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(2));
         expect(axios.get.mock.calls[1][0]).toBe("/api/budget/2021");
+    });
+});
+
+describe("useEachData", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("requests every path, and reports their answers together in the order asked", async () => {
+        axios.get.mockImplementation((path) => Promise.resolve({data: {for: path}}));
+
+        const {result} = renderHook(() => useEachData(["/cashflow/2019", "/cashflow/2020"]));
+
+        await waitFor(() => expect(result.current.loaded).toBe(true));
+        expect(result.current.data).toEqual([{for: "/api/cashflow/2019"}, {for: "/api/cashflow/2020"}]);
+        expect(axios.get.mock.calls.map((call) => call[1])).toEqual([{withCredentials: true}, {withCredentials: true}]);
+    });
+
+    it("is not loaded until every one of them has come back", () => {
+        axios.get.mockImplementation((path) => path.endsWith("2020")
+            ? new Promise(() => {})
+            : Promise.resolve({data: {}}));
+
+        const {result} = renderHook(() => useEachData(["/cashflow/2019", "/cashflow/2020"]));
+
+        expect(result.current.loaded).toBe(false);
+        expect(result.current.data).toBeNull();
+    });
+
+    it("fails as soon as any one of them fails", async () => {
+        const failure = new Error("Request failed");
+        failure.response = {status: 500};
+        axios.get.mockImplementation((path) => path.endsWith("2020")
+            ? Promise.reject(failure)
+            : Promise.resolve({data: {}}));
+        jest.spyOn(console, "error").mockImplementation(() => {});
+
+        const {result} = renderHook(() => useEachData(["/cashflow/2019", "/cashflow/2020"]));
+
+        await waitFor(() => expect(result.current.error).toBe(failure));
+        expect(result.current.loaded).toBe(false);
+    });
+
+    it("asks for nothing until it is wanted", () => {
+        renderHook(() => useEachData(["/cashflow/2019"], false));
+
+        expect(axios.get).not.toHaveBeenCalled();
+    });
+
+    it("asks for nothing when there is nothing to ask for, and is done at once", () => {
+        // a statement with no years in it has no years to fetch, and must not wait for them for ever
+        const {result} = renderHook(() => useEachData([]));
+
+        expect(axios.get).not.toHaveBeenCalled();
+        expect(result.current).toEqual({data: [], loaded: true, error: null});
     });
 });

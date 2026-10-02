@@ -138,26 +138,50 @@ describe("StatementChart", () => {
         expect(Math.round(extentOf("#eb6834").top)).toBe(Math.round(baseline));
     });
 
-    it("stacks either side outwards from the baseline in the order of the table", () => {
-        // both series gain in January: the table's first is the one standing on the baseline
-        const changes = chart({
+    describe("a column of changes, read top to bottom in the order of the table", () => {
+        const twoGainsTwoLosses = () => chart({
             form: "changes",
             baseline: 100,
-            points: [{period: "Jan", summary: 150, spacer: 100, s0: 30, s0_above: 30, s1: 20, s1_above: 20}],
+            series: [
+                {key: "s0", name: "First", color: "#000001"},
+                {key: "s1", name: "Second", color: "#000002"},
+            ],
+            points: [
+                {period: "Jan", summary: 150, spacer: 100, s0: 30, s0_above: 30, s1: 20, s1_above: 20},
+                {period: "Feb", summary: 50, spacer: 50, s0: -30, s0_below: 30, s1: -20, s1_below: 20},
+            ],
         });
-        const {container} = render(<StatementChart chart={changes}/>);
+        const baselineOf = (container) => Math.round(Number(
+            container.querySelector(".recharts-reference-line line[stroke-dasharray]").getAttribute("y1")));
+        // a group's gain and its loss are told apart by the side of the baseline they are drawn on
+        const partOf = (container, color, side) => Array.from(container.querySelectorAll(".recharts-rectangle"))
+            .filter((rectangle) => rectangle.getAttribute("fill") === color)
+            .map((rectangle) => {
+                const [, y, height] = /M\s*[-\d.]+,([-\d.]+) h [-\d.]+ v ([-\d.]+)/.exec(rectangle.getAttribute("d"));
+                const ends = [Number(y), Number(y) + Number(height)];
+                return {top: Math.round(Math.min(...ends)), bottom: Math.round(Math.max(...ends))};
+            })
+            .find((extent) => side === "above"
+                ? extent.bottom <= baselineOf(container)
+                : extent.top >= baselineOf(container));
 
-        const baseline = Number(container.querySelector(".recharts-reference-line line[stroke-dasharray]")
-            .getAttribute("y1"));
-        const footOf = (color) => {
-            const column = Array.from(container.querySelectorAll(".recharts-rectangle"))
-                .find((rectangle) => rectangle.getAttribute("fill") === color);
-            const [, y, height] = /M\s*[-\d.]+,([-\d.]+) h [-\d.]+ v ([-\d.]+)/.exec(column.getAttribute("d"));
-            return Math.max(Number(y), Number(y) + Number(height));
-        };
+        it("puts the table's first gain at the top, and its last standing on the baseline", () => {
+            const {container} = render(<StatementChart chart={twoGainsTwoLosses()}/>);
+            const firstGain = partOf(container, "#000001", "above");
+            const lastGain = partOf(container, "#000002", "above");
 
-        expect(Math.round(footOf("#2a78d6"))).toBe(Math.round(baseline));
-        expect(footOf("#eb6834")).toBeLessThan(footOf("#2a78d6"));
+            expect(lastGain.bottom).toBe(baselineOf(container));
+            expect(firstGain.bottom).toBe(lastGain.top);
+        });
+
+        it("hangs the table's first loss from the baseline, and its last at the bottom", () => {
+            const {container} = render(<StatementChart chart={twoGainsTwoLosses()}/>);
+            const firstLoss = partOf(container, "#000001", "below");
+            const lastLoss = partOf(container, "#000002", "below");
+
+            expect(firstLoss.top).toBe(baselineOf(container));
+            expect(lastLoss.top).toBe(firstLoss.bottom);
+        });
     });
 
     it("never draws the spacer that lifts a chart of changes off nought", () => {
@@ -171,6 +195,48 @@ describe("StatementChart", () => {
         const fills = Array.from(container.querySelectorAll(".recharts-rectangle"))
             .map((rectangle) => rectangle.getAttribute("fill"));
         expect(fills.filter((fill) => fill !== "transparent")).toHaveLength(2);
+    });
+
+    describe("narrowed to a stretch of its points", () => {
+        it("offers a slider under a chart that spaces its own points", () => {
+            const {container} = render(<StatementChart chart={chart()}/>);
+
+            expect(container.querySelector(".recharts-brush")).toBeInTheDocument();
+        });
+
+    });
+
+    describe("over many years", () => {
+        const decade = (baseline) => chart({
+            form: "changes",
+            baseline,
+            points: [
+                {period: "January 2019", summary: 10, spacer: baseline, s0: 10, s0_above: 10, s1: 0},
+                {period: "February 2019", summary: 10, spacer: baseline, s0: 0, s1: 0},
+                {period: "January 2020", summary: 15, spacer: baseline, s0: 5, s0_above: 5, s1: 0},
+            ],
+            ticks: [{value: "January 2019", label: "2019"}, {value: "January 2020", label: "2020"}],
+        });
+
+        it("names only the points it lists, by their own labels", () => {
+            const {container} = render(<StatementChart chart={decade(0)}/>);
+
+            const ticks = Array.from(container.querySelectorAll(".recharts-xAxis .recharts-cartesian-axis-tick"))
+                .map((tick) => tick.textContent);
+            expect(ticks).toEqual(["2019", "2020"]);
+        });
+
+        it("leaves a baseline at nought to the axis to name", () => {
+            const {container} = render(<StatementChart chart={decade(0)}/>);
+
+            expect(container.querySelector(".recharts-reference-line .recharts-label")).toBeNull();
+        });
+
+        it("names any other baseline on the value axis", () => {
+            const {container} = render(<StatementChart chart={decade(100)}/>);
+
+            expect(container.querySelector(".recharts-reference-line .recharts-label")).toHaveTextContent("100");
+        });
     });
 
     describe("lined up with the table", () => {
@@ -232,6 +298,12 @@ describe("StatementChart", () => {
             render(<StatementChart chart={aligned()} layout={layout}/>);
 
             expect(screen.getByText("100")).toBeInTheDocument();
+        });
+
+        it("offers no slider, which would pull its points out from under their columns", () => {
+            const {container} = render(<StatementChart chart={aligned()} layout={layout}/>);
+
+            expect(container.querySelector(".recharts-brush")).not.toBeInTheDocument();
         });
 
         it("draws nothing until the table has been laid out", () => {

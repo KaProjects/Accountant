@@ -150,14 +150,20 @@ describe("StatementRow", () => {
         expect(within(rowNamed("Current account")).getByText("440")).toBeInTheDocument();
     });
 
-    it("points the transactions dialog at a child's month, and clears it on leaving", () => {
-        const props = mountRow({showChildren: true});
-        const cell = within(rowNamed("Bank")).getAllByRole("cell")[1];
+    const leafMount = (overrides = {}) => mountRow({
+        row: {...row, children: [childWithoutChildren]},
+        showChildren: true,
+        ...overrides,
+    });
+    const cashCell = () => within(rowNamed("Cash")).getAllByRole("cell")[1];
 
-        fireEvent.mouseEnter(cell);
-        expect(props.transactionsDialog.target).toHaveBeenCalledWith("Bank", "21", 1);
+    it("points the transactions dialog at an account's month, and clears it on leaving", () => {
+        const props = leafMount();
 
-        fireEvent.mouseLeave(cell);
+        fireEvent.mouseEnter(cashCell());
+        expect(props.transactionsDialog.target).toHaveBeenCalledWith("Cash", "22", 1);
+
+        fireEvent.mouseLeave(cashCell());
         expect(props.transactionsDialog.clearTarget).toHaveBeenCalled();
     });
 
@@ -169,20 +175,58 @@ describe("StatementRow", () => {
         expect(props.transactionsDialog.target).toHaveBeenCalledWith("Current account", "210", 2);
     });
 
-    it("offers the dialog only on a node that has no children of its own", () => {
+    it("leaves the cells of a node with children alone, as they are no set of transactions", () => {
         // A node with children aggregates them, so its figures are not transactions.
-        const transactionsDialog = dialog({isTargeting: jest.fn().mockReturnValue(true)});
-        mountRow({showChildren: true, transactionsDialog});
+        const props = mountRow({showChildren: true, transactionsDialog: dialog({isTargeting: jest.fn().mockReturnValue(true)})});
+        const cell = within(rowNamed("Bank")).getAllByRole("cell")[1];
 
-        expect(within(rowNamed("Bank")).queryByRole("button")).not.toBeInTheDocument();
-        cleanup();
+        fireEvent.mouseEnter(cell);
+        fireEvent.click(cell);
 
-        mountRow({
-            row: {...row, children: [childWithoutChildren]},
-            showChildren: true,
-            transactionsDialog,
-        });
-        expect(within(rowNamed("Cash")).getAllByRole("button")).not.toHaveLength(0);
+        expect(props.transactionsDialog.target).not.toHaveBeenCalled();
+        expect(props.transactionsDialog.setOpen).not.toHaveBeenCalled();
+        expect(within(cell).queryByTestId("corner-mark")).not.toBeInTheDocument();
+    });
+
+    it("shades the account's cell being pointed at, and marks its corner", () => {
+        leafMount({transactionsDialog: dialog({isTargeting: jest.fn().mockReturnValue(true)})});
+
+        // top left, away from the figure, which is set to the right
+        expect(within(cashCell()).getByTestId("corner-mark")).toHaveAttribute("data-corner", "top-left");
+        expect(cashCell().style.boxShadow).toContain("inset 0 0 0 100vmax");
+        expect(cashCell().style.cursor).toBe("pointer");
+    });
+
+    it("leaves a cell plain while the pointer is elsewhere", () => {
+        leafMount();
+
+        expect(within(cashCell()).queryByTestId("corner-mark")).not.toBeInTheDocument();
+        expect(cashCell().style.boxShadow).not.toContain("100vmax");
+    });
+
+    it("opens the transactions dialog on a click anywhere on the cell", () => {
+        const props = leafMount();
+
+        fireEvent.click(cashCell());
+
+        expect(props.transactionsDialog.target).toHaveBeenCalledWith("Cash", "22", 1);
+        expect(props.transactionsDialog.setOpen).toHaveBeenCalledWith(true);
+    });
+
+    it("opens it from the keyboard too", () => {
+        const props = leafMount();
+
+        fireEvent.keyDown(cashCell(), {key: "Enter"});
+
+        expect(props.transactionsDialog.setOpen).toHaveBeenCalledWith(true);
+    });
+
+    it("does not also expand the row it is in", () => {
+        const props = leafMount();
+
+        fireEvent.click(cashCell());
+
+        expect(props.onToggleGrandChild).not.toHaveBeenCalled();
     });
 
     it("expands into yearly figures in the overall view", () => {
@@ -212,38 +256,12 @@ describe("StatementRow", () => {
             transactionsDialog,
         });
 
-        const cell = within(rowNamed("Cash")).getAllByRole("cell")[1];
-        expect(within(cell).queryByRole("button")).not.toBeInTheDocument();
-
+        const cell = within(rowNamed("Cash")).getAllByRole("cell")[0];
         fireEvent.mouseEnter(cell);
+        fireEvent.click(cell);
+
+        expect(within(cell).queryByTestId("corner-mark")).not.toBeInTheDocument();
         expect(transactionsDialog.target).not.toHaveBeenCalled();
-    });
-
-    it("opens the transactions dialog from the cell being pointed at", () => {
-        const transactionsDialog = dialog({isTargeting: jest.fn().mockReturnValue(true)});
-        mountRow({
-            row: {...row, children: [childWithoutChildren]},
-            showChildren: true,
-            transactionsDialog,
-        });
-
-        fireEvent.click(within(rowNamed("Cash")).getAllByRole("button")[0]);
-
-        expect(transactionsDialog.setOpen).toHaveBeenCalledWith(true);
-    });
-
-    it("offers the dialog to the left of the figure, not after it", () => {
-        const transactionsDialog = dialog({isTargeting: jest.fn().mockReturnValue(true)});
-        mountRow({
-            row: {...row, children: [childWithoutChildren]},
-            showChildren: true,
-            transactionsDialog,
-        });
-
-        const cell = within(rowNamed("Cash")).getAllByRole("cell")[1];
-        const button = within(cell).getByRole("button");
-        // Which side it sits on is a question about order, which the query API cannot ask.
-        // eslint-disable-next-line testing-library/no-node-access
-        expect(button.parentElement.firstElementChild).toBe(button);
+        expect(transactionsDialog.setOpen).not.toHaveBeenCalled();
     });
 });

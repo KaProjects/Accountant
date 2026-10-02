@@ -1,4 +1,4 @@
-import {cleanup, fireEvent, screen} from "@testing-library/react";
+import {cleanup, fireEvent, screen, within} from "@testing-library/react";
 import MainBar from "../MainBar";
 import {renderWithAppState} from "../../testUtils";
 
@@ -101,5 +101,34 @@ describe("MainBar", () => {
         renderBar({selectValues: values, selectedValue: {id: "60", name: "Revenues"}});
 
         expect(screen.getByRole("combobox")).not.toHaveTextContent("Revenues");
+    });
+
+    describe("the way to every year at once", () => {
+        it("is offered beside the year, where the page has an overall view", () => {
+            renderBar({overallPath: "/accounting/balance/overall"});
+
+            const button = screen.getByRole("button", {name: "all years"});
+            expect(within(button).getByTestId("AllYearsIcon")).toBeInTheDocument();
+        });
+
+        it("leads there, leaving the year behind with the page", () => {
+            renderBar({overallPath: "/accounting/balance/overall"});
+
+            fireEvent.click(screen.getByRole("button", {name: "all years"}));
+
+            expect(mockNavigate).toHaveBeenCalledWith("/accounting/balance/overall");
+        });
+
+        it("is not offered by a yearly page with no overall view", () => {
+            renderBar({overallPath: null});
+
+            expect(screen.queryByRole("button", {name: "all years"})).not.toBeInTheDocument();
+        });
+
+        it("is not offered without a year to leave", () => {
+            renderBar({isYearly: false, overallPath: "/accounting/balance/overall"});
+
+            expect(screen.queryByRole("button", {name: "all years"})).not.toBeInTheDocument();
+        });
     });
 });

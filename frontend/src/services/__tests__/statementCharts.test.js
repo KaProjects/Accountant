@@ -1,4 +1,4 @@
-import {abbreviateAmount, statementCharts, statementRowShades} from "../statementCharts";
+import {abbreviateAmount, monthlyCashFlowChart, statementCharts, statementRowShades} from "../statementCharts";
 import {aboveZeroShades, belowZeroShades} from "../../theme/palette";
 
 const greens = aboveZeroShades.map((shade) => shade.fill);
@@ -302,6 +302,95 @@ describe("statementCharts on a yearly statement", () => {
 
         expect(statementCharts("balance", yearly, false)).toEqual([]);
         expect(statementCharts("profit", yearly, false)).toEqual([]);
+    });
+});
+
+describe("monthlyCashFlowChart", () => {
+    const months = ["January", "February", "March", "April", "May", "June", "July",
+        "August", "September", "October", "November", "December"];
+    const monthly = (...values) => [...values, ...Array(12 - values.length).fill(0)];
+    const year = (initial, cash, credit) => {
+        const total = cash.map((change, month) => change + credit[month]);
+        return {
+            columns: ["Cash Flow Statement", "Initial", ...months, "Total"],
+            rows: [
+                {type: "CASH_FLOW_GROUP", schemaId: "20", name: "Cash", initial: initial.cash, monthlyValues: cash},
+                {type: "CASH_FLOW_GROUP", schemaId: "22", name: "Credit", initial: initial.credit, monthlyValues: credit},
+                {type: "CASH_FLOW_SUMMARY", schemaId: "cf", name: "Cash Flow",
+                    initial: initial.cash + initial.credit, monthlyValues: total},
+            ],
+        };
+    };
+    const overall = {
+        columns: ["Yearly Cash Flow Statement", "2018", "2019", "2020"],
+        rows: [
+            {type: "CASH_FLOW_GROUP", schemaId: "20", name: "Cash", yearlyValues: [0, 110, 115]},
+            {type: "CASH_FLOW_GROUP", schemaId: "22", name: "Credit", yearlyValues: [0, -50, -55]},
+            {type: "CASH_FLOW_SUMMARY", schemaId: "cf", name: "Cash Flow", yearlyValues: [0, 60, 60]},
+        ],
+    };
+    const years = [
+        {year: "2018", data: year({cash: 0, credit: 0}, monthly(), monthly())},
+        {year: "2019", data: year({cash: 100, credit: -50}, monthly(10), monthly(0, -5))},
+        {year: "2020", data: year({cash: 110, credit: -55}, monthly(5), monthly())},
+    ];
+    const chart = () => monthlyCashFlowChart(overall, years);
+
+    it("draws every month of every year, the way the chart of a single year draws them", () => {
+        expect(chart().form).toBe("changes");
+        expect(chart().points.slice(1, 3).map((point) => point.period)).toEqual(["January 2018", "February 2018"]);
+    });
+
+    it("starts from the first year, even one that recorded nothing", () => {
+        expect(chart().ticks).toEqual([
+            {value: "January 2018", label: "2018"},
+            {value: "January 2019", label: "2019"},
+            {value: "January 2020", label: "2020"},
+        ]);
+        expect(chart().points[1]).toMatchObject({period: "January 2018", summary: 0});
+    });
+
+    it("measures every month from one baseline: the opening of the first year", () => {
+        const january2020 = chart().points[25];
+
+        expect(chart().baseline).toBe(0);
+        expect(january2020.period).toBe("January 2020");
+        // 2020 opened at 55, but its month still stands on the first year's nought
+        expect(january2020.spacer).toBe(0);
+        expect(january2020.s0_above).toBe(5);
+    });
+
+    it("runs the line on through the turn of the year, from one month end to the next", () => {
+        const line = chart().points.map((point) => point.summary);
+
+        expect(line[12]).toBe(0); // December 2018
+        expect(line[13]).toBe(60); // January 2019
+        expect(line[14]).toBe(55); // February 2019
+        expect(line[25]).toBe(60); // January 2020
+    });
+
+    it("sets the line off from the first year's opening", () => {
+        expect(chart().points[0]).toEqual({period: "Initial", summary: 0, opening: true});
+    });
+
+    it("leaves empty only the months still to come", () => {
+        expect(chart().points[26]).toEqual({period: "February 2020", summary: null});
+        expect(chart().points).toHaveLength(1 + 36);
+    });
+
+    it("keeps a quiet month between recorded ones", () => {
+        // nothing moved from March to December 2019, but January 2020 did
+        expect(chart().points[15].summary).toBe(55);
+    });
+
+    it("keeps the colours and the order of the overall table", () => {
+        const [overallChart] = statementCharts("cashflow", overall);
+
+        expect(chart().series).toEqual(overallChart.series);
+    });
+
+    it("charts nothing when nothing was ever recorded", () => {
+        expect(monthlyCashFlowChart(overall, years.slice(0, 1))).toBeNull();
     });
 });
 

@@ -4,6 +4,26 @@ import {properties} from "./properties";
 import {credentialed} from "./services/session";
 
 /**
+ * One request to the backend, answering with what came back.
+ *
+ * A failure is logged and passed on. A refused session is also turned into a message the page can
+ * show, and the page is reloaded a moment later: it asks the backend for its session on startup,
+ * and will be shown the login form.
+ */
+const request = (path) => axios.get(properties.backend + path, credentialed)
+    .then((response) => response.data)
+    .catch((error) => {
+        console.error(error)
+        // A transport failure has no response at all, and reading a status off it threw, which
+        // replaced the real error with a TypeError.
+        if (error.response && error.response.status === 401) {
+            error.message = "Session expired! Redirecting..."
+            setTimeout(() => window.location.reload(), 1000)
+        }
+        throw error;
+    });
+
+/**
  * Fetches a path, optionally only once it is wanted.
  *
  * The flag exists for a caller that knows the path before it knows whether it will be used - a
@@ -30,25 +50,13 @@ export const useData = (path, enabled = true) => {
         // has moved on is discarded rather than shown.
         let awaited = true;
 
-        const dataFetch = async () => {
-            await axios.get(properties.backend + path, credentialed)
-                .then((response) => {
-                    if (awaited) setFetched({path, data: response.data, error: null})
-                }).catch((error) => {
-                    console.error(error)
-                    // A transport failure has no response at all, and reading a status off it
-                    // threw, which replaced the real error with a TypeError.
-                    if (error.response && error.response.status === 401) {
-                        error.message = "Session expired! Redirecting..."
-                        // Reloading is enough: the page asks the backend for its session on
-                        // startup, and will be shown the login form.
-                        setTimeout(() => window.location.reload(), 1000)
-                    }
-                    if (awaited) setFetched({path, data: null, error})
-                })
-        };
-
-        dataFetch();
+        request(path)
+            .then((data) => {
+                if (awaited) setFetched({path, data, error: null})
+            })
+            .catch((error) => {
+                if (awaited) setFetched({path, data: null, error})
+            });
 
         return () => {awaited = false};
     }, [path, enabled]);
@@ -59,5 +67,49 @@ export const useData = (path, enabled = true) => {
         data: answersThisPath ? fetched.data : null,
         loaded: answersThisPath && fetched.error === null && fetched.data !== null,
         error: answersThisPath ? fetched.error : null,
+    };
+};
+
+/**
+ * Fetches several paths at once, for a view built from more than one answer, and reports them
+ * together: loaded once every one of them has come back, in the order the paths were given, and
+ * failed as soon as any one of them has.
+ *
+ * What came back is remembered with the paths it came back for, exactly as useData remembers its
+ * one path, and for the same reason.
+ *
+ * Asked for no paths at all, it is loaded at once, with nothing: there is nothing to wait for. It
+ * used to wait for answers that were never asked for, and a view whose statement had no years in it
+ * showed its loader for ever.
+ */
+export const useEachData = (paths, enabled = true) => {
+
+    const key = paths.join("\n");
+    const [fetched, setFetched] = useState({key: null, data: null, error: null});
+
+    useEffect(() => {
+        if (!enabled || key === "") return;
+
+        let awaited = true;
+
+        Promise.all(key.split("\n").map(request))
+            .then((data) => {
+                if (awaited) setFetched({key, data, error: null})
+            })
+            .catch((error) => {
+                if (awaited) setFetched({key, data: null, error})
+            });
+
+        return () => {awaited = false};
+    }, [key, enabled]);
+
+    if (enabled && key === "") return {data: [], loaded: true, error: null};
+
+    const answersThesePaths = fetched.key === key;
+
+    return {
+        data: answersThesePaths ? fetched.data : null,
+        loaded: answersThesePaths && fetched.error === null && fetched.data !== null,
+        error: answersThesePaths ? fetched.error : null,
     };
 };

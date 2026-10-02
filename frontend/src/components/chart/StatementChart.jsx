@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import {
-    Bar, CartesianGrid, ComposedChart, Legend, Line,
+    Bar, Brush, CartesianGrid, ComposedChart, Legend, Line,
     ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import Paper from "@mui/material/Paper";
@@ -28,6 +28,7 @@ const alignedMargin = {top: 20, right: 20, left: 20, bottom: 5};
  * over the top of columns, so they are drawn heavier than the summary line of a stacked chart.
  */
 const lineWidth = 3;
+const brushHeight = 24;
 
 /**
  * The order a stack of columns is drawn in, chosen so that it reads from top to bottom in the
@@ -66,16 +67,27 @@ const seriesKeyOf = (dataKey) => String(dataKey).split("_")[0];
  * The stack of a chart of changes, from the bottom up: the spacer that lifts it off nought, the
  * losses, then the gains.
  *
- * Either side reads outwards from the baseline in the order of the table: the table's first group
- * is the change nearest the baseline, above it or below it, and its last group the one furthest
- * out. recharts stacks upwards in the order it is given, so the gains are given in the table's
- * order, and the losses - which are stacked up towards the baseline from beneath - backwards.
+ * The column reads top to bottom in the order of the table, as the tooltip does: above the
+ * baseline the table's first group is at the top and its last stands on the baseline, and below it
+ * the first hangs from the baseline and the last is at the bottom. recharts stacks upwards in the
+ * order it is given, so both halves are given backwards - the losses so that the first ends up just
+ * under the baseline, and the gains so that the last ends up just above it.
  */
 const changesInDrawingOrder = (chart) => {
     const backwards = chart.series.slice().reverse();
     return [{key: "spacer", name: "spacer", color: "transparent", spacer: true}]
         .concat(backwards.map((series) => ({...series, key: series.key + "_below"})))
-        .concat(chart.series.map((series) => ({...series, key: series.key + "_above"})));
+        .concat(backwards.map((series) => ({...series, key: series.key + "_above"})));
+};
+
+/**
+ * The ticks of an axis too long to name every point on, such as a decade of months: only the
+ * points the chart lists in `ticks` are named, each by its own label.
+ */
+const namedTicks = (chart) => {
+    if (!chart.ticks) return {};
+    const labels = new Map(chart.ticks.map((tick) => [tick.value, tick.label]));
+    return {ticks: chart.ticks.map((tick) => tick.value), tickFormatter: (value) => labels.get(value) ?? value, interval: 0};
 };
 
 /** The key, in the order of the table rather than in the order the marks happen to be drawn. */
@@ -110,6 +122,12 @@ const legend = (chart) => {
  * right, with each point under the column it is named after. Without one it fills the width it is
  * given and spaces its points evenly.
  *
+ * A chart that spaces its own points can also be narrowed to a stretch of them, with a slider under
+ * it, and its value axis then fits that stretch: the early years of a balance sheet that has since
+ * grown many times over sit flat at the foot of the whole chart, and fill it once the slider is
+ * drawn in around them. A chart lined up with the table has no slider, as narrowing it would pull
+ * its points out from under their columns.
+ *
  * A chart is titled only when it is `titled`, which a view asks for when it shows more than one
  * and they need telling apart.
  */
@@ -123,7 +141,7 @@ const StatementChart = ({chart, layout = null, titled = true}) => {
         >
             <CartesianGrid strokeDasharray="3 3"/>
             {layout === null
-                ? <XAxis dataKey="period" style={axisStyle}/>
+                ? <XAxis dataKey="period" style={axisStyle} {...namedTicks(chart)}/>
                 : <XAxis dataKey="period" style={axisStyle} scale={columnScale(chart.points.map((point) => point.period), layout)}/>
             }
             <YAxis tickFormatter={abbreviateAmount} style={axisStyle}/>
@@ -148,10 +166,11 @@ const StatementChart = ({chart, layout = null, titled = true}) => {
                 />
             ))}
             {chart.form === "changes" &&
-                // marked on the value axis too, which is where the figure it stands for is read
+                // marked on the value axis too, which is where the figure it stands for is read -
+                // unless it is nought, which the axis already names
                 <ReferenceLine
                     y={chart.baseline} stroke={chart.line.color} strokeWidth={1.5} strokeDasharray="5 4"
-                    label={{
+                    label={chart.baseline === 0 ? undefined : {
                         value: abbreviateAmount(chart.baseline), position: "left",
                         fill: chart.line.color, fontSize: 12, fontWeight: "bold",
                     }}
@@ -169,6 +188,12 @@ const StatementChart = ({chart, layout = null, titled = true}) => {
                     type="linear" dataKey={chart.line.key} name={chart.line.name}
                     stroke={chart.line.color} strokeWidth={chart.line.width} dot={false}
                     isAnimationActive={false}
+                />
+            }
+            {layout === null &&
+                <Brush
+                    dataKey="period" height={brushHeight} stroke={neutral.headerBorder}
+                    travellerWidth={10}
                 />
             }
         </ComposedChart>
@@ -200,6 +225,8 @@ StatementChart.propTypes = {
         form: PropTypes.oneOf(["stacked", "changes", "lines"]).isRequired,
         /** For a chart of changes: the figure every period's changes are stacked on. */
         baseline: PropTypes.number,
+        /** The only points to name on the axis, each with its own label: [{value, label}]. */
+        ticks: PropTypes.arrayOf(PropTypes.shape({value: PropTypes.string, label: PropTypes.string})),
         series: PropTypes.array.isRequired,
         line: PropTypes.object,
         points: PropTypes.array.isRequired,

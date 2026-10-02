@@ -138,43 +138,116 @@ function cashFlowCharts(data, axis) {
  * belongs to, and the line sets off from the baseline under the table's Initial column, which has
  * nothing else drawn in it: that point is the `opening`, and has no changes to report.
  *
- * The year may still be running. The table carries all twelve months regardless, the ones still to
- * come as noughts, so the line stops at the last month anything moved in: the months after it have
- * no figures yet, and a line carried on flat across them would claim the total stood still there.
- * A quiet month with later ones after it still counts, as something did happen after it.
+ * The year may still be running, so the line stops at the last month anything moved in.
  *
  * A group is coloured by the side its balance stands on, as its row in the table is, and not by
  * which way the year moved it: cash that dwindled over the year is still cash.
- *
- * Each month is a stack that recharts can draw on its own terms. It stacks only upwards, from
- * nought, so each month starts with a spacer that is never drawn, reaching up to the bottom of
- * the month's losses. The losses come next, reaching back up to the opening balance, and the
- * gains stand on top of that. A group can lose in one month and gain in the next, so each group
- * has a half for either case, and only one of the two is filled in any month. The signed change
- * itself is kept under the group's own key, for the tooltip to report.
  */
 function yearlyCashFlowCharts(data) {
     const summary = data.rows.find((row) => row.type === "CASH_FLOW_SUMMARY");
-    const changes = monthlyChangesAxis(data.columns);
-    if (summary === undefined || changes.labels.length === 0) return [];
-
     const groups = data.rows.filter((row) => row.type === "CASH_FLOW_GROUP");
-    const balances = runningBalanceAxis(data.columns);
-    const colours = shadesBySide(entriesOf(groups, balances)).map((shade) => shade.fill);
-    const series = groups.map((row, index) => ({key: "s" + index, name: nameOf(row, groups), color: colours[index]}));
+    const year = cashFlowMonths(data, groups.map((row) => row.schemaId));
+    if (year === null) return [];
 
-    const baseline = summary.initial ?? 0;
-    const monthEnds = balances.valuesOf(summary).slice(1);
-    const changesIn = (month) => groups.map((row) => changes.valuesOf(row)[month]);
-    const lastRecorded = changes.labels.reduce((last, period, month) =>
-        changesIn(month).some((change) => change !== 0) ? month : last, -1);
+    const colours = shadesBySide(entriesOf(groups, runningBalanceAxis(data.columns))).map((shade) => shade.fill);
 
-    const months = changes.labels.map((period, month) => {
-        if (month > lastRecorded) return {period, summary: null};
-        const point = {period, summary: monthEnds[month]};
+    return [{
+        key: "cf",
+        title: readableName(summary.name) + " from Initial",
+        form: "changes",
+        series: groups.map((row, index) => ({key: "s" + index, name: nameOf(row, groups), color: colours[index]})),
+        line: cashFlowLine(summary),
+        baseline: year.baseline,
+        points: [{period: "Initial", summary: year.baseline, opening: true}]
+            .concat(untilLastRecorded(year.points, year.recorded)),
+        alignToTable: true,
+    }];
+}
+
+/**
+ * The overall cash flow month by month: every year's months one after another, from the first
+ * year on, drawn as the chart of a single year draws its months.
+ *
+ * All the months are measured from one baseline, the cash flow the first year opened with, so
+ * every column stands on the same line however far the years have carried the total from it. The
+ * line runs on through the turn of each year, from one month end to the next, and stops at the last
+ * month anything moved in, as it does for a single year; only the months still to come are left
+ * empty, and a year that recorded nothing early on is charted as the nought it was. The groups keep
+ * the colours and the order of the overall table, which is the one above this chart. The axis names
+ * the years, at their Januaries; a month itself is named in full in its tooltip.
+ *
+ * Takes the overall statement and every year's own statement, as [{year, data}]; answers null
+ * when there is nothing to chart.
+ */
+export function monthlyCashFlowChart(overall, years) {
+    const summary = overall.rows.find((row) => row.type === "CASH_FLOW_SUMMARY");
+    const groups = overall.rows.filter((row) => row.type === "CASH_FLOW_GROUP");
+    const statements = years.filter(({data}) => data.rows.some((row) => row.type === "CASH_FLOW_SUMMARY"));
+    if (summary === undefined || statements.length === 0) return null;
+
+    const opening = statements[0].data.rows.find((row) => row.type === "CASH_FLOW_SUMMARY").initial ?? 0;
+    const schemaIds = groups.map((row) => row.schemaId);
+    const charted = statements
+        .map(({year, data}) => ({year, months: cashFlowMonths(data, schemaIds, opening)}))
+        .filter(({months}) => months !== null);
+    if (!charted.some(({months}) => months.recorded.some((recorded) => recorded))) return null;
+
+    const points = [];
+    const recorded = [];
+    charted.forEach(({year, months}) => months.points.forEach((point, index) => {
+        points.push({...point, period: point.period + " " + year});
+        recorded.push(months.recorded[index]);
+    }));
+    const colours = shadesBySide(entriesOf(groups, yearsAxis(overall.columns))).map((shade) => shade.fill);
+
+    return {
+        key: "cf-monthly",
+        title: readableName(summary.name) + " by month",
+        form: "changes",
+        series: groups.map((row, index) => ({key: "s" + index, name: nameOf(row, groups), color: colours[index]})),
+        line: cashFlowLine(summary),
+        baseline: opening,
+        points: [{period: "Initial", summary: opening, opening: true}].concat(untilLastRecorded(points, recorded)),
+        ticks: charted.map(({year, months}) => ({value: months.points[0].period + " " + year, label: String(year)})),
+    };
+}
+
+/** The line a cash flow chart draws its total with, in the ink of the total's row. */
+function cashFlowLine(summary) {
+    return {key: "summary", name: readableName(summary.name), color: cashFlowSummaryShade.ink, width: 3};
+}
+
+/**
+ * A year of a cash flow statement as months to chart: {baseline, points, recorded}, or null when
+ * the statement has no total to chart.
+ *
+ * The baseline is the cash flow the year opened with, unless another is given, and each point is a
+ * month: where the total stood at its end, and each group's change in it, stacked on the baseline. recharts stacks only
+ * upwards, from nought, so a month starts with a spacer that is never drawn, reaching up to the
+ * bottom of the month's losses; the losses come next, reaching back up to the baseline, and the
+ * gains stand on top of that. A group can lose in one month and gain in the next, so each group has
+ * a half for either case, and only one of the two is filled in any month. The signed change itself
+ * is kept under the group's own key, for the tooltip to report.
+ *
+ * The groups are taken in the order of `schemaIds`, so the months of several years line up with
+ * one another; a group a year does not have counts as never having moved. `recorded` says, month
+ * by month, whether any group moved at all.
+ */
+function cashFlowMonths(data, schemaIds, given) {
+    const summary = data.rows.find((row) => row.type === "CASH_FLOW_SUMMARY");
+    const changes = monthlyChangesAxis(data.columns);
+    if (summary === undefined || changes.labels.length === 0) return null;
+
+    const rows = schemaIds.map((schemaId) =>
+        data.rows.find((row) => row.type === "CASH_FLOW_GROUP" && row.schemaId === schemaId));
+    const baseline = given ?? summary.initial ?? 0;
+    const monthEnds = runningBalanceAxis(data.columns).valuesOf(summary).slice(1);
+    const changesIn = (month) => rows.map((row) => changes.valuesOf(row)[month]);
+
+    const points = changes.labels.map((period, month) => {
         const monthChanges = changesIn(month);
         const lost = monthChanges.reduce((sum, change) => change < 0 ? sum + change : sum, 0);
-        point.spacer = baseline + lost;
+        const point = {period, summary: monthEnds[month], spacer: baseline + lost};
         monthChanges.forEach((change, index) => {
             point["s" + index] = change;
             point["s" + index + "_below"] = change < 0 ? -change : null;
@@ -183,16 +256,23 @@ function yearlyCashFlowCharts(data) {
         return point;
     });
 
-    return [{
-        key: "cf",
-        title: readableName(summary.name) + " from Initial",
-        form: "changes",
-        series,
-        line: {key: "summary", name: readableName(summary.name), color: cashFlowSummaryShade.ink, width: 3},
+    return {
         baseline,
-        points: [{period: "Initial", summary: baseline, opening: true}].concat(months),
-        alignToTable: true,
-    }];
+        points,
+        recorded: changes.labels.map((period, month) => changesIn(month).some((change) => change !== 0)),
+    };
+}
+
+/**
+ * The months up to the last one anything moved in, and after it only their names.
+ *
+ * The statements carry all twelve months whether they have happened or not, the ones still to
+ * come as noughts, and a line carried on flat across them would claim the total stood still. A
+ * quiet month with a recorded one after it still counts, as something did happen after it.
+ */
+function untilLastRecorded(points, recorded) {
+    const last = recorded.lastIndexOf(true);
+    return points.map((point, index) => index <= last ? point : {period: point.period, summary: null});
 }
 
 /**

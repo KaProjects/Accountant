@@ -26,6 +26,8 @@ export const neutral = {
     negativeBackground: "#fff2f2",
     neutralValue: "#002e88",
     neutralBackground: "#f8f8ff",
+    // laid over any cell colour to darken it a step, for a cell under the pointer
+    highlight: "rgba(0, 0, 0, 0.08)",
 }
 
 /** Row colours for the budgeting table, keyed by the row type the backend sends. */

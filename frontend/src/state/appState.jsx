@@ -1,6 +1,6 @@
-import {createContext, useCallback, useContext, useEffect, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
 import PropTypes from "prop-types";
-import {useSearchParams} from "react-router-dom";
+import {useLocation, useSearchParams} from "react-router-dom";
 
 const AppStateContext = createContext(null);
 
@@ -44,9 +44,22 @@ export const yearlyPath = (path, year) => path + "?" + YEAR + "=" + year;
  */
 const AppState = ({children}) => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [isYearly, setIsYearly] = useState(false);
+    const {pathname} = useLocation();
+
+    // A page is yearly only while it is the page that said so. Being yearly used to outlast the
+    // page: leaving a single year for an address without one, the next page had not yet said it
+    // was not yearly when the year was written back into its address - the overall view of a
+    // statement opened as /accounting/profit/overall?year=2026. Remembering which page said it
+    // ends it the moment that page is left.
+    const [yearlyPage, setYearlyPage] = useState(null);
+    const isYearly = yearlyPage !== null && yearlyPage === pathname;
+    const pathnameNow = useRef(pathname);
+    pathnameNow.current = pathname;
     const [selectValues, rememberSelectValues] = useState(null);
     const [selectedValue, setSelectedValue] = useState("");
+    // Where a yearly page has an overall view of the same thing, so the main bar can offer the way
+    // there; null on every other page. The page itself says so, as only it knows.
+    const [overallPath, setOverallPath] = useState(null);
 
     const requestedYear = parseInt(searchParams.get(YEAR));
     const year = Number.isNaN(requestedYear) ? new Date().getFullYear() : requestedYear;
@@ -75,18 +88,18 @@ const AppState = ({children}) => {
     const setYearly = useCallback((yearly) => {
         rememberSelectValues(null);
         setSelectedValue("");
-        setIsYearly(yearly);
+        setYearlyPage(yearly ? pathnameNow.current : null);
     }, []);
 
     const setSelectValues = useCallback((values) => {
-        setIsYearly(false);
+        setYearlyPage(null);
         rememberSelectValues(values);
     }, []);
 
     return (
         <AppStateProvider value={{
-            year, isYearly, selectValues, selectedValue,
-            setYear, setYearly, setSelectedValue, setSelectValues,
+            year, isYearly, selectValues, selectedValue, overallPath,
+            setYear, setYearly, setSelectedValue, setSelectValues, setOverallPath,
         }}>
             {children}
         </AppStateProvider>

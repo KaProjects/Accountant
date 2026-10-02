@@ -1,6 +1,6 @@
 import {fireEvent, screen, within} from "@testing-library/react";
 import AccountingStatement from "../AccountingStatement";
-import {useData} from "../../fetch";
+import {useData, useEachData} from "../../fetch";
 import {useParams} from "react-router-dom";
 import realBalance from "../../__tests__/fixtures/accounting-balance-2020.json";
 import {renderWithAppState} from "../../testUtils";
@@ -54,19 +54,74 @@ const payload = (rows) => ({
     rows,
 });
 
-const mountView = (data, {loaded = true, error = null, params = {type: "balance"}} = {}) => {
+const mountView = (data, {loaded = true, error = null, params = {type: "balance"}, each} = {}) => {
     useParams.mockReturnValue(params);
     // The view and the transactions dialog inside it both fetch, so the mock answers by path
     // rather than returning the view's payload to whoever asks.
     useData.mockImplementation((path) =>
         path.startsWith("/accounting/2020/transaction") ? {data: [], loaded: true, error: null} : {data, loaded, error});
+    useEachData.mockImplementation((paths, enabled) => enabled && each !== undefined
+        ? {data: each(paths), loaded: true, error: null}
+        : {data: null, loaded: false, error: null});
     const setYearly = jest.fn();
-    renderWithAppState(<AccountingStatement/>, {year: 2020, setYearly});
-    return {setYearly};
+    const setOverallPath = jest.fn();
+    const view = renderWithAppState(<AccountingStatement/>, {year: 2020, setYearly, setOverallPath});
+    return {setYearly, setOverallPath, unmount: view.unmount};
 };
 
 describe("AccountingStatement", () => {
     beforeEach(() => jest.clearAllMocks());
+
+    describe("the overall cash flow", () => {
+        const overallCashFlow = {
+            columns: ["Yearly Cash Flow Statement", "2019", "2020"],
+            rows: [
+                {type: "CASH_FLOW_GROUP", schemaId: "20", name: "Cash", yearlyValues: [10, 20], children: []},
+                {type: "CASH_FLOW_SUMMARY", schemaId: "cf", name: "Cash Flow", yearlyValues: [10, 20], children: []},
+            ],
+        };
+        const yearOf = () => ({
+            columns: ["Cash Flow Statement", "Initial", "January", "February", "March", "April", "May",
+                "June", "July", "August", "September", "October", "November", "December", "Total"],
+            rows: [
+                {type: "CASH_FLOW_GROUP", schemaId: "20", name: "Cash", initial: 0, monthlyValues: months(10)},
+                {type: "CASH_FLOW_SUMMARY", schemaId: "cf", name: "Cash Flow", initial: 0, monthlyValues: months(10)},
+            ],
+        });
+        const mountCashFlow = (each) => mountView(overallCashFlow,
+            {params: {type: "cashflow", overall: "overall"}, each});
+
+        it("asks for every year's own statement, to chart the months of them all", () => {
+            mountCashFlow((paths) => paths.map(yearOf));
+
+            expect(useEachData).toHaveBeenCalledWith(["/accounting/cashflow/2019", "/accounting/cashflow/2020"], true);
+        });
+
+        it("charts the months below the chart of the years, neither of them titled", () => {
+            mountCashFlow((paths) => paths.map(yearOf));
+
+            // jsdom lays nothing out, so a chart shows only as its surface, which has no role
+            // eslint-disable-next-line testing-library/no-node-access
+            expect(document.querySelectorAll(".recharts-responsive-container")).toHaveLength(2);
+            expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+        });
+
+        it("shows no loader and no chart of months when the statement has no years", () => {
+            // an empty database: the statement comes back with no years, so there are none to fetch,
+            // and the hook answers an empty list of paths at once, with nothing
+            mountView({columns: ["Yearly Cash Flow Statement"], rows: []},
+                {params: {type: "cashflow", overall: "overall"}, each: () => []});
+
+            expect(useEachData).toHaveBeenCalledWith([], true);
+            expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+        });
+
+        it("asks for no year's statement anywhere else", () => {
+            mountView(overallPayload([row()]), {params: {type: "balance", overall: "overall"}});
+
+            expect(useEachData).toHaveBeenCalledWith([], false);
+        });
+    });
 
     it("requests the statement for the routed type and selected year", () => {
         mountView(payload([row()]));
@@ -84,6 +139,26 @@ describe("AccountingStatement", () => {
         const {setYearly} = mountView(payload([row()]));
 
         expect(setYearly).toHaveBeenCalledWith(true);
+    });
+
+    it("tells the main bar where the overall view of the same statement is", () => {
+        const {setOverallPath} = mountView(payload([row()]), {params: {type: "cashflow"}});
+
+        expect(setOverallPath).toHaveBeenLastCalledWith("/accounting/cashflow/overall");
+    });
+
+    it("offers no way to an overall view from the overall view itself", () => {
+        const {setOverallPath} = mountView(overallPayload([row()]), {params: {type: "balance", overall: "overall"}});
+
+        expect(setOverallPath).toHaveBeenLastCalledWith(null);
+    });
+
+    it("withdraws the way to its overall view on leaving, so no other page offers it", () => {
+        const {setOverallPath, unmount} = mountView(payload([row()]));
+
+        unmount();
+
+        expect(setOverallPath).toHaveBeenLastCalledWith(null);
     });
 
     it("leaves yearly mode off for the overall view", () => {
@@ -186,65 +261,81 @@ describe("AccountingStatement", () => {
 
         const header = (text) => screen.getByRole("columnheader", {name: new RegExp(text)});
 
-        it("offers nothing until the reader points at a year", () => {
+        const mark = (text) => within(header(text)).queryByTestId("corner-mark");
+
+        it("marks nothing until the reader points at a year", () => {
             mountOverall();
 
-            expect(within(header("2019")).queryByRole("button")).not.toBeInTheDocument();
+            expect(mark("2019")).not.toBeInTheDocument();
         });
 
-        it("offers to open the year being pointed at", () => {
-            mountOverall();
-
-            fireEvent.mouseEnter(header("2019"));
-
-            expect(within(header("2019")).getByRole("button")).toBeInTheDocument();
-        });
-
-        it("puts the offer before the year, not after it", () => {
+        it("shades the year being pointed at, and marks its corner", () => {
             mountOverall();
 
             fireEvent.mouseEnter(header("2019"));
 
-            const button = within(header("2019")).getByRole("button");
-            // Which side the offer sits on is a question about order, and the query API has no way
-            // to ask it - so this one assertion reads the structure directly.
-            // eslint-disable-next-line testing-library/no-node-access
-            expect(button.parentElement.firstElementChild).toBe(button);
+            // top right: the year is centred in its heading
+            expect(mark("2019")).toHaveAttribute("data-corner", "top-right");
+            expect(header("2019").style.boxShadow).toContain("inset 0 0 0 100vmax");
+            expect(header("2019").style.cursor).toBe("pointer");
         });
 
-        it("withdraws the offer when the reader points away", () => {
+        it("withdraws the shade and the mark when the reader points away", () => {
             mountOverall();
             fireEvent.mouseEnter(header("2019"));
 
             fireEvent.mouseLeave(header("2019"));
 
-            expect(within(header("2019")).queryByRole("button")).not.toBeInTheDocument();
+            expect(mark("2019")).not.toBeInTheDocument();
+            expect(header("2019").style.boxShadow).not.toContain("100vmax");
         });
 
-        it("offers nothing on the heading, which names no year", () => {
+        it("opens that year's statement on a click anywhere on its header", () => {
             mountOverall();
 
-            fireEvent.mouseEnter(header("Yearly Balance Sheet"));
-
-            expect(within(header("Yearly Balance Sheet")).queryByRole("button")).not.toBeInTheDocument();
-        });
-
-        it("opens that year's statement, carrying the year in the address", () => {
-            mountOverall();
-            fireEvent.mouseEnter(header("2019"));
-
-            fireEvent.click(within(header("2019")).getByRole("button"));
+            fireEvent.click(header("2019"));
 
             expect(mockNavigate).toHaveBeenCalledWith("/accounting/balance?year=2019");
         });
 
-        it("offers nothing in the single-year view, which has no years to open", () => {
+        it("opens it from the keyboard too", () => {
+            mountOverall();
+
+            fireEvent.keyDown(header("2019"), {key: "Enter"});
+
+            expect(mockNavigate).toHaveBeenCalledWith("/accounting/balance?year=2019");
+        });
+
+        it("opens nothing from the heading, which names no year", () => {
+            mountOverall();
+
+            fireEvent.mouseEnter(header("Yearly Balance Sheet"));
+            fireEvent.click(header("Yearly Balance Sheet"));
+
+            expect(mark("Yearly Balance Sheet")).not.toBeInTheDocument();
+            expect(mockNavigate).not.toHaveBeenCalled();
+        });
+
+        it("opens nothing from the income statement's Total, which is no year either", () => {
+            mountView({columns: ["Yearly Income Statement", "2019", "Total"], rows: [row()]},
+                {params: {type: "profit", overall: "overall"}});
+
+            fireEvent.mouseEnter(header("Total"));
+            fireEvent.click(header("Total"));
+
+            expect(mark("Total")).not.toBeInTheDocument();
+            expect(mockNavigate).not.toHaveBeenCalled();
+        });
+
+        it("opens nothing in the single-year view, which has no years to open", () => {
             mountView(payload([row()]));
+            const january = screen.getByRole("columnheader", {name: /January/});
 
-            fireEvent.mouseEnter(screen.getByRole("columnheader", {name: /January/}));
+            fireEvent.mouseEnter(january);
+            fireEvent.click(january);
 
-            expect(within(screen.getByRole("columnheader", {name: /January/})).queryByRole("button"))
-                .not.toBeInTheDocument();
+            expect(within(january).queryByTestId("corner-mark")).not.toBeInTheDocument();
+            expect(mockNavigate).not.toHaveBeenCalled();
         });
     });
 });
