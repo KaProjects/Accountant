@@ -34,9 +34,10 @@ export const syncActions = (year) => [
 /**
  * Runs one sync action and reports how it went.
  *
- * The endpoints answer in plain text, and the interesting part of a failure is the text of the
- * body rather than the status: a validation failure arrives as 406 whose body lists the years that
- * did not pass. Both outcomes are therefore reported the same way, and neither throws.
+ * The endpoints answer in plain text, and the interesting part of a failure is what its body says
+ * rather than the status: a validation failure arrives as 422 whose detail is the report of every
+ * year, the failed ones included. Both outcomes are therefore reported the same way, and neither
+ * throws.
  */
 export const runSync = async (path) => {
     try {

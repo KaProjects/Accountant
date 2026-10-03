@@ -1,0 +1,63 @@
+package org.kaleta.persistence.impl;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.kaleta.datasource.Accounts;
+import org.kaleta.persistence.api.AccountDao;
+import org.kaleta.persistence.entity.Account;
+
+import java.util.List;
+
+@ApplicationScoped
+public class AccountDaoImpl implements AccountDao
+{
+    @PersistenceContext
+    EntityManager entityManager;
+
+    private String selectYearly = "SELECT a FROM Account a WHERE a.accountId.year=:year";
+
+    @Override
+    public void syncAccounts(Accounts data)
+    {
+        entityManager.createNativeQuery("DELETE FROM Account WHERE year=?")
+                .setParameter(1, data.getYear())
+                .executeUpdate();
+
+        for (Accounts.Account account : data.getAccount()) {
+            entityManager.createNativeQuery("INSERT INTO Account (year, schema_id, semantic_id, name, metadata) VALUES (?,?,?,?,?)")
+                    .setParameter(1, data.getYear())
+                    .setParameter(2, account.getSchemaId())
+                    .setParameter(3, account.getSemanticId())
+                    .setParameter(4, account.getName())
+                    .setParameter(5, account.getMetadata())
+                    .executeUpdate();
+        }
+    }
+
+    @Override
+    public List<Account> list(String year)
+    {
+        return entityManager.createQuery(selectYearly, Account.class)
+                .setParameter("year", year)
+                .getResultList();
+    }
+
+    @Override
+    public List<Account> list(String year, String schemaPrefix)
+    {
+        return entityManager.createQuery(selectYearly + " AND a.accountId.schemaId LIKE :schema", Account.class)
+                .setParameter("year", year)
+                .setParameter("schema", schemaPrefix + "%")
+                .getResultList();
+    }
+
+    @Override
+    public List<Account> listByMetadata(String year, String metadata)
+    {
+        return entityManager.createQuery(selectYearly + " AND a.metadata LIKE :metadata", Account.class)
+                .setParameter("year", year)
+                .setParameter("metadata", "%" + metadata + "%")
+                .getResultList();
+    }
+}

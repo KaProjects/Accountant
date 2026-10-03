@@ -5,7 +5,6 @@ import io.quarkus.test.junit.TestProfile;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -13,6 +12,8 @@ import java.util.GregorianCalendar;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.kaleta.framework.Problems.assertInvalid;
+import static org.kaleta.framework.Problems.assertNotFound;
 
 @QuarkusTest
 @TestProfile(DataSourceTestProfile.class)
@@ -78,23 +79,11 @@ public class SyncResourceTest
     @Test
     public void parameterValidatorTest()
     {
-        assertThat(given().when()
-                .get("/sync/2x20")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/sync/2x20", "year");
 
-        assertThat(given().when()
-                .get("/sync/2014")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/sync/2014");
 
-        assertThat(given().when()
-                .get("/sync/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/sync/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
     }
 
 

@@ -6,7 +6,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.BudgetDto;
 import org.kaleta.dto.YearTransactionDto;
-import org.springframework.http.HttpStatus;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -14,9 +13,10 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.kaleta.framework.Problems.assertInvalid;
+import static org.kaleta.framework.Problems.assertNotFound;
 
 @QuarkusTest
 public class BudgetResourceTest
@@ -310,64 +310,24 @@ public class BudgetResourceTest
         String validBudgetId = "i2";
         String validMonth = "9";
 
-        assertThat(given().when()
-                .get("/budget/" + "2x20" + "/transaction/" + validBudgetId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/budget/" + "2x20" + "/transaction/" + validBudgetId + "/month/" + validMonth, "year");
 
-        assertThat(given().when()
-                .get("/budget/" + "2014" + "/transaction/" + validBudgetId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/budget/" + "2014" + "/transaction/" + validBudgetId + "/month/" + validMonth);
 
-        assertThat(given().when()
-                .get("/budget/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/transaction/" + validBudgetId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/budget/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/transaction/" + validBudgetId + "/month/" + validMonth);
 
-        assertThat(given().when()
-                .get("/budget/" + validYear + "/transaction/" + "x1" + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Budget ID Parameter"));
+        assertInvalid("/budget/" + validYear + "/transaction/" + "x1" + "/month/" + validMonth, "budgetId");
 
-        assertThat(given().when()
-                .get("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "0")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Month Parameter"));
+        assertInvalid("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "0", "month");
 
-        assertThat(given().when()
-                .get("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "13")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Month Parameter"));
+        assertInvalid("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "13", "month");
 
-        assertThat(given().when()
-                .get("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "x")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Month Parameter"));
+        assertInvalid("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "x", "month");
 
-        assertThat(given().when()
-                .get("/budget/" + "2x20")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/budget/" + "2x20", "year");
 
-        assertThat(given().when()
-                .get("/budget/" + "2014")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/budget/" + "2014");
 
-        assertThat(given().when()
-                .get("/budget/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/budget/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
     }
 }

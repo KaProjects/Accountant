@@ -1,0 +1,59 @@
+{
+  "columns" : [ "Date", "Amount", "Debit", "Credit", "Description" ],
+  "views" : [ {
+    "name" : "zzz",
+    "expenses" : "5000",
+    "transactions" : [ {
+      "date" : "1102",
+      "amount" : "2000",
+      "debit" : "doprava",
+      "credit" : "cash",
+      "description" : "vac=xxx"
+    }, {
+      "date" : "0503",
+      "amount" : "3000",
+      "debit" : "doprava",
+      "credit" : "cash",
+      "description" : "vac=yyy"
+    }, {
+      "date" : "0603",
+      "amount" : "~1000",
+      "debit" : "dolava",
+      "credit" : "doprava",
+      "description" : "vac=yyy"
+    }, {
+      "date" : "0704",
+      "amount" : "-100",
+      "debit" : "cash",
+      "credit" : "dolava",
+      "description" : ""
+    }, {
+      "date" : "0905",
+      "amount" : "100",
+      "debit" : "dolava",
+      "credit" : "cash",
+      "description" : ""
+    } ],
+    "chartData" : [ {
+      "name" : "account520",
+      "value" : 1000
+    }, {
+      "name" : "account510",
+      "value" : 4000
+    } ]
+  }, {
+    "name" : "ww",
+    "expenses" : "-1",
+    "transactions" : [ {
+      "date" : "0707",
+      "amount" : "-1",
+      "debit" : "cash",
+      "credit" : "account500",
+      "description" : ""
+    } ],
+    "chartData" : [ {
+      "name" : "account500",
+      "value" : -1
+    } ]
+  } ]
+}

@@ -1,0 +1,25 @@
+[ {
+  "date" : "0505",
+  "amount" : "600",
+  "debit" : "account000",
+  "credit" : "account001",
+  "description" : "month5 000"
+}, {
+  "date" : "1005",
+  "amount" : "800",
+  "debit" : "account000.2",
+  "credit" : "account001.2",
+  "description" : "month5 000"
+}, {
+  "date" : "1505",
+  "amount" : "-700",
+  "debit" : "account001",
+  "credit" : "account000",
+  "description" : "month5 000 -amount"
+}, {
+  "date" : "2005",
+  "amount" : "500",
+  "debit" : "account000",
+  "credit" : "account003",
+  "description" : "month5 000"
+} ]

@@ -1,12 +1,8 @@
 package org.kaleta.rest;
 
-import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
-import org.kaleta.dto.CredentialsDto;
-import org.kaleta.service.AuthService;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -14,6 +10,10 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import org.kaleta.dto.CredentialsDto;
+import org.kaleta.rest.error.AuthenticationFailedException;
+import org.kaleta.service.AuthService;
 
 @Path("/authenticate")
 public class AuthResource
@@ -33,24 +33,16 @@ public class AuthResource
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
-    public Response authenticate(CredentialsDto credentialsDto)
+    public Response authenticate(@Valid @NotNull CredentialsDto credentialsDto)
     {
-        return Endpoint.respond(() -> {
-            if (credentialsDto == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "payload is null");
-            } else {
-                credentialsDto.validate();
-            }
-            if (!authService.userExists(credentialsDto.getUsername())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User '" + credentialsDto.getUsername() + "' not found!");
-            }
-            if (!authService.authenticateUser(credentialsDto.getUsername(), credentialsDto.getPassword())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credentials doesn't match!");
-            }
-        }, () -> Response.noContent()
+        if (!authService.userExists(credentialsDto.getUsername())
+                || !authService.authenticateUser(credentialsDto.getUsername(), credentialsDto.getPassword())) {
+            throw new AuthenticationFailedException();
+        }
+        return Response.noContent()
                 .cookie(sessionCookie(authService.generateToken(
                         credentialsDto.getUsername(), credentialsDto.getPassword())))
-                .build());
+                .build();
     }
 
     /**

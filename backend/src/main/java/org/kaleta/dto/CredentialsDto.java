@@ -1,25 +1,17 @@
 package org.kaleta.dto;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 @Data
 @RegisterForReflection
 public class CredentialsDto
 {
+    @NotNull
     private String username;
+    @NotNull
     private String password;
-
-    public void validate(){
-        if (username == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username can't be null");
-        }
-        if (password == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "password can't be null");
-        }
-    }
 
     public static CredentialsDto from(String username, String password)
     {

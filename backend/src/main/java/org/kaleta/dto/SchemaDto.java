@@ -2,7 +2,7 @@ package org.kaleta.dto;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
-import org.kaleta.entity.Schema;
+import org.kaleta.persistence.entity.Schema;
 
 @Data
 @RegisterForReflection

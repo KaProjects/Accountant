@@ -1,7 +1,7 @@
 package org.kaleta.model;
 
 import org.kaleta.Utils;
-import org.kaleta.entity.Account;
+import org.kaleta.persistence.entity.Account;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

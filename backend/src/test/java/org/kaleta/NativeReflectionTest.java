@@ -4,6 +4,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.FinancialAssetsDto;
 import org.kaleta.model.ChartData;
+import org.kaleta.rest.error.Problem;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,14 +45,16 @@ public class NativeReflectionTest
     }
 
     /**
-     * Everything in the dto package, plus the chart configuration, which is the one response
-     * body modelled outside it.
+     * Everything in the dto package, plus the response bodies modelled outside it: the chart
+     * configuration, and the problem details every error is answered with.
      */
     private List<Class<?>> typesCrossingTheRestBoundary() throws Exception
     {
         List<Class<?>> types = new ArrayList<>();
         types.add(ChartData.Config.class);
         types.add(ChartData.Config.ChartType.class);
+        types.add(Problem.class);
+        types.add(Problem.Violation.class);
 
         // Anchored on a known class so this reads the compiled main classes rather than
         // whichever copy of the package name the test classpath happens to offer first.

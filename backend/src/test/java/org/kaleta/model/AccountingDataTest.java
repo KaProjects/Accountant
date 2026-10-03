@@ -2,16 +2,14 @@ package org.kaleta.model;
 
 import org.junit.jupiter.api.Test;
 import org.kaleta.Constants;
-import org.kaleta.entity.Account;
-import org.kaleta.entity.Transaction;
+import org.kaleta.persistence.entity.Account;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.kaleta.framework.Generator.account;
 import static org.kaleta.framework.Generator.transaction;
 

@@ -1,8 +1,8 @@
 package org.kaleta.model;
 
 import org.kaleta.Constants;
-import org.kaleta.entity.Account;
-import org.kaleta.entity.Transaction;
+import org.kaleta.persistence.entity.Account;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.List;
 import java.util.stream.Collectors;

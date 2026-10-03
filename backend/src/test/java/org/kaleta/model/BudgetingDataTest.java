@@ -1,8 +1,8 @@
 package org.kaleta.model;
 
 import org.junit.jupiter.api.Test;
-import org.kaleta.entity.Budgeting;
-import org.kaleta.entity.Transaction;
+import org.kaleta.persistence.entity.Budgeting;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.List;
 

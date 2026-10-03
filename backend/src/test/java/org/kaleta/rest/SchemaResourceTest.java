@@ -6,15 +6,15 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.kaleta.Constants;
 import org.kaleta.dto.YearSchemaDto;
-import org.springframework.http.HttpStatus;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.kaleta.framework.Problems.assertInvalid;
+import static org.kaleta.framework.Problems.assertNotFound;
 
 @QuarkusTest
 public class SchemaResourceTest
@@ -184,22 +184,10 @@ public class SchemaResourceTest
     @Test
     public void parameterValidatorTest()
     {
-        assertThat(given().when()
-                .get("/schema/2x20")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/schema/2x20", "year");
 
-        assertThat(given().when()
-                .get("/schema/2014")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/schema/2014");
 
-        assertThat(given().when()
-                .get("/schema/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/schema/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
     }
 }

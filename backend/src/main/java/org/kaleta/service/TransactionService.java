@@ -1,31 +1,48 @@
 package org.kaleta.service;
 
-import org.kaleta.entity.Transaction;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.kaleta.Utils;
+import org.kaleta.persistence.api.TransactionDao;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.List;
 import java.util.Set;
 
-public interface TransactionService
+@ApplicationScoped
+public class TransactionService
 {
+    private final TransactionDao transactionDao;
+
+    @Inject
+    public TransactionService(TransactionDao transactionDao)
+    {
+        this.transactionDao = transactionDao;
+    }
+
     /**
      * @return list of balance (excluding off-balance) transactions for specified year
      */
-    List<Transaction> getBalanceTransactions(String year);
-
-    /**
-     * @return list of transactions matching debit and credit prefixes for specified year
-     */
-    List<Transaction> getTransactionsMatching(String year, String debitPrefix, String creditPrefix);
+    public List<Transaction> getBalanceTransactions(String year)
+    {
+        return transactionDao.listByDescriptionMatching(year, "");
+    }
 
     /**
      * @return list of transactions matching description for specified year
      */
-    List<Transaction> getTransactionsMatchingDescription(String year, String description);
+    public List<Transaction> getTransactionsMatchingDescription(String year, String description)
+    {
+        return transactionDao.listByDescriptionMatching(year, description);
+    }
 
     /**
      * @return list of transactions matching schema prefix (debit or credit) for specified year
      */
-    List<Transaction> getTransactionsMatching(String year, String schemaPrefix);
+    public List<Transaction> getTransactionsMatching(String year, String schemaPrefix)
+    {
+        return transactionDao.list(year, schemaPrefix);
+    }
 
     /**
      * @return list of transactions matching conditions
@@ -38,7 +55,10 @@ public interface TransactionService
      *                     a value prefixed with '!' that can't be in description
      *                     null or empty string - all descriptions
      */
-    List<Transaction> getTransactionsMatching(String year, String debit, String credit, String description);
+    public List<Transaction> getTransactionsMatching(String year, String debit, String credit, String description)
+    {
+        return transactionDao.listByAccounts(year, debit, credit, description);
+    }
 
     /**
      * @param year - year condition
@@ -53,35 +73,67 @@ public interface TransactionService
      *
      * Note: off-balance transactions excluded
      */
-    List<Transaction> getSchemaTransactions(String year, String schemaId, String month);
+    public List<Transaction> getSchemaTransactions(String year, String schemaId, String month)
+    {
+        return transactionDao.listBySchema(year, schemaId, month);
+    }
 
     /**
      * @return list of transactions for specified year filtered to contain only transactions that are interesting for budgeting (e.i. of classes 2, 4, 5, 6)
      */
-    List<Transaction> getBudgetTransactions(String year);
+    public List<Transaction> getBudgetTransactions(String year)
+    {
+        return transactionDao.listForClasses2456(year);
+    }
 
     /**
      * @return list of closing transactions for all years (e.i. for account 701.0)
      */
-    List<Transaction> getClosingTransactions();
+    public List<Transaction> getClosingTransactions()
+    {
+        return transactionDao.listClosingBalanceTransactions();
+    }
 
     /**
      * @return list of profit transactions for all years (e.i. for account 710.0)
      */
-    List<Transaction> getProfitTransactions();
+    public List<Transaction> getProfitTransactions()
+    {
+        return transactionDao.listClosingProfitTransactions();
+    }
 
     /**
      * @return list of financial asset transactions for specified year (e.i. schema 23x and 549)
      */
-    List<Transaction> getFinancialAssetTransactions(String year);
+    public List<Transaction> getFinancialAssetTransactions(String year)
+    {
+        return transactionDao.listFinancialAssetTransactions(year);
+    }
 
     /**
      * @return monthly profit values for specified year
      */
-    Integer[] getMonthlyProfit(String year);
+    public Integer[] getMonthlyProfit(String year)
+    {
+        Integer[] monthlyProfit = Utils.initialMonthlyBalance();
+        for (Transaction transaction : transactionDao.listProfitTransactions(year))
+        {
+            int monthIndex = Integer.parseInt(transaction.getDate().substring(2,4)) - 1;
+            if (transaction.getDebit().startsWith("5") || transaction.getDebit().startsWith("6")) {
+                monthlyProfit[monthIndex] -= transaction.getAmount();
+            }
+            if (transaction.getCredit().startsWith("5") || transaction.getCredit().startsWith("6")) {
+                monthlyProfit[monthIndex] += transaction.getAmount();
+            }
+        }
+        return monthlyProfit;
+    }
 
     /**
      * @return all transactions matching schema prefix (e.i. for all years)
      */
-    List<Transaction> getMatching(Set<String> schemas);
+    public List<Transaction> getMatching(Set<String> schemas)
+    {
+        return  transactionDao.listMatching(schemas);
+    }
 }

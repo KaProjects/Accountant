@@ -1,18 +1,19 @@
 package org.kaleta.rest;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jboss.resteasy.annotations.jaxrs.PathParam;
-import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
-import org.kaleta.service.SyncService;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import org.kaleta.rest.error.DataSourceException;
+import org.kaleta.rest.error.InvalidDataException;
+import org.kaleta.rest.validation.ValidYear;
+import org.kaleta.service.SyncService;
+
 import java.io.IOException;
 
 @Path("/sync")
@@ -28,15 +29,13 @@ public class SyncResource
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/{year}")
-    public Response syncYear(@PathParam String year)
+    public Response syncYear(@PathParam("year") @ValidYear String year)
     {
-        return Endpoint.process(() -> ParamValidators.validateYear(year), () -> {
-            try {
-                return service.sync(dataLocation, year);
-            } catch (IOException ioe) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ioe.getMessage());
-            }
-        });
+        try {
+            return Response.ok(service.sync(dataLocation, year)).build();
+        } catch (IOException ioe) {
+            throw new DataSourceException(ioe);
+        }
     }
 
     @GET
@@ -45,43 +44,32 @@ public class SyncResource
     @Path("/all")
     public Response syncAll()
     {
-        return Endpoint.process(() -> {}, () -> {
-            try {
-                StringBuilder sb = new StringBuilder();
-                for (String year : service.getYears(dataLocation)){
-                    sb.append(service.sync(dataLocation, year));
-                }
-                return sb.toString();
-            } catch (IOException ioe) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ioe.getMessage());
-            }
-        });
+        try {
+            return Response.ok(service.syncAll(dataLocation)).build();
+        } catch (IOException ioe) {
+            throw new DataSourceException(ioe);
+        }
     }
 
+    /**
+     * Syncs every year and checks each one. A year that fails its checks makes the whole answer
+     * 422 Unprocessable Content, whose detail is the same report a passing run answers with.
+     */
     @GET
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/all/validate")
     public Response syncValidateData()
     {
-        return Endpoint.process(() -> {}, () -> {
-            try {
-                StringBuilder sb = new StringBuilder();
-                boolean hasError = false;
-                for (String year : service.getYears(dataLocation)){
-                    sb.append(service.sync(dataLocation, year));
-                    String message = service.validate(year, service.isActive(dataLocation, year));
-                    if (!message.contains("data valid")) hasError = true;
-                    sb.append(message).append("\n");
-                }
-                if (hasError) {
-                    throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, sb.toString());
-                } else {
-                    return sb.toString();
-                }
-            } catch (IOException ioe) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ioe.getMessage());
-            }
-        });
+        SyncService.SyncReport report;
+        try {
+            report = service.syncAndValidateAll(dataLocation);
+        } catch (IOException ioe) {
+            throw new DataSourceException(ioe);
+        }
+        if (!report.valid()) {
+            throw new InvalidDataException(report.text());
+        }
+        return Response.ok(report.text()).build();
     }
 }

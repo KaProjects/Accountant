@@ -1,7 +1,7 @@
 package org.kaleta.model;
 
 import org.junit.jupiter.api.Test;
-import org.kaleta.entity.Transaction;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.List;
 

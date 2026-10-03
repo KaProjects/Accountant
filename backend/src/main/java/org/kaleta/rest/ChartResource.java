@@ -1,33 +1,21 @@
 package org.kaleta.rest;
 
-import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
-import org.jboss.resteasy.annotations.jaxrs.PathParam;
-import org.kaleta.Utils;
-import org.kaleta.dto.ChartDto;
-import org.kaleta.entity.Transaction;
-import org.kaleta.model.ChartData;
-import org.kaleta.service.SchemaService;
-import org.kaleta.service.TransactionService;
-
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import org.kaleta.rest.validation.ValidChartId;
+import org.kaleta.service.ChartService;
 
 @Path("/chart")
 public class ChartResource
 {
     @Inject
-    SchemaService schemaService;
-    @Inject
-    TransactionService transactionService;
+    ChartService chartService;
 
     @GET
     @SecurityRequirement(name = "AccountantSecurity")
@@ -35,50 +23,15 @@ public class ChartResource
     @Path("/config")
     public Response getChartConfigs()
     {
-        return Endpoint.process(() -> {}, () -> {
-            Map<String, String> schemaNames = schemaService.getLatestSchemaNames();
-            return ChartData.getConfigs(schemaNames);
-        });
+        return Response.ok(chartService.getChartConfigs()).build();
     }
 
     @GET
     @SecurityRequirement(name = "AccountantSecurity")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/data/{id}")
-    public Response getChartData(@PathParam String id)
+    public Response getChartData(@PathParam("id") @ValidChartId String id)
     {
-        return Endpoint.process(() -> {
-            ParamValidators.validateChartId(id);
-        }, () -> {
-            Set<String> schemas = ChartData.getConfigs().get(id).getSchemas();
-            List<Transaction> transactions = transactionService.getMatching(schemas);
-            List<String> years = schemaService.getYears();
-            ChartData data = new ChartData(transactions, years);
-
-            ChartDto dto = new ChartDto();
-            String[] labels = data.getLabels();
-            Integer[] balances = data.getValues(id);
-            Integer[] cumulative = Utils.toCumulativeArray(balances);
-            if (id.equals("l"))
-            {
-                cumulative = Utils.mergeIntegerArrays(cumulative, getCumulativeProfit(years));
-            }
-            for (int i=0; i<labels.length; i++)
-            {
-                if (Integer.parseInt(labels[i].split("/")[1]) + 2000 == new GregorianCalendar().get(Calendar.YEAR)
-                        && Integer.parseInt(labels[i].split("/")[0]) > new GregorianCalendar().get(Calendar.MONTH) + 1) continue;
-
-                dto.addValue(labels[i], balances[i], cumulative[i]);
-            }
-            return dto;
-        });
-    }
-
-    private Integer[] getCumulativeProfit(List<String> years)
-    {
-        Set<String> schemas = ChartData.getConfigs().get("p").getSchemas();
-        List<Transaction> transactions = transactionService.getMatching(schemas);
-        ChartData data = new ChartData(transactions, years);
-        return Utils.toCumulativeArray(data.getValues("p"));
+        return Response.ok(chartService.getChartData(id)).build();
     }
 }

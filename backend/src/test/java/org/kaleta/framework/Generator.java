@@ -1,11 +1,11 @@
 package org.kaleta.framework;
 
-import org.kaleta.entity.Account;
-import org.kaleta.entity.AccountId;
-import org.kaleta.entity.Budgeting;
-import org.kaleta.entity.Schema;
-import org.kaleta.entity.Transaction;
-import org.kaleta.entity.YearId;
+import org.kaleta.persistence.entity.Account;
+import org.kaleta.persistence.entity.AccountId;
+import org.kaleta.persistence.entity.Budgeting;
+import org.kaleta.persistence.entity.Schema;
+import org.kaleta.persistence.entity.Transaction;
+import org.kaleta.persistence.entity.YearId;
 
 import java.util.Random;
 

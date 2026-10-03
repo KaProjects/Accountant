@@ -6,7 +6,6 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.Test;
 import org.kaleta.TestAuthentication;
 import org.kaleta.dto.CredentialsDto;
-import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
@@ -49,7 +48,7 @@ public class CsrfTest
 
             assertThat("expected to be refused with " + description,
                     request.when().post("/authenticate")
-                            .then().statusCode(HttpStatus.FORBIDDEN.value())
+                            .then().statusCode(403)
                             .extract().body().asString(),
                     containsString("did not come from the application"));
         });
@@ -61,7 +60,7 @@ public class CsrfTest
         bare().header("Origin", ORIGIN)
                 .header(CLIENT_HEADER, CLIENT_HEADER_VALUE)
                 .when().post("/authenticate")
-                .then().statusCode(HttpStatus.NO_CONTENT.value());
+                .then().statusCode(204);
     }
 
     @Test
@@ -69,6 +68,6 @@ public class CsrfTest
     {
         // Reading changes nothing, so it is the session cookie's job alone to decide. The suite
         // supplies that, and the request carries neither origin nor client header.
-        given().when().get("/schema/2023").then().statusCode(HttpStatus.OK.value());
+        given().when().get("/schema/2023").then().statusCode(200);
     }
 }

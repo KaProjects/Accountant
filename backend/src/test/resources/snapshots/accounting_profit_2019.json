@@ -1,0 +1,249 @@
+{
+  "columns" : [ "Income Statement", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Total" ],
+  "rows" : [ {
+    "type" : "INCOME_GROUP",
+    "name" : "group60",
+    "schemaId" : "60",
+    "monthlyValues" : [ 0, 800, 0, 0, 7000, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 7800,
+    "children" : [ {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account600",
+      "schemaId" : "600",
+      "monthlyValues" : [ 0, 800, 0, 0, 7000, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 7800,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group55",
+    "schemaId" : "55",
+    "monthlyValues" : [ 0, 800, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 800,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account550",
+      "schemaId" : "550",
+      "monthlyValues" : [ 0, 800, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 800,
+      "children" : [ ]
+    }, {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account551",
+      "schemaId" : "551",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    }, {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account552",
+      "schemaId" : "552",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "INCOME_GROUP",
+    "name" : "group63",
+    "schemaId" : "63",
+    "monthlyValues" : [ 0, 0, 900, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 900,
+    "children" : [ {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account631",
+      "schemaId" : "631",
+      "monthlyValues" : [ 0, 0, 900, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 900,
+      "children" : [ ]
+    }, {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account632",
+      "schemaId" : "632",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    }, {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account633",
+      "schemaId" : "633",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "PROFIT_SUMMARY",
+    "name" : "Net Income",
+    "schemaId" : "ni",
+    "monthlyValues" : [ 0, 0, 900, 0, 7000, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 7900,
+    "children" : [ ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group51",
+    "schemaId" : "51",
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account510",
+      "schemaId" : "510",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group52",
+    "schemaId" : "52",
+    "monthlyValues" : [ 0, 0, 0, 0, 7000, 0, 100, 100, 0, 0, 0, 0 ],
+    "total" : 7200,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account520",
+      "schemaId" : "520",
+      "monthlyValues" : [ 0, 0, 0, 0, 7000, 0, 100, 100, 0, 0, 0, 0 ],
+      "total" : 7200,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group53",
+    "schemaId" : "53",
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account530",
+      "schemaId" : "530",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "PROFIT_SUMMARY",
+    "name" : "Operating Profit",
+    "schemaId" : "op",
+    "monthlyValues" : [ 0, 0, 900, 0, 0, 0, -100, -100, 0, 0, 0, 0 ],
+    "total" : 700,
+    "children" : [ ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group50",
+    "schemaId" : "50",
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account500",
+      "schemaId" : "500",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "INCOME_GROUP",
+    "name" : "group61",
+    "schemaId" : "61",
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account610",
+      "schemaId" : "610",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group56",
+    "schemaId" : "56",
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account560",
+      "schemaId" : "560",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "INCOME_GROUP",
+    "name" : "group62",
+    "schemaId" : "62",
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account620",
+      "schemaId" : "620",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group54",
+    "schemaId" : "54",
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account540",
+      "schemaId" : "540",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "INCOME_GROUP",
+    "name" : "group63",
+    "schemaId" : "63",
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 300, 300, 0, 0, 0, 0 ],
+    "total" : 600,
+    "children" : [ {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account630",
+      "schemaId" : "630",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 300, 300, 0, 0, 0, 0 ],
+      "total" : 600,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group55",
+    "schemaId" : "55",
+    "monthlyValues" : [ 0, 0, 900, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 900,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account553",
+      "schemaId" : "553",
+      "monthlyValues" : [ 0, 0, 900, 0, 0, 0, 0, 0, 50, 0, 0, 0 ],
+      "total" : 950,
+      "children" : [ ]
+    }, {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account554",
+      "schemaId" : "554",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, -50, 0, 0, 0 ],
+      "total" : -50,
+      "children" : [ ]
+    }, {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account555",
+      "schemaId" : "555",
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "PROFIT_SUMMARY",
+    "name" : "Net Profit",
+    "schemaId" : "np",
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 200, 200, 0, 0, 0, 0 ],
+    "total" : 400,
+    "children" : [ ]
+  } ]
+}

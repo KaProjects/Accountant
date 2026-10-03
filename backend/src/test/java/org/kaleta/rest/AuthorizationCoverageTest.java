@@ -116,8 +116,10 @@ public class AuthorizationCoverageTest
     {
         List<Endpoint> endpoints = new ArrayList<>();
 
-        java.nio.file.Path directory = java.nio.file.Path.of(
-                AuthResource.class.getResource("AuthResource.class").toURI()).getParent();
+        // read from the build output: the class loader a @QuarkusTest runs in can serve the classes
+        // from memory - it does once quarkus-jacoco instruments them - where there is no directory
+        java.nio.file.Path directory = java.nio.file.Path.of("target", "classes")
+                .resolve(AuthResource.class.getPackageName().replace('.', '/'));
 
         try (Stream<java.nio.file.Path> files = Files.list(directory))
         {

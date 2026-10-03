@@ -18,8 +18,9 @@ public class DataSourceTestProfile implements QuarkusTestProfile
     @Override
     public Map<String, String> getConfigOverrides()
     {
-        return Map.of("quarkus.datasource.jdbc.url",
-                "jdbc:h2:mem:datasource;MODE=MySQL;NON_KEYWORDS=YEAR,VALUE"
-                        + ";INIT=RUNSCRIPT FROM 'sql/createTables.sql'");
+        // the tables alone, built by TestDatabase, with no fixtures in them
+        return Map.of(
+                "quarkus.datasource.jdbc.url", "jdbc:h2:mem:datasource;DB_CLOSE_DELAY=-1;MODE=MySQL;NON_KEYWORDS=YEAR,VALUE",
+                "test.database.fixture", "");
     }
 }

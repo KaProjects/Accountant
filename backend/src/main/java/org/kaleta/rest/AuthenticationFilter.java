@@ -1,7 +1,5 @@
 package org.kaleta.rest;
 
-import org.kaleta.service.AuthService;
-
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Priorities;
@@ -12,6 +10,9 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.ext.Provider;
+import org.kaleta.rest.error.Problem;
+import org.kaleta.service.AuthService;
+
 import java.security.Principal;
 
 /**
@@ -54,14 +55,14 @@ public class AuthenticationFilter implements ContainerRequestFilter
         Cookie session = requestContext.getCookies().get(SESSION_COOKIE);
 
         if (session == null) {
-            abortWithUnauthorized(requestContext, "missing session cookie");
+            abortWithUnauthorized(requestContext, "The request has no session; sign in first.");
             return;
         }
 
         String user = authService.authenticatedUser(session.getValue());
 
         if (user == null) {
-            abortWithUnauthorized(requestContext, "invalid session");
+            abortWithUnauthorized(requestContext, "The session is not valid or has expired; sign in again.");
         } else {
             requestContext.setSecurityContext(securityContextFor(user, requestContext));
         }
@@ -107,11 +108,14 @@ public class AuthenticationFilter implements ContainerRequestFilter
         return requestContext.getMethod().equals("POST") && path.equals(AUTHENTICATE_PATH);
     }
 
-    private void abortWithUnauthorized(ContainerRequestContext requestContext, String message) {
-        requestContext.abortWith(
-                Response.status(Response.Status.UNAUTHORIZED)
-                        .header(HttpHeaders.WWW_AUTHENTICATE, message)
-                        .entity(message)
-                        .build());
+    /**
+     * The challenge names the session cookie this API authenticates by. It used to carry the
+     * reason instead, which is not what the header is for; the reason is the problem's detail.
+     */
+    private void abortWithUnauthorized(ContainerRequestContext requestContext, String detail) {
+        Response problem = Problem.of(Response.Status.UNAUTHORIZED, detail);
+        requestContext.abortWith(Response.fromResponse(problem)
+                .header(HttpHeaders.WWW_AUTHENTICATE, "Cookie realm=\"accountant\", cookie-name=\"" + SESSION_COOKIE + "\"")
+                .build());
     }
 }

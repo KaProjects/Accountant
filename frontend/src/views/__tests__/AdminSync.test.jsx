@@ -66,15 +66,15 @@ describe("AdminSync", () => {
     });
 
     it("reports a failure as an error, keeping the body that explains it", async () => {
-        // A year that fails its checks arrives as 406 whose body is the report, so the body
+        // A year that fails its checks arrives as 422 whose detail is the report, so the body
         // matters more than the status and must not be swallowed.
-        runSync.mockResolvedValue({ok: false, status: "406 Not Acceptable", body: "2019: data invalid"});
+        runSync.mockResolvedValue({ok: false, status: "422 Unprocessable Content", body: "2019: data invalid"});
         mountView();
 
         fireEvent.click(screen.getByTestId("run-validate"));
 
         const result = await screen.findByTestId("result-validate");
-        expect(within(result).getByText("406 Not Acceptable")).toBeInTheDocument();
+        expect(within(result).getByText("422 Unprocessable Content")).toBeInTheDocument();
         expect(within(result).getByText(/data invalid/)).toBeInTheDocument();
         expect(result.className).toMatch(/colorError|standardError/);
     });

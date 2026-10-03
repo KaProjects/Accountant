@@ -1,0 +1,84 @@
+{
+  "columns" : [ "Cash Flow Statement", "Initial", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Total" ],
+  "rows" : [ {
+    "type" : "CASH_FLOW_GROUP",
+    "name" : "group20",
+    "schemaId" : "20",
+    "initial" : 1000,
+    "monthlyValues" : [ 0, 0, 0, 0, 1000, 200, 0, -600, 0, 0, 0, 0 ],
+    "total" : 1600,
+    "children" : [ {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account200",
+      "schemaId" : "200",
+      "initial" : 1000,
+      "monthlyValues" : [ 0, 0, 0, -200, 1000, 200, 0, -600, 0, 0, 0, 0 ],
+      "total" : 1400,
+      "children" : [ ]
+    }, {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account201",
+      "schemaId" : "201",
+      "initial" : 0,
+      "monthlyValues" : [ 0, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 200,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "CASH_FLOW_GROUP",
+    "name" : "group21",
+    "schemaId" : "21",
+    "initial" : 2000,
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 200, 0, 600, 0, 0, 0, 0 ],
+    "total" : 2800,
+    "children" : [ {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account210",
+      "schemaId" : "210",
+      "initial" : 2000,
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 200, 0, 600, 0, 0, 0, 0 ],
+      "total" : 2800,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "CASH_FLOW_GROUP",
+    "name" : "group23",
+    "schemaId" : "23",
+    "initial" : 4000,
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 4000,
+    "children" : [ {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account230",
+      "schemaId" : "230",
+      "initial" : 4000,
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 4000,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "CASH_FLOW_GROUP",
+    "name" : "group22",
+    "schemaId" : "22",
+    "initial" : -3000,
+    "monthlyValues" : [ 0, 0, 0, 0, -1000, -400, 0, 0, 0, 0, 0, 0 ],
+    "total" : -4400,
+    "children" : [ {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account220",
+      "schemaId" : "220",
+      "initial" : -3000,
+      "monthlyValues" : [ 0, 0, 0, 0, -1000, -400, 0, 0, 0, 0, 0, 0 ],
+      "total" : -4400,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "CASH_FLOW_SUMMARY",
+    "name" : "Cash Flow",
+    "schemaId" : "cf",
+    "initial" : 4000,
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 4000,
+    "children" : [ ]
+  } ]
+}

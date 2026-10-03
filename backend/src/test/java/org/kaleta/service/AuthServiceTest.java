@@ -53,7 +53,7 @@ public class AuthServiceTest
     @Test
     public void nothingIsAcceptedThatThisApplicationDidNotSign()
     {
-        String forged = Jwt.issuer(AuthServiceImpl.ISSUER).upn("user1")
+        String forged = Jwt.issuer(AuthService.ISSUER).upn("user1")
                 .expiresIn(Duration.ofHours(1))
                 .signWithSecret("a-different-secret-that-is-long-enough!!");
 
@@ -73,7 +73,7 @@ public class AuthServiceTest
     @Test
     public void anExpiredTokenIsRejected()
     {
-        String expired = Jwt.issuer(AuthServiceImpl.ISSUER).upn("user1")
+        String expired = Jwt.issuer(AuthService.ISSUER).upn("user1")
                 .expiresAt(Instant.now().minusSeconds(3600))
                 .signWithSecret(SECRET);
 
@@ -101,7 +101,7 @@ public class AuthServiceTest
     @Test
     public void theBackendRefusesToStartWithoutAUsableSecret()
     {
-        AuthServiceImpl service = new AuthServiceImpl();
+        AuthService service = new AuthService();
 
         service.tokenSecret = java.util.Optional.empty();
         assertThat(assertThrows(IllegalStateException.class, () -> service.verifyConfiguration(null))

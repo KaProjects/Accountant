@@ -36,7 +36,7 @@ public class EmptyDataSourceTest
             "/chart/config",
             "/schema/2023",
             "/account/2023",
-            "/transaction/2023",
+            "/transaction/2023/200.0",
             "/view/2023");
 
     @Test

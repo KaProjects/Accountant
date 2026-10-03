@@ -1,6 +1,6 @@
 package org.kaleta;
 
-import org.kaleta.entity.Account;
+import org.kaleta.persistence.entity.Account;
 
 public class AccountUtils
 {

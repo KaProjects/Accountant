@@ -9,7 +9,6 @@ import org.kaleta.Utils;
 import org.kaleta.dto.AccountingDto;
 import org.kaleta.dto.ChartDto;
 import org.kaleta.model.ChartData;
-import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -19,7 +18,6 @@ import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.kaleta.Constants.Label.ASSETS;
 import static org.kaleta.Constants.Label.CASH_FLOW;
@@ -28,6 +26,7 @@ import static org.kaleta.Constants.Label.NET_INCOME;
 import static org.kaleta.Constants.Label.NET_PROFIT;
 import static org.kaleta.Constants.Label.OPERATING_PROFIT;
 import static org.kaleta.Constants.Label.PROFIT;
+import static org.kaleta.framework.Problems.assertInvalid;
 
 @QuarkusTest
 @TestProfile(DataSourceTestProfile.class)
@@ -454,11 +453,7 @@ public class ChartResourceTest
     @Test
     public void parameterValidatorTest()
     {
-        assertThat(given().when()
-                .get("/chart/data/xxxxx")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Chart ID Parameter"));
+        assertInvalid("/chart/data/xxxxx", "id");
     }
 
     /**

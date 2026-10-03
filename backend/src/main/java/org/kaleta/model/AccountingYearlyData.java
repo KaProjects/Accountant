@@ -1,7 +1,7 @@
 package org.kaleta.model;
 
 import org.kaleta.Constants;
-import org.kaleta.entity.Transaction;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.List;
 import java.util.Map;

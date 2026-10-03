@@ -1,0 +1,71 @@
+{
+  "columns" : [ "Date", "Amount", "Debit", "Credit", "Description" ],
+  "views" : [ {
+    "name" : "xxx",
+    "expenses" : "6000",
+    "transactions" : [ {
+      "date" : "2001",
+      "amount" : "1000",
+      "debit" : "account500",
+      "credit" : "cash",
+      "description" : ""
+    }, {
+      "date" : "0402",
+      "amount" : "3000",
+      "debit" : "account500",
+      "credit" : "cash",
+      "description" : ""
+    }, {
+      "date" : "1102",
+      "amount" : "2000",
+      "debit" : "doprava",
+      "credit" : "cash",
+      "description" : ""
+    } ],
+    "chartData" : [ {
+      "name" : "account500",
+      "value" : 4000
+    }, {
+      "name" : "account510",
+      "value" : 2000
+    } ]
+  }, {
+    "name" : "yyy",
+    "expenses" : "5000",
+    "transactions" : [ {
+      "date" : "0403",
+      "amount" : "3000",
+      "debit" : "account500",
+      "credit" : "cash",
+      "description" : ""
+    }, {
+      "date" : "0503",
+      "amount" : "3000",
+      "debit" : "doprava",
+      "credit" : "cash",
+      "description" : ""
+    }, {
+      "date" : "0603",
+      "amount" : "~1000",
+      "debit" : "dolava",
+      "credit" : "doprava",
+      "description" : ""
+    }, {
+      "date" : "0703",
+      "amount" : "-1000",
+      "debit" : "cash",
+      "credit" : "account500",
+      "description" : ""
+    } ],
+    "chartData" : [ {
+      "name" : "account510",
+      "value" : 2000
+    }, {
+      "name" : "account500",
+      "value" : 2000
+    }, {
+      "name" : "account520",
+      "value" : 1000
+    } ]
+  } ]
+}

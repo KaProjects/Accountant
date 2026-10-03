@@ -5,8 +5,8 @@ import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
-import org.kaleta.dao.TransactionDao;
-import org.kaleta.entity.Transaction;
+import org.kaleta.persistence.api.TransactionDao;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.List;
 
@@ -206,18 +206,6 @@ class TransactionDaoTest
         entityManager.flush();
 
         assertThat(amountsOf(transactionDao.listFinancialAssetTransactions(YEAR)), containsInAnyOrder("100", "200"));
-    }
-
-    @Test
-    @TestTransaction
-    void listByPrefixesMatchesDebitAndCreditIndependently()
-    {
-        insert("t1", "0101", 100, "510.0", "210.0", "");
-        insert("t2", "0101", 200, "510.0", "220.0", "");
-        entityManager.flush();
-
-        assertThat(amountsOf(transactionDao.list(YEAR, "510", "21")), containsInAnyOrder("100"));
-        assertThat(amountsOf(transactionDao.list(YEAR, "510", "")), containsInAnyOrder("100", "200"));
     }
 
     @Test

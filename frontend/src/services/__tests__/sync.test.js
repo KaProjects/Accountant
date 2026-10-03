@@ -32,11 +32,15 @@ describe("runSync", () => {
 
     it("reports a rejected run without throwing, keeping the body", async () => {
         axios.get.mockRejectedValue({
-            response: {status: 406, statusText: "Not Acceptable", data: "2019: data invalid"},
+            response: {
+                status: 422,
+                statusText: "Unprocessable Content",
+                data: {title: "Unprocessable Content", status: 422, detail: "2019: data invalid"},
+            },
         });
 
         expect(await runSync("/sync/all/validate"))
-            .toEqual({ok: false, status: "406 Not Acceptable", body: "2019: data invalid"});
+            .toEqual({ok: false, status: "422 Unprocessable Content", body: "2019: data invalid"});
     });
 
     it("reports a transport failure when there was no response at all", async () => {
@@ -46,12 +50,19 @@ describe("runSync", () => {
             .toEqual({ok: false, status: "no response", body: "ERR_NETWORK Network Error"});
     });
 
-    it("reads the details out of the container's own error object", async () => {
+    it("reads a failure of the server out of its problem, with the id it was logged under", async () => {
         axios.get.mockRejectedValue({
-            response: {status: 500, statusText: "Internal Server Error", data: {details: "NullPointerException"}},
+            response: {
+                status: 500,
+                statusText: "Internal Server Error",
+                data: {title: "Internal Server Error", status: 500, detail: "The accounting data source could not be read.", errorId: "7f3a"},
+            },
         });
 
-        expect(await runSync("/sync/all"))
-            .toEqual({ok: false, status: "500 Internal Server Error", body: "NullPointerException"});
+        expect(await runSync("/sync/all")).toEqual({
+            ok: false,
+            status: "500 Internal Server Error",
+            body: "The accounting data source could not be read. (error id 7f3a)",
+        });
     });
 });

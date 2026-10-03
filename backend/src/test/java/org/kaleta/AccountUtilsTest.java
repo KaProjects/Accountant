@@ -1,7 +1,7 @@
 package org.kaleta;
 
 import org.junit.jupiter.api.Test;
-import org.kaleta.entity.Account;
+import org.kaleta.persistence.entity.Account;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;

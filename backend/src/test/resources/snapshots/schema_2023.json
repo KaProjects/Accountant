@@ -1,0 +1,47 @@
+{
+  "classes" : [ {
+    "id" : "0",
+    "name" : "class0",
+    "groups" : [ {
+      "id" : "00",
+      "name" : "group00",
+      "accounts" : [ {
+        "id" : "000",
+        "name" : "account000",
+        "type" : "A"
+      }, {
+        "id" : "001",
+        "name" : "account001",
+        "type" : "L"
+      }, {
+        "id" : "002",
+        "name" : "account002",
+        "type" : "E"
+      }, {
+        "id" : "003",
+        "name" : "account003",
+        "type" : "R"
+      } ]
+    }, {
+      "id" : "01",
+      "name" : "group01",
+      "accounts" : [ {
+        "id" : "010",
+        "name" : "account010",
+        "type" : "A"
+      } ]
+    } ]
+  }, {
+    "id" : "7",
+    "name" : "class7",
+    "groups" : [ {
+      "id" : "70",
+      "name" : "group70",
+      "accounts" : [ {
+        "id" : "700",
+        "name" : "account700",
+        "type" : "X"
+      } ]
+    } ]
+  } ]
+}

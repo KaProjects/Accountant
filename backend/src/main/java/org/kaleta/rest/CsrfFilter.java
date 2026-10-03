@@ -1,13 +1,14 @@
 package org.kaleta.rest;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.kaleta.rest.error.Problem;
+
 import java.util.Set;
 
 /**
@@ -34,8 +35,15 @@ public class CsrfFilter implements ContainerRequestFilter
 
     private static final Set<String> UNSAFE_METHODS = Set.of("POST", "PUT", "PATCH", "DELETE");
 
+    /**
+     * Read when a request arrives rather than when the filter is made. The REST layer makes its
+     * filters while the application is initialised, which a native build does at build time: a
+     * value injected directly was looked up there - where the deployment's FRONTEND_ORIGIN does not
+     * exist, failing the build, and where any value it did find would have been fixed into the
+     * binary for good.
+     */
     @ConfigProperty(name = "auth.frontend-origin")
-    String frontendOrigin;
+    jakarta.inject.Provider<String> frontendOrigin;
 
     @Override
     public void filter(ContainerRequestContext requestContext)
@@ -45,11 +53,10 @@ public class CsrfFilter implements ContainerRequestFilter
         String origin = requestContext.getHeaderString("Origin");
         String client = requestContext.getHeaderString(CLIENT_HEADER);
 
-        if (!frontendOrigin.equals(origin) || !CLIENT_HEADER_VALUE.equals(client))
+        if (!frontendOrigin.get().equals(origin) || !CLIENT_HEADER_VALUE.equals(client))
         {
-            requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-                    .entity("request did not come from the application")
-                    .build());
+            requestContext.abortWith(Problem.of(Response.Status.FORBIDDEN,
+                    "The request did not come from the application."));
         }
     }
 }

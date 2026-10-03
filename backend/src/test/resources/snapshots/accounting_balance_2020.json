@@ -1,0 +1,188 @@
+{
+  "columns" : [ "Balance Sheet", "Initial", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Total" ],
+  "rows" : [ {
+    "type" : "BALANCE_SUMMARY",
+    "name" : "ASSETS",
+    "schemaId" : "a",
+    "initial" : 7000,
+    "monthlyValues" : [ 0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0 ],
+    "total" : 8400,
+    "children" : [ ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class0",
+    "schemaId" : "0",
+    "initial" : 0,
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class1",
+    "schemaId" : "1",
+    "initial" : 0,
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class2",
+    "schemaId" : "2",
+    "initial" : 7000,
+    "monthlyValues" : [ 0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0 ],
+    "total" : 8400,
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group20",
+      "schemaId" : "20",
+      "initial" : 1000,
+      "monthlyValues" : [ 0, 0, 0, 0, 1000, 200, 0, -600, 0, 0, 0, 0 ],
+      "total" : 1600,
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account200",
+        "schemaId" : "200",
+        "initial" : 1000,
+        "monthlyValues" : [ 0, 0, 0, -200, 1000, 200, 0, -600, 0, 0, 0, 0 ],
+        "total" : 1400,
+        "children" : [ ]
+      }, {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account201",
+        "schemaId" : "201",
+        "initial" : 0,
+        "monthlyValues" : [ 0, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        "total" : 200,
+        "children" : [ ]
+      } ]
+    }, {
+      "type" : "BALANCE_GROUP",
+      "name" : "group21",
+      "schemaId" : "21",
+      "initial" : 2000,
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 200, 0, 600, 0, 0, 0, 0 ],
+      "total" : 2800,
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account210",
+        "schemaId" : "210",
+        "initial" : 2000,
+        "monthlyValues" : [ 0, 0, 0, 0, 0, 200, 0, 600, 0, 0, 0, 0 ],
+        "total" : 2800,
+        "children" : [ ]
+      } ]
+    }, {
+      "type" : "BALANCE_GROUP",
+      "name" : "group23",
+      "schemaId" : "23",
+      "initial" : 4000,
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 4000,
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account230",
+        "schemaId" : "230",
+        "initial" : 4000,
+        "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        "total" : 4000,
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class3",
+    "schemaId" : "3",
+    "initial" : 0,
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group30",
+      "schemaId" : "30",
+      "initial" : 0,
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "BALANCE_SUMMARY",
+    "name" : "LIABILITIES",
+    "schemaId" : "l",
+    "initial" : 7000,
+    "monthlyValues" : [ 0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0 ],
+    "total" : 8400,
+    "children" : [ ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class2",
+    "schemaId" : "2",
+    "initial" : 3000,
+    "monthlyValues" : [ 0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0 ],
+    "total" : 4400,
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group22",
+      "schemaId" : "22",
+      "initial" : 3000,
+      "monthlyValues" : [ 0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0 ],
+      "total" : 4400,
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account220",
+        "schemaId" : "220",
+        "initial" : 3000,
+        "monthlyValues" : [ 0, 0, 0, 0, 1000, 400, 0, 0, 0, 0, 0, 0 ],
+        "total" : 4400,
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class3",
+    "schemaId" : "3",
+    "initial" : 0,
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group31",
+      "schemaId" : "31",
+      "initial" : 0,
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class4",
+    "schemaId" : "4",
+    "initial" : 4000,
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, -1000, 0, 0, 0 ],
+    "total" : 3000,
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group40",
+      "schemaId" : "40",
+      "initial" : 4000,
+      "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, -1000, 0, 0, 0 ],
+      "total" : 3000,
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account400",
+        "schemaId" : "400",
+        "initial" : 4000,
+        "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, -1000, 0, 0, 0 ],
+        "total" : 3000,
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "Profit",
+    "schemaId" : "p",
+    "initial" : 0,
+    "monthlyValues" : [ 0, 0, 0, 0, 0, 0, 0, 0, 1000, 0, 0, 0 ],
+    "total" : 1000,
+    "children" : [ ]
+  } ]
+}

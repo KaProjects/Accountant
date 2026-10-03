@@ -2,30 +2,56 @@ import {describeResponseError} from "../../services/errors";
 
 describe("describeResponseError", () => {
 
-    it("uses the details of the container's own error object", () => {
-        // What a 500 actually looks like: the backend never reached its own error handling, so
-        // the container answered with a JSON object. Concatenating it showed "[object Object]".
+    it("says what went wrong, from the problem the backend answered with", () => {
         const error = {
             response: {
-                status: 500,
-                statusText: "Internal Server Error",
+                status: 401,
+                statusText: "Unauthorized",
+                data: {title: "Unauthorized", status: 401, detail: "Invalid username or password."},
+            },
+        };
+
+        expect(describeResponseError(error)).toBe("401 Unauthorized: Invalid username or password.");
+    });
+
+    it("names each invalid parameter of a request that failed validation", () => {
+        const error = {
+            response: {
+                status: 400,
+                statusText: "Bad Request",
                 data: {
-                    details: "Error id 48b01e9e, java.lang.NullPointerException",
-                    stack: "org.jboss.resteasy.spi.UnhandledException: ...",
+                    title: "Bad Request", status: 400, detail: "The request is not valid.",
+                    violations: [
+                        {field: "month", message: "must be a month number from 1 to 12"},
+                        {field: "year", message: "must be a four-digit year"},
+                    ],
                 },
             },
         };
 
         expect(describeResponseError(error))
-            .toBe("500 Internal Server Error: Error id 48b01e9e, java.lang.NullPointerException");
+            .toBe("400 Bad Request: month must be a month number from 1 to 12; year must be a four-digit year");
+    });
+
+    it("gives the id an unexpected failure was logged under, to quote when reporting it", () => {
+        const error = {
+            response: {
+                status: 500,
+                statusText: "Internal Server Error",
+                data: {title: "Internal Server Error", status: 500, detail: "An unexpected error occurred.", errorId: "48b01e9e"},
+            },
+        };
+
+        expect(describeResponseError(error))
+            .toBe("500 Internal Server Error: An unexpected error occurred. (error id 48b01e9e)");
     });
 
     it("passes a plain text body through", () => {
         const error = {
-            response: {status: 401, statusText: "Unauthorized", data: "User 'bob' not found!"},
+            response: {status: 502, statusText: "Bad Gateway", data: "upstream unavailable"},
         };
 
-        expect(describeResponseError(error)).toBe("401 Unauthorized: User 'bob' not found!");
+        expect(describeResponseError(error)).toBe("502 Bad Gateway: upstream unavailable");
     });
 
     it("reports the status alone when the body says nothing", () => {

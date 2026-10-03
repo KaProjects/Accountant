@@ -3,7 +3,7 @@ package org.kaleta.dto;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import org.kaleta.Utils;
-import org.kaleta.entity.Transaction;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
