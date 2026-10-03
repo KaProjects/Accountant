@@ -171,8 +171,10 @@ public class TransactionRepositoryImpl implements TransactionRepository
     {
         return entityManager.createQuery(selectYearly
                         + " AND (t.debit LIKE '5%' OR t.debit LIKE '6%' OR t.credit LIKE '5%' OR t.credit LIKE '6%')"
-                        + excludeOffBalanceTransactions, Transaction.class)
+                        + " AND t.debit NOT IN (:closing, :profit) AND t.credit NOT IN (:closing, :profit)", Transaction.class)
                 .setParameter("year", year)
+                .setParameter("closing", Constants.Account.CLOSING_ACC_ID)
+                .setParameter("profit", Constants.Account.PROFIT_ACC_ID)
                 .getResultList();
     }
 

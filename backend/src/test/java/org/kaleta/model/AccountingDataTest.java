@@ -207,4 +207,69 @@ class AccountingDataTest
         assertThat(classComponent.getGroups().size(), is(1));
         assertThat(classComponent.getGroups().get(0).getSchemaId(), is("21"));
     }
+
+    @Test
+    void aTransactionFromAnAccountToItselfMovesNothing()
+    {
+        // The desktop data has repostings such as "626.0 -> 626.0 preuctovanie". They used to be
+        // counted once, on the debit side, so the year no longer added up to its closing.
+        SchemaClass schema = schemaClass("6", "62", schemaAccount("626", Constants.AccountType.R));
+        List<Transaction> transactions = List.of(
+                transaction(YEAR, "0201", 500, "200.0", "626.0"),
+                transaction(YEAR, "3101", 300, "626.0", "626.0", "preuctovanie"));
+
+        GroupComponent.AccountComponent revenue = new AccountingData(transactions, List.of(account(YEAR, "626.0")), schema)
+                .getGroupComponent("62", "6").getAccounts().get(0);
+
+        assertThat(revenue.getMonthlyBalance(), is(arrayContaining(500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)));
+    }
+
+    @Test
+    void anAssetOpeningBelowZeroIsWrittenTheOtherWayRound()
+    {
+        // An overdrawn bank account opens with a positive amount credited against 700.0, as 2017
+        // does with "700.0 -> 210.0 zostatok". Only the usual direction used to be read, so the
+        // opening was lost. It stays in the opening balance although it is dated December.
+        SchemaClass schema = schemaClass("2", "21", schemaAccount("210", Constants.AccountType.A));
+        List<Transaction> transactions = List.of(
+                transaction(YEAR, "0112", 300, "700.0", "210.0", "zostatok"),
+                transaction(YEAR, "0512", 1000, "210.0", "600.0"));
+
+        GroupComponent.AccountComponent bank = new AccountingData(transactions, List.of(account(YEAR, "210.0")), schema)
+                .getGroupComponent("21", "0").getAccounts().get(0);
+
+        assertThat(bank.getInitialValue(), is(-300));
+        assertThat(bank.getMonthlyBalance(), is(arrayContaining(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000)));
+    }
+
+    @Test
+    void aLiabilityOpeningBelowZeroIsWrittenTheOtherWayRound()
+    {
+        SchemaClass schema = schemaClass("2", "22", schemaAccount("220", Constants.AccountType.L));
+        List<Transaction> transactions = List.of(transaction(YEAR, "0101", 400, "220.0", "700.0"));
+
+        GroupComponent.AccountComponent loan = new AccountingData(transactions, List.of(account(YEAR, "220.0")), schema)
+                .getGroupComponent("22", "0").getAccounts().get(0);
+
+        assertThat(loan.getInitialValue(), is(-400));
+    }
+
+    @Test
+    void aCorrectionAgainstTheInitialAccountMovesAnExpenseInItsMonth()
+    {
+        // An expense account has no opening balance, so what the desktop data books on it against
+        // 700.0 - "nezauctovane odpisy", "najdene v Met Life polise" - is a movement of the month
+        // it is dated, and the year-end closing includes it. Only the closing itself is left out.
+        SchemaClass schema = schemaClass("5", "54", schemaAccount("541", Constants.AccountType.E));
+        List<Transaction> transactions = List.of(
+                transaction(YEAR, "0101", 400, "541.0", "700.0", "nezauctovane odpisy"),
+                transaction(YEAR, "3112", 900, "700.0", "541.0", "najdene"),
+                transaction(YEAR, "3112", 500, "541.0", "710.0", "closure"));
+
+        GroupComponent.AccountComponent expense = new AccountingData(transactions, List.of(account(YEAR, "541.0")), schema)
+                .getGroupComponent("54", "1").getAccounts().get(0);
+
+        assertThat(expense.getInitialValue(), is(0));
+        assertThat(expense.getMonthlyBalance(), is(arrayContaining(400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -900)));
+    }
 }

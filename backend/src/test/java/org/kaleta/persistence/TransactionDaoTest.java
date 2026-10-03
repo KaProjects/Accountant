@@ -183,6 +183,21 @@ class TransactionDaoTest
 
     @Test
     @TestTransaction
+    void listProfitTransactionsKeepsCorrectionsAgainstTheInitialAccountButNotTheClosing()
+    {
+        // A correction booked against 700.0 moves the year's profit, and the desktop app closes it
+        // into 710.0 with everything else. Only the closing itself is not a movement.
+        insert("t1", "0101", 100, "541.0", "700.0", "correction");
+        insert("t2", "3112", 200, "710.0", "541.0", "closure");
+        insert("t3", "3112", 300, "600.0", "710.0", "closure");
+        insert("t4", "3112", 400, "541.0", "701.0", "closure");
+        entityManager.flush();
+
+        assertThat(amountsOf(transactionDao.listProfitTransactions(YEAR)), containsInAnyOrder("100"));
+    }
+
+    @Test
+    @TestTransaction
     void listFinancialAssetTransactionsCoversBoth23xAnd549Accounts()
     {
         insert("t1", "0101", 100, "230.0", "210.0", "");
