@@ -1,4 +1,4 @@
-import {colors, getChartConfigStyle, netIncomeColor, profitGroupColors, startingLevelColor} from "../palette";
+import {balanceClassColors, balanceHatchedClasses, colors, getChartConfigStyle, netIncomeColor, profitGroupColors, startingLevelColor} from "../palette";
 
 // Characterization tests: these pin down the behaviour getChartConfigStyle has
 // today, including the fact that later rules deliberately override earlier ones
@@ -89,5 +89,17 @@ describe("profitGroupColors", () => {
 describe("netIncomeColor", () => {
     it("is a lighter blue than the starting level, so it does not weigh on the costs laid over it", () => {
         expect(lightness(netIncomeColor)).toBeGreaterThan(lightness(startingLevelColor) + 0.05);
+    });
+});
+
+describe("balanceClassColors", () => {
+    it("gives every class of the balance sheet a colour of its own", () => {
+        const all = Object.values(balanceClassColors);
+
+        expect(new Set(all).size).toBe(all.length);
+    });
+
+    it("hatches only classes it colours", () => {
+        balanceHatchedClasses.forEach((schemaId) => expect(balanceClassColors[schemaId]).toBeDefined());
     });
 });

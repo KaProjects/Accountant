@@ -145,6 +145,23 @@ export const belowZeroShades = [
 ];
 
 /**
+ * The classes of the balance sheet, one colour each, by schema id. Finance and Relations stand on
+ * both sides of it, and keep the same colour on both, so the two charts read as one sheet; every
+ * other class has a colour no other class has. Profit stands on the liabilities side only to
+ * balance it, and is drawn hatched as well - see `balanceHatchedClasses`.
+ */
+export const balanceClassColors = {
+    "0": "#2a78d6", // Fixed Assets, blue
+    "1": "#eb6834", // Resources, orange
+    "2": "#2fa84f", // Finance, green
+    "3": "#f2c230", // Relations, yellow
+    "4": "#6250d6", // Funding, violet
+    "p": "#e87ba4", // Profit, pink
+};
+/** The balance classes drawn hatched: the profit, which is there only to balance the sheet. */
+export const balanceHatchedClasses = ["p"];
+
+/**
  * Series colours for the overall statement charts, in a fixed order so that a component keeps
  * its colour as the statement grows. One hue per component, and the hues are ordered so that the
  * first few are as far apart as the palette allows, for the charts that only use a few. The

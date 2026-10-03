@@ -127,10 +127,29 @@ describe("AccountingStatement", () => {
             expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
         });
 
-        it("asks for no year's statement anywhere else", () => {
-            mountView(overallPayload([row()]), {params: {type: "balance", overall: "overall"}});
+        it("asks for no other year's statement on a single year", () => {
+            mountView(payload([row()]), {params: {type: "cashflow"}});
 
             expect(useEachData).toHaveBeenCalledWith([], false);
+        });
+    });
+
+    describe("the overall balance sheet", () => {
+        const overallBalance = overallPayload([
+            {type: "BALANCE_SUMMARY", schemaId: "a", name: "ASSETS", yearlyValues: [10, 20, 30], children: []},
+            {type: "BALANCE_CLASS", schemaId: "2", name: "Finance", yearlyValues: [10, 20, 30], children: []},
+        ]);
+        const yearOf = () => payload([
+            {type: "BALANCE_SUMMARY", schemaId: "a", name: "ASSETS", initial: 0, monthlyValues: months(10), children: []},
+            {type: "BALANCE_CLASS", schemaId: "2", name: "Finance", initial: 0, monthlyValues: months(10), children: []},
+        ]);
+
+        it("asks for every year's own statement, and offers its months", () => {
+            mountView(overallBalance, {params: {type: "balance", overall: "overall"}, each: (paths) => paths.map(yearOf)});
+
+            expect(useEachData).toHaveBeenCalledWith(
+                ["/accounting/balance/2018", "/accounting/balance/2019", "/accounting/balance/2020"], true);
+            expect(screen.getByRole("button", {name: "Monthly"})).toBeInTheDocument();
         });
     });
 

@@ -111,9 +111,38 @@ const layerInDrawingOrder = (chart, layer) => {
 };
 const hasLayer = (chart, layer) => chart.series.some((series) => series.layer === layer);
 
+/**
+ * A series drawn `hatched` is filled with diagonal stripes of its colour over a pale wash of it,
+ * rather than with the plain colour: a part that is not like the others - the profit that is on
+ * the liabilities side only to balance it. The stripes are a pattern each chart defines for
+ * itself, under an id of its own, as several charts share the page.
+ */
+const hatchOf = (chart, series) => "hatch-" + chart.key + "-" + series.key;
+const fillOf = (chart, series) => series.hatched ? "url(#" + hatchOf(chart, series) + ")" : series.color;
+
+const hatches = (chart) => (
+    <defs>
+        {chart.series.filter((series) => series.hatched).map((series) => (
+            <pattern
+                key={series.key} id={hatchOf(chart, series)} width="8" height="8"
+                patternUnits="userSpaceOnUse" patternTransform="rotate(45)"
+            >
+                <rect width="8" height="8" fill={series.color} fillOpacity="0.3"/>
+                <rect width="4" height="8" fill={series.color}/>
+            </pattern>
+        ))}
+    </defs>
+);
+
+const legendName = (value, entry) => <span style={{color: entry.payload?.ink ?? entry.color}}>{value}</span>;
+
 /** The key, in the order of the table rather than in the order the marks happen to be drawn. */
 const legend = (chart) => {
-    const marks = chart.series.map((series) => ({value: series.name, color: series.color, id: series.key, type: "rect"}));
+    // the icon is painted with the series' fill, which for a hatched one is its pattern; the name
+    // is written in its plain colour, which recharts would otherwise also take from the fill
+    const marks = chart.series.map((series) => ({
+        value: series.name, color: fillOf(chart, series), id: series.key, type: "rect", payload: {ink: series.color},
+    }));
     if (chart.line !== null) {
         marks.push({value: chart.line.name, color: chart.line.color, type: "line"});
     }
@@ -161,16 +190,17 @@ const StatementChart = ({chart, layout = null, titled = true, control = null}) =
             {...size} data={chart.points} margin={layout === null ? margin : alignedMargin}
             stackOffset={chart.form === "stacked" ? "sign" : "none"}
         >
+            {hatches(chart)}
             <CartesianGrid strokeDasharray="3 3"/>
             <XAxis dataKey="period" style={axisStyle} {...(layout === null ? namedTicks(chart) : alignedTo(layout))}/>
             <YAxis tickFormatter={abbreviateAmount} style={axisStyle}/>
             <Tooltip content={<StackTooltip chart={chart}/>}/>
-            <Legend payload={legend(chart)}/>
+            <Legend payload={legend(chart)} formatter={legendName}/>
             <ReferenceLine y={0} stroke={neutral.text} strokeWidth={1.5}/>
             {chart.form === "stacked" && drawingOrder(chart).map((series) => (
                 <Bar
                     key={series.key} dataKey={series.key} name={series.name}
-                    fill={series.color} stackId="stack"
+                    fill={fillOf(chart, series)} stackId="stack"
                     isAnimationActive={false}
                 />
             ))}

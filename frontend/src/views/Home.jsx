@@ -14,11 +14,17 @@ import HomeSection from "../components/home/HomeSection";
 import {useAppState} from "../state/appState";
 import {useGoTo} from "../services/navigation";
 
-/** Statement cards offer the same two spans of time. */
-const spans = (goTo, path) => [
-    {label: "Yearly", onSelect: goTo(path)},
-    {label: "Overall", onSelect: goTo(path + "/overall")},
-];
+/**
+ * Statement cards offer the same two spans of time, and open at the single year when the card
+ * itself is clicked.
+ */
+const statement = (goTo, path) => ({
+    onOpen: goTo(path),
+    actions: [
+        {label: "Yearly", onSelect: goTo(path)},
+        {label: "Overall", onSelect: goTo(path + "/overall")},
+    ],
+});
 
 const sections = (goTo) => [
     {
@@ -29,15 +35,15 @@ const sections = (goTo) => [
                 caption: "Data visualisation for all accounting statements.",
             },
             {
-                title: "Balance Sheet", icon: <AccountBalanceIcon/>, actions: spans(goTo, "/accounting/balance"),
+                title: "Balance Sheet", icon: <AccountBalanceIcon/>, ...statement(goTo, "/accounting/balance"),
                 caption: "A balance sheet is a financial statement that contains details of a company's assets or liabilities at a specific point in time.",
             },
             {
-                title: "Income Statement", icon: <PostAddIcon/>, actions: spans(goTo, "/accounting/profit"),
+                title: "Income Statement", icon: <PostAddIcon/>, ...statement(goTo, "/accounting/profit"),
                 caption: "The income statement provides an overview of revenues, expenses, net income, operating profit and net profit.",
             },
             {
-                title: "Cash Flow Statement", icon: <CurrencyExchangeIcon/>, actions: spans(goTo, "/accounting/cashflow"),
+                title: "Cash Flow Statement", icon: <CurrencyExchangeIcon/>, ...statement(goTo, "/accounting/cashflow"),
                 caption: "The cash flow statement (CFS) measures how well a company generates cash to pay its debt obligations, fund its operating expenses, and fund investments.",
             },
         ],

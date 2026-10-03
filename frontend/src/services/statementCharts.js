@@ -1,7 +1,7 @@
 import {
-    aboveZeroAccountShade, aboveZeroShades, belowZeroAccountShade, belowZeroShades,
-    cashFlowSummaryShade, netIncomeColor, profitGainShades, profitGroupColors, profitLossShades, startingLevelColor,
-    statementSeriesColors, summaryLineColor,
+    aboveZeroAccountShade, aboveZeroShades, balanceClassColors, balanceHatchedClasses, belowZeroAccountShade,
+    belowZeroShades, cashFlowSummaryShade, netIncomeColor, profitGainShades, profitGroupColors, profitLossShades,
+    startingLevelColor, statementSeriesColors, summaryLineColor,
 } from "../theme/palette";
 
 /**
@@ -25,6 +25,7 @@ export function statementCharts(type, data, overall = true) {
     if (!overall) {
         if (type === "cashflow") return yearlyCashFlowCharts(data);
         if (type === "profit") return yearlyProfitCharts(data);
+        if (type === "balance") return yearlyBalanceCharts(data);
         return [];
     }
     if (type === "balance") return balanceCharts(data, axis);
@@ -103,14 +104,32 @@ function balanceCharts(data, axis) {
         else if (sections.length > 0) sections[sections.length - 1].components.push(row);
     });
 
-    return sections.map((section) => chart({
-        key: section.summary.schemaId,
-        title: readableName(section.summary.name),
-        form: "stacked",
-        entries: entriesOf(section.components, axis),
-        summary: section.summary,
-        axis,
-    }));
+    return sections.map((section) => {
+        const drawn = chart({
+            key: section.summary.schemaId,
+            title: readableName(section.summary.name),
+            form: "stacked",
+            entries: entriesOf(section.components, axis),
+            summary: section.summary,
+            axis,
+            colouring: classColours,
+        });
+        return {
+            ...drawn,
+            series: drawn.series.map((series, index) => balanceHatchedClasses.includes(section.components[index].schemaId)
+                ? {...series, hatched: true}
+                : series),
+        };
+    });
+}
+
+/**
+ * The colour of each class of the balance sheet: its own, whichever side it stands on, so a class
+ * on both sides is one colour on both. A class the palette does not know takes a hue by its place.
+ */
+function classColours(entries) {
+    return entries.map((entry, index) =>
+        balanceClassColors[entry.schemaId] ?? statementSeriesColors[index % statementSeriesColors.length]);
 }
 
 function cashFlowCharts(data, axis) {
@@ -435,10 +454,6 @@ export function monthlyProfitCharts(overall, years) {
     const statements = years.filter(({data}) => data.rows.length > 0);
     if (statements.length === 0) return [];
 
-    const rowAt = (rows, [index, ...deeper]) => {
-        const row = rows[index];
-        return row === undefined || deeper.length === 0 ? row : rowAt(row.children ?? [], deeper);
-    };
     const monthsOf = (row, path) => statements.flatMap(({data}) => {
         const own = rowAt(data.rows, path);
         return monthlyChangesAxis(data.columns).valuesOf(own !== undefined && own.schemaId === row.schemaId ? own : null);
@@ -458,6 +473,84 @@ export function monthlyProfitCharts(overall, years) {
     return profitCharts({...overall, rows: merged(overall.rows, [])}, axis).map((chart) => ({
         ...untilOwnLastRecorded(chart),
         key: chart.key + "-monthly",
+        ticks,
+    }));
+}
+
+/**
+ * The row at a place in a statement - [index of the row, index of its child, ...] - or undefined
+ * where it has none.
+ *
+ * Each year's own statement lists the same rows as the overall one, in the same order, and that
+ * order is what matches them up: a schema id alone does not, as the income statement's groups after
+ * operating profit reuse the ids of the ones before it, and both sides of the balance sheet have a
+ * Finance and a Relations of the same id.
+ */
+function rowAt(rows, [index, ...deeper]) {
+    const row = rows[index];
+    return row === undefined || deeper.length === 0 ? row : rowAt(row.children ?? [], deeper);
+}
+
+/**
+ * The balance sheet of a single year: the same charts as over all the years - each side of it,
+ * class by class - month by month, each month under its column of the table.
+ *
+ * A balance is carried from one month to the next, so each month is charted as where the classes
+ * stood at its end, from the balance the year opened with, which stands under the Initial column.
+ * The months still to come would only carry the last balance on unchanged, so they are only named,
+ * as on the year's cash flow.
+ */
+function yearlyBalanceCharts(data) {
+    const recorded = [true].concat(monthsRecorded(data));
+    return balanceCharts(data, runningBalanceAxis(data.columns)).map((chart) => ({
+        ...chart,
+        points: untilLastRecorded(chart.points, recorded),
+        alignToTable: true,
+    }));
+}
+
+/** Whether anything in a single year's statement moved in each of its months. */
+function monthsRecorded(data) {
+    const months = monthlyChangesAxis(data.columns);
+    const changes = data.rows.map((row) => months.valuesOf(row));
+    return months.labels.map((month, index) => changes.some((row) => row[index] !== 0));
+}
+
+/**
+ * The overall balance sheet month by month: the same charts as over the years, with every year's
+ * months one after another, from the first year on, each where the classes stood at its end. The
+ * axis names the years, at their Januaries; a month itself is named in full in its tooltip.
+ *
+ * Each year's months are read from its own statement, from the balance it opened with, so at the
+ * turn of a year the profit it made moves into funding, as it does in the books. The months after
+ * the last one anything moved in are only named, as on a single year. Takes the overall statement
+ * and every year's own statement, as [{year, data}].
+ */
+export function monthlyBalanceCharts(overall, years) {
+    const statements = years.filter(({data}) => data.rows.length > 0);
+    if (statements.length === 0) return [];
+
+    const merged = overall.rows.map((row, index) => ({
+        ...row,
+        monthlyBalances: statements.flatMap(({data}) => {
+            const own = rowAt(data.rows, [index]);
+            const months = monthlyChangesAxis(data.columns).labels.length;
+            return own !== undefined && own.schemaId === row.schemaId
+                ? runningBalanceAxis(data.columns).valuesOf(own).slice(1, 1 + months)
+                : Array(months).fill(0);
+        }),
+    }));
+    const axis = {
+        labels: statements.flatMap(({year, data}) => monthlyChangesAxis(data.columns).labels.map((month) => month + " " + year)),
+        valuesOf: (row) => row.monthlyBalances,
+    };
+    const recorded = statements.flatMap(({data}) => monthsRecorded(data));
+    const ticks = statements.map(({year, data}) => ({value: monthlyChangesAxis(data.columns).labels[0] + " " + year, label: String(year)}));
+
+    return balanceCharts({...overall, rows: merged}, axis).map((chart) => ({
+        ...chart,
+        key: chart.key + "-monthly",
+        points: untilLastRecorded(chart.points, recorded),
         ticks,
     }));
 }

@@ -226,6 +226,38 @@ describe("StatementChart", () => {
         });
     });
 
+    describe("a hatched series", () => {
+        const hatched = () => chart({
+            key: "l",
+            series: [
+                {key: "s0", name: "Funding", color: "#6250d6"},
+                {key: "s1", name: "Profit", color: "#e87ba4", hatched: true},
+            ],
+            points: [{period: "2019", s0: 10, s1: 20, summary: 30}],
+        });
+
+        it("fills its columns with stripes of its colour, the others plainly", () => {
+            const {container} = render(<StatementChart chart={hatched()}/>);
+
+            const fills = Array.from(container.querySelectorAll(".recharts-bar-rectangle .recharts-rectangle"))
+                .map((rectangle) => rectangle.getAttribute("fill"));
+            expect(fills).toContain("#6250d6");
+            expect(fills).toContain("url(#hatch-l-s1)");
+            const stripes = container.querySelector("pattern#hatch-l-s1");
+            expect(Array.from(stripes.querySelectorAll("rect")).map((rect) => rect.getAttribute("fill")))
+                .toEqual(["#e87ba4", "#e87ba4"]);
+        });
+
+        it("keys it with the stripes, but names it in its plain colour", () => {
+            const {container} = render(<StatementChart chart={hatched()}/>);
+
+            const entry = Array.from(container.querySelectorAll(".recharts-legend-item"))
+                .find((item) => item.textContent === "Profit");
+            expect(entry.querySelector("path").getAttribute("fill")).toBe("url(#hatch-l-s1)");
+            expect(screen.getByText("Profit", {selector: ".recharts-legend-item span span"})).toHaveStyle({color: "#e87ba4"});
+        });
+    });
+
     it("keys the chart in the order of the table, not the order the columns are drawn", () => {
         render(<StatementChart chart={chart()}/>);
 

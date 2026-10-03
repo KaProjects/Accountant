@@ -69,6 +69,16 @@ describe("Home", () => {
         expect(mockNavigate).toHaveBeenCalledWith("/accounting/balance");
     });
 
+    it("opens each statement at its single year when its card is clicked", () => {
+        renderHome();
+
+        [["Balance Sheet", "/accounting/balance"], ["Income Statement", "/accounting/profit"],
+            ["Cash Flow Statement", "/accounting/cashflow"]].forEach(([title, path]) => {
+            fireEvent.click(screen.getByText(title));
+            expect(mockNavigate).toHaveBeenLastCalledWith(path);
+        });
+    });
+
     it("navigates to the overall balance sheet", () => {
         renderHome();
         const overallButtons = screen.getAllByText("Overall");

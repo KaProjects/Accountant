@@ -1,5 +1,5 @@
-import {abbreviateAmount, monthlyCashFlowChart, monthlyProfitCharts, statementCharts, statementRowShades} from "../statementCharts";
-import {aboveZeroShades, belowZeroShades, netIncomeColor, profitGainShades, profitGroupColors, profitLossShades, startingLevelColor} from "../../theme/palette";
+import {abbreviateAmount, monthlyBalanceCharts, monthlyCashFlowChart, monthlyProfitCharts, statementCharts, statementRowShades} from "../statementCharts";
+import {aboveZeroShades, balanceClassColors, belowZeroShades, netIncomeColor, profitGainShades, profitGroupColors, profitLossShades, startingLevelColor} from "../../theme/palette";
 
 const greens = aboveZeroShades.map((shade) => shade.fill);
 const reds = belowZeroShades.map((shade) => shade.fill);
@@ -42,6 +42,48 @@ describe("statementCharts", () => {
         expect(charts.map((chart) => chart.title)).toEqual(["Assets", "Liabilities"]);
         expect(charts[0].series.map((series) => series.name)).toEqual(["Fixed Assets", "Finance"]);
         expect(charts[1].series.map((series) => series.name)).toEqual(["Funding"]);
+    });
+
+    describe("the colours of the balance sheet's classes", () => {
+        const both = {
+            columns: ["Yearly Balance Sheet", "2019"],
+            rows: [
+                {type: "BALANCE_SUMMARY", schemaId: "a", name: "ASSETS", yearlyValues: [40]},
+                {type: "BALANCE_CLASS", schemaId: "0", name: "Fixed Assets", yearlyValues: [5]},
+                {type: "BALANCE_CLASS", schemaId: "1", name: "Resources", yearlyValues: [5]},
+                {type: "BALANCE_CLASS", schemaId: "2", name: "Finance", yearlyValues: [20]},
+                {type: "BALANCE_CLASS", schemaId: "3", name: "Relations", yearlyValues: [10]},
+                {type: "BALANCE_SUMMARY", schemaId: "l", name: "LIABILITIES", yearlyValues: [40]},
+                {type: "BALANCE_CLASS", schemaId: "2", name: "Finance", yearlyValues: [10]},
+                {type: "BALANCE_CLASS", schemaId: "3", name: "Relations", yearlyValues: [10]},
+                {type: "BALANCE_CLASS", schemaId: "4", name: "Funding", yearlyValues: [15]},
+                {type: "BALANCE_CLASS", schemaId: "p", name: "Profit", yearlyValues: [5]},
+            ],
+        };
+        const colours = () => statementCharts("balance", both)
+            .map((chart) => Object.fromEntries(chart.series.map((series) => [series.name, series.color])));
+
+        it("keeps a class on both sides in one colour - green for finance, yellow for relations", () => {
+            const [assets, liabilities] = colours();
+
+            expect(assets.Finance).toBe(liabilities.Finance);
+            expect(assets.Relations).toBe(liabilities.Relations);
+            expect([assets.Finance, assets.Relations]).toEqual([balanceClassColors["2"], balanceClassColors["3"]]);
+        });
+
+        it("gives every other class a colour no other class has, across both charts", () => {
+            const [assets, liabilities] = colours();
+            const all = [assets["Fixed Assets"], assets.Resources, assets.Finance, assets.Relations, liabilities.Funding, liabilities.Profit];
+
+            expect(new Set(all).size).toBe(all.length);
+        });
+
+        it("hatches the profit, which stands there only to balance the sheet, and nothing else", () => {
+            const [assets, liabilities] = statementCharts("balance", both);
+
+            expect(liabilities.series.filter((series) => series.hatched).map((series) => series.name)).toEqual(["Profit"]);
+            expect(assets.series.some((series) => series.hatched)).toBe(false);
+        });
     });
 
     it("stacks the classes under the row that totals them", () => {
@@ -458,11 +500,42 @@ describe("statementCharts on a yearly statement", () => {
         expect(shades[2].ink).toBe(chart.line.color);
     });
 
-    it("leaves the other yearly statements without a chart, for now", () => {
-        const yearly = {...yearlyCashFlow, columns: ["Balance Sheet", "Initial", ...months, "Total"]};
+    describe("a balance sheet", () => {
+        const quiet = (...values) => [...values, ...Array(12 - values.length).fill(0)];
+        const yearlyBalance = {
+            columns: ["Balance Sheet", "Initial", ...months, "Total"],
+            rows: [
+                {type: "BALANCE_SUMMARY", schemaId: "a", name: "ASSETS", initial: 100, monthlyValues: quiet(10, 0, -30)},
+                {type: "BALANCE_CLASS", schemaId: "0", name: "Fixed Assets", initial: 40, monthlyValues: quiet(0, 0, -30)},
+                {type: "BALANCE_CLASS", schemaId: "2", name: "Finance", initial: 60, monthlyValues: quiet(10)},
+                {type: "BALANCE_SUMMARY", schemaId: "l", name: "LIABILITIES", initial: 100, monthlyValues: quiet(10, 0, -30)},
+                {type: "BALANCE_CLASS", schemaId: "4", name: "Funding", initial: 100, monthlyValues: quiet()},
+                {type: "BALANCE_CLASS", schemaId: "p", name: "Profit", initial: 0, monthlyValues: quiet(10, 0, -30)},
+            ],
+        };
+        const charts = () => statementCharts("balance", yearlyBalance, false);
 
-        expect(statementCharts("balance", yearly, false)).toEqual([]);
-        expect(statementCharts("profit", yearly, false)).toEqual([]);
+        it("charts each side, class by class, as over all the years", () => {
+            expect(charts().map((chart) => chart.title)).toEqual(["Assets", "Liabilities"]);
+            expect(charts()[0].series.map((series) => series.name)).toEqual(["Fixed Assets", "Finance"]);
+            expect(charts()[0].form).toBe("stacked");
+        });
+
+        it("charts where the classes stood, from the opening balance under the Initial column", () => {
+            const [assets] = charts();
+
+            expect(assets.alignToTable).toBe(true);
+            expect(assets.points[0]).toEqual({period: "Initial", s0: 40, s1: 60, summary: 100});
+            // a quiet month carries the balance on
+            expect(assets.points.slice(1, 4).map((point) => point.summary)).toEqual([110, 110, 80]);
+            expect(assets.points[3]).toMatchObject({s0: 10, s1: 70});
+        });
+
+        it("only names the months still to come", () => {
+            charts().forEach((chart) => {
+                expect(chart.points[4]).toEqual({period: "April", summary: null});
+            });
+        });
     });
 });
 
@@ -551,6 +624,82 @@ describe("monthlyProfitCharts", () => {
 
     it("charts nothing without a year to chart", () => {
         expect(monthlyProfitCharts(overall, [])).toEqual([]);
+    });
+});
+
+describe("monthlyBalanceCharts", () => {
+    const months = ["January", "February", "March", "April", "May", "June", "July",
+        "August", "September", "October", "November", "December"];
+    const monthly = (...values) => [...values, ...Array(12 - values.length).fill(0)];
+    // both sides have a Finance of the same id, as the real balance sheet does
+    const year = (cash, credit, profit, initial) => ({
+        columns: ["Balance Sheet", "Initial", ...months, "Total"],
+        rows: [
+            {type: "BALANCE_SUMMARY", schemaId: "a", name: "ASSETS", initial: initial.cash, monthlyValues: cash},
+            {type: "BALANCE_CLASS", schemaId: "2", name: "Finance", initial: initial.cash, monthlyValues: cash},
+            {type: "BALANCE_SUMMARY", schemaId: "l", name: "LIABILITIES", initial: initial.cash, monthlyValues: cash},
+            {type: "BALANCE_CLASS", schemaId: "2", name: "Finance", initial: initial.credit, monthlyValues: credit},
+            {type: "BALANCE_CLASS", schemaId: "4", name: "Funding", initial: initial.funding, monthlyValues: monthly()},
+            {type: "BALANCE_CLASS", schemaId: "p", name: "Profit", initial: 0, monthlyValues: profit},
+        ],
+    });
+    const overall = {
+        columns: ["Yearly Balance Sheet", "2019", "2020"],
+        rows: [
+            {type: "BALANCE_SUMMARY", schemaId: "a", name: "ASSETS", yearlyValues: [130, 150]},
+            {type: "BALANCE_CLASS", schemaId: "2", name: "Finance", yearlyValues: [130, 150]},
+            {type: "BALANCE_SUMMARY", schemaId: "l", name: "LIABILITIES", yearlyValues: [130, 150]},
+            {type: "BALANCE_CLASS", schemaId: "2", name: "Finance", yearlyValues: [20, 20]},
+            {type: "BALANCE_CLASS", schemaId: "4", name: "Funding", yearlyValues: [80, 110]},
+            {type: "BALANCE_CLASS", schemaId: "p", name: "Profit", yearlyValues: [30, 20]},
+        ],
+    };
+    // 2019 opens with 100 of cash against 20 of credit and 80 of funding, and makes 30; 2020 opens
+    // with that 30 moved into funding, and makes 20 by February
+    const years = [
+        {year: "2019", data: year(monthly(10, 0, 20), monthly(), monthly(10, 0, 20), {cash: 100, credit: 20, funding: 80})},
+        {year: "2020", data: year(monthly(5, 15), monthly(), monthly(5, 15), {cash: 130, credit: 20, funding: 110})},
+    ];
+    const charts = () => monthlyBalanceCharts(overall, years);
+
+    it("charts each side as the years do, keyed after the chart of the years each is a variant of", () => {
+        expect(charts().map((chart) => chart.title)).toEqual(["Assets", "Liabilities"]);
+        expect(charts().map((chart) => chart.key)).toEqual(["a-monthly", "l-monthly"]);
+    });
+
+    it("charts where the classes stood at the end of every month, one year after another", () => {
+        const [assets] = charts();
+
+        expect(assets.points.slice(0, 3).map((point) => point.summary)).toEqual([110, 110, 130]);
+        expect(assets.points[11]).toMatchObject({period: "December 2019", summary: 130});
+        expect(assets.points[12]).toMatchObject({period: "January 2020", summary: 135});
+        expect(assets.ticks).toEqual([{value: "January 2019", label: "2019"}, {value: "January 2020", label: "2020"}]);
+    });
+
+    it("moves the year's profit into funding at the turn of the year, as the books do", () => {
+        const [, liabilities] = charts();
+        const [, funding, profit] = liabilities.series.map((series) => series.key);
+
+        expect(liabilities.points[11]).toMatchObject({[funding]: 80, [profit]: 30});
+        expect(liabilities.points[12]).toMatchObject({[funding]: 110, [profit]: 5});
+    });
+
+    it("matches a year's rows to the overall ones by their place, as both sides have a Finance", () => {
+        const [, liabilities] = charts();
+
+        expect(liabilities.series[0].name).toBe("Finance");
+        expect(liabilities.points[0].s0).toBe(20);
+    });
+
+    it("only names the months after the last one anything moved in", () => {
+        const [assets] = charts();
+
+        expect(assets.points[13]).toMatchObject({period: "February 2020", summary: 150});
+        expect(assets.points[14]).toEqual({period: "March 2020", summary: null});
+    });
+
+    it("charts nothing without a year to chart", () => {
+        expect(monthlyBalanceCharts(overall, [])).toEqual([]);
     });
 });
 

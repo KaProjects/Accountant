@@ -15,7 +15,7 @@ import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
 import {useColumnLayout} from "../hooks/useColumnLayout";
 import {useAppState, yearlyPath} from "../state/appState";
 import {useGoTo} from "../services/navigation";
-import {monthlyCashFlowChart, monthlyProfitCharts, statementCharts, statementRowShades} from "../services/statementCharts";
+import {monthlyBalanceCharts, monthlyCashFlowChart, monthlyProfitCharts, statementCharts, statementRowShades} from "../services/statementCharts";
 
 /**
  * The corner mark of a year is positioned against this block, not against the header cell: the
@@ -50,9 +50,8 @@ const AccountingStatement = () => {
 
     const transactionsDialog = useTransactionsDialog();
 
-    // The overall cash flow and income statement are also charted month by month, which takes every
-    // year's own statement.
-    const monthsOfEveryYear = isOverall && (type === "cashflow" || type === "profit") && loaded;
+    // Every overall statement is also charted month by month, which takes every year's own statement.
+    const monthsOfEveryYear = isOverall && ["balance", "cashflow", "profit"].includes(type) && loaded;
     const everyYear = monthsOfEveryYear ? data.columns.slice(1).filter((column) => /^\d{4}$/.test(column)) : [];
     const yearly = useEachData(everyYear.map((each) => "/accounting/" + type + "/" + each), monthsOfEveryYear);
 
@@ -114,6 +113,7 @@ const AccountingStatement = () => {
         if (!yearly.loaded) return [];
         const years = everyYear.map((each, index) => ({year: each, data: yearly.data[index]}));
         if (type === "profit") return monthlyProfitCharts(data, years);
+        if (type === "balance") return monthlyBalanceCharts(data, years);
         const cashFlow = monthlyCashFlowChart(data, years);
         return cashFlow === null ? [] : [cashFlow];
     }
