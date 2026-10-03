@@ -101,6 +101,10 @@ jobs:
             const results = [];
 
             for (const projectNumber of projectNumbers) {
+              // repositoryOwner resolves an organization or a person in one field. Asking for
+              // organization(login:) and user(login:) side by side returns the project AND a
+              // NOT_FOUND error for whichever of the two the owner is not, and the GraphQL client
+              // throws as soon as a response carries any error at all, however complete its data.
               const projectResult = await github.graphql(
                 `
                   query(
@@ -108,14 +112,16 @@ jobs:
                     $number: Int!
                     $statusFieldName: String!
                   ) {
-                    organization(login: $login) {
-                      projectV2(number: $number) {
-                        ...ProjectData
+                    repositoryOwner(login: $login) {
+                      ... on Organization {
+                        projectV2(number: $number) {
+                          ...ProjectData
+                        }
                       }
-                    }
-                    user(login: $login) {
-                      projectV2(number: $number) {
-                        ...ProjectData
+                      ... on User {
+                        projectV2(number: $number) {
+                          ...ProjectData
+                        }
                       }
                     }
                   }
@@ -142,9 +148,7 @@ jobs:
                 },
               );
 
-              const project =
-                projectResult.organization?.projectV2 ??
-                projectResult.user?.projectV2;
+              const project = projectResult.repositoryOwner?.projectV2;
               if (!project) {
                 throw new Error(
                   `Project ${projectOwner}/${projectNumber} was not found.`,
