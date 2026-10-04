@@ -60,6 +60,10 @@ const AppState = ({children}) => {
     // Where a yearly page has an overall view of the same thing, so the main bar can offer the way
     // there; null on every other page. The page itself says so, as only it knows.
     const [overallPath, setOverallPath] = useState(null);
+    // The parts a page is divided into, offered as tabs in the main bar, and the one shown; null on
+    // every page that is not divided. The page itself says so, and withdraws them when it is left.
+    const [tabs, setTabs] = useState(null);
+    const [selectedTab, setSelectedTab] = useState(null);
 
     const requestedYear = parseInt(searchParams.get(YEAR));
     const year = Number.isNaN(requestedYear) ? new Date().getFullYear() : requestedYear;
@@ -98,8 +102,8 @@ const AppState = ({children}) => {
 
     return (
         <AppStateProvider value={{
-            year, isYearly, selectValues, selectedValue, overallPath,
-            setYear, setYearly, setSelectedValue, setSelectValues, setOverallPath,
+            year, isYearly, selectValues, selectedValue, overallPath, tabs, selectedTab,
+            setYear, setYearly, setSelectedValue, setSelectValues, setOverallPath, setTabs, setSelectedTab,
         }}>
             {children}
         </AppStateProvider>

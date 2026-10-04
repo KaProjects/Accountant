@@ -67,7 +67,6 @@ const App = () => {
                     <Route exact path="/budgeting" element={<Budgeting/> }/>
                     <Route exact path="/view/:vacation" element={<Views/> }/>
                     <Route exact path="/view" element={<Views/> }/>
-                    <Route exact path="/financial/assets/:all" element={<FinancialAssets/> }/>
                     <Route exact path="/financial/assets" element={<FinancialAssets/> }/>
                     <Route exact path="/accounting/:type" element={<AccountingStatement/> }/>
                     <Route exact path="/accounting/:type/:overall" element={<AccountingStatement/> }/>

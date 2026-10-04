@@ -94,4 +94,36 @@ class FinancialAssetsOverallDataTest
         assertThat(data.getAssetGroupName("230"), is("shares"));
         assertThat(data.getFinancialAsset("230", "230.0").getName(), is("asset 230.0"));
     }
+
+    @Test
+    void theAssetsAreListedByIdWhichIsTheOrderTheyWereOpenedIn()
+    {
+        FinancialAssetsOverallData data = new FinancialAssetsOverallData(Map.of(
+                "2024", year("2024", Map.of("230.2", 100, "230.10", 100)),
+                "2025", year("2025", Map.of("230.9", 100, "230.1", 100))));
+
+        // by number, not text: 230.10 after 230.9; and not by the year they first appear in
+        assertThat(data.getAssetIds("230"), contains("230.1", "230.2", "230.9", "230.10"));
+    }
+
+    @Test
+    void anAssetIsStillHeldIfTheLatestYearHasIt()
+    {
+        FinancialAssetsOverallData data = new FinancialAssetsOverallData(Map.of(
+                "2024", year("2024", Map.of("230.0", 100, "230.1", 100)),
+                "2025", year("2025", Map.of("230.1", 150))));
+
+        assertThat(data.isHeldInLatestYear("230", "230.1"), is(true));
+        assertThat(data.isHeldInLatestYear("230", "230.0"), is(false));
+    }
+
+    @Test
+    void idsCompareByTheirNumbers()
+    {
+        assertThat(FinancialAssetsOverallData.compareIds("230.9", "230.10") < 0, is(true));
+        assertThat(FinancialAssetsOverallData.compareIds("231.0", "230.10") > 0, is(true));
+        assertThat(FinancialAssetsOverallData.compareIds("230.1-2", "230.1-10") < 0, is(true));
+        assertThat(FinancialAssetsOverallData.compareIds("230.1", "230.1-1") < 0, is(true));
+        assertThat(FinancialAssetsOverallData.compareIds("230.1", "230.1"), is(0));
+    }
 }

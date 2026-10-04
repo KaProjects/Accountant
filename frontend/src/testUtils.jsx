@@ -8,11 +8,15 @@ const DEFAULT_APP_STATE = {
     selectValues: null,
     selectedValue: "",
     overallPath: null,
+    tabs: null,
+    selectedTab: null,
     setYear: () => {},
     setYearly: () => {},
     setSelectedValue: () => {},
     setSelectValues: () => {},
     setOverallPath: () => {},
+    setTabs: () => {},
+    setSelectedTab: () => {},
 };
 
 /** Renders a component together with the shared state it reads. */

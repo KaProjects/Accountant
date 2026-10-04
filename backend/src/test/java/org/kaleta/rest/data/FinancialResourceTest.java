@@ -33,27 +33,34 @@ public class FinancialResourceTest
         given().when().get("/sync/all").then().statusCode(200);
 
         FinancialAssetsDto dto = given().when()
-                .get("/financial/assets/" + new GregorianCalendar().get(Calendar.YEAR))
+                .get("/financial/assets")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", FinancialAssetsDto.class);
 
+        // every asset's timeline ends at the current month, never in the months still to come
+        String currentMonth = (new GregorianCalendar().get(Calendar.MONTH) + 1) + "/" + (new GregorianCalendar().get(Calendar.YEAR) % 100);
+        boolean anyHeldNow = false;
         for (FinancialAssetsDto.Group group : dto.getGroups())
         {
             for (FinancialAssetsDto.Group.Account account : group.getAccounts())
             {
-                int month = new GregorianCalendar().get(Calendar.MONTH) + 1;
-                assertThat(account.getLabels().length, is(month));
-                assertThat(account.getDeposits().length, is(month));
-                assertThat(account.getWithdrawals().length, is(month));
-                assertThat(account.getRevaluations().length, is(month));
-                assertThat(account.getBalances().length, is(month));
-                assertThat(account.getFunding().length, is(month));
-                assertThat(account.getCumulativeDeposits().length, is(month));
-                assertThat(account.getCumulativeWithdrawals().length, is(month));
+                int length = account.getLabels().length;
+                if (account.getActive()) {
+                    anyHeldNow = true;
+                    assertThat(account.getLabels()[length - 1], is(currentMonth));
+                }
+                assertThat(account.getDeposits().length, is(length));
+                assertThat(account.getWithdrawals().length, is(length));
+                assertThat(account.getRevaluations().length, is(length));
+                assertThat(account.getBalances().length, is(length));
+                assertThat(account.getFunding().length, is(length));
+                assertThat(account.getCumulativeDeposits().length, is(length));
+                assertThat(account.getCumulativeWithdrawals().length, is(length));
             }
         }
+        assertThat(anyHeldNow, is(true));
     }
 
 }

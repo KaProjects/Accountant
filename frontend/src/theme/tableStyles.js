@@ -172,14 +172,6 @@ export const highlightedCell = (style) => ({
 
 export const isExpenseRow = (type) => expenseBudgetRows.includes(type);
 
-/** An asset list entry, highlighted while its chart is open. */
-export const assetTitleStyle = (isOpen) => ({
-    boxShadow: "0 0 8px 0",
-    background: isOpen ? "#87befc" : "#b6d8ff",
-    color: "#3361bb",
-    fontWeight: "bold",
-});
-
 /** A view list entry, highlighted while its transactions are open. */
 export const viewTitleStyle = (isOpen) => ({
     boxShadow: "0 0 8px 0",

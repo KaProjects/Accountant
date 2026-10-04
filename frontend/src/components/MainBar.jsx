@@ -1,5 +1,5 @@
 import React from "react";
-import {AppBar, Box, Button, IconButton, MenuItem, Select, Toolbar, Typography} from "@mui/material";
+import {AppBar, Box, Button, IconButton, MenuItem, Select, Tab, Tabs, Toolbar, Typography} from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -22,6 +22,13 @@ const drawerButtonStyle = {mr: 2};
  */
 const unavailableStepStyle = {visibility: "hidden"};
 
+/**
+ * The tabs of a divided page, on the coloured bar: white text and a white line under the one
+ * shown. They are not hidden on a narrow screen as the year is, since they are the only way
+ * between the page's parts; a row of them too long for the bar scrolls instead.
+ */
+const tabsStyle = {minWidth: 0, '.MuiTabs-indicator': {backgroundColor: "white"}};
+
 /** The selector sits on the coloured bar, so it has to be drawn in white rather than the default. */
 const selectorStyle = {
     color: "white",
@@ -31,7 +38,10 @@ const selectorStyle = {
 };
 
 const MainBar = () => {
-    const {year, isYearly, selectValues, selectedValue, overallPath, setYear, setSelectedValue} = useAppState();
+    const {
+        year, isYearly, selectValues, selectedValue, overallPath, tabs, selectedTab,
+        setYear, setSelectedValue, setSelectedTab,
+    } = useAppState();
     const goHome = useGoHome();
     const goTo = useGoTo();
 
@@ -88,6 +98,13 @@ const MainBar = () => {
                         </Select>
                     }
                 </Box>
+                {tabs !== null &&
+                    <Tabs value={tabs.includes(selectedTab) ? selectedTab : false}
+                          onChange={(event, tab) => setSelectedTab(tab)}
+                          textColor="inherit" variant="scrollable" scrollButtons="auto" sx={tabsStyle}>
+                        {tabs.map((tab) => <Tab key={tab} value={tab} label={tab}/>)}
+                    </Tabs>
+                }
                 <Box sx={spacerStyle} />
             </Toolbar>
         </AppBar>

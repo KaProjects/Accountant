@@ -41,7 +41,12 @@ public class FinancialAssetsOverallData
                 data -> data.getAssetGroupName(groupSchemaId));
     }
 
-    /** Every asset ever held in the group, oldest acquisition first. */
+    /**
+     * Every asset ever held in the group, by id: an account's number within its schema account
+     * only grows, so this is the order the assets were opened in. Ordered by their first year
+     * instead, two assets opened in the same year came out in whichever order that year listed
+     * them.
+     */
     public List<String> getAssetIds(String groupSchemaId)
     {
         Set<String> ids = new LinkedHashSet<>();
@@ -50,7 +55,39 @@ public class FinancialAssetsOverallData
             if (!data.getAssetGroups().contains(groupSchemaId)) continue;
             data.getAssetsByGroup(groupSchemaId).forEach(account -> ids.add(account.getFullId()));
         }
-        return new ArrayList<>(ids);
+        List<String> sorted = new ArrayList<>(ids);
+        sorted.sort(FinancialAssetsOverallData::compareIds);
+        return sorted;
+    }
+
+    /**
+     * Whether the asset is still held: whether the latest year of the books has it. An asset sold
+     * off is one of the earlier years only.
+     */
+    public boolean isHeldInLatestYear(String groupSchemaId, String assetId)
+    {
+        return !dataByYear.isEmpty() && findAccount(dataByYear.lastEntry().getValue(), groupSchemaId, assetId) != null;
+    }
+
+    /**
+     * Account ids by their parts as numbers - the schema account, then the account's number in it
+     * and any number after a dash - so that 230.10 comes after 230.9 rather than before it.
+     */
+    static int compareIds(String first, String second)
+    {
+        String[] a = first.split("[.-]");
+        String[] b = second.split("[.-]");
+        for (int i = 0; i < Math.min(a.length, b.length); i++) {
+            int compared = comparePart(a[i], b[i]);
+            if (compared != 0) return compared;
+        }
+        return Integer.compare(a.length, b.length);
+    }
+
+    private static int comparePart(String a, String b)
+    {
+        if (a.matches("\\d+") && b.matches("\\d+")) return new java.math.BigInteger(a).compareTo(new java.math.BigInteger(b));
+        return a.compareTo(b);
     }
 
     /**

@@ -30,7 +30,6 @@ public class EmptyDataSourceTest
             "/accounting/profit",
             "/accounting/cashflow/2023",
             "/accounting/cashflow",
-            "/financial/assets/2023",
             "/financial/assets",
             "/budget/2023",
             "/chart/config",

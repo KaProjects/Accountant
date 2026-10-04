@@ -50,7 +50,6 @@ public class ResponseSnapshotTest
             "/budget/2019",
             "/budget/2019/transaction/i2/month/9",
             "/chart/config",
-            "/financial/assets/2021",
             "/financial/assets",
             "/schema/2020",
             "/schema/2023",

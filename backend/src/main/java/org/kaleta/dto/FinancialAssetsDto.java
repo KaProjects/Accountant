@@ -29,13 +29,18 @@ public class FinancialAssetsDto
         @RegisterForReflection
         public static class Account
         {
+            private String id;
             private String name;
+            /** Whether the asset is still held, in the latest year of the books. */
+            private Boolean active;
 
             private Integer initialValue;
             private Integer depositsSum;
             private Integer withdrawalsSum;
             private Integer currentValue;
             private BigDecimal currentReturn;
+            /** The money-weighted return per year, in percent; null where there is none to state. */
+            private BigDecimal annualReturn;
 
             private Integer[] deposits;
             private Integer[] withdrawals;
@@ -85,9 +90,58 @@ public class FinancialAssetsDto
         }
     }
 
+    /**
+     * Cuts each asset's timeline down to the months it was in use: from the month money first went
+     * into it, and - for an asset no longer held - up to the month of its last transaction.
+     * <p>
+     * The timelines are put together a year at a time, so they used to start in the January of the
+     * year an asset was bought and run to the December of the year it was sold, with months of
+     * nothing either side. An asset that already held a value when the books begin starts at their
+     * start, as that value is where it began; an asset still held runs to the current month, as it
+     * is worth something in every one of them.
+     */
+    public void trimToActivity()
+    {
+        for (Group group : groups)
+        {
+            for (Group.Account account : group.getAccounts())
+            {
+                int months = account.getLabels().length;
+                int first = 0;
+                if (account.getInitialValue() == null || account.getInitialValue() == 0) {
+                    while (first < months && !movedIn(account, first)) first++;
+                }
+                int last = months - 1;
+                if (!Boolean.TRUE.equals(account.getActive())) {
+                    while (last >= first && !movedIn(account, last)) last--;
+                }
+                if (first > last) continue; // nothing ever moved: there is no stretch to keep
+                if (first == 0 && last == months - 1) continue;
+
+                int from = first;
+                int to = last + 1;
+                account.setLabels(Arrays.copyOfRange(account.getLabels(), from, to));
+                account.setDeposits(Arrays.copyOfRange(account.getDeposits(), from, to));
+                account.setWithdrawals(Arrays.copyOfRange(account.getWithdrawals(), from, to));
+                account.setRevaluations(Arrays.copyOfRange(account.getRevaluations(), from, to));
+                account.setBalances(Arrays.copyOfRange(account.getBalances(), from, to));
+                account.setFunding(Arrays.copyOfRange(account.getFunding(), from, to));
+                account.setCumulativeDeposits(Arrays.copyOfRange(account.getCumulativeDeposits(), from, to));
+                account.setCumulativeWithdrawals(Arrays.copyOfRange(account.getCumulativeWithdrawals(), from, to));
+            }
+        }
+    }
+
+    /** Whether anything was put in, taken out or revalued in the given month. */
+    private static boolean movedIn(Group.Account account, int month)
+    {
+        return account.getDeposits()[month] != 0 || account.getWithdrawals()[month] != 0 || account.getRevaluations()[month] != 0;
+    }
+
     public static FinancialAssetsDto.Group.Account from(FinancialAsset asset)
     {
         FinancialAssetsDto.Group.Account accountDto = new FinancialAssetsDto.Group.Account();
+        accountDto.setId(asset.getFullId());
         accountDto.setName(asset.getName());
         accountDto.setInitialValue(asset.getInitialValue());
         accountDto.setWithdrawalsSum(asset.getWithdrawalsSum());

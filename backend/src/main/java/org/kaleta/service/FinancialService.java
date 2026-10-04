@@ -4,7 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.kaleta.Constants;
 import org.kaleta.dto.FinancialAssetsDto;
-import org.kaleta.model.FinancialAsset;
+import org.kaleta.model.AnnualReturn;
 import org.kaleta.model.FinancialAssetsData;
 import org.kaleta.model.FinancialAssetsOverallData;
 import org.kaleta.model.SchemaClass;
@@ -54,32 +54,6 @@ public class FinancialService
     }
 
     /**
-     * @return the financial assets of the specified year, by group, each account month by month,
-     * up to the current month
-     */
-    public FinancialAssetsDto getFinancialAssets(String year)
-    {
-        FinancialAssetsDto dto = new FinancialAssetsDto();
-
-        FinancialAssetsData data = getFinancialAssetsData(year);
-
-        for (String schemaId : data.getAssetGroups())
-        {
-            FinancialAssetsDto.Group groupDto = new FinancialAssetsDto.Group();
-            groupDto.setName(data.getAssetGroupName(schemaId).toUpperCase());
-
-            for (Account account : data.getAssetsByGroup(schemaId))
-            {
-                FinancialAsset asset = data.getFinancialAsset(account);
-                groupDto.getAccounts().add(FinancialAssetsDto.from(asset));
-            }
-            dto.getGroups().add(groupDto);
-        }
-        dto.trimFutureMonths();
-        return dto;
-    }
-
-    /**
      * @return the financial assets of every year that has any, by group, each asset month by
      * month across the years, up to the current month
      */
@@ -96,12 +70,21 @@ public class FinancialService
 
             for (String assetId : data.getAssetIds(schemaId))
             {
-                FinancialAsset asset = data.getFinancialAsset(schemaId, assetId);
-                groupDto.getAccounts().add(FinancialAssetsDto.from(asset));
+                FinancialAssetsDto.Group.Account account = FinancialAssetsDto.from(data.getFinancialAsset(schemaId, assetId));
+                account.setActive(data.isHeldInLatestYear(schemaId, assetId));
+                groupDto.getAccounts().add(account);
             }
             dto.getGroups().add(groupDto);
         }
         dto.trimFutureMonths();
+        dto.trimToActivity();
+        // from the timelines as they are kept: the months still to come would only lengthen them
+        for (FinancialAssetsDto.Group group : dto.getGroups()) {
+            for (FinancialAssetsDto.Group.Account account : group.getAccounts()) {
+                account.setAnnualReturn(AnnualReturn.of(account.getInitialValue(), account.getDeposits(),
+                        account.getWithdrawals(), account.getBalances(), account.getCurrentValue()));
+            }
+        }
         return dto;
     }
 }

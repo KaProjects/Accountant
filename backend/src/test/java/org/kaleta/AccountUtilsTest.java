@@ -11,12 +11,12 @@ import static org.kaleta.framework.Generator.account;
 
 /**
  * Financial asset accounts (23x) have their creation and revaluation counterpart
- * accounts derived from their id, and the derivation changed shape after 2020.
+ * accounts derived from their id.
  */
 public class AccountUtilsTest
 {
     @Test
-    void finCreationAccountIdFrom2021OnwardsKeepsTheGroupDigit()
+    void finCreationAccountIdKeepsTheGroupDigit()
     {
         // 230.1 -> 549.0-1 : group digit of 23x, then the semantic id
         assertThat(AccountUtils.getFinCreationAccountId(account("2021", "230.1")), is("549.0-1"));
@@ -24,32 +24,25 @@ public class AccountUtilsTest
     }
 
     @Test
-    void finCreationAccountIdUpTo2020OmitsTheGroupDigit()
+    void everyYearIsNamedTheSameWay()
     {
-        assertThat(AccountUtils.getFinCreationAccountId(account("2020", "230.1")), is("549.1"));
-        assertThat(AccountUtils.getFinCreationAccountId(account("2019", "232.7")), is("549.7"));
+        // the books once named the years up to 2020 without the group digit; they no longer do
+        assertThat(AccountUtils.getFinCreationAccountId(account("2019", "232.7")), is("549.2-7"));
+        assertThat(AccountUtils.getFinCreationAccountId(account("2020", "230.0")), is("549.0-0"));
     }
 
     @Test
     void revenueRevaluationAccountIdFollowsTheSameRule()
     {
         assertThat(AccountUtils.getFinRevRevaluationAccountId(account("2021", "231.2")), is("629.1-2"));
-        assertThat(AccountUtils.getFinRevRevaluationAccountId(account("2020", "231.2")), is("629.2"));
+        assertThat(AccountUtils.getFinRevRevaluationAccountId(account("2020", "231.2")), is("629.1-2"));
     }
 
     @Test
     void expenseRevaluationAccountIdFollowsTheSameRule()
     {
         assertThat(AccountUtils.getFinExpRevaluationAccountId(account("2021", "233.0")), is("548.3-0"));
-        assertThat(AccountUtils.getFinExpRevaluationAccountId(account("2020", "233.0")), is("548.0"));
-    }
-
-    @Test
-    void the2020BoundaryIsExclusiveOfTheOldForm()
-    {
-        // 2020 uses the old form, 2021 the new one
-        assertThat(AccountUtils.getFinCreationAccountId(account("2020", "230.0")), is("549.0"));
-        assertThat(AccountUtils.getFinCreationAccountId(account("2021", "230.0")), is("549.0-0"));
+        assertThat(AccountUtils.getFinExpRevaluationAccountId(account("2020", "233.0")), is("548.3-0"));
     }
 
     @Test

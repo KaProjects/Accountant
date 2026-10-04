@@ -79,6 +79,14 @@ describe("Home", () => {
         });
     });
 
+    it("opens the financial assets, which have one view over all the years", () => {
+        renderHome();
+
+        fireEvent.click(screen.getByText("Financial Assets"));
+
+        expect(mockNavigate).toHaveBeenLastCalledWith("/financial/assets");
+    });
+
     it("navigates to the overall balance sheet", () => {
         renderHome();
         const overallButtons = screen.getAllByText("Overall");

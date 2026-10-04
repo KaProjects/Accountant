@@ -64,11 +64,7 @@ const sections = (goTo) => [
                 caption: "A view groups various transactions and accounts together for better visualization of specific interests.",
             },
             {
-                title: "Financial Assets", icon: <TrendingUpIcon/>,
-                actions: [
-                    {label: "Yearly", onSelect: goTo("/financial/assets")},
-                    {label: "Overall", onSelect: goTo("/financial/assets/all")},
-                ],
+                title: "Financial Assets", icon: <TrendingUpIcon/>, onOpen: goTo("/financial/assets"),
                 caption: "A financial asset is a liquid asset that gets its value from a contractual right or ownership claim. Cash, stocks, bonds, mutual funds, and bank deposits are all are examples of financial assets.",
             },
         ],

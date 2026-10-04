@@ -131,4 +131,23 @@ describe("MainBar", () => {
             expect(screen.queryByRole("button", {name: "all years"})).not.toBeInTheDocument();
         });
     });
+
+    describe("the tabs of a divided page", () => {
+        it("are not shown on a page that offers none", () => {
+            renderBar({tabs: null});
+
+            expect(screen.queryAllByRole("tab")).toHaveLength(0);
+        });
+
+        it("are shown, the chosen one selected, and choosing another says so", () => {
+            const setSelectedTab = jest.fn();
+            renderBar({isYearly: false, tabs: ["Podiely", "Akcie"], selectedTab: "Podiely", setSelectedTab});
+
+            expect(screen.getByRole("tab", {name: "Podiely"})).toHaveAttribute("aria-selected", "true");
+
+            fireEvent.click(screen.getByRole("tab", {name: "Akcie"}));
+
+            expect(setSelectedTab).toHaveBeenCalledWith("Akcie");
+        });
+    });
 });
