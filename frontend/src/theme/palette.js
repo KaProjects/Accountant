@@ -30,18 +30,23 @@ export const neutral = {
     highlight: "rgba(0, 0, 0, 0.08)",
 }
 
-/** Row colours for the budgeting table, keyed by the row type the backend sends. */
+/**
+ * Row colours for the budgeting table, keyed by the row type the backend sends: tints, with the rows
+ * that add others up one step deeper than the rows they add up, and every row in the same dark ink -
+ * the only colour in its text is that of its differences from the planning.
+ */
+const budgetInk = "#222";
 export const budgetRowColors = {
-    INCOME: {background: "#b4ffb4", foreground: "#017901"},
-    INCOME_SUM: {background: "#67da67", foreground: "#017901"},
-    EXPENSE: {background: "#fdc6c6", foreground: "#c42424"},
-    EXPENSE_SUM: {background: "#fc9e9e", foreground: "#ab0000"},
-    BALANCE: {background: "#7eb9ff", foreground: "#002e88"},
-    OF_BUDGET_BALANCE: {background: "#7eb9ff", foreground: "#002e88"},
-    OF_BUDGET: {background: "#b6d8ff", foreground: "#3361bb"},
+    INCOME: {background: "#f1fbf1", foreground: budgetInk},
+    INCOME_SUM: {background: "#dcf3dc", foreground: budgetInk},
+    EXPENSE: {background: "#fdf3f3", foreground: budgetInk},
+    EXPENSE_SUM: {background: "#f8dede", foreground: budgetInk},
+    BALANCE: {background: "#e7f0fc", foreground: budgetInk},
+    OF_BUDGET_BALANCE: {background: "#e7f0fc", foreground: budgetInk},
+    OF_BUDGET: {background: "#f1f7ff", foreground: budgetInk},
 }
 
-/** Budget row types drawn with a heavier top and bottom border. */
+/** Budget row types that add others up, drawn in bold. */
 export const emphasisedBudgetRows = ["EXPENSE_SUM", "INCOME_SUM", "BALANCE", "OF_BUDGET_BALANCE"];
 
 /** Budget row types counted as expenses, where overspending is the bad direction. */

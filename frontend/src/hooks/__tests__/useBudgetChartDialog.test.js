@@ -58,6 +58,17 @@ describe("useBudgetChartDialog", () => {
         expect(asExpense).not.toBe(result.current.isExpense);
     });
 
+    it("keeps showing the row it was opened on while the pointer leaves the row for the dialog", () => {
+        const {result} = renderHook(() => useBudgetChartDialog());
+        act(() => result.current.preview(row()));
+        act(() => result.current.setOpen(true));
+
+        act(() => result.current.preview(null));
+
+        expect(result.current.name).toBe("Groceries");
+        expect(result.current.data).toHaveLength(12);
+    });
+
     it("closing both shuts the dialog and clears the preview", () => {
         const {result} = renderHook(() => useBudgetChartDialog());
         act(() => {result.current.preview(row()); result.current.setOpen(true)});

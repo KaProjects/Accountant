@@ -1,5 +1,5 @@
 {
-  "columns" : [ "Budget 2019", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "actual", "actual/9", "budget/9", "delta/9" ],
+  "columns" : [ "Budget 2019", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "actual", "actual/9" ],
   "rows" : [ {
     "type" : "INCOME",
     "name" : "i1",

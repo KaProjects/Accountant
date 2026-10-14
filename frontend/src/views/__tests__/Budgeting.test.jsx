@@ -31,7 +31,7 @@ const row = (overrides = {}) => ({
 const payload = (rows) => ({
     columns: ["Budget 2020", "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December",
-        "actual", "actual/3", "budget/3", "delta/3"],
+        "actual", "actual/3"],
     lastFilledMonth: 3,
     rows,
 });
@@ -78,10 +78,10 @@ describe("Budgeting", () => {
         mountView(payload([row()]));
 
         const headers = screen.getAllByRole("columnheader");
-        expect(headers).toHaveLength(17);
+        expect(headers).toHaveLength(15);
         expect(headers[0]).toHaveTextContent("Budget 2020");
         expect(headers[1]).toHaveTextContent("January");
-        expect(headers[16]).toHaveTextContent("delta/3");
+        expect(headers[14]).toHaveTextContent("actual/3");
     });
 
     it("shows actual figures up to the last filled month and planned ones after it", () => {
@@ -101,8 +101,7 @@ describe("Budgeting", () => {
         const cells = screen.getAllByRole("cell");
         expect(cells[13]).toHaveTextContent("600"); // actualSum
         expect(cells[14]).toHaveTextContent("200"); // actualAvg
-        expect(cells[15]).toHaveTextContent("150"); // plannedAvgToFilledMonth
-        expect(cells[16]).toHaveTextContent("50");  // deltaAvg
+        expect(cells).toHaveLength(15);
     });
 
     it("keeps sub rows hidden until the row is clicked", () => {
@@ -118,28 +117,65 @@ describe("Budgeting", () => {
         expect(screen.getByText("Supermarket")).toBeInTheDocument();
     });
 
-    it("reveals the planned and difference rows from the row toggle", () => {
+    it("shows under each actual figure how far it is from the planning", () => {
         mountView(payload([row()]));
 
+        const cells = screen.getAllByRole("cell");
+        expect(cells[1]).toHaveTextContent("100(-50)");  // 100 - 150
+        expect(cells[2]).toHaveTextContent("200(+50)");  // 200 - 150
+        expect(cells[3]).toHaveTextContent("300(+150)"); // 300 - 150
+        expect(cells[4]).toHaveTextContent(/^150$/);     // planned, beyond the filled months
         expect(screen.queryByText("Planned")).not.toBeInTheDocument();
-
-        fireEvent.click(screen.getAllByRole("button", {name: "expand row"})[0]);
-
-        expect(screen.getByText("Planned")).toBeInTheDocument();
-        expect(screen.getByText("Difference")).toBeInTheDocument();
     });
 
-    it("computes the difference row as actual minus planned", () => {
-        mountView(payload([row()]));
-        fireEvent.click(screen.getAllByRole("button", {name: "expand row"})[0]);
+    describe("folding a part into its total", () => {
+        const part = (count, summary) => [
+            ...Array.from({length: count}, (_, index) => row({id: "me" + (index + 1), name: "Cost " + (index + 1)})),
+            row({id: "me", name: summary, type: "EXPENSE_SUM"}),
+        ];
+        const toggle = () => screen.queryByRole("button", {name: /fold rows/});
 
-        const differenceRow = screen.getAllByRole("row")
-            .find((candidate) => within(candidate).queryByText("Difference"));
-        const cells = within(differenceRow).getAllByRole("cell");
-        expect(cells[0]).toHaveTextContent("-50");  // 100 - 150
-        expect(cells[1]).toHaveTextContent("50");   // 200 - 150
-        expect(cells[2]).toHaveTextContent("150");  // 300 - 150
-        expect(cells[3]).toHaveTextContent("-");    // beyond the filled months
+        it("offers nothing to fold for three rows or fewer", () => {
+            mountView(payload(part(3, "Mandatory")));
+
+            expect(toggle()).not.toBeInTheDocument();
+            expect(screen.getByText("Cost 3")).toBeInTheDocument();
+        });
+
+        it("starts four to six mandatory expenses unfolded, and folds them into the total", () => {
+            mountView(payload(part(6, "Mandatory")));
+            expect(screen.getByText("Cost 6")).toBeInTheDocument();
+
+            fireEvent.click(screen.getByRole("button", {name: "fold rows"}));
+
+            expect(screen.queryByText("Cost 1")).not.toBeInTheDocument();
+            expect(screen.getByText(/Mandatory/)).toBeInTheDocument();
+        });
+
+        it("starts more than six mandatory expenses folded, and unfolds them from the total's row", () => {
+            mountView(payload(part(7, "Mandatory")));
+            expect(screen.queryByText("Cost 1")).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByText(/Mandatory/));
+
+            expect(screen.getByText("Cost 7")).toBeInTheDocument();
+            expect(screen.getByRole("button", {name: "fold rows"})).toBeInTheDocument();
+        });
+    });
+
+    it("opens the transactions of the total of the mandatory expenses, but none of a balance", () => {
+        mountView(payload([
+            row({id: "me1", name: "Rent"}),
+            row({id: "me", name: "Mandatory", type: "EXPENSE_SUM"}),
+            row({id: "ntme", name: "Net", type: "BALANCE"}),
+        ]));
+        const firstMonth = (name) => within(screen.getByRole("row", {name: new RegExp(name)})).getAllByRole("cell")[1];
+
+        fireEvent.click(firstMonth("Net"));
+        expect(useData).not.toHaveBeenCalledWith("/budget/2020/transaction/ntme/month/1", true);
+
+        fireEvent.click(firstMonth("Mandatory"));
+        expect(useData).toHaveBeenCalledWith("/budget/2020/transaction/me/month/1", true);
     });
 
     it("renders one row per budget line", () => {
@@ -153,8 +189,9 @@ describe("Budgeting", () => {
         mountView(realBudget);
 
         expect(screen.getAllByRole("columnheader")).toHaveLength(realBudget.columns.length);
-        // one table row per budget line, before any expansion
-        expect(screen.getAllByRole("row")).toHaveLength(realBudget.rows.length + 1);
+        // one table row per budget line, before any expansion - but for its seven mandatory
+        // expenses, which start folded up into their total
+        expect(screen.getAllByRole("row")).toHaveLength(realBudget.rows.length + 1 - 7);
     });
 
     it("offers the main bar an edit button that opens the year's budget in the editor", async () => {

@@ -3,11 +3,12 @@ import PropTypes from "prop-types";
 import {IconButton, TableCell, TableRow} from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import {budgetPlannedRowStyle, budgetRowStyle} from "../../theme/tableStyles";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import {budgetDeltaStyle, budgetPlannedRowStyle, budgetRowStyle, highlightedCell} from "../../theme/tableStyles";
+import {formatAmount} from "../../services/amount";
+import CornerMark from "../common/CornerMark";
 
-/** Opens the transactions dialog for the cell currently pointed at. */
 const iconStyle = {width: 18};
 /** Laid out over the cell, so appearing under the pointer does not widen the column. */
 const cellButtonStyle = {
@@ -21,68 +22,125 @@ const cellButtonStyle = {
 /** Positioned inside the cell, so the cell keeps painting behind its neighbours' shadows. */
 const offerHostStyle = {position: "relative", display: "block"};
 const expandButtonStyle = {height: "2px", width: "10px"};
+// on the right of the name, so it does not cover it or the sub rows' toggle on its left
+const chartButtonStyle = {...cellButtonStyle, left: "auto", right: 0};
+// under the figure, on a line of its own
+const deltaHostStyle = {display: "block"};
 
-const TransactionsButton = ({color, onOpen}) => (
-    <IconButton style={{...cellButtonStyle, color}} onClick={onOpen}>
-        <ReceiptLongIcon sx={iconStyle}/>
-    </IconButton>
+/** The difference from the planning, signed. */
+const signed = (delta) => (delta > 0 ? "+" : "") + formatAmount(delta);
+
+/** Under an actual figure, how far it is from what was planned. */
+const Delta = ({type, value}) => (
+    <span style={deltaHostStyle}>
+        <span style={budgetDeltaStyle(type, value)}>({signed(value)})</span>
+    </span>
 );
 
-TransactionsButton.propTypes = {
-    color: PropTypes.string,
-    onOpen: PropTypes.func.isRequired,
+Delta.propTypes = {
+    type: PropTypes.string,
+    value: PropTypes.number.isRequired,
 };
 
 /**
- * One budget line, plus the sub rows and the planned/difference breakdown it can
- * expand into.
+ * One budget line, with the sub rows it can expand into. Each actual figure of the line has, under
+ * it, how far it is from what was planned; a sub row is not planned, so it has none.
  */
-const BudgetRow = ({row, id, expansion, transactionsDialog, budgetChart}) => {
-    const {showSubRows, showDeltas, onToggleSubRows, onToggleDeltas} = expansion;
+const BudgetRow = ({row, id, expansion, fold, transactionsDialog, budgetChart}) => {
+    const {showSubRows, onToggleSubRows} = expansion;
+
+    /**
+     * What a month cell of a line with transactions of its own does, as in the statements: pointing
+     * at it shades it as the one the dialog would open for, and a click anywhere on it - or Enter,
+     * from the keyboard - opens the dialog. A line made of sub rows shows all of theirs; only one
+     * adding up other lines - a total, a balance - has none of its own to show.
+     */
+    const opensTransactions = (line) => transactionsDialog.opensFor(line.id);
+    const monthCellProps = (line, index) => {
+        if (!opensTransactions(line)) return {};
+        const target = () => transactionsDialog.target(line.name, line.id, index + 1);
+        const open = (event) => {
+            // the row's own click opens its sub rows or folds its part, which this one must not do too
+            event.stopPropagation();
+            target();
+            transactionsDialog.setOpen(true);
+        };
+        return {
+            tabIndex: 0,
+            onMouseEnter: target,
+            onMouseLeave: () => transactionsDialog.clearTarget(),
+            onClick: open,
+            onKeyDown: (event) => {
+                if (event.key === "Enter") open(event);
+            },
+        };
+    };
+    const pointedAt = (line, index) => opensTransactions(line) && transactionsDialog.isTargeting(line.id, index + 1);
+    const monthCellStyle = (line, index, style) => (pointedAt(line, index) ? highlightedCell(style ?? {}) : style);
+    const toggle = () => {
+        if (row.subRows.length !== 0) onToggleSubRows(id);
+        else if (fold) fold.onToggle();
+    };
 
     return (
     <React.Fragment>
-        <TableRow key={id} onClick={() => {if (row.subRows.length !== 0) onToggleSubRows(id)}}>
+        {/* the chart is offered wherever on the row the pointer is */}
+        <TableRow key={id} onClick={toggle}
+                  onMouseEnter={() => budgetChart.preview(row)}
+                  onMouseLeave={() => budgetChart.preview(null)}
+        >
             <TableCell style={budgetRowStyle(row.type, false, true)} key={-1}>
-                <IconButton
-                    aria-label="expand row"
-                    style={expandButtonStyle}
-                    onClick={(e) => {onToggleDeltas(id);e.stopPropagation();}}
-                >
-                    {showDeltas ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                </IconButton>
-                {" " + row.name}
-                {(row.subRows.length !== 0) && <IconButton
-                    aria-label="expand row"
-                    style={cellButtonStyle}
-                    onClick={(e) => {onToggleSubRows(id);e.stopPropagation();}}
-                >
-                    {showSubRows ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                </IconButton>}
+                <span style={offerHostStyle}>
+                    {/* before the name, in line, rather than over its first letters */}
+                    {(row.subRows.length !== 0) && <IconButton
+                        aria-label="expand row"
+                        style={expandButtonStyle}
+                        onClick={(e) => {onToggleSubRows(id);e.stopPropagation();}}
+                    >
+                        {showSubRows ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>}
+                    {/* a total folds up the rows it adds up, which are above it */}
+                    {fold && <IconButton
+                        aria-label={fold.folded ? "unfold rows" : "fold rows"}
+                        style={expandButtonStyle}
+                        onClick={(e) => {fold.onToggle();e.stopPropagation();}}
+                    >
+                        {fold.folded ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
+                    </IconButton>}
+                    {(row.subRows.length !== 0 || fold ? " " : "") + row.name}
+                    {budgetChart.isPreviewing(row.name) &&
+                        <IconButton
+                            aria-label="budget chart"
+                            style={chartButtonStyle}
+                            onClick={(e) => {budgetChart.setOpen(true);e.stopPropagation();}}
+                        >
+                            <BarChartIcon sx={iconStyle}/>
+                        </IconButton>
+                    }
+                </span>
             </TableCell>
             {row.actual.map((month, index) => (
                 (index < row.lastFilledMonth)
                     ? <TableCell
-                        style={budgetRowStyle(row.type, false, false)} align="right" key={index}
-                        onMouseEnter={() => {if (row.subRows.length === 0) transactionsDialog.target(row.name, row.id, index + 1)}}
-                        onMouseLeave={() => transactionsDialog.clearTarget()}
+                        style={monthCellStyle(row, index, budgetRowStyle(row.type, false, false))} align="right" key={index}
+                        {...monthCellProps(row, index)}
                       >
                         <span style={offerHostStyle}>
-                            {transactionsDialog.isTargeting(row.id, index + 1) &&
-                                <TransactionsButton
-                                    color={budgetRowStyle(row.type).color}
-                                    onOpen={() => transactionsDialog.setOpen(true)}
-                                />
-                            }
-                            {month}
+                            {pointedAt(row, index) && <CornerMark icon={ReceiptLongIcon} corner="top-left"/>}
+                            {formatAmount(month)}
                         </span>
+                        <Delta type={row.type} value={month - row.planned[index]}/>
                       </TableCell>
-                    : <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={index}>{row.planned[index]}</TableCell>
+                    : <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={index}>{formatAmount(row.planned[index])}</TableCell>
             ))}
-            <TableCell style={budgetRowStyle(row.type, true, false)} align="right" key={12}>{row.actualSum}</TableCell>
-            <TableCell style={budgetRowStyle(row.type, true, true)} align="right" key={13}>{row.actualAvg}</TableCell>
-            <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={14}>{row.plannedAvgToFilledMonth}</TableCell>
-            <TableCell style={budgetPlannedRowStyle(row.type, false, row.deltaAvg)} align="right" key={15}>{row.deltaAvg}</TableCell>
+            <TableCell style={budgetRowStyle(row.type, true, false)} align="right" key={12}>
+                {formatAmount(row.actualSum)}
+                <Delta type={row.type} value={row.actualSum - row.plannedSumToFilledMonth}/>
+            </TableCell>
+            <TableCell style={budgetRowStyle(row.type, true, false)} align="right" key={13}>
+                {formatAmount(row.actualAvg)}
+                <Delta type={row.type} value={row.actualAvg - row.plannedAvgToFilledMonth}/>
+            </TableCell>
         </TableRow>
 
         {showSubRows && row.subRows.map((subrow, index) => (
@@ -94,66 +152,20 @@ const BudgetRow = ({row, id, expansion, transactionsDialog, budgetChart}) => {
                     (monthIndex < row.lastFilledMonth)
                         ? <TableCell
                             align="right" key={monthIndex}
-                            onMouseEnter={() => transactionsDialog.target(subrow.name, subrow.id, monthIndex + 1)}
-                            onMouseLeave={() => transactionsDialog.clearTarget()}
+                            style={monthCellStyle(subrow, monthIndex, undefined)}
+                            {...monthCellProps(subrow, monthIndex)}
                         >
                             <span style={offerHostStyle}>
-                                {transactionsDialog.isTargeting(subrow.id, monthIndex + 1) &&
-                                    <TransactionsButton onOpen={() => transactionsDialog.setOpen(true)}/>
-                                }
-                                {month}
+                                {pointedAt(subrow, monthIndex) && <CornerMark icon={ReceiptLongIcon} corner="top-left"/>}
+                                {formatAmount(month)}
                             </span>
                         </TableCell>
-                        : <TableCell align="right" key={monthIndex}>{subrow.planned[monthIndex]}</TableCell>
+                        : <TableCell align="right" key={monthIndex}>{formatAmount(subrow.planned[monthIndex])}</TableCell>
                 ))}
-                <TableCell align="right" key={12}>{subrow.actualSum}</TableCell>
-                <TableCell align="right" key={13}>{subrow.actualAvg}</TableCell>
-                <TableCell align="right" key={14}>{subrow.plannedAvgToFilledMonth}</TableCell>
-                <TableCell align="right" key={15}>{subrow.deltaAvg}</TableCell>
+                <TableCell align="right" key={12}>{formatAmount(subrow.actualSum)}</TableCell>
+                <TableCell align="right" key={13}>{formatAmount(subrow.actualAvg)}</TableCell>
             </TableRow>
         ))}
-
-        {showDeltas &&
-            <>
-                <TableRow key={id + "dp"}>
-                    <TableCell style={budgetPlannedRowStyle(row.type)} component="th" scope="row" key={-1}>Planned</TableCell>
-                    {row.planned.map((month, index) => (
-                        (index < row.lastFilledMonth)
-                            ? <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={index}>{month}</TableCell>
-                            : <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={index}>-</TableCell>
-                    ))}
-                    <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={12}>{row.plannedSumToFilledMonth}</TableCell>
-                    <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={13}>{row.plannedAvgToFilledMonth}</TableCell>
-                    <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={14}>-</TableCell>
-                    <TableCell style={budgetPlannedRowStyle(row.type)} align="right" key={15}>-</TableCell>
-                </TableRow>
-                <TableRow key={id + "dd"}>
-                    <TableCell style={budgetPlannedRowStyle(row.type, true)} component="th" scope="row" key={-1}
-                               onMouseEnter={() => budgetChart.preview(row)}
-                               onMouseLeave={() => budgetChart.preview(null)}
-                    >
-                        Difference
-                        {budgetChart.isPreviewing(row.name) &&
-                            <IconButton
-                                style={cellButtonStyle}
-                                onClick={() => budgetChart.setOpen(true)}
-                            >
-                                <BarChartIcon sx={iconStyle}/>
-                            </IconButton>
-                        }
-                    </TableCell>
-                    {row.planned.map((month, index) => (
-                        (index < row.lastFilledMonth)
-                            ? <TableCell style={budgetPlannedRowStyle(row.type, true, row.actual[index] - month)} align="right" key={index}>{row.actual[index] - month}</TableCell>
-                            : <TableCell style={budgetPlannedRowStyle(row.type, true)} align="right" key={index}>-</TableCell>
-                    ))}
-                    <TableCell style={budgetPlannedRowStyle(row.type, true, row.actualSum - row.plannedSumToFilledMonth)} align="right" key={12}>{row.actualSum - row.plannedSumToFilledMonth}</TableCell>
-                    <TableCell style={budgetPlannedRowStyle(row.type, true, row.actualAvg - row.plannedAvgToFilledMonth)} align="right" key={13}>{row.actualAvg - row.plannedAvgToFilledMonth}</TableCell>
-                    <TableCell style={budgetPlannedRowStyle(row.type, true)} align="right" key={14}>-</TableCell>
-                    <TableCell style={budgetPlannedRowStyle(row.type, true)} align="right" key={15}>-</TableCell>
-                </TableRow>
-            </>
-        }
     </React.Fragment>
     );
 };
@@ -161,13 +173,16 @@ const BudgetRow = ({row, id, expansion, transactionsDialog, budgetChart}) => {
 BudgetRow.propTypes = {
     row: PropTypes.object.isRequired,
     id: PropTypes.number.isRequired,
-    /** Which of the row's breakdowns are open, and how to open them. */
+    /** Whether the row's sub rows are open, and how to open them. */
     expansion: PropTypes.shape({
         showSubRows: PropTypes.bool,
-        showDeltas: PropTypes.bool,
         onToggleSubRows: PropTypes.func.isRequired,
-        onToggleDeltas: PropTypes.func.isRequired,
     }).isRequired,
+    /** For a total that can fold up the rows it adds up: whether they are folded, and how to toggle them. */
+    fold: PropTypes.shape({
+        folded: PropTypes.bool.isRequired,
+        onToggle: PropTypes.func.isRequired,
+    }),
     transactionsDialog: PropTypes.object.isRequired,
     budgetChart: PropTypes.object.isRequired,
 };

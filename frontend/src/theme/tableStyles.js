@@ -21,8 +21,31 @@ const headerStyle = (hasLeftBorder, hasRightBorder) => ({
     borderColor: neutral.headerBorder,
 });
 
-export const budgetHeaderStyle = (index) =>
-    headerStyle(index === 13, index === 0 || index === 13 || index === 14);
+/**
+ * The widths of the budgeting table's columns other than the months: its names, and its sums and
+ * averages. The months share what is left equally, so that each is as wide as the next.
+ */
+const budgetColumnWidths = {0: "170px", 13: "110px", 14: "110px"};
+
+/**
+ * A heading of the budgeting table, in the look of its rows: the same ink on a plain grey, over a
+ * single rule, centred, and bordered where the rows are.
+ */
+export const budgetHeaderStyle = (index) => ({
+    width: budgetColumnWidths[index],
+    // a cool grey, darker than any row's tint, so it reads as the heading and never as a row
+    background: "#e4e7eb",
+    color: "#222",
+    fontWeight: "bold",
+    fontSize: "13px",
+    whiteSpace: "nowrap",
+    textAlign: "center",
+    border: "0px",
+    borderBottom: "1px solid #9aa1a9",
+    borderLeft: border(index === 13),
+    // none after the last column: the table's own side is there
+    borderRight: border(index === 0 || index === 13),
+});
 
 /**
  * A cell of the column of row names, which stays in view while a statement too wide for the screen
@@ -70,16 +93,14 @@ export const statementHeaderStyle = (index, {columnCount, hasInitial, hasTotal})
 
 export function budgetRowStyle(type, hasLeftBorder, hasRightBorder) {
     const palette = budgetRowColors[type];
-    const emphasised = emphasisedBudgetRows.includes(type);
 
     return {
-        fontWeight: "bold",
+        // the rows that add others up stand out by their weight, the rest stay plain
+        fontWeight: emphasisedBudgetRows.includes(type) ? "bold" : "normal",
         background: palette && palette.background,
         color: palette && palette.foreground,
         border: "0px",
-        boxShadow: "0 0 8px 0",
-        borderTop: border(emphasised),
-        borderBottom: border(emphasised),
+        borderBottom: "1px solid #e3e3e3",
         borderLeft: border(hasLeftBorder),
         borderRight: border(hasRightBorder),
     };
@@ -89,6 +110,38 @@ export function budgetRowStyle(type, hasLeftBorder, hasRightBorder) {
  * Style for a planned or difference cell. A non-null delta colours the cell by
  * whether the variance is favourable for that row type.
  */
+/** How a difference from the planning reads on a row of the given type: good, bad or neither. */
+function deltaColors(type, delta) {
+    if (type === "OF_BUDGET" || type === "OF_BUDGET_BALANCE") {
+        return {color: neutral.text, background: neutral.plainBackground};
+    }
+    if (delta === 0) {
+        return {color: neutral.neutralValue, background: neutral.neutralBackground};
+    }
+    // a surplus is good news on income and balance rows, bad news on expense rows
+    const higherIsBetter = favourablyPositiveBudgetRows.includes(type);
+    const favourable = delta > 0 ? higherIsBetter : !higherIsBetter;
+    return favourable
+        ? {color: neutral.positive, background: neutral.positiveBackground}
+        : {color: neutral.negative, background: neutral.negativeBackground};
+}
+
+/**
+ * The difference from the planning under an actual figure: small, and coloured by whether it is good
+ * or bad news, straight on the row's own background. A difference that is neither - none at all, or
+ * one off the budget - takes the row's own ink, faded: an expense row's ink is the very red of an
+ * overspend, and an income row's the green of a surplus, so at full strength it would read as one.
+ */
+export const budgetDeltaStyle = (type, delta) => {
+    const neither = delta === 0 || type === "OF_BUDGET" || type === "OF_BUDGET_BALANCE";
+    return {
+        color: neither ? budgetRowColors[type]?.foreground : deltaColors(type, delta).color,
+        opacity: neither ? 0.5 : 1,
+        fontSize: "11px",
+        fontWeight: "normal",
+    };
+};
+
 export function budgetPlannedRowStyle(type, hasBottomPadding, delta) {
     let background = neutral.plainBackground;
     let color = neutral.text;
@@ -96,19 +149,7 @@ export function budgetPlannedRowStyle(type, hasBottomPadding, delta) {
 
     if (delta != null) {
         fontWeight = "bold";
-        if (type === "OF_BUDGET" || type === "OF_BUDGET_BALANCE") {
-            color = neutral.text;
-            background = neutral.plainBackground;
-        } else if (delta === 0) {
-            color = neutral.neutralValue;
-            background = neutral.neutralBackground;
-        } else {
-            // a surplus is good news on income and balance rows, bad news on expense rows
-            const higherIsBetter = favourablyPositiveBudgetRows.includes(type);
-            const favourable = delta > 0 ? higherIsBetter : !higherIsBetter;
-            color = favourable ? neutral.positive : neutral.negative;
-            background = favourable ? neutral.positiveBackground : neutral.negativeBackground;
-        }
+        ({color, background} = deltaColors(type, delta));
     }
 
     return {
@@ -131,7 +172,8 @@ export function statementRowStyle(type, hasLeftBorder, hasRightBorder) {
         background: palette && palette.background,
         color: palette && palette.foreground,
         border: "0px",
-        boxShadow: "0 0 8px 0",
+        // the rows that add others up glow in their colour; the rest are set apart by a hairline
+        boxShadow: emphasised ? "0 0 8px 0" : "0 0 1px 0 rgba(0, 0, 0, 0.3)",
         borderTop: border(emphasised),
         borderBottom: border(emphasised),
         borderLeft: border(hasLeftBorder),

@@ -34,7 +34,7 @@ public class BudgetResourceTest
 
         BudgetDto dto = response.jsonPath().getObject("", BudgetDto.class);
 
-        assertThat(dto.getColumns().size(), is(17));
+        assertThat(dto.getColumns().size(), is(15));
         assertThat(dto.getColumns().get(0), is("Budget 2019"));
         assertThat(dto.getLastFilledMonth(), is(9));
         assertThat(dto.getRows().size(), is(12));
@@ -330,6 +330,41 @@ public class BudgetResourceTest
                 .statusCode(200)
                 .body("size()", is(1))
                 .body("[0].description", is("with08"));
+    }
+
+    @Test
+    public void theTransactionsOfARowMadeOfSubRows_areAllOfTheirs()
+    {
+        // the fixtures' i1 is made of i1.1 and i1.2, which both count something in July
+        List<YearTransactionDto> row = transactions("/budget/2019/transaction/i1/month/7");
+        List<YearTransactionDto> first = transactions("/budget/2019/transaction/i1.1/month/7");
+        List<YearTransactionDto> second = transactions("/budget/2019/transaction/i1.2/month/7");
+
+        assertThat(row.size(), is(first.size() + second.size()));
+        assertThat(row.containsAll(first) && row.containsAll(second), is(true));
+    }
+
+    @Test
+    public void theTransactionsOfTheTotalOfAPart_areAllOfItsRows()
+    {
+        // the fixtures' income is i1 - made of i1.1 and i1.2 - and i2
+        for (String month : List.of("5", "7", "9")) {
+            List<YearTransactionDto> total = transactions("/budget/2019/transaction/i/month/" + month);
+            List<YearTransactionDto> first = transactions("/budget/2019/transaction/i1/month/" + month);
+            List<YearTransactionDto> second = transactions("/budget/2019/transaction/i2/month/" + month);
+
+            assertThat(total.size(), is(first.size() + second.size()));
+            assertThat(total.containsAll(first) && total.containsAll(second), is(true));
+        }
+        assertThat(transactions("/budget/2019/transaction/me/month/9").size(), is(
+                transactions("/budget/2019/transaction/me1/month/9").size()
+                        + transactions("/budget/2019/transaction/me2/month/9").size()));
+    }
+
+    private static List<YearTransactionDto> transactions(String path)
+    {
+        return given().when().get(path).then().statusCode(200)
+                .extract().response().jsonPath().getList("", YearTransactionDto.class);
     }
 
     @Test

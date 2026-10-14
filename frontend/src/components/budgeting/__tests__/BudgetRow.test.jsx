@@ -40,6 +40,7 @@ const dialog = (overrides = {}) => ({
     clearTarget: jest.fn(),
     isTargeting: jest.fn().mockReturnValue(false),
     setOpen: jest.fn(),
+    opensFor: jest.fn().mockReturnValue(true),
     ...overrides,
 });
 
@@ -50,11 +51,10 @@ const chart = (overrides = {}) => ({
     ...overrides,
 });
 
-const mountRow = ({showSubRows, showDeltas, ...props} = {}) => {
+const mountRow = ({showSubRows, ...props} = {}) => {
     const expansion = {
-        showSubRows, showDeltas,
+        showSubRows,
         onToggleSubRows: jest.fn(),
-        onToggleDeltas: jest.fn(),
     };
     const merged = {
         row, id: 0, expansion,
@@ -77,22 +77,20 @@ describe("BudgetRow", () => {
         mountRow();
         const cells = within(rowNamed(/Salary/)).getAllByRole("cell");
 
-        // One name cell, twelve months, then the four summary cells.
-        expect(cells).toHaveLength(17);
+        // One name cell, twelve months, then the sum and the average.
+        expect(cells).toHaveLength(15);
         expect(cells[1]).toHaveTextContent("11");
         expect(cells[3]).toHaveTextContent("33");
         expect(cells[4]).toHaveTextContent("400");
-        expect(cells[12]).toHaveTextContent("1200");
+        expect(cells[12]).toHaveTextContent("1,200");
     });
 
-    it("summarises the row with its sum, average, planned average and difference", () => {
+    it("summarises the row with its sum and average", () => {
         mountRow();
         const cells = within(rowNamed(/Salary/)).getAllByRole("cell");
 
         expect(cells[13]).toHaveTextContent("66");
         expect(cells[14]).toHaveTextContent("24");
-        expect(cells[15]).toHaveTextContent("199");
-        expect(cells[16]).toHaveTextContent("-176");
     });
 
     it("does not expand a row that has no sub rows", () => {
@@ -111,16 +109,6 @@ describe("BudgetRow", () => {
         expect(props.onToggleSubRows).toHaveBeenCalledWith(0);
     });
 
-    it("toggles the breakdown without also toggling the sub rows", () => {
-        // The two controls sit in the same cell, so the inner click must not reach the row.
-        const props = mountRow({row: withSubRow});
-
-        fireEvent.click(within(rowNamed(/Salary/)).getAllByLabelText("expand row")[0]);
-
-        expect(props.onToggleDeltas).toHaveBeenCalledWith(0);
-        expect(props.onToggleSubRows).not.toHaveBeenCalled();
-    });
-
     it("renders its sub rows only while they are expanded", () => {
         mountRow({row: withSubRow});
         expect(screen.queryByText("Bonus")).not.toBeInTheDocument();
@@ -129,29 +117,50 @@ describe("BudgetRow", () => {
         mountRow({row: withSubRow, showSubRows: true});
         expect(screen.getByText("Bonus")).toBeInTheDocument();
         expect(within(rowNamed("Bonus")).getByText("7")).toBeInTheDocument();
-        expect(within(rowNamed("Bonus")).getByText("1001")).toBeInTheDocument();
+        expect(within(rowNamed("Bonus")).getByText("1,001")).toBeInTheDocument();
     });
 
-    it("shows the planned and difference breakdown only while it is expanded", () => {
+    it("shows under each actual figure how far it is from the planning, and none under a planned one", () => {
         mountRow();
-        expect(screen.queryByText("Planned")).not.toBeInTheDocument();
-        cleanup();
+        const cells = within(rowNamed(/Salary/)).getAllByRole("cell");
 
-        mountRow({showDeltas: true});
-        expect(within(rowNamed("Planned")).getByText("100")).toBeInTheDocument();
-        expect(within(rowNamed("Planned")).getByText("600")).toBeInTheDocument();
+        expect(cells[1]).toHaveTextContent("11(-89)");
+        expect(cells[2]).toHaveTextContent("22(-178)");
+        expect(cells[3]).toHaveTextContent("33(-267)");
+        expect(cells[4]).toHaveTextContent(/^400$/);
+        // the sum against what was planned up to the last filled month, the average likewise
+        expect(cells[13]).toHaveTextContent("66(-534)");
+        expect(cells[14]).toHaveTextContent("24(-175)");
     });
 
-    it("computes each difference as actual minus planned, and dashes the unfilled months", () => {
-        mountRow({showDeltas: true});
-        const cells = within(rowNamed("Difference")).getAllByRole("cell");
+    it("signs a difference above the planning", () => {
+        mountRow({row: {...row, actual: [111, 22, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0]}});
 
-        expect(cells[0]).toHaveTextContent("-89");
-        expect(cells[1]).toHaveTextContent("-178");
-        expect(cells[2]).toHaveTextContent("-267");
-        expect(cells[3]).toHaveTextContent("-");
-        expect(cells[12]).toHaveTextContent("-534");
-        expect(cells[13]).toHaveTextContent("-175");
+        expect(within(rowNamed(/Salary/)).getAllByRole("cell")[1]).toHaveTextContent("111(+11)");
+    });
+
+    it("shows no difference under a sub row's figures, which are not planned", () => {
+        mountRow({row: withSubRow, showSubRows: true});
+
+        expect(within(rowNamed("Bonus")).queryByText(/\(/)).not.toBeInTheDocument();
+    });
+
+    it("previews the budget chart from anywhere on the row, and opens it from the row's name", () => {
+        const budgetChart = chart({isPreviewing: jest.fn().mockReturnValue(true)});
+        const props = mountRow({row: withSubRow, budgetChart});
+        const tableRow = rowNamed(/Salary/);
+        const cell = within(tableRow).getAllByRole("cell")[0];
+
+        fireEvent.mouseEnter(within(tableRow).getAllByRole("cell")[7]);
+        expect(budgetChart.preview).toHaveBeenCalledWith(withSubRow);
+
+        fireEvent.click(within(cell).getByRole("button", {name: "budget chart"}));
+        expect(budgetChart.setOpen).toHaveBeenCalledWith(true);
+        // opening the chart does not also open the sub rows
+        expect(props.onToggleSubRows).not.toHaveBeenCalled();
+
+        fireEvent.mouseLeave(tableRow);
+        expect(budgetChart.preview).toHaveBeenCalledWith(null);
     });
 
     it("points the transactions dialog at the cell under the pointer, and clears it on leaving", () => {
@@ -165,50 +174,58 @@ describe("BudgetRow", () => {
         expect(props.transactionsDialog.clearTarget).toHaveBeenCalled();
     });
 
-    it("offers no transactions dialog on a row that only aggregates its sub rows", () => {
+    it("opens the transactions of all its sub rows from a row made of them", () => {
         const props = mountRow({row: withSubRow});
 
-        fireEvent.mouseEnter(within(rowNamed(/Salary/)).getAllByRole("cell")[2]);
+        fireEvent.click(within(rowNamed(/Salary/)).getAllByRole("cell")[2]);
 
-        expect(props.transactionsDialog.target).not.toHaveBeenCalled();
+        expect(props.transactionsDialog.target).toHaveBeenCalledWith("Salary", "600", 2);
+        expect(props.transactionsDialog.setOpen).toHaveBeenCalledWith(true);
+        // the click on the cell is the cell's, not the row's, which would open the sub rows
+        expect(props.onToggleSubRows).not.toHaveBeenCalled();
     });
 
-    it("opens the transactions dialog from the cell being pointed at", () => {
-        const transactionsDialog = dialog({
-            isTargeting: jest.fn((id, month) => id === "600" && month === 1),
-        });
-        mountRow({transactionsDialog});
+    it("opens the transactions dialog from a click anywhere on a month cell, not also opening the row", () => {
+        const props = mountRow({row: withSubRow, showSubRows: true});
+        // the sub row's name is its row's header, so its cells are its months: the third is March
+        const cell = within(rowNamed("Bonus")).getAllByRole("cell")[2];
 
-        fireEvent.click(within(rowNamed(/Salary/)).getAllByRole("button")[1]);
+        fireEvent.click(cell);
 
-        expect(transactionsDialog.setOpen).toHaveBeenCalledWith(true);
+        expect(props.transactionsDialog.target).toHaveBeenCalledWith("Bonus", "600.1", 3);
+        expect(props.transactionsDialog.setOpen).toHaveBeenCalledWith(true);
+        expect(props.onToggleSubRows).not.toHaveBeenCalled();
     });
 
-    it("previews the budget chart from the difference row and opens it", () => {
-        const budgetChart = chart({isPreviewing: jest.fn().mockReturnValue(true)});
-        mountRow({showDeltas: true, budgetChart});
-        const cell = within(rowNamed("Difference")).getByRole("rowheader");
-
-        fireEvent.mouseEnter(cell);
-        expect(budgetChart.preview).toHaveBeenCalledWith(row);
-
-        fireEvent.click(within(cell).getByRole("button"));
-        expect(budgetChart.setOpen).toHaveBeenCalledWith(true);
-
-        fireEvent.mouseLeave(cell);
-        expect(budgetChart.preview).toHaveBeenCalledWith(null);
-    });
-
-    it("offers the dialog to the left of the figure, not after it", () => {
-        const transactionsDialog = dialog({
-            isTargeting: jest.fn((id, month) => id === "600" && month === 1),
-        });
-        mountRow({transactionsDialog});
-
+    it("opens the transactions dialog from the keyboard, with Enter on a month cell", () => {
+        const props = mountRow();
         const cell = within(rowNamed(/Salary/)).getAllByRole("cell")[1];
-        const button = within(cell).getByRole("button");
-        // Which side it sits on is a question about order, which the query API cannot ask.
-        // eslint-disable-next-line testing-library/no-node-access
-        expect(button.parentElement.firstElementChild).toBe(button);
+
+        fireEvent.keyDown(cell, {key: "Enter"});
+
+        expect(props.transactionsDialog.setOpen).toHaveBeenCalledWith(true);
     });
+
+    it("shades and marks the month cell being pointed at, as the statements do", () => {
+        const transactionsDialog = dialog({
+            isTargeting: jest.fn((id, month) => id === "600" && month === 1),
+        });
+        mountRow({transactionsDialog});
+        const cells = within(rowNamed(/Salary/)).getAllByRole("cell");
+
+        expect(cells[1]).toHaveStyle({cursor: "pointer"});
+        expect(within(cells[1]).getByTestId("corner-mark")).toBeInTheDocument();
+        expect(cells[2]).not.toHaveStyle({cursor: "pointer"});
+        expect(within(cells[2]).queryByTestId("corner-mark")).not.toBeInTheDocument();
+    });
+
+    it("opens nothing from a row that adds up other rows", () => {
+        const transactionsDialog = dialog({opensFor: jest.fn().mockReturnValue(false)});
+        mountRow({transactionsDialog});
+
+        fireEvent.click(within(rowNamed(/Salary/)).getAllByRole("cell")[1]);
+
+        expect(transactionsDialog.setOpen).not.toHaveBeenCalled();
+    });
+
 });

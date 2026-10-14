@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.kaleta.Constants.Budget.FIN_ASSET;
 import static org.kaleta.Constants.Budget.VACATION_LABEL;
@@ -39,6 +40,8 @@ import static org.kaleta.dto.BudgetDto.Row.Type.OF_BUDGET_BALANCE;
 @ApplicationScoped
 public class BudgetingService
 {
+    /** The ids of the totals of the parts of the budget whose transactions can be listed together. */
+    private static final Set<String> SUMMED_PART_IDS = Set.of("i", "me");
     /** A part of the budget - income, mandatory expenses, expenses, off-budget - and a number. */
     private static final String ROW_ID = "(i|me|e|of)\\d+(\\.\\d+)*";
     /** An account: its schema id, a dot and its number - and for an asset's, a dash and another. */
@@ -317,15 +320,45 @@ public class BudgetingService
     }
 
     /**
-     * @return list of transactions for specified ID, year and month
+     * @return list of transactions for specified ID, year and month - of a row, its sub rows, or for
+     * the total of the income or the mandatory expenses, every row of that part
      */
     public List<Transaction> getBudgetTransactions(String year, String budgetId, String month)
     {
-        Budgeting schema = getSchema(year).stream()
-                .filter(row -> row.getYearId().getId().equals(budgetId))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("The budget of " + year + " has no row '" + budgetId + "'."));
+        List<Budgeting> rows = getSchema(year);
+        boolean total = SUMMED_PART_IDS.contains(budgetId);
+        if (!total && rows.stream().noneMatch(row -> row.getYearId().getId().equals(budgetId))) {
+            throw new ResourceNotFoundException("The budget of " + year + " has no row '" + budgetId + "'.");
+        }
 
+        // what the row counts itself; or, for a row made of sub rows, what they count; or, for the
+        // total of a part, what every row of the part counts - each transaction once
+        List<Budgeting> covered = rows.stream().filter(row -> {
+            String id = row.getYearId().getId();
+            return total ? id.matches(budgetId + "\\d.*") : id.equals(budgetId) || id.startsWith(budgetId + ".");
+        }).toList();
+        List<Budgeting> counting = covered.stream()
+                .filter(row -> covered.stream().noneMatch(other -> other.getYearId().getId().startsWith(row.getYearId().getId() + ".")))
+                .filter(row -> !total || row.getDebit() != null || row.getCredit() != null)
+                .toList();
+        List<Transaction> transactions = counting.stream()
+                .flatMap(row -> transactionsOf(year, row, month).stream())
+                .distinct()
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        Map<String, String> accountNames = accountService.getAccountNamesMap(year);
+        transactions.forEach(transaction -> {
+            transaction.setDebit(accountNames.get(transaction.getDebit()));
+            transaction.setCredit(accountNames.get(transaction.getCredit()));
+        });
+
+        return transactions;
+    }
+
+    /** The transactions a row with accounts of its own counts in the given month, by account id. */
+    private List<Transaction> transactionsOf(String year, Budgeting schema, String month)
+    {
+        String budgetId = schema.getYearId().getId();
         if (schema.getDebit() == null && schema.getCredit() == null){
             throw new IllegalArgumentException("Budget schema specified by budgetId='" + budgetId + "' doesn't have debit/credit accounts specified.");
         }
@@ -357,12 +390,6 @@ public class BudgetingService
 
         // filter correcting transactions between same schema account
         transactions.removeIf(transaction -> transaction.getDebit().substring(0,3).equals(transaction.getCredit().substring(0,3)));
-
-        Map<String, String> accountNames = accountService.getAccountNamesMap(year);
-        transactions.forEach(transaction -> {
-            transaction.setDebit(accountNames.get(transaction.getDebit()));
-            transaction.setCredit(accountNames.get(transaction.getCredit()));
-        });
 
         return transactions;
     }

@@ -26,8 +26,6 @@ public class BudgetDto
         columns.remove(13);
         columns.add("actual");
         columns.add("actual/"+lastFilledMonth);
-        columns.add("budget/"+lastFilledMonth);
-        columns.add("delta/"+lastFilledMonth);
     }
 
     public BudgetDto.Row addRow(BudgetDto.Row.Type type, String name, String id, Integer[] monthlyActual, Integer[] monthlyPlanned)

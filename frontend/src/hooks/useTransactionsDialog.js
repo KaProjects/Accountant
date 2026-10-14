@@ -48,9 +48,12 @@ export function useTransactionsDialog({ignoredRowIds = []} = {}) {
         forgetTarget();
     };
 
+    /** Whether a row has transactions of its own to open, rather than adding up other rows'. */
+    const opensFor = (candidateRowId) => !ignoredRowIds.includes(candidateRowId);
+
     /** True when the given cell is the one currently pointed at. */
     const isTargeting = (candidateRowId, candidateMonth) =>
         candidateRowId === rowId && candidateMonth === month;
 
-    return {open, rowName, rowId, month, setOpen, target, clearTarget, close, isTargeting};
+    return {open, rowName, rowId, month, setOpen, target, clearTarget, close, isTargeting, opensFor};
 }

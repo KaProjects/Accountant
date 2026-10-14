@@ -12,31 +12,30 @@ import {neutral} from "../palette";
 // replaced, so any drift in the extraction shows up here.
 
 describe("budgetRowStyle", () => {
-    it("colours a plain income row without the heavier borders", () => {
+    it("tints a plain income row, in plain weight, over a hairline", () => {
         expect(budgetRowStyle("INCOME", false, true)).toEqual({
-            fontWeight: "bold",
-            background: "#b4ffb4",
-            color: "#017901",
+            fontWeight: "normal",
+            background: "#f1fbf1",
+            color: "#222",
             border: "0px",
-            boxShadow: "0 0 8px 0",
-            borderTop: "0px",
-            borderBottom: "0px",
+            borderBottom: "1px solid #e3e3e3",
             borderLeft: "0px",
             borderRight: "2px solid",
         });
     });
 
-    it("gives summary rows a heavier top and bottom border", () => {
+    it("draws the rows that add others up in bold, on a deeper tint than the rows they add up", () => {
         ["INCOME_SUM", "EXPENSE_SUM", "BALANCE", "OF_BUDGET_BALANCE"].forEach((type) => {
-            const style = budgetRowStyle(type, false, false);
-            expect(style.borderTop).toBe("2px solid");
-            expect(style.borderBottom).toBe("2px solid");
+            expect(budgetRowStyle(type, false, false).fontWeight).toBe("bold");
         });
+        expect(budgetRowStyle("INCOME_SUM", false, false).background).toBe("#dcf3dc");
+        expect(budgetRowStyle("EXPENSE_SUM", false, false).background).toBe("#f8dede");
+        expect(budgetRowStyle("EXPENSE", false, false).background).toBe("#fdf3f3");
     });
 
-    it("keeps the distinct expense summary foreground", () => {
-        expect(budgetRowStyle("EXPENSE", false, false).color).toBe("#c42424");
-        expect(budgetRowStyle("EXPENSE_SUM", false, false).color).toBe("#ab0000");
+    it("writes every row in the same dark ink, leaving colour to the differences", () => {
+        ["INCOME", "INCOME_SUM", "EXPENSE", "EXPENSE_SUM", "BALANCE", "OF_BUDGET", "OF_BUDGET_BALANCE"]
+            .forEach((type) => expect(budgetRowStyle(type, false, false).color).toBe("#222"));
     });
 
     it("leaves colours undefined for an unknown row type", () => {
@@ -100,17 +99,21 @@ describe("budgetPlannedRowStyle", () => {
 });
 
 describe("budgetHeaderStyle", () => {
-    it("borders the label, sum and average columns", () => {
+    it("borders the label and sum columns, and leaves the table's own side after the last", () => {
         expect(budgetHeaderStyle(0).borderRight).toBe("2px solid");
         expect(budgetHeaderStyle(13).borderLeft).toBe("2px solid");
         expect(budgetHeaderStyle(13).borderRight).toBe("2px solid");
-        expect(budgetHeaderStyle(14).borderRight).toBe("2px solid");
+        expect(budgetHeaderStyle(14).borderRight).toBe("0px");
     });
 
-    it("leaves the month columns unbordered", () => {
+    it("leaves the month columns unbordered, over a single rule", () => {
         expect(budgetHeaderStyle(5).borderLeft).toBe("0px");
         expect(budgetHeaderStyle(5).borderRight).toBe("0px");
-        expect(budgetHeaderStyle(5).borderBottom).toBe("2px solid");
+        expect(budgetHeaderStyle(5).borderBottom).toBe("1px solid #9aa1a9");
+    });
+
+    it("centres every heading", () => {
+        [0, 5, 14].forEach((index) => expect(budgetHeaderStyle(index).textAlign).toBe("center"));
     });
 });
 
