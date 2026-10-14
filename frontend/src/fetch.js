@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 import {properties} from "./properties";
 import {credentialed} from "./services/session";
@@ -24,7 +24,7 @@ const request = (path) => axios.get(properties.backend + path, credentialed)
     });
 
 /**
- * Fetches a path, optionally only once it is wanted.
+ * Fetches a path, optionally only once it is wanted, and again whenever reload is called.
  *
  * The flag exists for a caller that knows the path before it knows whether it will be used - a
  * dialog that has been pointed at a row but not yet opened. Such a caller used to be forced to
@@ -42,6 +42,9 @@ const request = (path) => axios.get(properties.backend + path, credentialed)
 export const useData = (path, enabled = true) => {
 
     const [fetched, setFetched] = useState({path: null, data: null, error: null});
+    // raised to fetch the same path again, after something changed what it answers
+    const [version, setVersion] = useState(0);
+    const reload = useCallback(() => setVersion((current) => current + 1), []);
 
     useEffect(() => {
         if (!enabled) return;
@@ -59,7 +62,7 @@ export const useData = (path, enabled = true) => {
             });
 
         return () => {awaited = false};
-    }, [path, enabled]);
+    }, [path, enabled, version]);
 
     const answersThisPath = fetched.path === path;
 
@@ -67,6 +70,8 @@ export const useData = (path, enabled = true) => {
         data: answersThisPath ? fetched.data : null,
         loaded: answersThisPath && fetched.error === null && fetched.data !== null,
         error: answersThisPath ? fetched.error : null,
+        // what was shown stays until the new answer replaces it
+        reload,
     };
 };
 

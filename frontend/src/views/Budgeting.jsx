@@ -6,6 +6,7 @@ import {useData} from "../fetch";
 import TransactionsDialog from "../components/dialog/TransactionsDialog";
 import BudgetChartDialog from "../components/dialog/BudgetChartDialog";
 import BudgetRow from "../components/budgeting/BudgetRow";
+import BudgetEditorDialog from "../components/budgeting/BudgetEditorDialog";
 import {budgetHeaderStyle} from "../theme/tableStyles";
 import {useTransactionsDialog} from "../hooks/useTransactionsDialog";
 import {useBudgetChartDialog} from "../hooks/useBudgetChartDialog";
@@ -15,13 +16,20 @@ import {useAppState} from "../state/appState";
 const AGGREGATE_ROW_IDS = ["i", "me", "e", "ntme", "bcf", "dcf"];
 
 const Budgeting = () => {
-    const {year, setYearly} = useAppState();
+    const {year, setYearly, setEditAction} = useAppState();
 
-    const {data, loaded, error} = useData("/budget/" + year)
+    const {data, loaded, error, reload} = useData("/budget/" + year)
 
     useEffect(() => {
         setYearly(true)
     }, [setYearly]);
+
+    // the main bar's edit button opens the editor of the year's budget, while this page is shown
+    const [editorOpen, setEditorOpen] = React.useState(false);
+    useEffect(() => {
+        setEditAction(() => setEditorOpen(true));
+        return () => setEditAction(null);
+    }, [setEditAction]);
 
     const [showSubRows, setShowSubRows] = React.useState([]);
     const [showDeltas, setShowDeltas] = React.useState([]);
@@ -36,6 +44,16 @@ const Budgeting = () => {
     }
 
     return (
+    <>
+    <BudgetEditorDialog
+        open={editorOpen}
+        year={year}
+        onClose={() => setEditorOpen(false)}
+        onSaved={() => {
+            setEditorOpen(false);
+            reload();
+        }}
+    />
     <DataView loaded={loaded} error={error}>
         {() => (
         <>
@@ -86,6 +104,7 @@ const Budgeting = () => {
         </>
         )}
     </DataView>
+    </>
     )
 }
 

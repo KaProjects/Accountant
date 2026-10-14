@@ -1,6 +1,7 @@
 import React from "react";
 import {AppBar, Box, Button, IconButton, MenuItem, Select, Tab, Tabs, Toolbar, Typography} from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
+import EditIcon from '@mui/icons-material/Edit';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import AllYearsIcon from "./common/AllYearsIcon";
@@ -39,7 +40,7 @@ const selectorStyle = {
 
 const MainBar = () => {
     const {
-        year, isYearly, selectValues, selectedValue, overallPath, tabs, selectedTab,
+        year, isYearly, selectValues, selectedValue, overallPath, tabs, selectedTab, editAction,
         setYear, setSelectedValue, setSelectedTab,
     } = useAppState();
     const goHome = useGoHome();
@@ -98,6 +99,12 @@ const MainBar = () => {
                         </Select>
                     }
                 </Box>
+                {/* on a page that can be edited, such as a year's budget */}
+                {editAction !== null &&
+                    <IconButton color="inherit" aria-label="edit" title="Edit" onClick={editAction}>
+                        <EditIcon/>
+                    </IconButton>
+                }
                 {tabs !== null &&
                     <Tabs value={tabs.includes(selectedTab) ? selectedTab : false}
                           onChange={(event, tab) => setSelectedTab(tab)}

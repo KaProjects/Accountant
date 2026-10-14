@@ -1,4 +1,4 @@
-import {fireEvent, screen, within} from "@testing-library/react";
+import {act, fireEvent, screen, within} from "@testing-library/react";
 import Budgeting from "../Budgeting";
 import {useData} from "../../fetch";
 import realBudget from "../../__tests__/fixtures/budget-2020.json";
@@ -39,11 +39,17 @@ const payload = (rows) => ({
 const mountView = (data, {loaded = true, error = null} = {}) => {
     // The view and the transactions dialog inside it both fetch, so the mock answers by path
     // rather than returning the view's payload to whoever asks.
+    // the same answer every time, as the real hook gives: the editor reads its rows again whenever
+    // the answer is a new one
+    const nothing = {data: [], loaded: true, error: null};
     useData.mockImplementation((path) =>
-        path.startsWith("/budget/2020/transaction") ? {data: [], loaded: true, error: null} : {data, loaded, error});
+        path.startsWith("/budget/2020/transaction") || path === "/budget/2020/schema" || path === "/account/2020"
+            || path === "/schema/2020" || path === "/budget/2019/schema"
+            ? nothing : {data, loaded, error});
     const setYearly = jest.fn();
-    renderWithAppState(<Budgeting/>, {year: 2020, setYearly});
-    return {setYearly};
+    const setEditAction = jest.fn();
+    renderWithAppState(<Budgeting/>, {year: 2020, setYearly, setEditAction});
+    return {setYearly, setEditAction};
 };
 
 describe("Budgeting", () => {
@@ -149,5 +155,16 @@ describe("Budgeting", () => {
         expect(screen.getAllByRole("columnheader")).toHaveLength(realBudget.columns.length);
         // one table row per budget line, before any expansion
         expect(screen.getAllByRole("row")).toHaveLength(realBudget.rows.length + 1);
+    });
+
+    it("offers the main bar an edit button that opens the year's budget in the editor", async () => {
+        const {setEditAction} = mountView(payload([row()]));
+
+        expect(screen.queryByRole("region", {name: "Income"})).not.toBeInTheDocument();
+        const openEditor = setEditAction.mock.calls[0][0];
+        act(() => openEditor());
+
+        expect(await screen.findByRole("region", {name: "Income"})).toBeInTheDocument();
+        expect(useData).toHaveBeenCalledWith("/budget/2020/schema", true);
     });
 });

@@ -150,4 +150,15 @@ describe("MainBar", () => {
             expect(setSelectedTab).toHaveBeenCalledWith("Akcie");
         });
     });
+
+    it("offers an edit button only on a page that can be edited, and does what the page says", () => {
+        renderBar();
+        expect(screen.queryByRole("button", {name: "edit"})).not.toBeInTheDocument();
+        cleanup();
+
+        const editAction = jest.fn();
+        renderBar({editAction});
+        fireEvent.click(screen.getByRole("button", {name: "edit"}));
+        expect(editAction).toHaveBeenCalled();
+    });
 });

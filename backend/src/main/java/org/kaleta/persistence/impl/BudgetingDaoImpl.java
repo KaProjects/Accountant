@@ -15,18 +15,18 @@ public class BudgetingDaoImpl implements BudgetingDao
     EntityManager entityManager;
 
     @Override
-    public Budgeting getSchemaById(String year, String id)
-    {
-        return entityManager.createQuery("SELECT b FROM Budgeting b WHERE b.yearId.year=:year AND b.yearId.id=:id", Budgeting.class)
+    public List<Budgeting> getSchema(String year){
+        return entityManager.createQuery("SELECT b FROM Budgeting b WHERE b.yearId.year=:year ORDER BY b.yearId.id", Budgeting.class)
                 .setParameter("year", year)
-                .setParameter("id", id)
-                .getSingleResult();
+                .getResultList();
     }
 
     @Override
-    public List<Budgeting> getSchema(String year){
-        return entityManager.createQuery("SELECT b FROM Budgeting b WHERE b.yearId.year=:year", Budgeting.class)
+    public void replaceSchema(String year, List<Budgeting> rows)
+    {
+        entityManager.createQuery("DELETE FROM Budgeting b WHERE b.yearId.year=:year")
                 .setParameter("year", year)
-                .getResultList();
+                .executeUpdate();
+        rows.forEach(entityManager::persist);
     }
 }

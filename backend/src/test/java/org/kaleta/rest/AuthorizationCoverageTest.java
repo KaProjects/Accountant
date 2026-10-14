@@ -62,7 +62,11 @@ public class AuthorizationCoverageTest
         {
             if (isPublic(endpoint)) continue;
 
+            // from the application's own page, so that a request which changes something is not
+            // turned away as forged before its credentials are even looked at
             Response response = given().noFiltersOfType(TestAuthentication.class)
+                    .header("Origin", TestAuthentication.ORIGIN)
+                    .header(CsrfFilter.CLIENT_HEADER, CsrfFilter.CLIENT_HEADER_VALUE)
                     .when().request(endpoint.httpMethod, endpoint.path);
             if (response.statusCode() != 401) reachable.add(endpoint + " -> " + response.statusCode());
         }

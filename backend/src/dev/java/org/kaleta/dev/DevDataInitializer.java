@@ -31,6 +31,7 @@ import java.sql.Statement;
 public class DevDataInitializer
 {
     private static final Logger LOG = Logger.getLogger(DevDataInitializer.class);
+    private static final String BUDGETING_SCRIPT = "../deploy/createBudgeting.sql";
 
     @ConfigProperty(name = "data.location")
     String dataLocation;
@@ -44,18 +45,28 @@ public class DevDataInitializer
     void onStart(@Observes StartupEvent event)
     {
         createDatabase();
+        loadBudgeting();
         syncSampleData();
     }
 
-    /** The tables, then the development budgeting data, which the sync does not supply. */
     private void createDatabase()
     {
         try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
             statement.execute("RUNSCRIPT FROM 'sql/createTables.sql'");
-            statement.execute("RUNSCRIPT FROM 'classpath:createDevDb.sql'");
             LOG.info("Dev database created.");
         } catch (SQLException e) {
             LOG.error("Failed to create the dev database.", e);
+        }
+    }
+
+    /** The budgeting the sync does not supply. Without it the budget is empty, and all else works. */
+    private void loadBudgeting()
+    {
+        try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("RUNSCRIPT FROM '" + BUDGETING_SCRIPT + "'");
+            LOG.info("Dev budgeting loaded.");
+        } catch (SQLException e) {
+            LOG.warnf("Failed to load the dev budgeting from %s: %s", BUDGETING_SCRIPT, e.getMessage());
         }
     }
 

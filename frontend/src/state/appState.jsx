@@ -64,6 +64,11 @@ const AppState = ({children}) => {
     // every page that is not divided. The page itself says so, and withdraws them when it is left.
     const [tabs, setTabs] = useState(null);
     const [selectedTab, setSelectedTab] = useState(null);
+    // What the main bar's edit button does on a page that can be edited; null on every other page.
+    // The page itself says so, and withdraws it when it is left. Kept wrapped, since a function
+    // handed to a state setter is taken for an update of the state rather than the state itself.
+    const [editAction, keepEditAction] = useState(null);
+    const setEditAction = useCallback((action) => keepEditAction(() => action), []);
 
     const requestedYear = parseInt(searchParams.get(YEAR));
     const year = Number.isNaN(requestedYear) ? new Date().getFullYear() : requestedYear;
@@ -102,8 +107,9 @@ const AppState = ({children}) => {
 
     return (
         <AppStateProvider value={{
-            year, isYearly, selectValues, selectedValue, overallPath, tabs, selectedTab,
+            year, isYearly, selectValues, selectedValue, overallPath, tabs, selectedTab, editAction,
             setYear, setYearly, setSelectedValue, setSelectValues, setOverallPath, setTabs, setSelectedTab,
+            setEditAction,
         }}>
             {children}
         </AppStateProvider>

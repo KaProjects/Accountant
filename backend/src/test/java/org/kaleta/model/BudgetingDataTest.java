@@ -108,6 +108,18 @@ class BudgetingDataTest
     }
 
     @Test
+    void anAccountIdWithADotAndAPercentMatchesByPrefix()
+    {
+        BudgetComponent component = componentOf(
+                List.of(budgetingRow(YEAR, "e1", "511.0-%", "210%", null, "all=0")),
+                List.of(transaction(YEAR, "0101", 100, "511.0-0", "210.0"),
+                        transaction(YEAR, "0101", 200, "511.0-3", "210.0"),
+                        transaction(YEAR, "0101", 400, "511.3-0", "210.0")));
+
+        assertThat(component.getActualMonths()[0], is(300));
+    }
+
+    @Test
     void aDescriptionFiltersTheMatchingTransactions()
     {
         BudgetComponent component = componentOf(
@@ -204,6 +216,49 @@ class BudgetingDataTest
                         transaction(YEAR, "0101", 1000, "210.0", "233.0", "Sale of a different asset")));
 
         assertThat(component.getActualMonths()[0], is(5000));
+    }
+
+    @Test
+    void aFinancialAssetRowCountsWhatIsBookedStraightToTheAsset()
+    {
+        BudgetComponent component = componentOf(
+                List.of(budgetingRow(YEAR, "e1", "549.1-2", "231.2", "finXasset", "all=0")),
+                List.of(transaction(YEAR, "0910", 5000, "231.2", "302.0", "shares granted"),
+                        transaction(YEAR, "0910", 8000, "210.0", "231.2", "")));
+
+        assertThat(component.getActualMonths()[9], is(5000 - 8000));
+    }
+
+    @Test
+    void aFinancialAssetRowLeavesOutTheRevaluationsOfWhatItIsWorth()
+    {
+        BudgetComponent component = componentOf(
+                List.of(budgetingRow(YEAR, "e1", "549.3-1", "233.1", "finXasset", "all=0")),
+                List.of(transaction(YEAR, "0101", 2800, "549.3-1", "210.0", "Creation of Bitcoin"),
+                        transaction(YEAR, "3101", 500, "233.1", "629.3-1", "Revaluation of Bitcoin"),
+                        transaction(YEAR, "3101", 300, "548.3-1", "233.1", "Revaluation of Bitcoin")));
+
+        assertThat(component.getActualMonths()[0], is(2800));
+    }
+
+    @Test
+    void aFinancialAssetRowLeavesOutTheOpeningAndClosingOfTheYear()
+    {
+        BudgetComponent component = componentOf(
+                List.of(budgetingRow(YEAR, "e1", "549.3-1", "233.1", "finXasset", "all=0")),
+                List.of(transaction(YEAR, "0101", 4000, "233.1", "700.0", "initiation"),
+                        transaction(YEAR, "3112", 1500, "701.0", "233.1", "closure"),
+                        transaction(YEAR, "3112", 0, "710.0", "549.3-1", "closure")));
+
+        assertThat(component.getActualMonths(), is(arrayContaining(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)));
+    }
+
+    @Test
+    void aGroupRowWithNoSubRowsAndNoAccountsIsZero()
+    {
+        BudgetComponent component = componentOf(List.of(budgetingPlan(YEAR, "e1", "all=100")), List.of());
+
+        assertThat(component.getActualMonths(), is(arrayContaining(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)));
     }
 
     @Test

@@ -9,7 +9,6 @@ import org.kaleta.persistence.api.BudgetingDao;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
 import static org.kaleta.framework.Generator.budgetingPlan;
 import static org.kaleta.framework.Generator.budgetingRow;
 
@@ -30,7 +29,7 @@ class BudgetingDaoTest
 
     @Test
     @TestTransaction
-    void getSchema_answersTheRowsOfTheYear_andGetSchemaByIdOneOfThem()
+    void getSchema_answersTheRowsOfTheYear()
     {
         entityManager.persist(budgetingPlan(YEAR, "i1", "all=1000"));
         entityManager.persist(budgetingRow(YEAR, "i1.1", "210.0", "600.0", "", "all=1000"));
@@ -38,6 +37,5 @@ class BudgetingDaoTest
 
         assertThat(budgetingDao.getSchema(YEAR).stream().map(row -> row.getYearId().getId()).toList(),
                 containsInAnyOrder("i1", "i1.1"));
-        assertThat(budgetingDao.getSchemaById(YEAR, "i1.1").getDebit(), is("210.0"));
     }
 }

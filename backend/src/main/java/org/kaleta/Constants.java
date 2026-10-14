@@ -22,6 +22,17 @@ public class Constants
         public static final String ACCUMULATED_EARNINGS_ACC_ID = "401.0";
     }
 
+    public static class Budget
+    {
+        /**
+         * The description that marks a budget row as a financial asset's: debit its creation, credit
+         * the asset - or, credit a prefix such as 23%, every asset of the year it covers.
+         */
+        public static final String FIN_ASSET = "finXasset";
+        /** The label in the description of every transaction of a vacation. */
+        public static final String VACATION_LABEL = "vac=";
+    }
+
     public enum AccountType
     {
         A, L, R, E, X

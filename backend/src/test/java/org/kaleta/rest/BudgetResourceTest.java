@@ -304,6 +304,35 @@ public class BudgetResourceTest
     }
 
     @Test
+    public void aRowOfEveryFinancialAsset_hasASubRowForEachAssetOfTheYear()
+    {
+        BudgetDto dto = given().when().get("/budget/2021").then().statusCode(200)
+                .extract().response().jsonPath().getObject("", BudgetDto.class);
+
+        BudgetDto.Row assets = dto.getRows().stream().filter(row -> row.getId().equals("of1")).findFirst().orElseThrow();
+        assertThat(assets.getSubRows().stream().map(BudgetDto.Row::getId).toList(),
+                is(List.of("of1.230.0", "of1.230.1", "of1.231.0")));
+        assertThat(assets.getSubRows().stream().map(BudgetDto.Row::getName).toList(),
+                is(List.of("fin0-0", "fin0-1", "fin1-0")));
+        // created in February, March and October, 1000 taken out in August; the revaluations and
+        // the opening of the year are no money put in or taken out
+        assertThat(assets.getSubRows().get(1).getActual(), is(List.of(0, 1000, 1000, 0, 0, 0, 0, -1000, 0, 1000, 0, 0)));
+        assertThat(assets.getActual(), is(List.of(0, 1000, 1000, 0, 0, 0, 0, -1000, 0, 1000, 0, 0)));
+        assertThat(assets.getPlanned(), is(List.of(500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500)));
+    }
+
+    @Test
+    public void theTransactionsOfAFinancialAssetRow_areTheMoneyPutInAndTakenOut()
+    {
+        given().when()
+                .get("/budget/2021/transaction/of1.230.1/month/8")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].description", is("with08"));
+    }
+
+    @Test
     public void parameterValidatorTest()
     {
         String validYear = "2019";
@@ -327,6 +356,8 @@ public class BudgetResourceTest
         assertInvalid("/budget/" + "2x20", "year");
 
         assertNotFound("/budget/" + "2014");
+
+        assertNotFound("/budget/" + validYear + "/transaction/" + "of9" + "/month/" + validMonth);
 
         assertNotFound("/budget/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
     }

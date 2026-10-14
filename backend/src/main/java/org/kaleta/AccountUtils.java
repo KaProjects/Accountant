@@ -44,8 +44,16 @@ public class AccountUtils
     private static String finAccountId(Account account, String schemaId)
     {
         validateFinAssetAccount(account);
-        String id = account.getFullId();
-        return schemaId + "." + id.charAt(2) + "-" + id.split("\\.")[1];
+        return finAccountId(account.getFullId(), schemaId);
+    }
+
+    /**
+     * The account of the given schema that belongs to the financial asset of the given full id - its
+     * creation (549) or revaluation (629, 548) account - as 549.0-1 for the asset 230.1.
+     */
+    public static String finAccountId(String assetId, String schemaId)
+    {
+        return schemaId + "." + assetId.charAt(2) + "-" + assetId.split("\\.")[1];
     }
 
     /**
