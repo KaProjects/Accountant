@@ -59,19 +59,22 @@ describe("Views", () => {
     it("splits a run-together view name into words", () => {
         mountView(payload([view()]));
 
-        expect(screen.getByText("Summer Trip 2 0 2 0")).toBeInTheDocument();
+        expect(screen.getByText("Summer Trip 2020")).toBeInTheDocument();
     });
 
-    it("keeps the transactions collapsed until the view is opened", () => {
-        mountView(payload([view()]));
+    it("keeps every view closed to begin with, its title saying what it spent", () => {
+        // the total as the backend sends it, as text
+        mountView(payload([view({expenses: "12345"}), view({name: "WinterTrip"})]));
 
         expect(screen.queryByText("hotel")).not.toBeInTheDocument();
+        expect(screen.getAllByTestId("ExpandMoreIcon")).toHaveLength(2);
+        expect(screen.getByRole("button", {name: /Summer Trip 2020.*12,345/})).toBeInTheDocument();
     });
 
-    it("opens the transactions, total and charts for a view", () => {
+    it("opens a view's transactions, total and charts", () => {
         mountView(payload([view()]));
 
-        fireEvent.click(screen.getByText("Summer Trip 2 0 2 0"));
+        fireEvent.click(screen.getByText("Summer Trip 2020"));
 
         expect(screen.getByText("hotel")).toBeInTheDocument();
         expect(screen.getByText(/Total Expenses: 1234/)).toBeInTheDocument();
@@ -80,7 +83,7 @@ describe("Views", () => {
 
     it("renders the column headings and a row per transaction", () => {
         mountView(payload([view()]));
-        fireEvent.click(screen.getByText("Summer Trip 2 0 2 0"));
+        fireEvent.click(screen.getByText("Summer Trip 2020"));
 
         expect(screen.getAllByRole("columnheader")).toHaveLength(5);
         const row = screen.getAllByRole("row")
@@ -90,13 +93,15 @@ describe("Views", () => {
         expect(cells[1]).toHaveTextContent("500");
     });
 
-    it("opening one view marks any other as closed", () => {
+    it("opens a view and closes it again on its own, leaving the others as they are", () => {
         mountView(payload([view(), view({name: "WinterTrip"})]));
 
-        fireEvent.click(screen.getByText("Summer Trip 2 0 2 0"));
-        expect(screen.getAllByTestId("ExpandLessIcon")).toHaveLength(1);
-
+        fireEvent.click(screen.getByText("Summer Trip 2020"));
         fireEvent.click(screen.getByText("Winter Trip"));
+        expect(screen.getAllByTestId("ExpandLessIcon")).toHaveLength(2);
+
+        fireEvent.click(screen.getByText("Summer Trip 2020"));
         expect(screen.getAllByTestId("ExpandLessIcon")).toHaveLength(1);
+        expect(screen.getAllByTestId("ExpandMoreIcon")).toHaveLength(1);
     });
 });

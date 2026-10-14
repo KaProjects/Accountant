@@ -5,12 +5,18 @@ describe("formatViewTitle", () => {
         expect(formatViewTitle("SummerTrip")).toBe("Summer Trip");
     });
 
-    it("breaks before each digit, one per group", () => {
-        expect(formatViewTitle("Trip2020")).toBe("Trip 2 0 2 0");
+    it("breaks before a number, keeping it whole", () => {
+        expect(formatViewTitle("Trip2020")).toBe("Trip 2020");
+        expect(formatViewTitle("SummerTrip2020")).toBe("Summer Trip 2020");
     });
 
-    it("leaves an already spaced name alone apart from its capitals", () => {
-        expect(formatViewTitle("Summer")).toBe("Summer");
+    it("keeps capitals that follow each other together", () => {
+        expect(formatViewTitle("TripUSA")).toBe("Trip USA");
+        expect(formatViewTitle("CZTrip")).toBe("CZTrip");
+    });
+
+    it("begins with a capital", () => {
+        expect(formatViewTitle("byvanie")).toBe("Byvanie");
     });
 
     it("handles an empty name", () => {

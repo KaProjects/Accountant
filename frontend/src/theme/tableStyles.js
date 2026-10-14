@@ -214,11 +214,14 @@ export const highlightedCell = (style) => ({
 
 export const isExpenseRow = (type) => expenseBudgetRows.includes(type);
 
-/** A view list entry, highlighted while its transactions are open. */
+/**
+ * The title of a view, in the look of the budgeting table's headings: the same ink on a cool grey,
+ * over a rule, a step darker while the view is closed, so the closed ones read as such.
+ */
 export const viewTitleStyle = (isOpen) => ({
-    boxShadow: "0 0 8px 0",
-    background: isOpen ? "#87befc" : "#b6d8ff",
-    color: "#3361bb",
+    background: isOpen ? "#e4e7eb" : "#d5d9de",
+    color: "#222",
+    borderBottom: "1px solid #9aa1a9",
 });
 
 /** Column widths for the view transactions table. */

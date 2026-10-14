@@ -7,32 +7,38 @@ import DataView from "../components/common/DataView";
 import ViewPanel from "../components/views/ViewPanel";
 import {useAppState} from "../state/appState";
 
+// the views right under the main bar, with room between one and the next
+const listStyle = {"& > * + *": {marginTop: "12px"}};
+
 const Views = () => {
     const {year, setYearly} = useAppState();
     const {vacation} = useParams();
-
-    const [openIndex, setOpenIndex] = useState(null)
 
     const {data, loaded, error} = useData("/view/" + year + (vacation === undefined ? "" : "/vacation"))
 
     useEffect(() => {
         setYearly(true)
-        setOpenIndex(null)
-    }, [data, setYearly]);
+    }, [setYearly]);
 
-    /** Opening a view closes any other. */
-    const toggle = (index) => setOpenIndex(openIndex === index ? null : index)
+    // every view closed to begin with, for each answer read - its title says what it spent; each
+    // opened and closed again on its own
+    const [opened, setOpened] = useState({views: null, indices: []});
+    const openIndices = opened.views === data ? opened.indices : [];
+    const toggle = (index) => setOpened({
+        views: data,
+        indices: openIndices.includes(index) ? openIndices.filter((one) => one !== index) : [...openIndices, index],
+    });
 
     return (
         <DataView loaded={loaded} error={error}>
             {() => (
-                <List component="nav" aria-labelledby="nested-list-subheader">
+                <List component="nav" aria-labelledby="nested-list-subheader" disablePadding sx={listStyle}>
                     {data.views.map((view, index) => (
                         <ViewPanel
                             key={index}
                             view={view}
                             columns={data.columns}
-                            isOpen={openIndex === index}
+                            isOpen={openIndices.includes(index)}
                             onToggle={() => toggle(index)}
                         />
                     ))}
