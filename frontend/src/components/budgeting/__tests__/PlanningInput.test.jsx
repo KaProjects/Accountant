@@ -2,7 +2,7 @@ import {useState} from "react";
 import {fireEvent, render, screen} from "@testing-library/react";
 import PlanningInput from "../PlanningInput";
 
-const renderInput = (value) => {
+const mountInput = (value) => {
     const onChange = jest.fn();
     render(<PlanningInput value={value} onChange={onChange}/>);
     return onChange;
@@ -10,14 +10,14 @@ const renderInput = (value) => {
 
 describe("PlanningInput", () => {
     it("shows a fixed planning as one amount", () => {
-        renderInput("all=1500");
+        mountInput("all=1500");
 
         expect(screen.getByRole("button", {name: "Fixed"})).toHaveAttribute("aria-pressed", "true");
         expect(screen.getByRole("spinbutton", {name: "Planning"})).toHaveValue(1500);
     });
 
     it("writes one amount as a fixed planning, and none as no planning", () => {
-        const onChange = renderInput("all=1500");
+        const onChange = mountInput("all=1500");
 
         fireEvent.change(screen.getByRole("spinbutton", {name: "Planning"}), {target: {value: "2000"}});
         expect(onChange).toHaveBeenLastCalledWith("all=2000");
@@ -27,7 +27,7 @@ describe("PlanningInput", () => {
     });
 
     it("shows an amount for each month, month by month", () => {
-        renderInput("1|2|3|4|5|6|7|8|9|10|11|12");
+        mountInput("1|2|3|4|5|6|7|8|9|10|11|12");
 
         expect(screen.getByRole("button", {name: "Monthly"})).toHaveAttribute("aria-pressed", "true");
         expect(screen.getByRole("spinbutton", {name: "Mar"})).toHaveValue(3);
@@ -35,7 +35,7 @@ describe("PlanningInput", () => {
     });
 
     it("writes a month's amount in its place among the others", () => {
-        const onChange = renderInput("1|2|3|4|5|6|7|8|9|10|11|12");
+        const onChange = mountInput("1|2|3|4|5|6|7|8|9|10|11|12");
 
         fireEvent.change(screen.getByRole("spinbutton", {name: "Feb"}), {target: {value: "20"}});
 
@@ -43,13 +43,13 @@ describe("PlanningInput", () => {
     });
 
     it("carries the fixed amount over to every month when switched to monthly", () => {
-        const onChange = renderInput("all=100");
+        const onChange = mountInput("all=100");
         fireEvent.click(screen.getByRole("button", {name: "Monthly"}));
         expect(onChange).toHaveBeenLastCalledWith("100|100|100|100|100|100|100|100|100|100|100|100");
     });
 
     it("carries the first month's amount over when switched to fixed", () => {
-        const onChange = renderInput("7|2|3|4|5|6|7|8|9|10|11|12");
+        const onChange = mountInput("7|2|3|4|5|6|7|8|9|10|11|12");
         fireEvent.click(screen.getByRole("button", {name: "Fixed"}));
         expect(onChange).toHaveBeenLastCalledWith("all=7");
     });

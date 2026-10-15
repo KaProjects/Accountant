@@ -100,9 +100,9 @@ public class BudgetingData
             List<Transaction> debitTransactions = filterTransactions(debit, "", description);
             List<Transaction> creditTransactions = filterTransactions("", credit, description);
             return Utils.subtractIntegerArrays(monthlyBalanceOf(debitTransactions), monthlyBalanceOf(creditTransactions));
-        } else if (description.equals(Constants.Budget.FIN_ASSET))
+        } else if (AccountUtils.isFinAssetPair(debit, credit))
         {
-            return investedIn(debit, credit);
+            return investedIn(debit, credit, description);
         } else
         {
             return monthlyBalanceOf(filterTransactions(debit, credit, description));
@@ -110,30 +110,23 @@ public class BudgetingData
     }
 
     /**
-     * What was put into a financial asset, less what was taken out of it, month by month - the
-     * deposits and withdrawals the financial assets view shows for it: whatever is booked to its
-     * creation account or straight to the asset, and whatever leaves the asset, except the
-     * revaluations of what it is worth and the opening and closing of the year.
+     * What was put into a financial asset, month by month: whatever is booked to its creation account
+     * or straight to the asset - but for the revaluations of what it is worth and the opening of the
+     * year - that the row's description lets through, such as all but the money moved over from
+     * another asset, which is not new money. What is taken out of the asset does not count.
      */
-    private Integer[] investedIn(String creationId, String assetId)
+    private Integer[] investedIn(String creationId, String assetId, String description)
     {
         String gainsId = AccountUtils.finAccountId(assetId, Constants.Schema.FIN_REV_REVALUATION_ID);
-        String lossesId = AccountUtils.finAccountId(assetId, Constants.Schema.FIN_EXP_REVALUATION_ID);
         List<Transaction> in = new ArrayList<>();
-        List<Transaction> out = new ArrayList<>();
         for (Transaction transaction : transactions)
         {
             boolean ofTheYear = !transaction.getDebit().startsWith("7") && !transaction.getCredit().startsWith("7");
-            if (!ofTheYear) continue;
-            if (transaction.getDebit().equals(creationId)
-                    || (transaction.getDebit().equals(assetId) && !transaction.getCredit().equals(gainsId))) {
-                in.add(transaction);
-            }
-            if (transaction.getCredit().equals(assetId) && !transaction.getDebit().equals(lossesId)) {
-                out.add(transaction);
-            }
+            boolean putIn = transaction.getDebit().equals(creationId)
+                    || (transaction.getDebit().equals(assetId) && !transaction.getCredit().equals(gainsId));
+            if (ofTheYear && putIn && matchesDescription(transaction.getDescription(), description)) in.add(transaction);
         }
-        return Utils.subtractIntegerArrays(monthlyBalanceOf(in), monthlyBalanceOf(out));
+        return monthlyBalanceOf(in);
     }
 
     private List<Transaction> filterTransactions(String debit, String credit, String description) {
@@ -142,12 +135,21 @@ public class BudgetingData
         {
             boolean debitCheck = matchesAccount(transaction.getDebit(), debit);
             boolean creditCheck = matchesAccount(transaction.getCredit(), credit);
-            boolean descriptionCheck = description.startsWith("!")
-                    ? !transaction.getDescription().contains(description.replace("!", ""))
-                    : transaction.getDescription().contains(description);
+            boolean descriptionCheck = matchesDescription(transaction.getDescription(), description);
             if (debitCheck && creditCheck && descriptionCheck) filteredTransactions.add(transaction);
         }
         return filteredTransactions;
+    }
+
+    /**
+     * A transaction's description against a budget row's: the row's text has to be in it, or, after a
+     * !, must not be; no text at all lets every transaction through.
+     */
+    public static boolean matchesDescription(String transactionDescription, String rowDescription)
+    {
+        String filter = rowDescription == null ? "" : rowDescription;
+        String text = transactionDescription == null ? "" : transactionDescription;
+        return filter.startsWith("!") ? !text.contains(filter.replace("!", "")) : text.contains(filter);
     }
 
     /**

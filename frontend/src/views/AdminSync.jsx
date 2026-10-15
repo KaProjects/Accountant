@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Alert, AlertTitle, Box, Button, CircularProgress, Paper, Typography} from "@mui/material";
+import {Alert, AlertTitle, Box, Button, CircularProgress, MenuItem, Paper, TextField, Typography} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {runSync, syncActions} from "../services/sync";
 import {useAppState} from "../state/appState";
@@ -11,6 +11,15 @@ const actionStyle = {padding: "12px 14px", marginBottom: 2};
 const actionLabelStyle = {fontSize: 15, fontWeight: 600};
 const actionCaptionStyle = {fontSize: 13, marginBottom: 1};
 const resultStyle = {marginTop: 1.5};
+const controlsStyle = {display: "flex", alignItems: "center", gap: "12px"};
+const yearSelectStyle = {width: 110};
+
+/** The years the books can hold, as the sync accepts them: from the first one up to this one. */
+const FIRST_YEAR = 2015;
+const years = () => {
+    const latest = new Date().getFullYear();
+    return Array.from({length: latest - FIRST_YEAR + 1}, (_, index) => latest - index);
+};
 const statusStyle = {marginBottom: 0};
 
 /** The response bodies are plain text and the validation one is a report, so it is shown as written. */
@@ -35,7 +44,9 @@ const responseStyle = {
  * to run them from, because it already has one.
  */
 const AdminSync = () => {
-    const {year, setYearly} = useAppState();
+    const {setYearly} = useAppState();
+    // the year synced on its own: the latest, unless another is chosen
+    const [syncedYear, setSyncedYear] = useState(() => new Date().getFullYear());
     const goTo = useGoTo();
 
     const [results, setResults] = useState({});
@@ -62,19 +73,28 @@ const AdminSync = () => {
                 Admin
             </Button>
 
-            {syncActions(year).map((action) => (
+            {syncActions(syncedYear).map((action) => (
                 <Paper key={action.id} variant="outlined" sx={actionStyle}>
                     <Typography sx={actionLabelStyle}>{action.label}</Typography>
                     <Typography color="text.secondary" sx={actionCaptionStyle}>
                         {action.caption}
                     </Typography>
 
-                    <Button variant="contained" size="small"
-                            disabled={running !== null}
-                            onClick={run(action)}
-                            data-testid={"run-" + action.id}>
-                        {running === action.id ? <CircularProgress size={18}/> : "Run"}
-                    </Button>
+                    <Box sx={controlsStyle}>
+                        {action.id === "year" &&
+                            <TextField select size="small" label="Year" sx={yearSelectStyle}
+                                       value={syncedYear} disabled={running !== null}
+                                       onChange={(event) => setSyncedYear(Number(event.target.value))}>
+                                {years().map((one) => <MenuItem key={one} value={one}>{one}</MenuItem>)}
+                            </TextField>
+                        }
+                        <Button variant="contained" size="small"
+                                disabled={running !== null}
+                                onClick={run(action)}
+                                data-testid={"run-" + action.id}>
+                            {running === action.id ? <CircularProgress size={18}/> : "Run"}
+                        </Button>
+                    </Box>
 
                     {results[action.id] && (
                         <Alert severity={results[action.id].ok ? "success" : "error"}

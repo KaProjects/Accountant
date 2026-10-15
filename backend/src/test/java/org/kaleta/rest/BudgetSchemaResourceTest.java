@@ -81,7 +81,7 @@ public class BudgetSchemaResourceTest
         BudgetSchemaDto investments = row("2022", "of2");
         assertThat(investments.getDebit(), is("549%"));
         assertThat(investments.getCredit(), is("23%"));
-        assertThat(investments.getDescription(), is("finXasset"));
+        assertThat(investments.getDescription(), is((String) null));
         assertThat(investments.getPlanning(), is("all=0"));
         assertThat(investments.isFixed(), is(true));
     }
@@ -123,7 +123,7 @@ public class BudgetSchemaResourceTest
         save(List.of(
                 Map.of("id", "i1", "name", "salary", "planning", "all=100"),
                 Map.of("id", "i1.1", "name", "employer", "debit", "200.0", "credit", "5%", "planning", " "),
-                Map.of("id", "of1", "name", "assets", "debit", "510%", "credit", "20%", "description", "finXasset")))
+                Map.of("id", "of1", "name", "assets", "debit", "510%", "credit", "20%", "description", "!dane")))
                 .then().statusCode(204);
 
         List<BudgetSchemaDto> rows = stored(YEAR);

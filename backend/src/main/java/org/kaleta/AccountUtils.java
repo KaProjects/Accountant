@@ -57,6 +57,17 @@ public class AccountUtils
     }
 
     /**
+     * Whether a budget row's debit and credit are those of financial assets: a creation account
+     * (549...) against an asset (23...) - one asset's own pair, as 549.0-1 and 230.1, or prefixes of
+     * them, as 549% and 23%. Such a row counts what was put into the asset.
+     */
+    public static boolean isFinAssetPair(String debit, String credit)
+    {
+        return debit != null && credit != null
+                && debit.startsWith(Constants.Schema.FIN_CREATION_ID) && credit.startsWith(Constants.Schema.FIN_GROUP_ID);
+    }
+
+    /**
      * @return true if specified account type is debit type, false if credit type
      */
     public static boolean isDebit(Constants.AccountType type)

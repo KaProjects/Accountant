@@ -257,7 +257,7 @@ INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'e1.2', 'e
 
 INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2019', 'of1', 'of1', 'all=1000', '202%', '201%', 'vac=');
 INSERT INTO Budgeting (year, id, name, planning) VALUES ('2019', 'of2', 'of2', '1000|1000|1000|1000|1000|1000|1000|1000|0|0|0|0');
-INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.1', 'of2.1', '210.0', '210.1', 'finXasset');
+INSERT INTO Budgeting (year, id, name, debit, credit, description) VALUES ('2019', 'of2.1', 'of2.1', '210.0', '210.1', NULL);
 INSERT INTO Budgeting (year, id, name, debit, credit) VALUES ('2019', 'of2.2', 'of2.2', '202.10', '202.10');
 
 
@@ -386,7 +386,7 @@ INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VAL
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0109', '1000', '230.1', '629.0-1', '21x9', 'rrev09');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0110', '1000', '549.0-1', '200.0', '21x10', 'cre10');
 INSERT INTO Transaction (year, date, amount, debit, credit, id, description) VALUES ('2021', '0111', '1000', '548.0-1', '230.1', '21x11', 'nrev11');
-INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2021', 'of1', 'of1', 'all=500', '549%', '23%', 'finXasset');
+INSERT INTO Budgeting (year, id, name, planning, debit, credit, description) VALUES ('2021', 'of1', 'of1', 'all=500', '549%', '23%', NULL);
 
 INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '7', 'class7', '');
 INSERT INTO ASchema (year, id, name, type) VALUES ('2022', '70', 'group70', '');

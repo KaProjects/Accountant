@@ -31,10 +31,12 @@ describe("AdminSync", () => {
         expect(mockNavigate).toHaveBeenCalledWith("/admin");
     });
 
-    it("offers each sync action, naming the selected year", () => {
+    const latest = new Date().getFullYear();
+
+    it("offers each sync action, the single year's for the latest year to begin with", () => {
         mountView();
 
-        expect(screen.getByText("Sync 2020")).toBeInTheDocument();
+        expect(screen.getByText("Sync " + latest)).toBeInTheDocument();
         expect(screen.getByText("Sync All Years")).toBeInTheDocument();
         expect(screen.getByText("Sync All Years & Validate")).toBeInTheDocument();
     });
@@ -51,7 +53,22 @@ describe("AdminSync", () => {
 
         fireEvent.click(screen.getByTestId("run-year"));
 
-        await waitFor(() => expect(runSync).toHaveBeenCalledWith("/sync/2020"));
+        await waitFor(() => expect(runSync).toHaveBeenCalledWith("/sync/" + latest));
+    });
+
+    it("syncs the year chosen from every year the books can hold", async () => {
+        runSync.mockResolvedValue({ok: true, status: "200 OK", body: "2019 synced"});
+        mountView();
+
+        fireEvent.mouseDown(screen.getByRole("combobox", {name: "Year"}));
+        const options = within(screen.getByRole("listbox")).getAllByRole("option");
+        expect(options[0]).toHaveTextContent(String(latest));
+        expect(options[options.length - 1]).toHaveTextContent("2015");
+        fireEvent.click(within(screen.getByRole("listbox")).getByRole("option", {name: "2019"}));
+
+        expect(screen.getByText("Sync 2019")).toBeInTheDocument();
+        fireEvent.click(screen.getByTestId("run-year"));
+        await waitFor(() => expect(runSync).toHaveBeenCalledWith("/sync/2019"));
     });
 
     it("reports the status and the response body of a successful run", async () => {

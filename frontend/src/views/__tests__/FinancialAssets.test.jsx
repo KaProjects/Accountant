@@ -203,8 +203,8 @@ describe("FinancialAssets", () => {
 
             // from the 1000 it opened with to the 1120 it is worth at the end of month 3, 100 put in
             expect(screen.getByText("0 – 3")).toBeInTheDocument();
-            const card = screen.getByText("Start Value").closest(".MuiCard-root");
-            expect(within(card).getByText("+1.82%")).toBeInTheDocument();
+            // the card's return, which only the card states
+            expect(screen.getByText("+1.82%")).toBeInTheDocument();
         });
 
         it("works the figures out again for the stretch it picks", () => {
@@ -215,8 +215,8 @@ describe("FinancialAssets", () => {
             // from the end of month 1 (worth 1000) to the end of month 3 (worth 1120), 100 put in
             expect(screen.getByText("1 – 3")).toBeInTheDocument();
             expect(screen.getByText("Start Value")).toBeInTheDocument();
-            const card = screen.getByText("Start Value").closest(".MuiCard-root");
-            expect(within(card).getByText("+1.82%")).toBeInTheDocument();
+            // the card's return, which only the card states
+            expect(screen.getByText("+1.82%")).toBeInTheDocument();
         });
     });
 });

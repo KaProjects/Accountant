@@ -235,11 +235,11 @@ public class BudgetResourceTest
 
         assertThat(dto.getRows().get(10).getId(), is("of2"));
         assertThat(dto.getRows().get(10).getType(), is(BudgetDto.Row.Type.OF_BUDGET));
-        assertThat(dto.getRows().get(10).getActual(), is(List.of(0, 0, 0, 1000, 0, 0, 200, 200, 10000, 0, 0, 0)));
-        assertThat(dto.getRows().get(10).getActualSum(), is(11400));
-        assertThat(dto.getRows().get(10).getActualAvg(), is(1266));
-        assertThat(dto.getRows().get(10).getDeltaSum(), is(3400));
-        assertThat(dto.getRows().get(10).getDeltaAvg(), is(378));
+        assertThat(dto.getRows().get(10).getActual(), is(List.of(0, 0, 0, 0, 0, 0, 200, 200, 10000, 0, 0, 0)));
+        assertThat(dto.getRows().get(10).getActualSum(), is(10400));
+        assertThat(dto.getRows().get(10).getActualAvg(), is(1155));
+        assertThat(dto.getRows().get(10).getDeltaSum(), is(2400));
+        assertThat(dto.getRows().get(10).getDeltaAvg(), is(267));
         assertThat(dto.getRows().get(10).getPlanned(), is(List.of(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 0, 0, 0, 0)));
         assertThat(dto.getRows().get(10).getPlannedSum(), is(8000));
         assertThat(dto.getRows().get(10).getPlannedSumToFilledMonth(), is(8000));
@@ -248,11 +248,11 @@ public class BudgetResourceTest
         assertThat(dto.getRows().get(10).getSubRows().size(), is(2));
         assertThat(dto.getRows().get(10).getSubRows().get(0).getId(), is("of2.1"));
         assertThat(dto.getRows().get(10).getSubRows().get(0).getType(), is(BudgetDto.Row.Type.SUB_ROW));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getActual(), is(List.of(0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 0)));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getActualSum(), is(1000));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getActualAvg(), is(111));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getDeltaSum(), is(1000));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getDeltaAvg(), is(111));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getActual(), is(List.of(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getActualSum(), is(0));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getActualAvg(), is(0));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getDeltaSum(), is(0));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getDeltaAvg(), is(0));
         assertThat(dto.getRows().get(10).getSubRows().get(0).getPlanned(), is(List.of(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)));
         assertThat(dto.getRows().get(10).getSubRows().get(0).getSubRows().size(), is(0));
         assertThat(dto.getRows().get(10).getSubRows().get(1).getId(), is("of2.2"));
@@ -267,11 +267,11 @@ public class BudgetResourceTest
 
         assertThat(dto.getRows().get(11).getId(), is("dcf"));
         assertThat(dto.getRows().get(11).getType(), is(BudgetDto.Row.Type.OF_BUDGET_BALANCE));
-        assertThat(dto.getRows().get(11).getActual(), is(List.of(0, 0, 0, 1000, 0, 0, 200, 200, 20000, 0, 0, 0)));
-        assertThat(dto.getRows().get(11).getActualSum(), is(21400));
-        assertThat(dto.getRows().get(11).getActualAvg(), is(2377));
-        assertThat(dto.getRows().get(11).getDeltaSum(), is(4400));
-        assertThat(dto.getRows().get(11).getDeltaAvg(), is(489));
+        assertThat(dto.getRows().get(11).getActual(), is(List.of(0, 0, 0, 0, 0, 0, 200, 200, 20000, 0, 0, 0)));
+        assertThat(dto.getRows().get(11).getActualSum(), is(20400));
+        assertThat(dto.getRows().get(11).getActualAvg(), is(2266));
+        assertThat(dto.getRows().get(11).getDeltaSum(), is(3400));
+        assertThat(dto.getRows().get(11).getDeltaAvg(), is(378));
         assertThat(dto.getRows().get(11).getPlanned(), is(List.of(2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 1000, 1000, 1000, 1000)));
         assertThat(dto.getRows().get(11).getPlannedSum(), is(20000));
         assertThat(dto.getRows().get(11).getPlannedSumToFilledMonth(), is(17000));
@@ -314,22 +314,28 @@ public class BudgetResourceTest
                 is(List.of("of1.230.0", "of1.230.1", "of1.231.0")));
         assertThat(assets.getSubRows().stream().map(BudgetDto.Row::getName).toList(),
                 is(List.of("fin0-0", "fin0-1", "fin1-0")));
-        // created in February, March and October, 1000 taken out in August; the revaluations and
-        // the opening of the year are no money put in or taken out
-        assertThat(assets.getSubRows().get(1).getActual(), is(List.of(0, 1000, 1000, 0, 0, 0, 0, -1000, 0, 1000, 0, 0)));
-        assertThat(assets.getActual(), is(List.of(0, 1000, 1000, 0, 0, 0, 0, -1000, 0, 1000, 0, 0)));
+        // created in February, March and October; what was taken out in August, the revaluations
+        // and the opening of the year are no money put in
+        assertThat(assets.getSubRows().get(1).getActual(), is(List.of(0, 1000, 1000, 0, 0, 0, 0, 0, 0, 1000, 0, 0)));
+        assertThat(assets.getActual(), is(List.of(0, 1000, 1000, 0, 0, 0, 0, 0, 0, 1000, 0, 0)));
         assertThat(assets.getPlanned(), is(List.of(500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500)));
     }
 
     @Test
-    public void theTransactionsOfAFinancialAssetRow_areTheMoneyPutInAndTakenOut()
+    public void theTransactionsOfAFinancialAssetRow_areTheMoneyPutIn()
     {
+        given().when()
+                .get("/budget/2021/transaction/of1.230.1/month/2")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].description", is("cre02"));
+        // what was taken out in August is not
         given().when()
                 .get("/budget/2021/transaction/of1.230.1/month/8")
                 .then()
                 .statusCode(200)
-                .body("size()", is(1))
-                .body("[0].description", is("with08"));
+                .body("size()", is(0));
     }
 
     @Test

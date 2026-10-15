@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.kaleta.Constants.Budget.FIN_ASSET;
 import static org.kaleta.Constants.Budget.VACATION_LABEL;
 import static org.kaleta.dto.BudgetDto.Row.Type.BALANCE;
 import static org.kaleta.dto.BudgetDto.Row.Type.EXPENSE;
@@ -265,10 +264,10 @@ public class BudgetingService
 
     /**
      * The rows of the budget of the specified year, as stored, but for the rows of every financial
-     * asset: a row of the financial assets whose accounts are given by a prefix, as credit 23%, is
-     * expanded into a sub row for each asset of the year whose account it covers - named as the
-     * account, debit its creation, credit the asset - so that no asset has to be stored, and none is
-     * missed. The stored row stays as the group of those sub rows, with its name and planning.
+     * asset: a row of the financial assets - debit a creation account, credit an asset - whose asset
+     * is given by a prefix, as debit 549% and credit 23%, is expanded into a sub row for each asset
+     * of the year it covers - named as the account, debit its creation, credit the asset, and
+     * filtered as the row is - so that no asset has to be stored, and none is missed. The stored row stays as the group of those sub rows, with its name and planning.
      * Only a main row is expanded, as a sub row cannot have sub rows of its own.
      */
     public List<Budgeting> getSchema(String year)
@@ -292,7 +291,8 @@ public class BudgetingService
                         Budgeting row = row(year, id + "." + asset.getFullId(), asset.getName(), null);
                         row.setDebit(AccountUtils.getFinCreationAccountId(asset));
                         row.setCredit(asset.getFullId());
-                        row.setDescription(FIN_ASSET);
+                        // what the row leaves out, each asset leaves out too
+                        row.setDescription(stored.getDescription());
                         schema.add(row);
                     });
         }
@@ -301,8 +301,8 @@ public class BudgetingService
 
     private static boolean isEveryFinancialAsset(Budgeting row)
     {
-        return FIN_ASSET.equals(row.getDescription())
-                && row.getCredit() != null && row.getCredit().endsWith("%")
+        return AccountUtils.isFinAssetPair(row.getDebit(), row.getCredit())
+                && row.getCredit().endsWith("%")
                 && !row.getYearId().getId().contains(".");
     }
 
@@ -369,19 +369,15 @@ public class BudgetingService
             List<Transaction> creditTransactions = transactionService.getTransactionsMatching(year, "", schema.getCredit(), schema.getDescription());
             creditTransactions.forEach(transaction -> transaction.setAmount(-transaction.getAmount()));
             transactions.addAll(creditTransactions);
-        } else if (FIN_ASSET.equals(schema.getDescription())) {
-            // as the row counts them: see BudgetingData
+        } else if (AccountUtils.isFinAssetPair(schema.getDebit(), schema.getCredit())) {
+            // as the row counts them, what was put in: see BudgetingData
             String assetId = schema.getCredit();
             String gainsId = AccountUtils.finAccountId(assetId, Constants.Schema.FIN_REV_REVALUATION_ID);
-            String lossesId = AccountUtils.finAccountId(assetId, Constants.Schema.FIN_EXP_REVALUATION_ID);
             transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), "", ""));
             transactions.addAll(transactionService.getTransactionsMatching(year, assetId, "", "").stream()
                     .filter(transaction -> !transaction.getCredit().equals(gainsId)).toList());
-            List<Transaction> creditTransactions = transactionService.getTransactionsMatching(year, "", assetId, "").stream()
-                    .filter(transaction -> !transaction.getDebit().equals(lossesId)).toList();
-            creditTransactions.forEach(transaction -> transaction.setAmount(-transaction.getAmount()));
-            transactions.addAll(creditTransactions);
-            transactions.removeIf(transaction -> transaction.getDebit().startsWith("7") || transaction.getCredit().startsWith("7"));
+            transactions.removeIf(transaction -> transaction.getDebit().startsWith("7") || transaction.getCredit().startsWith("7")
+                    || !BudgetingData.matchesDescription(transaction.getDescription(), schema.getDescription()));
         } else {
             transactions.addAll(transactionService.getTransactionsMatching(year, schema.getDebit(), schema.getCredit(), schema.getDescription()));
         }
