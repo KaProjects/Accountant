@@ -1,0 +1,73 @@
+{
+  "columns" : [ "Yearly Cash Flow Statement", "2017", "2018", "2019", "2020" ],
+  "rows" : [ {
+    "type" : "CASH_FLOW_GROUP",
+    "name" : "group20",
+    "schemaId" : "20",
+    "yearlyValues" : [ 1000, 1100, 1500, 1600 ],
+    "total" : 5200,
+    "children" : [ {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account200",
+      "schemaId" : "200",
+      "yearlyValues" : [ 1000, 1100, 1500, 1400 ],
+      "total" : 5000,
+      "children" : [ ]
+    }, {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account201",
+      "schemaId" : "201",
+      "yearlyValues" : [ 0, 0, 0, 200 ],
+      "total" : 200,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "CASH_FLOW_GROUP",
+    "name" : "group21",
+    "schemaId" : "21",
+    "yearlyValues" : [ 2000, 2200, 2500, 2800 ],
+    "total" : 9500,
+    "children" : [ {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account210",
+      "schemaId" : "210",
+      "yearlyValues" : [ 2000, 2200, 2500, 2800 ],
+      "total" : 9500,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "CASH_FLOW_GROUP",
+    "name" : "group23",
+    "schemaId" : "23",
+    "yearlyValues" : [ 4000, 4400, 4500, 4000 ],
+    "total" : 16900,
+    "children" : [ {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account230",
+      "schemaId" : "230",
+      "yearlyValues" : [ 4000, 4400, 4500, 4000 ],
+      "total" : 16900,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "CASH_FLOW_GROUP",
+    "name" : "group22",
+    "schemaId" : "22",
+    "yearlyValues" : [ -3000, -3300, -3500, -4400 ],
+    "total" : -14200,
+    "children" : [ {
+      "type" : "CASH_FLOW_ACCOUNT",
+      "name" : "account220",
+      "schemaId" : "220",
+      "yearlyValues" : [ -3000, -3300, -3500, -4400 ],
+      "total" : -14200,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "CASH_FLOW_SUMMARY",
+    "name" : "Cash Flow",
+    "schemaId" : "cf",
+    "yearlyValues" : [ 4000, 4400, 5000, 4000 ],
+    "children" : [ ]
+  } ]
+}

@@ -6,7 +6,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.AccountingDto;
 import org.kaleta.dto.YearTransactionDto;
-import org.springframework.http.HttpStatus;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -14,9 +13,10 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.kaleta.framework.Problems.assertInvalid;
+import static org.kaleta.framework.Problems.assertNotFound;
 
 @QuarkusTest
 public class AccountingResourceTest
@@ -57,7 +57,7 @@ public class AccountingResourceTest
         AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
 
         assertThat(dto.getColumns().size(), is(15));
-        assertThat(dto.getColumns().get(0), is("Cash Flow Statement 2020"));
+        assertThat(dto.getColumns().get(0), is("Cash Flow Statement"));
         assertThat(dto.getRows().size(), is(5));
 
         assertThat(dto.getRows().get(0).getSchemaId(), is("20"));
@@ -116,6 +116,13 @@ public class AccountingResourceTest
         assertThat(dto.getRows().get(0).getSchemaId(), is("20"));
         assertThat(dto.getRows().get(0).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
         assertThat(dto.getRows().get(0).getYearlyValues(), is(new Integer[]{1000, 1100, 1500, 1600}));
+        assertThat(dto.getRows().get(0).getChildren().size(), is(2));
+        assertThat(dto.getRows().get(0).getChildren().get(0).getSchemaId(), is("200"));
+        assertThat(dto.getRows().get(0).getChildren().get(0).getType(), is(AccountingDto.Type.CASH_FLOW_ACCOUNT));
+        assertThat(dto.getRows().get(0).getChildren().get(0).getYearlyValues(), is(new Integer[]{1000, 1100, 1500, 1400}));
+        assertThat(dto.getRows().get(0).getChildren().get(1).getSchemaId(), is("201"));
+        assertThat(dto.getRows().get(0).getChildren().get(1).getType(), is(AccountingDto.Type.CASH_FLOW_ACCOUNT));
+        assertThat(dto.getRows().get(0).getChildren().get(1).getYearlyValues(), is(new Integer[]{0, 0, 0, 200}));
 
         assertThat(dto.getRows().get(1).getSchemaId(), is("21"));
         assertThat(dto.getRows().get(1).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
@@ -128,6 +135,11 @@ public class AccountingResourceTest
         assertThat(dto.getRows().get(3).getSchemaId(), is("22"));
         assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.CASH_FLOW_GROUP));
         assertThat(dto.getRows().get(3).getYearlyValues(), is(new Integer[]{-3000, -3300, -3500, -4400}));
+        // the accounts of an inverted group are inverted with it, so the rows under it still add up
+        assertThat(dto.getRows().get(3).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getSchemaId(), is("220"));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getType(), is(AccountingDto.Type.CASH_FLOW_ACCOUNT));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getYearlyValues(), is(new Integer[]{-3000, -3300, -3500, -4400}));
 
         assertThat(dto.getRows().get(4).getSchemaId(), is("cf"));
         assertThat(dto.getRows().get(4).getType(), is(AccountingDto.Type.CASH_FLOW_SUMMARY));
@@ -149,7 +161,7 @@ public class AccountingResourceTest
         AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
 
         assertThat(dto.getColumns().size(), is(15));
-        assertThat(dto.getColumns().get(0), is("Balance Sheet 2020"));
+        assertThat(dto.getColumns().get(0), is("Balance Sheet"));
         assertThat(dto.getRows().size(), is(10));
 
         assertThat(dto.getRows().get(0).getSchemaId(), is("a"));
@@ -325,7 +337,27 @@ public class AccountingResourceTest
         assertThat(dto.getRows().get(3).getSchemaId(), is("2"));
         assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.BALANCE_CLASS));
         assertThat(dto.getRows().get(3).getYearlyValues(), is(new Integer[]{7000, 7700, 8500, 8400}));
-        assertThat(dto.getRows().get(3).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(3).getChildren().size(), is(3));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getSchemaId(), is("20"));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_GROUP));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getYearlyValues(), is(new Integer[]{1000, 1100, 1500, 1600}));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().size(), is(2));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getSchemaId(), is("200"));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_ACCOUNT));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getYearlyValues(), is(new Integer[]{1000, 1100, 1500, 1400}));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(0).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(1).getSchemaId(), is("201"));
+        assertThat(dto.getRows().get(3).getChildren().get(0).getChildren().get(1).getYearlyValues(), is(new Integer[]{0, 0, 0, 200}));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getSchemaId(), is("21"));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getYearlyValues(), is(new Integer[]{2000, 2200, 2500, 2800}));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().get(0).getSchemaId(), is("210"));
+        assertThat(dto.getRows().get(3).getChildren().get(1).getChildren().get(0).getYearlyValues(), is(new Integer[]{2000, 2200, 2500, 2800}));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getSchemaId(), is("23"));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getYearlyValues(), is(new Integer[]{4000, 4400, 4500, 4000}));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().get(0).getSchemaId(), is("230"));
+        assertThat(dto.getRows().get(3).getChildren().get(2).getChildren().get(0).getYearlyValues(), is(new Integer[]{4000, 4400, 4500, 4000}));
 
         assertThat(dto.getRows().get(5).getSchemaId(), is("l"));
         assertThat(dto.getRows().get(5).getType(), is(AccountingDto.Type.BALANCE_SUMMARY));
@@ -335,15 +367,28 @@ public class AccountingResourceTest
         assertThat(dto.getRows().get(6).getSchemaId(), is("2"));
         assertThat(dto.getRows().get(6).getType(), is(AccountingDto.Type.BALANCE_CLASS));
         assertThat(dto.getRows().get(6).getYearlyValues(), is(new Integer[]{3000, 3300, 3500, 4400}));
-        assertThat(dto.getRows().get(6).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(6).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getSchemaId(), is("22"));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_GROUP));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getYearlyValues(), is(new Integer[]{3000, 3300, 3500, 4400}));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().get(0).getSchemaId(), is("220"));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_ACCOUNT));
+        assertThat(dto.getRows().get(6).getChildren().get(0).getChildren().get(0).getYearlyValues(), is(new Integer[]{3000, 3300, 3500, 4400}));
         assertThat(dto.getRows().get(7).getSchemaId(), is("3"));
         assertThat(dto.getRows().get(7).getType(), is(AccountingDto.Type.BALANCE_CLASS));
         assertThat(dto.getRows().get(7).getYearlyValues(), is(new Integer[]{0, 0, 0, 0}));
-        assertThat(dto.getRows().get(7).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(7).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(7).getChildren().get(0).getType(), is(AccountingDto.Type.BALANCE_GROUP));
         assertThat(dto.getRows().get(8).getSchemaId(), is("4"));
         assertThat(dto.getRows().get(8).getType(), is(AccountingDto.Type.BALANCE_CLASS));
         assertThat(dto.getRows().get(8).getYearlyValues(), is(new Integer[]{18000, 5800, 5140, 3000}));
-        assertThat(dto.getRows().get(8).getChildren().size(), is(0));
+        assertThat(dto.getRows().get(8).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getSchemaId(), is("40"));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getYearlyValues(), is(new Integer[]{18000, 5800, 5140, 3000}));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().size(), is(1));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().get(0).getSchemaId(), is("400"));
+        assertThat(dto.getRows().get(8).getChildren().get(0).getChildren().get(0).getYearlyValues(), is(new Integer[]{18000, 5800, 5140, 3000}));
         assertThat(dto.getRows().get(9).getSchemaId(), is("p"));
         assertThat(dto.getRows().get(9).getType(), is(AccountingDto.Type.BALANCE_CLASS));
         assertThat(dto.getRows().get(9).getName(), is("Profit"));
@@ -366,7 +411,7 @@ public class AccountingResourceTest
         AccountingDto dto = response.jsonPath().getObject("", AccountingDto.class);
 
         assertThat(dto.getColumns().size(), is(14));
-        assertThat(dto.getColumns().get(0), is("Income Statement 2019"));
+        assertThat(dto.getColumns().get(0), is("Income Statement"));
         assertThat(dto.getRows().size(), is(16));
 
         assertThat(dto.getRows().get(0).getSchemaId(), is("60"));
@@ -480,6 +525,16 @@ public class AccountingResourceTest
         assertThat(dto.getRows().get(1).getType(), is(AccountingDto.Type.EXPENSE_GROUP));
         assertThat(dto.getRows().get(1).getYearlyValues(), is(new Integer[]{2000, 200, 20, 1000}));
         assertThat(dto.getRows().get(1).getTotal(), is(3220));
+        // this row is only part of its group, so it expands into only the accounts it covers
+        assertThat(dto.getRows().get(1).getChildren().size(), is(3));
+        assertThat(dto.getRows().get(1).getChildren().get(0).getSchemaId(), is("550"));
+        assertThat(dto.getRows().get(1).getChildren().get(0).getType(), is(AccountingDto.Type.EXPENSE_ACCOUNT));
+        assertThat(dto.getRows().get(1).getChildren().get(0).getYearlyValues(), is(new Integer[]{2000, 200, 20, 1000}));
+        assertThat(dto.getRows().get(1).getChildren().get(0).getTotal(), is(3220));
+        assertThat(dto.getRows().get(1).getChildren().get(1).getSchemaId(), is("551"));
+        assertThat(dto.getRows().get(1).getChildren().get(1).getYearlyValues(), is(new Integer[]{0, 0, 0, 0}));
+        assertThat(dto.getRows().get(1).getChildren().get(2).getSchemaId(), is("552"));
+        assertThat(dto.getRows().get(1).getChildren().get(2).getYearlyValues(), is(new Integer[]{0, 0, 0, 0}));
 
         assertThat(dto.getRows().get(2).getSchemaId(), is("63"));
         assertThat(dto.getRows().get(2).getType(), is(AccountingDto.Type.INCOME_GROUP));
@@ -490,6 +545,7 @@ public class AccountingResourceTest
         assertThat(dto.getRows().get(3).getType(), is(AccountingDto.Type.PROFIT_SUMMARY));
         assertThat(dto.getRows().get(3).getYearlyValues(), is(new Integer[]{2000, 200, 20, 0}));
         assertThat(dto.getRows().get(3).getTotal(), is(2220));
+        assertThat(dto.getRows().get(3).getChildren().size(), is(0));
 
         assertThat(dto.getRows().get(4).getSchemaId(), is("51"));
         assertThat(dto.getRows().get(4).getType(), is(AccountingDto.Type.EXPENSE_GROUP));
@@ -539,112 +595,40 @@ public class AccountingResourceTest
         String validAccountId = "000";
         String validMonth = "5";
 
-        assertThat(given().when()
-                .get("/accounting/" + "2x20" + "/transaction/" + validAccountId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/accounting/" + "2x20" + "/transaction/" + validAccountId + "/month/" + validMonth, "year");
 
-        assertThat(given().when()
-                .get("/accounting/" + "2014" + "/transaction/" + validAccountId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/accounting/" + "2014" + "/transaction/" + validAccountId + "/month/" + validMonth);
 
-        assertThat(given().when()
-                .get("/accounting/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/transaction/" + validAccountId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/accounting/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/transaction/" + validAccountId + "/month/" + validMonth);
 
-        assertThat(given().when()
-                .get("/accounting/" + validYear + "/transaction/" + "22" + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+        assertInvalid("/accounting/" + validYear + "/transaction/" + "22" + "/month/" + validMonth, "accountId");
 
-        assertThat(given().when()
-                .get("/accounting/" + validYear + "/transaction/" + "2222" + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+        assertInvalid("/accounting/" + validYear + "/transaction/" + "2222" + "/month/" + validMonth, "accountId");
 
-        assertThat(given().when()
-                .get("/accounting/" + validYear + "/transaction/" + "xxx" + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+        assertInvalid("/accounting/" + validYear + "/transaction/" + "xxx" + "/month/" + validMonth, "accountId");
 
-        assertThat(given().when()
-                .get("/accounting/" + validYear + "/transaction/" + validAccountId + "/month/" + "0")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Month Parameter"));
+        assertInvalid("/accounting/" + validYear + "/transaction/" + validAccountId + "/month/" + "0", "month");
 
-        assertThat(given().when()
-                .get("/accounting/" + validYear + "/transaction/" + validAccountId + "/month/" + "13")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Month Parameter"));
+        assertInvalid("/accounting/" + validYear + "/transaction/" + validAccountId + "/month/" + "13", "month");
 
-        assertThat(given().when()
-                .get("/accounting/" + validYear + "/transaction/" + validAccountId + "/month/" + "x")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Month Parameter"));
+        assertInvalid("/accounting/" + validYear + "/transaction/" + validAccountId + "/month/" + "x", "month");
 
-        assertThat(given().when()
-                .get("/accounting/cashflow/" + "2x20")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/accounting/cashflow/" + "2x20", "year");
 
-        assertThat(given().when()
-                .get("/accounting/cashflow/" + "2014")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/accounting/cashflow/" + "2014");
 
-        assertThat(given().when()
-                .get("/accounting/cashflow/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/accounting/cashflow/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
 
-        assertThat(given().when()
-                .get("/accounting/profit/" + "2x20")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/accounting/profit/" + "2x20", "year");
 
-        assertThat(given().when()
-                .get("/accounting/profit/" + "2014")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/accounting/profit/" + "2014");
 
-        assertThat(given().when()
-                .get("/accounting/profit/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/accounting/profit/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
 
-        assertThat(given().when()
-                .get("/accounting/balance/" + "2x20")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/accounting/balance/" + "2x20", "year");
 
-        assertThat(given().when()
-                .get("/accounting/balance/" + "2014")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/accounting/balance/" + "2014");
 
-        assertThat(given().when()
-                .get("/accounting/balance/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/accounting/balance/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
     }
 }

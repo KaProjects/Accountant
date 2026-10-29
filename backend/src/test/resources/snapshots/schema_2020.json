@@ -1,0 +1,191 @@
+{
+  "classes" : [ {
+    "id" : "0",
+    "name" : "class0",
+    "groups" : [ ]
+  }, {
+    "id" : "1",
+    "name" : "class1",
+    "groups" : [ ]
+  }, {
+    "id" : "2",
+    "name" : "class2",
+    "groups" : [ {
+      "id" : "20",
+      "name" : "group20",
+      "accounts" : [ {
+        "id" : "200",
+        "name" : "account200",
+        "type" : "A"
+      }, {
+        "id" : "201",
+        "name" : "account201",
+        "type" : "A"
+      } ]
+    }, {
+      "id" : "21",
+      "name" : "group21",
+      "accounts" : [ {
+        "id" : "210",
+        "name" : "account210",
+        "type" : "A"
+      } ]
+    }, {
+      "id" : "22",
+      "name" : "group22",
+      "accounts" : [ {
+        "id" : "220",
+        "name" : "account220",
+        "type" : "L"
+      } ]
+    }, {
+      "id" : "23",
+      "name" : "group23",
+      "accounts" : [ {
+        "id" : "230",
+        "name" : "account230",
+        "type" : "A"
+      } ]
+    } ]
+  }, {
+    "id" : "3",
+    "name" : "class3",
+    "groups" : [ {
+      "id" : "30",
+      "name" : "group30",
+      "accounts" : [ ]
+    }, {
+      "id" : "31",
+      "name" : "group31",
+      "accounts" : [ ]
+    } ]
+  }, {
+    "id" : "4",
+    "name" : "class4",
+    "groups" : [ {
+      "id" : "40",
+      "name" : "group40",
+      "accounts" : [ {
+        "id" : "400",
+        "name" : "account400",
+        "type" : "L"
+      } ]
+    } ]
+  }, {
+    "id" : "5",
+    "name" : "class5",
+    "groups" : [ {
+      "id" : "50",
+      "name" : "group50",
+      "accounts" : [ ]
+    }, {
+      "id" : "51",
+      "name" : "group51",
+      "accounts" : [ {
+        "id" : "510",
+        "name" : "account510",
+        "type" : "E"
+      } ]
+    }, {
+      "id" : "52",
+      "name" : "group52",
+      "accounts" : [ {
+        "id" : "520",
+        "name" : "account520",
+        "type" : "E"
+      } ]
+    }, {
+      "id" : "53",
+      "name" : "group53",
+      "accounts" : [ ]
+    }, {
+      "id" : "54",
+      "name" : "group54",
+      "accounts" : [ ]
+    }, {
+      "id" : "55",
+      "name" : "group55",
+      "accounts" : [ {
+        "id" : "550",
+        "name" : "account550",
+        "type" : "E"
+      }, {
+        "id" : "551",
+        "name" : "account551",
+        "type" : "E"
+      }, {
+        "id" : "552",
+        "name" : "account552",
+        "type" : "E"
+      }, {
+        "id" : "553",
+        "name" : "account553",
+        "type" : "E"
+      }, {
+        "id" : "554",
+        "name" : "account554",
+        "type" : "E"
+      }, {
+        "id" : "555",
+        "name" : "account555",
+        "type" : "E"
+      } ]
+    }, {
+      "id" : "56",
+      "name" : "group56",
+      "accounts" : [ ]
+    } ]
+  }, {
+    "id" : "6",
+    "name" : "class6",
+    "groups" : [ {
+      "id" : "60",
+      "name" : "group60",
+      "accounts" : [ {
+        "id" : "600",
+        "name" : "account600",
+        "type" : "R"
+      } ]
+    }, {
+      "id" : "61",
+      "name" : "group61",
+      "accounts" : [ ]
+    }, {
+      "id" : "62",
+      "name" : "group62",
+      "accounts" : [ ]
+    }, {
+      "id" : "63",
+      "name" : "group63",
+      "accounts" : [ {
+        "id" : "630",
+        "name" : "account630",
+        "type" : "R"
+      }, {
+        "id" : "631",
+        "name" : "account631",
+        "type" : "R"
+      }, {
+        "id" : "632",
+        "name" : "account632",
+        "type" : "R"
+      }, {
+        "id" : "633",
+        "name" : "account633",
+        "type" : "R"
+      } ]
+    } ]
+  }, {
+    "id" : "7",
+    "name" : "class7",
+    "groups" : [ {
+      "id" : "70",
+      "name" : "group70",
+      "accounts" : [ {
+        "id" : "700",
+        "name" : "account700",
+        "type" : "X"
+      } ]
+    } ]
+  } ]
+}

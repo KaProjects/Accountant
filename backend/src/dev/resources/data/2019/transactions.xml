@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<transactions year="2019">
+    <transaction id="19x1" date="0502" description="same summary" amount="100" debit="550.0" credit="600.0"/>
+    <transaction id="19x2" date="0502" description="same summary" amount="100" debit="550.0" credit="600.0"/>
+    <transaction id="19x3" date="0502" description="same summary" amount="100" debit="550.0" credit="600.0"/>
+    <transaction id="19x4" date="0502" description="same summary" amount="100" debit="550.0" credit="600.0"/>
+    <transaction id="19x5" date="0502" description="same summary" amount="100" debit="550.0" credit="600.0"/>
+    <transaction id="19x6" date="0502" description="same summary" amount="100" debit="550.0" credit="600.0"/>
+    <transaction id="19x7" date="0502" description="same summary" amount="100" debit="550.0" credit="600.0"/>
+    <transaction id="19x8" date="0502" description="same summary" amount="100" debit="550.0" credit="600.0"/>
+    <transaction id="19x11" date="0503" description="different summary" amount="100" debit="553.0" credit="631.0"/>
+    <transaction id="19x12" date="0503" description="different summary" amount="100" debit="553.0" credit="631.0"/>
+    <transaction id="19x13" date="0503" description="different summary" amount="100" debit="553.0" credit="631.0"/>
+    <transaction id="19x14" date="0503" description="different summary" amount="100" debit="553.0" credit="631.0"/>
+    <transaction id="19x15" date="0503" description="different summary" amount="100" debit="553.0" credit="631.0"/>
+    <transaction id="19x16" date="0503" description="different summary" amount="100" debit="553.0" credit="631.0"/>
+    <transaction id="19x17" date="0503" description="different summary" amount="100" debit="553.0" credit="631.0"/>
+    <transaction id="19x18" date="0503" description="different summary" amount="100" debit="553.0" credit="631.0"/>
+    <transaction id="19x19" date="0503" description="different summary" amount="100" debit="553.0" credit="631.0"/>
+    <transaction id="19x43" date="0909" description="same group" amount="10" debit="553.0" credit="554.0"/>
+    <transaction id="19x21" date="1005" description="different semantic account" amount="1000" debit="520.0" credit="600.1"/>
+    <transaction id="19x22" date="1005" description="different semantic account" amount="1000" debit="520.0" credit="600.1"/>
+    <transaction id="19x23" date="1005" description="different semantic account" amount="1000" debit="520.0" credit="600.1"/>
+    <transaction id="19x24" date="1005" description="different semantic account" amount="1000" debit="520.0" credit="600.1"/>
+    <transaction id="19x25" date="1005" description="different semantic account" amount="1000" debit="520.0" credit="600.1"/>
+    <transaction id="19x26" date="1005" description="different semantic account" amount="1000" debit="520.0" credit="600.1"/>
+    <transaction id="19x27" date="1005" description="different semantic account" amount="1000" debit="520.0" credit="600.1"/>
+    <transaction id="19x31" date="1007" description="profit" amount="100" debit="202.10" credit="630.0"/>
+    <transaction id="19x32" date="1007" description="profit" amount="100" debit="202.10" credit="630.0"/>
+    <transaction id="19x33" date="1007" description="profit" amount="100" debit="202.10" credit="630.0"/>
+    <transaction id="19x34" date="1007" description="profit" amount="100" debit="520.0" credit="202.10"/>
+    <transaction id="19x35" date="1008" description="profit" amount="100" debit="202.10" credit="630.0"/>
+    <transaction id="19x36" date="1008" description="profit" amount="100" debit="202.10" credit="630.0"/>
+    <transaction id="19x37" date="1008" description="profit" amount="100" debit="202.10" credit="630.0"/>
+    <transaction id="19x38" date="1008" description="profit" amount="100" debit="520.0" credit="202.10"/>
+    <transaction id="19x42" date="1009" description="same group" amount="10" debit="553.0" credit="554.0"/>
+    <transaction id="19x41" date="1509" description="same group" amount="10" debit="553.0" credit="554.0"/>
+    <transaction id="19x44" date="2009" description="same group" amount="10" debit="553.0" credit="554.0"/>
+    <transaction id="19x52" date="2104" description="" amount="6000" debit="210.0" credit="210.2"/>
+    <transaction id="19x53" date="2104" description="Sale of asds" amount="5000" debit="210.2" credit="210.1"/>
+    <transaction id="19x45" date="2109" description="same group" amount="10" debit="553.0" credit="554.0"/>
+    <transaction id="19x51" date="2109" description="vac=xxx" amount="10000" debit="202.10" credit="201.1"/>
+    <transaction id="19xx1" date="3112" description="closing" amount="10000" debit="701.0" credit="600.0"/>
+    <transaction id="19xx2" date="3112" description="closing" amount="10000" debit="550.0" credit="701.0"/>
+    <transaction id="cx10" date="3112" description="closing" amount="2500" debit="701.0" credit="210.0"/>
+    <transaction id="cx11" date="3112" description="closing" amount="3500" debit="220.0" credit="701.0"/>
+    <transaction id="cx12" date="3112" description="closing" amount="4500" debit="701.0" credit="230.0"/>
+    <transaction id="cx12b" date="3112" description="closing" amount="5140" debit="400.0" credit="701.0"/>
+    <transaction id="cx9" date="3112" description="closing" amount="1500" debit="701.0" credit="200.0"/>
+    <transaction id="px13" date="3112" description="closing" amount="10" debit="600.0" credit="710.0"/>
+    <transaction id="px23" date="3112" description="closing" amount="20" debit="710.0" credit="550.0"/>
+    <transaction id="px33" date="3112" description="closing" amount="30" debit="631.0" credit="710.0"/>
+    <transaction id="px43" date="3112" description="closing" amount="40" debit="710.0" credit="510.0"/>
+    <transaction id="px53" date="3112" description="closing" amount="50" debit="710.0" credit="520.0"/>
+    <transaction id="px63" date="3112" description="closing" amount="60" debit="710.0" credit="530.0"/>
+    <transaction id="px73" date="3112" description="closing" amount="70" debit="630.0" credit="710.0"/>
+    <transaction id="px83" date="3112" description="closing" amount="80" debit="710.0" credit="553.0"/>
+</transactions>

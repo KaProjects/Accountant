@@ -5,9 +5,9 @@ public class Constants
     public static class Schema
     {
         public static final String FIN_GROUP_ID = "23";
-        public static final String FIN_CREATION_ID = "546";
-        public static final String FIN_REV_REVALUATION_ID = "624";
-        public static final String FIN_EXP_REVALUATION_ID = "544";
+        public static final String FIN_CREATION_ID = "549";
+        public static final String FIN_REV_REVALUATION_ID = "629";
+        public static final String FIN_EXP_REVALUATION_ID = "548";
         public static final String ACCUMULATED_DEP_GROUP_ID = "09";
         public static final String DEPRECIATION_GROUP_ID = "50";
         public static final String CONSUMPTION_GROUP_ID = "51";
@@ -20,6 +20,12 @@ public class Constants
         public static final String PROFIT_ACC_ID = "710.0";
         public static final String PERSONAL_CAPITAL_ACC_ID = "400.0";
         public static final String ACCUMULATED_EARNINGS_ACC_ID = "401.0";
+    }
+
+    public static class Budget
+    {
+        /** The label in the description of every transaction of a vacation. */
+        public static final String VACATION_LABEL = "vac=";
     }
 
     public enum AccountType

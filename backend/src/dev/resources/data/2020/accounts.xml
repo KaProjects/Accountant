@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<accounts year="2020">
+    <account schemaId="200" semanticId="0" name="general" metadata=""/>
+    <account schemaId="201" semanticId="0" name="general" metadata=""/>
+    <account schemaId="210" semanticId="0" name="general" metadata=""/>
+    <account schemaId="220" semanticId="0" name="general" metadata=""/>
+    <account schemaId="230" semanticId="0" name="general" metadata=""/>
+    <account schemaId="400" semanticId="0" name="general" metadata=""/>
+    <account schemaId="510" semanticId="0" name="general" metadata=""/>
+    <account schemaId="520" semanticId="0" name="general" metadata=""/>
+    <account schemaId="550" semanticId="0" name="general" metadata=""/>
+    <account schemaId="600" semanticId="0" name="general" metadata=""/>
+    <account schemaId="630" semanticId="0" name="general" metadata=""/>
+    <account schemaId="700" semanticId="0" name="general" metadata=""/>
+</accounts>

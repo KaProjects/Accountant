@@ -1,0 +1,121 @@
+import {fireEvent, screen, waitFor, within} from "@testing-library/react";
+import AdminSync from "../AdminSync";
+import {runSync} from "../../services/sync";
+import {renderWithAppState} from "../../testUtils";
+
+const mockNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+    ...jest.requireActual("react-router-dom"),
+    useNavigate: () => mockNavigate,
+}));
+
+jest.mock("../../services/sync", () => ({
+    ...jest.requireActual("../../services/sync"),
+    runSync: jest.fn(),
+}));
+
+const mountView = () => {
+    const setYearly = jest.fn();
+    renderWithAppState(<AdminSync/>, {year: 2020, setYearly});
+    return {setYearly};
+};
+
+describe("AdminSync", () => {
+    beforeEach(() => jest.clearAllMocks());
+
+    it("goes back to the admin page", () => {
+        mountView();
+
+        fireEvent.click(screen.getByRole("button", {name: /Admin/}));
+
+        expect(mockNavigate).toHaveBeenCalledWith("/admin");
+    });
+
+    const latest = new Date().getFullYear();
+
+    it("offers each sync action, the single year's for the latest year to begin with", () => {
+        mountView();
+
+        expect(screen.getByText("Sync " + latest)).toBeInTheDocument();
+        expect(screen.getByText("Sync All Years")).toBeInTheDocument();
+        expect(screen.getByText("Sync All Years & Validate")).toBeInTheDocument();
+    });
+
+    it("shows nothing until an action has been run", () => {
+        mountView();
+
+        expect(screen.queryByTestId("result-all")).not.toBeInTheDocument();
+    });
+
+    it("runs the endpoint of the action that was clicked", async () => {
+        runSync.mockResolvedValue({ok: true, status: "200 OK", body: "2020 synced"});
+        mountView();
+
+        fireEvent.click(screen.getByTestId("run-year"));
+
+        await waitFor(() => expect(runSync).toHaveBeenCalledWith("/sync/" + latest));
+    });
+
+    it("syncs the year chosen from every year the books can hold", async () => {
+        runSync.mockResolvedValue({ok: true, status: "200 OK", body: "2019 synced"});
+        mountView();
+
+        fireEvent.mouseDown(screen.getByRole("combobox", {name: "Year"}));
+        const options = within(screen.getByRole("listbox")).getAllByRole("option");
+        expect(options[0]).toHaveTextContent(String(latest));
+        expect(options[options.length - 1]).toHaveTextContent("2015");
+        fireEvent.click(within(screen.getByRole("listbox")).getByRole("option", {name: "2019"}));
+
+        expect(screen.getByText("Sync 2019")).toBeInTheDocument();
+        fireEvent.click(screen.getByTestId("run-year"));
+        await waitFor(() => expect(runSync).toHaveBeenCalledWith("/sync/2019"));
+    });
+
+    it("reports the status and the response body of a successful run", async () => {
+        runSync.mockResolvedValue({ok: true, status: "200 OK", body: "2020 synced\n2021 synced"});
+        mountView();
+
+        fireEvent.click(screen.getByTestId("run-all"));
+
+        const result = await screen.findByTestId("result-all");
+        expect(within(result).getByText("200 OK")).toBeInTheDocument();
+        expect(within(result).getByText(/2021 synced/)).toBeInTheDocument();
+    });
+
+    it("reports a failure as an error, keeping the body that explains it", async () => {
+        // A year that fails its checks arrives as 422 whose detail is the report, so the body
+        // matters more than the status and must not be swallowed.
+        runSync.mockResolvedValue({ok: false, status: "422 Unprocessable Content", body: "2019: data invalid"});
+        mountView();
+
+        fireEvent.click(screen.getByTestId("run-validate"));
+
+        const result = await screen.findByTestId("result-validate");
+        expect(within(result).getByText("422 Unprocessable Content")).toBeInTheDocument();
+        expect(within(result).getByText(/data invalid/)).toBeInTheDocument();
+        expect(result.className).toMatch(/colorError|standardError/);
+    });
+
+    it("keeps the results of different actions apart", async () => {
+        runSync.mockResolvedValueOnce({ok: true, status: "200 OK", body: "all synced"});
+        mountView();
+
+        fireEvent.click(screen.getByTestId("run-all"));
+        await screen.findByTestId("result-all");
+
+        expect(screen.queryByTestId("result-year")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("result-validate")).not.toBeInTheDocument();
+    });
+
+    it("blocks the other actions while one is running, so two do not rebuild at once", async () => {
+        let finish;
+        runSync.mockReturnValue(new Promise((resolve) => {finish = resolve}));
+        mountView();
+
+        fireEvent.click(screen.getByTestId("run-all"));
+
+        await waitFor(() => expect(screen.getByTestId("run-year")).toBeDisabled());
+        finish({ok: true, status: "200 OK", body: ""});
+        await waitFor(() => expect(screen.getByTestId("run-year")).toBeEnabled());
+    });
+});

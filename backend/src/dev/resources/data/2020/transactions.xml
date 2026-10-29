@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<transactions year="2020">
+    <transaction id="20xi0" date="0101" description="init" amount="0" debit="201.0" credit="700.0"/>
+    <transaction id="20xi1" date="0101" description="init" amount="1000" debit="200.0" credit="700.0"/>
+    <transaction id="20xi2" date="0101" description="init" amount="2000" debit="210.0" credit="700.0"/>
+    <transaction id="20xi3" date="0101" description="init" amount="3000" debit="700.0" credit="220.0"/>
+    <transaction id="20xi4" date="0101" description="init" amount="4000" debit="230.0" credit="700.0"/>
+    <transaction id="20xi5" date="0101" description="init" amount="4000" debit="700.0" credit="400.0"/>
+    <transaction id="20x1" date="0504" description="same group" amount="100" debit="201.0" credit="200.0"/>
+    <transaction id="20x2" date="0504" description="same group" amount="100" debit="201.0" credit="200.0"/>
+    <transaction id="20x10" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x11" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x12" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x3" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x4" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x5" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x6" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x7" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x8" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x9" date="0505" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x13" date="1006" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x14" date="1006" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x15" date="1006" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x16" date="1006" description="x" amount="100" debit="200.0" credit="220.0"/>
+    <transaction id="20x17" date="1006" description="x" amount="100" debit="210.0" credit="200.0"/>
+    <transaction id="20x18" date="1006" description="x" amount="100" debit="210.0" credit="200.0"/>
+    <transaction id="px91" date="1209" description="" amount="1000" debit="550.0" credit="600.0"/>
+    <transaction id="px92" date="1209" description="" amount="1000" debit="510.0" credit="520.0"/>
+    <transaction id="px93" date="1209" description="" amount="1000" debit="400.0" credit="630.0"/>
+    <transaction id="20x19" date="1508" description="x" amount="100" debit="210.0" credit="200.0"/>
+    <transaction id="20x20" date="1508" description="x" amount="100" debit="210.0" credit="200.0"/>
+    <transaction id="20x21" date="1508" description="x" amount="100" debit="210.0" credit="200.0"/>
+    <transaction id="20x22" date="1508" description="x" amount="100" debit="210.0" credit="200.0"/>
+    <transaction id="20x23" date="1508" description="x" amount="100" debit="210.0" credit="200.0"/>
+    <transaction id="20x24" date="1508" description="x" amount="100" debit="210.0" credit="200.0"/>
+</transactions>

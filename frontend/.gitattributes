@@ -1,3 +1,0 @@
-.gitattributes !filter !diff
-
-src/properties.js filter=git-crypt diff=git-crypt

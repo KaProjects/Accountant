@@ -1,0 +1,86 @@
+package org.kaleta.dev;
+
+import io.quarkus.runtime.StartupEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
+import org.kaleta.service.SyncService;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+/**
+ * Builds the in-memory database and syncs the sample export into it, once on every start.
+ * <p>
+ * The tables are created here rather than by an INIT clause on the JDBC URL. H2 runs a URL's INIT
+ * on every connection it opens, not once, and the table script starts by dropping every table: so
+ * whenever the connection pool opened another connection - for a few requests arriving together,
+ * or after idling - it dropped the synced data, and any request running at that moment failed on
+ * a database with no tables at all. The database itself outlives its connections because the URL
+ * keeps it open, so building it once is enough.
+ * <p>
+ * Without the sync the schema, account and transaction tables would stay empty until /sync/all is
+ * called by hand. This class lives in src/dev/java, which only the Maven "dev" profile adds to the
+ * build, so it is never part of a production artifact.
+ */
+@ApplicationScoped
+public class DevDataInitializer
+{
+    private static final Logger LOG = Logger.getLogger(DevDataInitializer.class);
+    private static final String BUDGETING_SCRIPT = "../deploy/createBudgeting.sql";
+
+    @ConfigProperty(name = "data.location")
+    String dataLocation;
+
+    @Inject
+    SyncService syncService;
+
+    @Inject
+    DataSource dataSource;
+
+    void onStart(@Observes StartupEvent event)
+    {
+        createDatabase();
+        loadBudgeting();
+        syncSampleData();
+    }
+
+    private void createDatabase()
+    {
+        try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("RUNSCRIPT FROM 'sql/createTables.sql'");
+            LOG.info("Dev database created.");
+        } catch (SQLException e) {
+            LOG.error("Failed to create the dev database.", e);
+        }
+    }
+
+    /** The budgeting the sync does not supply. Without it the budget is empty, and all else works. */
+    private void loadBudgeting()
+    {
+        try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("RUNSCRIPT FROM '" + BUDGETING_SCRIPT + "'");
+            LOG.info("Dev budgeting loaded.");
+        } catch (SQLException e) {
+            LOG.warnf("Failed to load the dev budgeting from %s: %s", BUDGETING_SCRIPT, e.getMessage());
+        }
+    }
+
+    private void syncSampleData()
+    {
+        try {
+            int years = 0;
+            for (String year : syncService.getYears(dataLocation)) {
+                syncService.sync(dataLocation, year);
+                years++;
+            }
+            LOG.infof("Dev sample data synced from %s (%d years).", dataLocation, years);
+        } catch (Exception e) {
+            LOG.errorf(e, "Failed to sync dev sample data from %s.", dataLocation);
+        }
+    }
+}

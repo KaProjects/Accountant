@@ -1,9 +1,11 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import org.kaleta.Utils;
 
 @Data
+@RegisterForReflection
 public class YearAccountTransactionDto implements Comparable<YearAccountTransactionDto>
 {
     private String date;

@@ -1,0 +1,17 @@
+# The frontend image builds from the repository root so it can pick up
+# deploy/nginx.conf. Everything not needed by that build is excluded to keep the
+# build context small.
+.git
+.git-crypt
+.claude
+android
+desktop
+backend
+deploy/.env.prod
+**/node_modules
+**/target
+**/target-dev
+frontend/build
+**/.idea
+**/*.iml
+.DS_Store

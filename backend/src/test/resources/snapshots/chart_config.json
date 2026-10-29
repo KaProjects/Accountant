@@ -1,0 +1,156 @@
+[ {
+  "id" : "60",
+  "name" : "60",
+  "type" : "BALANCE",
+  "schemas" : [ "60" ]
+}, {
+  "id" : "55a",
+  "name" : "55 - 60 - Naklady",
+  "type" : "BALANCE",
+  "schemas" : [ "550", "551", "552" ]
+}, {
+  "id" : "63a",
+  "name" : "63 - 60 - Vynosy",
+  "type" : "BALANCE",
+  "schemas" : [ "631", "632", "633", "634" ]
+}, {
+  "id" : "ni",
+  "name" : "Net Income",
+  "type" : "BALANCE",
+  "schemas" : [ "60", "550", "551", "552", "631", "632", "633", "634" ]
+}, {
+  "id" : "51",
+  "name" : "51",
+  "type" : "BALANCE",
+  "schemas" : [ "51" ]
+}, {
+  "id" : "52",
+  "name" : "52",
+  "type" : "BALANCE",
+  "schemas" : [ "52" ]
+}, {
+  "id" : "53",
+  "name" : "53",
+  "type" : "BALANCE",
+  "schemas" : [ "53" ]
+}, {
+  "id" : "op",
+  "name" : "Operating Profit",
+  "type" : "BALANCE",
+  "schemas" : [ "60", "550", "551", "552", "631", "632", "633", "634", "51", "52", "53" ]
+}, {
+  "id" : "50",
+  "name" : "50",
+  "type" : "BALANCE",
+  "schemas" : [ "50" ]
+}, {
+  "id" : "61",
+  "name" : "61 - Vynosy",
+  "type" : "BALANCE",
+  "schemas" : [ "61" ]
+}, {
+  "id" : "56",
+  "name" : "56 - Naklady",
+  "type" : "BALANCE",
+  "schemas" : [ "56" ]
+}, {
+  "id" : "62",
+  "name" : "62 - Vynosy",
+  "type" : "BALANCE",
+  "schemas" : [ "62" ]
+}, {
+  "id" : "54",
+  "name" : "54 - Naklady",
+  "type" : "BALANCE",
+  "schemas" : [ "54" ]
+}, {
+  "id" : "63b",
+  "name" : "63 - Ostatne - Vynosy",
+  "type" : "BALANCE",
+  "schemas" : [ "630", "635" ]
+}, {
+  "id" : "55b",
+  "name" : "55 - Ostatne - Naklady",
+  "type" : "BALANCE",
+  "schemas" : [ "553", "554", "555", "556" ]
+}, {
+  "id" : "np",
+  "name" : "Net Profit",
+  "type" : "BALANCE",
+  "schemas" : [ "6", "5" ]
+}, {
+  "id" : "20",
+  "name" : "20",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "20" ]
+}, {
+  "id" : "21",
+  "name" : "21",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "21" ]
+}, {
+  "id" : "23",
+  "name" : "23",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "23" ]
+}, {
+  "id" : "22",
+  "name" : "22",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "22" ]
+}, {
+  "id" : "cf",
+  "name" : "Cash Flow",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "20", "21", "22", "23" ]
+}, {
+  "id" : "a",
+  "name" : "Assets",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "0", "1", "20", "21", "23", "30" ]
+}, {
+  "id" : "0",
+  "name" : "class0",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "0" ]
+}, {
+  "id" : "1",
+  "name" : "1",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "1" ]
+}, {
+  "id" : "2a",
+  "name" : "2 - Assets",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "20", "21", "23" ]
+}, {
+  "id" : "3a",
+  "name" : "3 - Assets",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "30" ]
+}, {
+  "id" : "l",
+  "name" : "Liabilities",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "22", "31", "4" ]
+}, {
+  "id" : "2l",
+  "name" : "2 - Liabilities",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "22" ]
+}, {
+  "id" : "3l",
+  "name" : "3 - Liabilities",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "31" ]
+}, {
+  "id" : "4",
+  "name" : "4",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "4" ]
+}, {
+  "id" : "p",
+  "name" : "Profit",
+  "type" : "CUMULATIVE",
+  "schemas" : [ "6", "5" ]
+} ]

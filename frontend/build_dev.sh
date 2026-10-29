@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Trading's dev stack already uses 3000 / 9090 / 5005 on this machine, so the
+# Accountant web stack is offset by one to let both run side by side.
+export PORT="${PORT:-3001}"
+
+# Bind to the loopback interface, as the backend already does. Unset, the development server binds
+# every interface, and because its proxy forwards to the backend from the server side, that puts
+# the whole stack on the local network - where the development credentials, which are committed in
+# the clear, are enough to read the real accounting data. The origin checks do not help: they are
+# header comparisons, and anything that is not a browser sets whatever headers it likes.
+#
+# Override it when you deliberately want to reach the stack from another device:
+#   HOST=0.0.0.0 ./build_dev.sh
+export HOST="${HOST:-127.0.0.1}"
+
+usage() {
+  printf 'Usage: %s\n' "${0##*/}" >&2
+  exit 2
+}
+
+[[ $# -eq 0 ]] || usage
+
+node_is_supported() {
+  local executable="$1"
+
+  "$executable" -e '
+    const major = Number(process.versions.node.split(".")[0])
+    process.exit(major >= 18 ? 0 : 1)
+  ' >/dev/null 2>&1
+}
+
+activate_development_node() {
+  local candidate
+
+  export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+  if [[ -s "$NVM_DIR/nvm.sh" ]] && [[ -n "${ACCOUNTANT_NODE_VERSION:-}" ]]; then
+    set +u
+    source "$NVM_DIR/nvm.sh"
+    set -u
+    if nvm use --silent "$ACCOUNTANT_NODE_VERSION" >/dev/null 2>&1; then
+      printf 'Using Node.js %s for frontend development.\n' "$(node --version)"
+      return 0
+    fi
+  fi
+
+  if command -v node >/dev/null 2>&1 \
+      && node_is_supported "$(command -v node)"; then
+    return 0
+  fi
+
+  for candidate in \
+      "$HOME"/.nvm/versions/node/v*/bin/node \
+      /opt/homebrew/bin/node \
+      /usr/local/bin/node; do
+    [[ -x "$candidate" ]] || continue
+    if node_is_supported "$candidate"; then
+      export PATH="$(dirname "$candidate"):$PATH"
+      hash -r
+      printf 'Using Node.js %s from %s for frontend development.\n' \
+        "$(node --version)" "$(dirname "$candidate")"
+      return 0
+    fi
+  done
+
+  printf 'Frontend development requires Node.js 18 or newer.\n' >&2
+  return 127
+}
+
+cd "$SCRIPT_DIR"
+
+activate_development_node || exit $?
+exec npm start

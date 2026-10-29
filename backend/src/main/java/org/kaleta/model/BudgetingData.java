@@ -1,8 +1,10 @@
 package org.kaleta.model;
 
+import org.kaleta.AccountUtils;
+import org.kaleta.Constants;
 import org.kaleta.Utils;
-import org.kaleta.entity.Budgeting;
-import org.kaleta.entity.Transaction;
+import org.kaleta.persistence.entity.Budgeting;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +62,13 @@ public class BudgetingData
         return schema.getYearId().getId().startsWith(id) && schema.getYearId().getId().contains(".");
     }
 
-    private Integer[] parsePlanning(String planning)
+    /**
+     * The twelve monthly amounts a row's planning stands for: none, all=amount for the same every
+     * month, or twelve amounts separated by |.
+     *
+     * @throws IllegalArgumentException for a planning in neither form
+     */
+    public static Integer[] parsePlanning(String planning)
     {
         Integer[] output = new Integer[12];
         if (planning == null || planning.isEmpty()) {
@@ -80,16 +88,11 @@ public class BudgetingData
 
     private Integer[] getMonthlyBalanceForBudgetingRow(Budgeting row)
     {
-        try
-        {
-            String debit = row.getDebit().replace("%", "");
+        // a group row with nothing in it - the investments of a year no asset was held in
+        if (row.getDebit() == null && row.getCredit() == null) return Utils.initialMonthlyBalance();
 
-        } catch (NullPointerException e) {
-            System.out.println(row);
-            throw e;
-        }
-        String debit = row.getDebit().replace("%", "");
-        String credit = row.getCredit().replace("%", "");
+        String debit = row.getDebit();
+        String credit = row.getCredit();
         String description = row.getDescription() == null ? "" : row.getDescription();
 
         if (debit.equals(credit))
@@ -97,29 +100,68 @@ public class BudgetingData
             List<Transaction> debitTransactions = filterTransactions(debit, "", description);
             List<Transaction> creditTransactions = filterTransactions("", credit, description);
             return Utils.subtractIntegerArrays(monthlyBalanceOf(debitTransactions), monthlyBalanceOf(creditTransactions));
-        } else if (description != null && description.equals("finXasset"))
+        } else if (AccountUtils.isFinAssetPair(debit, credit))
         {
-            List<Transaction> debitTransactions = filterTransactions(debit, "", "");
-            List<Transaction> creditTransactions = filterTransactions("", credit, "Sale of ");
-            return Utils.subtractIntegerArrays(monthlyBalanceOf(debitTransactions), monthlyBalanceOf(creditTransactions));
+            return investedIn(debit, credit, description);
         } else
         {
             return monthlyBalanceOf(filterTransactions(debit, credit, description));
         }
     }
 
+    /**
+     * What was put into a financial asset, month by month: whatever is booked to its creation account
+     * or straight to the asset - but for the revaluations of what it is worth and the opening of the
+     * year - that the row's description lets through, such as all but the money moved over from
+     * another asset, which is not new money. What is taken out of the asset does not count.
+     */
+    private Integer[] investedIn(String creationId, String assetId, String description)
+    {
+        String gainsId = AccountUtils.finAccountId(assetId, Constants.Schema.FIN_REV_REVALUATION_ID);
+        List<Transaction> in = new ArrayList<>();
+        for (Transaction transaction : transactions)
+        {
+            boolean ofTheYear = !transaction.getDebit().startsWith("7") && !transaction.getCredit().startsWith("7");
+            boolean putIn = transaction.getDebit().equals(creationId)
+                    || (transaction.getDebit().equals(assetId) && !transaction.getCredit().equals(gainsId));
+            if (ofTheYear && putIn && matchesDescription(transaction.getDescription(), description)) in.add(transaction);
+        }
+        return monthlyBalanceOf(in);
+    }
+
     private List<Transaction> filterTransactions(String debit, String credit, String description) {
         List<Transaction> filteredTransactions = new ArrayList<>();
         for (Transaction transaction : transactions)
         {
-            boolean debitCheck = debit.contains(".") ? transaction.getDebit().equals(debit) : transaction.getDebit().startsWith(debit);
-            boolean creditCheck = credit.contains(".") ? transaction.getCredit().equals(credit) : transaction.getCredit().startsWith(credit);
-            boolean descriptionCheck = description.startsWith("!")
-                    ? !transaction.getDescription().contains(description.replace("!", ""))
-                    : transaction.getDescription().contains(description);
+            boolean debitCheck = matchesAccount(transaction.getDebit(), debit);
+            boolean creditCheck = matchesAccount(transaction.getCredit(), credit);
+            boolean descriptionCheck = matchesDescription(transaction.getDescription(), description);
             if (debitCheck && creditCheck && descriptionCheck) filteredTransactions.add(transaction);
         }
         return filteredTransactions;
+    }
+
+    /**
+     * A transaction's description against a budget row's: the row's text has to be in it, or, after a
+     * !, must not be; no text at all lets every transaction through.
+     */
+    public static boolean matchesDescription(String transactionDescription, String rowDescription)
+    {
+        String filter = rowDescription == null ? "" : rowDescription;
+        String text = transactionDescription == null ? "" : transactionDescription;
+        return filter.startsWith("!") ? !text.contains(filter.replace("!", "")) : text.contains(filter);
+    }
+
+    /**
+     * An account against a budget row's account pattern: one ending in % is a prefix, as in the
+     * transactions the row lists - "511.0-%" is every account of the group 511.0, though it names
+     * no account itself. Without it, an account (with a dot) has to be the very one, and anything
+     * shorter - a schema id such as "510" - is again a prefix.
+     */
+    private static boolean matchesAccount(String account, String pattern)
+    {
+        if (pattern.endsWith("%")) return account.startsWith(pattern.substring(0, pattern.length() - 1));
+        return pattern.contains(".") ? account.equals(pattern) : account.startsWith(pattern);
     }
 
     private Integer[] monthlyBalanceOf(List<Transaction> transactions)

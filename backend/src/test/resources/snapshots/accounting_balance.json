@@ -1,0 +1,142 @@
+{
+  "columns" : [ "Yearly Balance Sheet", "2017", "2018", "2019", "2020" ],
+  "rows" : [ {
+    "type" : "BALANCE_SUMMARY",
+    "name" : "ASSETS",
+    "schemaId" : "a",
+    "yearlyValues" : [ 7000, 7700, 8500, 8400 ],
+    "children" : [ ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class0",
+    "schemaId" : "0",
+    "yearlyValues" : [ 0, 0, 0, 0 ],
+    "children" : [ ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class1",
+    "schemaId" : "1",
+    "yearlyValues" : [ 0, 0, 0, 0 ],
+    "children" : [ ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class2",
+    "schemaId" : "2",
+    "yearlyValues" : [ 7000, 7700, 8500, 8400 ],
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group20",
+      "schemaId" : "20",
+      "yearlyValues" : [ 1000, 1100, 1500, 1600 ],
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account200",
+        "schemaId" : "200",
+        "yearlyValues" : [ 1000, 1100, 1500, 1400 ],
+        "children" : [ ]
+      }, {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account201",
+        "schemaId" : "201",
+        "yearlyValues" : [ 0, 0, 0, 200 ],
+        "children" : [ ]
+      } ]
+    }, {
+      "type" : "BALANCE_GROUP",
+      "name" : "group21",
+      "schemaId" : "21",
+      "yearlyValues" : [ 2000, 2200, 2500, 2800 ],
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account210",
+        "schemaId" : "210",
+        "yearlyValues" : [ 2000, 2200, 2500, 2800 ],
+        "children" : [ ]
+      } ]
+    }, {
+      "type" : "BALANCE_GROUP",
+      "name" : "group23",
+      "schemaId" : "23",
+      "yearlyValues" : [ 4000, 4400, 4500, 4000 ],
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account230",
+        "schemaId" : "230",
+        "yearlyValues" : [ 4000, 4400, 4500, 4000 ],
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class3",
+    "schemaId" : "3",
+    "yearlyValues" : [ 0, 0, 0, 0 ],
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group30",
+      "schemaId" : "30",
+      "yearlyValues" : [ 0, 0, 0, 0 ],
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "BALANCE_SUMMARY",
+    "name" : "LIABILITIES",
+    "schemaId" : "l",
+    "yearlyValues" : [ 7000, 7700, 8500, 8400 ],
+    "children" : [ ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class2",
+    "schemaId" : "2",
+    "yearlyValues" : [ 3000, 3300, 3500, 4400 ],
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group22",
+      "schemaId" : "22",
+      "yearlyValues" : [ 3000, 3300, 3500, 4400 ],
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account220",
+        "schemaId" : "220",
+        "yearlyValues" : [ 3000, 3300, 3500, 4400 ],
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class3",
+    "schemaId" : "3",
+    "yearlyValues" : [ 0, 0, 0, 0 ],
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group31",
+      "schemaId" : "31",
+      "yearlyValues" : [ 0, 0, 0, 0 ],
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "class4",
+    "schemaId" : "4",
+    "yearlyValues" : [ 18000, 5800, 5140, 3000 ],
+    "children" : [ {
+      "type" : "BALANCE_GROUP",
+      "name" : "group40",
+      "schemaId" : "40",
+      "yearlyValues" : [ 18000, 5800, 5140, 3000 ],
+      "children" : [ {
+        "type" : "BALANCE_ACCOUNT",
+        "name" : "account400",
+        "schemaId" : "400",
+        "yearlyValues" : [ 18000, 5800, 5140, 3000 ],
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "type" : "BALANCE_CLASS",
+    "name" : "Profit",
+    "schemaId" : "p",
+    "yearlyValues" : [ -14000, -1400, -140, 1000 ],
+    "children" : [ ]
+  } ]
+}

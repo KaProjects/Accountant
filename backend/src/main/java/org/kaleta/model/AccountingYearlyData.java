@@ -1,7 +1,7 @@
 package org.kaleta.model;
 
 import org.kaleta.Constants;
-import org.kaleta.entity.Transaction;
+import org.kaleta.persistence.entity.Transaction;
 
 import java.util.List;
 import java.util.Map;
@@ -12,24 +12,36 @@ import java.util.TreeSet;
 public class AccountingYearlyData
 {
     private List<Transaction> transactions;
+    private final Set<String> yearsWithData;
 
-    public AccountingYearlyData(List<Transaction> transactions)
+    public AccountingYearlyData(List<Transaction> transactions, List<String> yearsWithData)
     {
         this.transactions = transactions;
+        this.yearsWithData = new TreeSet<>(yearsWithData);
     }
 
+    /**
+     * The years axis of every overall view: the closed years, followed by the year
+     * that is still running.
+     * <p>
+     * A year counts as closed once it has closing transactions, and the running year
+     * is the one after the last of those. The desktop app may already have written a
+     * closing transaction into the running year, in which case that "next" year does
+     * not exist yet - it is only appended when there is actually data for it.
+     */
     public String[] getYears()
     {
-        Set<String> closingYears = new TreeSet<>();
+        TreeSet<String> closingYears = new TreeSet<>();
         transactions.forEach(transaction -> {
             closingYears.add(transaction.getYear());
         });
-        String[] years = new String[closingYears.size() + 1];
-        for (int i=0;i<closingYears.size();i++){
-            years[i] = closingYears.toArray(new String[]{})[i];
-        }
-        years[years.length - 1] = String.valueOf(Integer.parseInt(years[years.length - 2]) + 1);
-        return years;
+
+        if (closingYears.isEmpty()) return yearsWithData.toArray(new String[]{});
+
+        String nextYear = String.valueOf(Integer.parseInt(closingYears.last()) + 1);
+        if (yearsWithData.contains(nextYear)) closingYears.add(nextYear);
+
+        return closingYears.toArray(new String[]{});
     }
 
     public Integer[] getYearlyGroupValues(String groupId, String... accountIdSuffixes)
@@ -74,6 +86,35 @@ public class AccountingYearlyData
     public Integer[] getYearlyClassValues(String classId)
     {
         return getYearlyClassValues(classId, "0","1","2","3","4","5","6","7","8","9");
+    }
+
+    /**
+     * The year-by-year value of everything whose account id starts with the given prefix: one
+     * schema account ("200"), or a whole group ("20").
+     * <p>
+     * This is what the overall statements expand into. The group and class methods above answer
+     * the same question for a selection of groups or accounts; this one answers it for a single
+     * branch of the schema, so a row and the rows it expands into are read off the same
+     * transactions and still add up.
+     * <p>
+     * The accumulated depreciation group reduces the class it sits in, so its entries count
+     * negative here exactly as they do in {@link #getYearlyClassValues}.
+     */
+    public Integer[] getYearlyValues(String schemaIdPrefix)
+    {
+        Map<String, Integer> yearlyData = new TreeMap<>();
+        for (String year : getYears()){
+            yearlyData.put(year, 0);
+        }
+        for (Transaction transaction : transactions){
+            if (transaction.getDebit().startsWith(schemaIdPrefix) || transaction.getCredit().startsWith(schemaIdPrefix))
+            {
+                Integer amount = transaction.getAmount();
+                if (transaction.getDebit().startsWith(Constants.Schema.ACCUMULATED_DEP_GROUP_ID)) amount = -amount;
+                yearlyData.put(transaction.getYear(), yearlyData.get(transaction.getYear()) + amount);
+            }
+        }
+        return yearlyData.values().toArray(new Integer[]{});
     }
 
     public Integer[] getYearlyOverallValues()

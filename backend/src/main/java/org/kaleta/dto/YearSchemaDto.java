@@ -1,5 +1,6 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import org.kaleta.Constants;
 import org.kaleta.model.SchemaClass;
@@ -9,11 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@RegisterForReflection
 public class YearSchemaDto
 {
     private List<Class> classes = new ArrayList<>();
 
     @Data
+    @RegisterForReflection
     public static class Class
     {
         private String id;
@@ -21,6 +24,7 @@ public class YearSchemaDto
         private List<Group> groups = new ArrayList<>();
 
         @Data
+        @RegisterForReflection
         public static class Group
         {
             private String id;
@@ -28,6 +32,7 @@ public class YearSchemaDto
             private List<Account> accounts = new ArrayList<>();
 
             @Data
+            @RegisterForReflection
             public static class Account
             {
                 private String id;

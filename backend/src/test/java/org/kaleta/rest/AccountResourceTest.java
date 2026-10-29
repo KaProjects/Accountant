@@ -5,17 +5,18 @@ import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.YearAccountDto;
 import org.kaleta.dto.YearAccountOverviewDto;
-import org.springframework.http.HttpStatus;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.kaleta.framework.Problems.assertInvalid;
+import static org.kaleta.framework.Problems.assertNotFound;
 
 @QuarkusTest
 public class AccountResourceTest
@@ -66,64 +67,60 @@ public class AccountResourceTest
     }
 
     @Test
+    void offBalanceSchemaIsNotAnError()
+    {
+        // 700 is an off-balance (type X) account, which has no debit or credit
+        // orientation. Picking it in the accounting data view used to raise a 500.
+        given().when()
+                .get("/account/2020/700")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON);
+    }
+
+    @Test
+    void offBalanceAccountsAreListedWithoutATurnoverOrBalance()
+    {
+        // asserted on the wire rather than through the DTO, whose fields default to
+        // zero and would mask the absence
+        List<Map<String, Object>> accounts = given().when()
+                .get("/account/2020/700")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().response().jsonPath().getList("");
+
+        assertThat(accounts.size(), is(1));
+        assertThat(accounts.get(0).get("id"), is("700.0"));
+        assertThat(accounts.get(0).get("name"), is("general"));
+        // neither figure is meaningful for an off-balance account, so neither is sent
+        assertThat(accounts.get(0).containsKey("turnover"), is(false));
+        assertThat(accounts.get(0).containsKey("balance"), is(false));
+    }
+
+    @Test
     public void parameterValidatorTest()
     {
-        assertThat(given().when()
-                .get("/account/2x20")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/account/2x20", "year");
 
-        assertThat(given().when()
-                .get("/account/2014")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/account/2014");
 
-        assertThat(given().when()
-                .get("/account/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/account/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
 
         String validSchemaId = "123";
 
-        assertThat(given().when()
-                .get("/account/2x20/" + validSchemaId)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/account/2x20/" + validSchemaId, "year");
 
-        assertThat(given().when()
-                .get("/account/2014/" + validSchemaId)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/account/2014/" + validSchemaId);
 
-        assertThat(given().when()
-                .get("/account/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/" + validSchemaId)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/account/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/" + validSchemaId);
 
         String validYear = "2019";
 
-        assertThat(given().when()
-                .get("/account/" + validYear + "/" + "22")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+        assertInvalid("/account/" + validYear + "/" + "22", "schemaId");
 
-        assertThat(given().when()
-                .get("/account/" + validYear + "/" + "2222")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+        assertInvalid("/account/" + validYear + "/" + "2222", "schemaId");
 
-        assertThat(given().when()
-                .get("/account/" + validYear + "/" + "xxx")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Schema Account ID Parameter"));
+        assertInvalid("/account/" + validYear + "/" + "xxx", "schemaId");
     }
 }

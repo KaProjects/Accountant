@@ -4,16 +4,16 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.ViewDto;
-import org.springframework.http.HttpStatus;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.kaleta.framework.Problems.assertInvalid;
+import static org.kaleta.framework.Problems.assertNotFound;
 
 @QuarkusTest
 public class ViewResourceTest
@@ -99,40 +99,16 @@ public class ViewResourceTest
     @Test
     public void parameterValidatorTest()
     {
-        assertThat(given().when()
-                .get("/view/2x20/vacation")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/view/2x20/vacation", "year");
 
-        assertThat(given().when()
-                .get("/view/2014/vacation")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/view/2014/vacation");
 
-        assertThat(given().when()
-                .get("/view/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/vacation")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/view/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/vacation");
 
-        assertThat(given().when()
-                .get("/view/2x20")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/view/2x20", "year");
 
-        assertThat(given().when()
-                .get("/view/2014")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/view/2014");
 
-        assertThat(given().when()
-                .get("/view/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/view/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
     }
 }

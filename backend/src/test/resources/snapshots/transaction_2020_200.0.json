@@ -1,0 +1,126 @@
+[ {
+  "date" : "1508",
+  "credit" : "100",
+  "pair" : "210.0 account210",
+  "description" : "x"
+}, {
+  "date" : "1508",
+  "credit" : "100",
+  "pair" : "210.0 account210",
+  "description" : "x"
+}, {
+  "date" : "1508",
+  "credit" : "100",
+  "pair" : "210.0 account210",
+  "description" : "x"
+}, {
+  "date" : "1508",
+  "credit" : "100",
+  "pair" : "210.0 account210",
+  "description" : "x"
+}, {
+  "date" : "1508",
+  "credit" : "100",
+  "pair" : "210.0 account210",
+  "description" : "x"
+}, {
+  "date" : "1508",
+  "credit" : "100",
+  "pair" : "210.0 account210",
+  "description" : "x"
+}, {
+  "date" : "1006",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "1006",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "1006",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "1006",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "1006",
+  "credit" : "100",
+  "pair" : "210.0 account210",
+  "description" : "x"
+}, {
+  "date" : "1006",
+  "credit" : "100",
+  "pair" : "210.0 account210",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0505",
+  "debit" : "100",
+  "pair" : "220.0 account220",
+  "description" : "x"
+}, {
+  "date" : "0504",
+  "credit" : "100",
+  "pair" : "201.0 account201",
+  "description" : "same group"
+}, {
+  "date" : "0504",
+  "credit" : "100",
+  "pair" : "201.0 account201",
+  "description" : "same group"
+}, {
+  "date" : "0101",
+  "debit" : "1000",
+  "pair" : "700.0 account700",
+  "description" : "init"
+} ]

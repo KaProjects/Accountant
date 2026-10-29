@@ -6,7 +6,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import org.kaleta.dto.BudgetDto;
 import org.kaleta.dto.YearTransactionDto;
-import org.springframework.http.HttpStatus;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -14,9 +13,10 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.kaleta.framework.Problems.assertInvalid;
+import static org.kaleta.framework.Problems.assertNotFound;
 
 @QuarkusTest
 public class BudgetResourceTest
@@ -34,7 +34,7 @@ public class BudgetResourceTest
 
         BudgetDto dto = response.jsonPath().getObject("", BudgetDto.class);
 
-        assertThat(dto.getColumns().size(), is(17));
+        assertThat(dto.getColumns().size(), is(15));
         assertThat(dto.getColumns().get(0), is("Budget 2019"));
         assertThat(dto.getLastFilledMonth(), is(9));
         assertThat(dto.getRows().size(), is(12));
@@ -235,11 +235,11 @@ public class BudgetResourceTest
 
         assertThat(dto.getRows().get(10).getId(), is("of2"));
         assertThat(dto.getRows().get(10).getType(), is(BudgetDto.Row.Type.OF_BUDGET));
-        assertThat(dto.getRows().get(10).getActual(), is(List.of(0, 0, 0, 1000, 0, 0, 200, 200, 10000, 0, 0, 0)));
-        assertThat(dto.getRows().get(10).getActualSum(), is(11400));
-        assertThat(dto.getRows().get(10).getActualAvg(), is(1266));
-        assertThat(dto.getRows().get(10).getDeltaSum(), is(3400));
-        assertThat(dto.getRows().get(10).getDeltaAvg(), is(378));
+        assertThat(dto.getRows().get(10).getActual(), is(List.of(0, 0, 0, 0, 0, 0, 200, 200, 10000, 0, 0, 0)));
+        assertThat(dto.getRows().get(10).getActualSum(), is(10400));
+        assertThat(dto.getRows().get(10).getActualAvg(), is(1155));
+        assertThat(dto.getRows().get(10).getDeltaSum(), is(2400));
+        assertThat(dto.getRows().get(10).getDeltaAvg(), is(267));
         assertThat(dto.getRows().get(10).getPlanned(), is(List.of(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 0, 0, 0, 0)));
         assertThat(dto.getRows().get(10).getPlannedSum(), is(8000));
         assertThat(dto.getRows().get(10).getPlannedSumToFilledMonth(), is(8000));
@@ -248,11 +248,11 @@ public class BudgetResourceTest
         assertThat(dto.getRows().get(10).getSubRows().size(), is(2));
         assertThat(dto.getRows().get(10).getSubRows().get(0).getId(), is("of2.1"));
         assertThat(dto.getRows().get(10).getSubRows().get(0).getType(), is(BudgetDto.Row.Type.SUB_ROW));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getActual(), is(List.of(0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 0)));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getActualSum(), is(1000));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getActualAvg(), is(111));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getDeltaSum(), is(1000));
-        assertThat(dto.getRows().get(10).getSubRows().get(0).getDeltaAvg(), is(111));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getActual(), is(List.of(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getActualSum(), is(0));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getActualAvg(), is(0));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getDeltaSum(), is(0));
+        assertThat(dto.getRows().get(10).getSubRows().get(0).getDeltaAvg(), is(0));
         assertThat(dto.getRows().get(10).getSubRows().get(0).getPlanned(), is(List.of(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)));
         assertThat(dto.getRows().get(10).getSubRows().get(0).getSubRows().size(), is(0));
         assertThat(dto.getRows().get(10).getSubRows().get(1).getId(), is("of2.2"));
@@ -267,11 +267,11 @@ public class BudgetResourceTest
 
         assertThat(dto.getRows().get(11).getId(), is("dcf"));
         assertThat(dto.getRows().get(11).getType(), is(BudgetDto.Row.Type.OF_BUDGET_BALANCE));
-        assertThat(dto.getRows().get(11).getActual(), is(List.of(0, 0, 0, 1000, 0, 0, 200, 200, 20000, 0, 0, 0)));
-        assertThat(dto.getRows().get(11).getActualSum(), is(21400));
-        assertThat(dto.getRows().get(11).getActualAvg(), is(2377));
-        assertThat(dto.getRows().get(11).getDeltaSum(), is(4400));
-        assertThat(dto.getRows().get(11).getDeltaAvg(), is(489));
+        assertThat(dto.getRows().get(11).getActual(), is(List.of(0, 0, 0, 0, 0, 0, 200, 200, 20000, 0, 0, 0)));
+        assertThat(dto.getRows().get(11).getActualSum(), is(20400));
+        assertThat(dto.getRows().get(11).getActualAvg(), is(2266));
+        assertThat(dto.getRows().get(11).getDeltaSum(), is(3400));
+        assertThat(dto.getRows().get(11).getDeltaAvg(), is(378));
         assertThat(dto.getRows().get(11).getPlanned(), is(List.of(2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 1000, 1000, 1000, 1000)));
         assertThat(dto.getRows().get(11).getPlannedSum(), is(20000));
         assertThat(dto.getRows().get(11).getPlannedSumToFilledMonth(), is(17000));
@@ -304,70 +304,102 @@ public class BudgetResourceTest
     }
 
     @Test
+    public void aRowOfEveryFinancialAsset_hasASubRowForEachAssetOfTheYear()
+    {
+        BudgetDto dto = given().when().get("/budget/2021").then().statusCode(200)
+                .extract().response().jsonPath().getObject("", BudgetDto.class);
+
+        BudgetDto.Row assets = dto.getRows().stream().filter(row -> row.getId().equals("of1")).findFirst().orElseThrow();
+        assertThat(assets.getSubRows().stream().map(BudgetDto.Row::getId).toList(),
+                is(List.of("of1.230.0", "of1.230.1", "of1.231.0")));
+        assertThat(assets.getSubRows().stream().map(BudgetDto.Row::getName).toList(),
+                is(List.of("fin0-0", "fin0-1", "fin1-0")));
+        // created in February, March and October; what was taken out in August, the revaluations
+        // and the opening of the year are no money put in
+        assertThat(assets.getSubRows().get(1).getActual(), is(List.of(0, 1000, 1000, 0, 0, 0, 0, 0, 0, 1000, 0, 0)));
+        assertThat(assets.getActual(), is(List.of(0, 1000, 1000, 0, 0, 0, 0, 0, 0, 1000, 0, 0)));
+        assertThat(assets.getPlanned(), is(List.of(500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500)));
+    }
+
+    @Test
+    public void theTransactionsOfAFinancialAssetRow_areTheMoneyPutIn()
+    {
+        given().when()
+                .get("/budget/2021/transaction/of1.230.1/month/2")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].description", is("cre02"));
+        // what was taken out in August is not
+        given().when()
+                .get("/budget/2021/transaction/of1.230.1/month/8")
+                .then()
+                .statusCode(200)
+                .body("size()", is(0));
+    }
+
+    @Test
+    public void theTransactionsOfARowMadeOfSubRows_areAllOfTheirs()
+    {
+        // the fixtures' i1 is made of i1.1 and i1.2, which both count something in July
+        List<YearTransactionDto> row = transactions("/budget/2019/transaction/i1/month/7");
+        List<YearTransactionDto> first = transactions("/budget/2019/transaction/i1.1/month/7");
+        List<YearTransactionDto> second = transactions("/budget/2019/transaction/i1.2/month/7");
+
+        assertThat(row.size(), is(first.size() + second.size()));
+        assertThat(row.containsAll(first) && row.containsAll(second), is(true));
+    }
+
+    @Test
+    public void theTransactionsOfTheTotalOfAPart_areAllOfItsRows()
+    {
+        // the fixtures' income is i1 - made of i1.1 and i1.2 - and i2
+        for (String month : List.of("5", "7", "9")) {
+            List<YearTransactionDto> total = transactions("/budget/2019/transaction/i/month/" + month);
+            List<YearTransactionDto> first = transactions("/budget/2019/transaction/i1/month/" + month);
+            List<YearTransactionDto> second = transactions("/budget/2019/transaction/i2/month/" + month);
+
+            assertThat(total.size(), is(first.size() + second.size()));
+            assertThat(total.containsAll(first) && total.containsAll(second), is(true));
+        }
+        assertThat(transactions("/budget/2019/transaction/me/month/9").size(), is(
+                transactions("/budget/2019/transaction/me1/month/9").size()
+                        + transactions("/budget/2019/transaction/me2/month/9").size()));
+    }
+
+    private static List<YearTransactionDto> transactions(String path)
+    {
+        return given().when().get(path).then().statusCode(200)
+                .extract().response().jsonPath().getList("", YearTransactionDto.class);
+    }
+
+    @Test
     public void parameterValidatorTest()
     {
         String validYear = "2019";
         String validBudgetId = "i2";
         String validMonth = "9";
 
-        assertThat(given().when()
-                .get("/budget/" + "2x20" + "/transaction/" + validBudgetId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/budget/" + "2x20" + "/transaction/" + validBudgetId + "/month/" + validMonth, "year");
 
-        assertThat(given().when()
-                .get("/budget/" + "2014" + "/transaction/" + validBudgetId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/budget/" + "2014" + "/transaction/" + validBudgetId + "/month/" + validMonth);
 
-        assertThat(given().when()
-                .get("/budget/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/transaction/" + validBudgetId + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/budget/" + (new GregorianCalendar().get(Calendar.YEAR) + 1) + "/transaction/" + validBudgetId + "/month/" + validMonth);
 
-        assertThat(given().when()
-                .get("/budget/" + validYear + "/transaction/" + "x1" + "/month/" + validMonth)
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Budget ID Parameter"));
+        assertInvalid("/budget/" + validYear + "/transaction/" + "x1" + "/month/" + validMonth, "budgetId");
 
-        assertThat(given().when()
-                .get("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "0")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Month Parameter"));
+        assertInvalid("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "0", "month");
 
-        assertThat(given().when()
-                .get("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "13")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Month Parameter"));
+        assertInvalid("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "13", "month");
 
-        assertThat(given().when()
-                .get("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "x")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Month Parameter"));
+        assertInvalid("/budget/" + validYear + "/transaction/" + validBudgetId + "/month/" + "x", "month");
 
-        assertThat(given().when()
-                .get("/budget/" + "2x20")
-                .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract().body().asString(), containsString("Invalid Year Parameter"));
+        assertInvalid("/budget/" + "2x20", "year");
 
-        assertThat(given().when()
-                .get("/budget/" + "2014")
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/budget/" + "2014");
 
-        assertThat(given().when()
-                .get("/budget/" + (new GregorianCalendar().get(Calendar.YEAR) + 1))
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .extract().body().asString(), containsString(" not found"));
+        assertNotFound("/budget/" + validYear + "/transaction/" + "of9" + "/month/" + validMonth);
+
+        assertNotFound("/budget/" + (new GregorianCalendar().get(Calendar.YEAR) + 1));
     }
 }

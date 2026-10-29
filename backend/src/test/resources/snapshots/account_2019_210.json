@@ -1,0 +1,19 @@
+[ {
+  "id" : "210.0",
+  "name" : "general",
+  "initial" : 0,
+  "turnover" : 6000,
+  "balance" : 6000
+}, {
+  "id" : "210.1",
+  "name" : "generaly",
+  "initial" : 0,
+  "turnover" : 0,
+  "balance" : -5000
+}, {
+  "id" : "210.2",
+  "name" : "generalz",
+  "initial" : 0,
+  "turnover" : 5000,
+  "balance" : -1000
+} ]

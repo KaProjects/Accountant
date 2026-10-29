@@ -1,5 +1,6 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 
 import java.text.DateFormatSymbols;
@@ -8,29 +9,34 @@ import java.util.List;
 import java.util.Locale;
 
 @Data
+@RegisterForReflection
 public class AccountingDto
 {
     private List<String> columns = new ArrayList<>();
     private List<Row> rows = new ArrayList<>();
 
     public AccountingDto() {}
-    public AccountingDto(String year, Type type)
+    /**
+     * The title carries no year: the page already shows which year it is, in the bar and in its
+     * own address, so repeating it in the first cell of the table said the same thing a third time.
+     */
+    public AccountingDto(Type type)
     {
         if (type == Type.PROFIT_SUMMARY) {
-            columns.add("Income Statement " + year);
+            columns.add("Income Statement");
             columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
             columns.remove(13);
             columns.add("Total");
         }
         if (type == Type.CASH_FLOW_SUMMARY) {
-            columns.add("Cash Flow Statement " + year);
+            columns.add("Cash Flow Statement");
             columns.add("Initial");
             columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
             columns.remove(14);
             columns.add("Total");
         }
         if (type == Type.BALANCE_SUMMARY) {
-            columns.add("Balance Sheet " + year);
+            columns.add("Balance Sheet");
             columns.add("Initial");
             columns.addAll(List.of(new DateFormatSymbols(Locale.US).getMonths()));
             columns.remove(14);
@@ -56,6 +62,7 @@ public class AccountingDto
     }
 
     @Data
+    @RegisterForReflection
     public static class Row
     {
         private Type type;
@@ -76,6 +83,7 @@ public class AccountingDto
         }
     }
 
+    @RegisterForReflection
     public enum Type
     {
         PROFIT_SUMMARY, INCOME_GROUP, INCOME_ACCOUNT, EXPENSE_GROUP, EXPENSE_ACCOUNT,

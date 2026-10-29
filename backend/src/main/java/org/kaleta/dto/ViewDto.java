@@ -1,5 +1,6 @@
 package org.kaleta.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 import org.kaleta.Utils;
 
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
+@RegisterForReflection
 public class ViewDto
 {
     private List<String> columns = new ArrayList<>(List.of("Date", "Amount", "Debit", "Credit", "Description"));
@@ -26,6 +28,7 @@ public class ViewDto
     }
 
     @Data
+    @RegisterForReflection
     public static class View
     {
         private String name;
@@ -44,6 +47,7 @@ public class ViewDto
         }
 
         @Data
+        @RegisterForReflection
         public static class Transaction
         {
             private String date;
@@ -54,6 +58,7 @@ public class ViewDto
         }
 
         @Data
+        @RegisterForReflection
         public static class ChartData
         {
             private String name;

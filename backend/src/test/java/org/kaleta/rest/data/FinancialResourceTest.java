@@ -1,10 +1,10 @@
 package org.kaleta.rest.data;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
 import io.restassured.http.ContentType;
-import org.eclipse.microprofile.config.ConfigProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
 import org.kaleta.dto.FinancialAssetsDto;
 
 import java.util.Calendar;
@@ -15,40 +15,52 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
+@TestProfile(DataSourceTestProfile.class)
 public class FinancialResourceTest
 {
+    // RestAssured only learns the application's port per test method, so the datasource is
+    // written and synced here rather than once for the class.
+    @BeforeEach
+    void syncGeneratedDataSource()
+    {
+        FakeDataSource.generate();
+        given().when().get("/sync/all").then().statusCode(200);
+    }
+
     @Test
-    @EnabledIf(value = "isDataLocationSet", disabledReason = "set data.location in test/resources/application.properties")
     public void testTrimFutureMonths()
     {
         given().when().get("/sync/all").then().statusCode(200);
 
         FinancialAssetsDto dto = given().when()
-                .get("/financial/assets/" + new GregorianCalendar().get(Calendar.YEAR))
+                .get("/financial/assets")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
                 .extract().response().jsonPath().getObject("", FinancialAssetsDto.class);
 
+        // every asset's timeline ends at the current month, never in the months still to come
+        String currentMonth = (new GregorianCalendar().get(Calendar.MONTH) + 1) + "/" + (new GregorianCalendar().get(Calendar.YEAR) % 100);
+        boolean anyHeldNow = false;
         for (FinancialAssetsDto.Group group : dto.getGroups())
         {
             for (FinancialAssetsDto.Group.Account account : group.getAccounts())
             {
-                int month = new GregorianCalendar().get(Calendar.MONTH) + 1;
-                assertThat(account.getLabels().length, is(month));
-                assertThat(account.getDeposits().length, is(month));
-                assertThat(account.getWithdrawals().length, is(month));
-                assertThat(account.getRevaluations().length, is(month));
-                assertThat(account.getBalances().length, is(month));
-                assertThat(account.getFunding().length, is(month));
-                assertThat(account.getCumulativeDeposits().length, is(month));
-                assertThat(account.getCumulativeWithdrawals().length, is(month));
+                int length = account.getLabels().length;
+                if (account.getActive()) {
+                    anyHeldNow = true;
+                    assertThat(account.getLabels()[length - 1], is(currentMonth));
+                }
+                assertThat(account.getDeposits().length, is(length));
+                assertThat(account.getWithdrawals().length, is(length));
+                assertThat(account.getRevaluations().length, is(length));
+                assertThat(account.getBalances().length, is(length));
+                assertThat(account.getFunding().length, is(length));
+                assertThat(account.getCumulativeDeposits().length, is(length));
+                assertThat(account.getCumulativeWithdrawals().length, is(length));
             }
         }
+        assertThat(anyHeldNow, is(true));
     }
 
-    boolean isDataLocationSet()
-    {
-        return !ConfigProvider.getConfig().getValue("data.location", String.class).equals("X");
-    }
 }

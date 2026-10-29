@@ -1,0 +1,207 @@
+{
+  "columns" : [ "Yearly Income Statement", "2017", "2018", "2019", "2020", "Total" ],
+  "rows" : [ {
+    "type" : "INCOME_GROUP",
+    "name" : "group60",
+    "schemaId" : "60",
+    "yearlyValues" : [ 1000, 100, 10, 1000 ],
+    "total" : 2110,
+    "children" : [ {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account600",
+      "schemaId" : "600",
+      "yearlyValues" : [ 1000, 100, 10, 1000 ],
+      "total" : 2110,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group55",
+    "schemaId" : "55",
+    "yearlyValues" : [ 2000, 200, 20, 1000 ],
+    "total" : 3220,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account550",
+      "schemaId" : "550",
+      "yearlyValues" : [ 2000, 200, 20, 1000 ],
+      "total" : 3220,
+      "children" : [ ]
+    }, {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account551",
+      "schemaId" : "551",
+      "yearlyValues" : [ 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    }, {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account552",
+      "schemaId" : "552",
+      "yearlyValues" : [ 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "INCOME_GROUP",
+    "name" : "group63",
+    "schemaId" : "63",
+    "yearlyValues" : [ 3000, 300, 30, 0 ],
+    "total" : 3330,
+    "children" : [ {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account631",
+      "schemaId" : "631",
+      "yearlyValues" : [ 3000, 300, 30, 0 ],
+      "total" : 3330,
+      "children" : [ ]
+    }, {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account632",
+      "schemaId" : "632",
+      "yearlyValues" : [ 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    }, {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account633",
+      "schemaId" : "633",
+      "yearlyValues" : [ 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "PROFIT_SUMMARY",
+    "name" : "Net Income",
+    "schemaId" : "ni",
+    "yearlyValues" : [ 2000, 200, 20, 0 ],
+    "total" : 2220,
+    "children" : [ ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group51",
+    "schemaId" : "51",
+    "yearlyValues" : [ 4000, 400, 40, 1000 ],
+    "total" : 5440,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account510",
+      "schemaId" : "510",
+      "yearlyValues" : [ 4000, 400, 40, 1000 ],
+      "total" : 5440,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group52",
+    "schemaId" : "52",
+    "yearlyValues" : [ 5000, 500, 50, -1000 ],
+    "total" : 4550,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account520",
+      "schemaId" : "520",
+      "yearlyValues" : [ 5000, 500, 50, -1000 ],
+      "total" : 4550,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group53",
+    "schemaId" : "53",
+    "yearlyValues" : [ 6000, 600, 60, 0 ],
+    "total" : 6660,
+    "children" : [ ]
+  }, {
+    "type" : "PROFIT_SUMMARY",
+    "name" : "Operating Profit",
+    "schemaId" : "op",
+    "yearlyValues" : [ -13000, -1300, -130, 0 ],
+    "total" : -14430,
+    "children" : [ ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group50",
+    "schemaId" : "50",
+    "yearlyValues" : [ 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ ]
+  }, {
+    "type" : "INCOME_GROUP",
+    "name" : "group61",
+    "schemaId" : "61",
+    "yearlyValues" : [ 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group56",
+    "schemaId" : "56",
+    "yearlyValues" : [ 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ ]
+  }, {
+    "type" : "INCOME_GROUP",
+    "name" : "group62",
+    "schemaId" : "62",
+    "yearlyValues" : [ 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group54",
+    "schemaId" : "54",
+    "yearlyValues" : [ 0, 0, 0, 0 ],
+    "total" : 0,
+    "children" : [ ]
+  }, {
+    "type" : "INCOME_GROUP",
+    "name" : "group63",
+    "schemaId" : "63",
+    "yearlyValues" : [ 7000, 700, 70, 1000 ],
+    "total" : 8770,
+    "children" : [ {
+      "type" : "INCOME_ACCOUNT",
+      "name" : "account630",
+      "schemaId" : "630",
+      "yearlyValues" : [ 7000, 700, 70, 1000 ],
+      "total" : 8770,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "EXPENSE_GROUP",
+    "name" : "group55",
+    "schemaId" : "55",
+    "yearlyValues" : [ 8000, 800, 80, 0 ],
+    "total" : 8880,
+    "children" : [ {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account553",
+      "schemaId" : "553",
+      "yearlyValues" : [ 8000, 800, 80, 0 ],
+      "total" : 8880,
+      "children" : [ ]
+    }, {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account554",
+      "schemaId" : "554",
+      "yearlyValues" : [ 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    }, {
+      "type" : "EXPENSE_ACCOUNT",
+      "name" : "account555",
+      "schemaId" : "555",
+      "yearlyValues" : [ 0, 0, 0, 0 ],
+      "total" : 0,
+      "children" : [ ]
+    } ]
+  }, {
+    "type" : "PROFIT_SUMMARY",
+    "name" : "Net Profit",
+    "schemaId" : "np",
+    "yearlyValues" : [ -14000, -1400, -140, 1000 ],
+    "total" : -14540,
+    "children" : [ ]
+  } ]
+}
