@@ -1,9 +1,5 @@
 package org.kaleta.accountant.backend.model;
 
-
-import lombok.Data;
-
-@Data
 public class FirebaseAccountModel
 {
     private String id;
@@ -11,6 +7,22 @@ public class FirebaseAccountModel
 
     public FirebaseAccountModel(String name, String id) {
         this.id = id;
+        this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
 }

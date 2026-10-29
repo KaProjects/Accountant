@@ -32,7 +32,10 @@ public class OpenEditProcedureDialog extends MenuAction {
 
         CreateProcedureDialog dialog = new CreateProcedureDialog(getConfiguration(), accountPairDescriptionMap, allAccountMap, classList, procedure, procedureGroup, procedureGroupNameList);
         dialog.setVisible(true);
-        if (dialog.getResult()){
+        if (dialog.isDeleteRequested()){
+            Service.PROCEDURES.deleteProcedure(getConfiguration().getSelectedYear(), procedure.getId());
+            getConfiguration().update(Configuration.PROCEDURE_UPDATED);
+        } else if (dialog.getResult()){
             Service.PROCEDURES.updateProcedure(getConfiguration().getSelectedYear(), procedure.getId(), dialog.getProcedureName(), dialog.getGroupName(), dialog.getTransactions());
             getConfiguration().update(Configuration.PROCEDURE_UPDATED);
         }

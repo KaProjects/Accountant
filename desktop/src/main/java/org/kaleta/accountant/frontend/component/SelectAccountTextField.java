@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 public class SelectAccountTextField extends JTextField implements Validable {
+    private static final String NOTHING_SELECTED = " - - Click to Select - - ";
+
     private final Configuration configuration;
 
     private final String label;
@@ -52,7 +54,7 @@ public class SelectAccountTextField extends JTextField implements Validable {
         }
         validatorEnabled = true;
         selectedAccount = "";
-        this.setText(" - - Click to Select - - ");
+        this.setText(NOTHING_SELECTED);
         this.setForeground(Color.GRAY);
         this.setEditable(false);
         this.addMouseListener(new MouseAdapter() {
@@ -93,8 +95,19 @@ public class SelectAccountTextField extends JTextField implements Validable {
     }
 
     public void setSelectedAccount(String selectedAccount) {
+        // a procedure whose account has not been filled in yet carries no id at all: the field goes
+        // back to inviting a choice rather than trying to name an account that was never chosen
+        if (selectedAccount == null || selectedAccount.trim().isEmpty()) {
+            this.selectedAccount = "";
+            this.setText(NOTHING_SELECTED);
+            this.setForeground(Color.GRAY);
+            return;
+        }
+        // the name is resolved first: if the id is not one, the field keeps the account it had
+        // instead of being left holding an id that never appears in its text
+        String name = Service.ACCOUNT.getAccountAndGroupName(configuration.getSelectedYear(), selectedAccount);
         this.selectedAccount = selectedAccount;
-        this.setText(Service.ACCOUNT.getAccountAndGroupName(configuration.getSelectedYear(), selectedAccount));
+        this.setText(name);
     }
 
     @Override
@@ -116,18 +129,43 @@ public class SelectAccountTextField extends JTextField implements Validable {
 
         }
 
+        /**
+         * Only an id of an account that actually exists may be dropped here.
+         * <p>
+         * Checking that the target is one of these fields says nothing about what is being dropped:
+         * any text at all was accepted and kept as the selected account. Dragging the amount out of
+         * the amount field next door - which is draggable - therefore set the amount as the debit,
+         * silently, because the field went on showing the account it had while quietly holding a
+         * number, and the validator only asked whether something was selected at all.
+         */
         public boolean canImport(TransferSupport ts) {
-            return ts.getComponent() instanceof SelectAccountTextField;
+            return ts.getComponent() instanceof SelectAccountTextField && isAccountId(droppedText(ts));
         }
 
         public boolean importData(TransferSupport ts) {
-            try {
-                ((SelectAccountTextField) ts.getComponent())
-                        .setSelectedAccount((String) ts.getTransferable().getTransferData(DataFlavor.stringFlavor));
-                return true;
-            } catch (UnsupportedFlavorException | IOException e) {
+            String accountId = droppedText(ts);
+            if (!isAccountId(accountId)) {
                 return false;
             }
+            ((SelectAccountTextField) ts.getComponent()).setSelectedAccount(accountId);
+            return true;
+        }
+
+        private String droppedText(TransferSupport ts) {
+            if (!ts.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                return null;
+            }
+            try {
+                return (String) ts.getTransferable().getTransferData(DataFlavor.stringFlavor);
+            } catch (UnsupportedFlavorException | IOException e) {
+                return null;
+            }
+        }
+
+        private boolean isAccountId(String text) {
+            return text != null
+                    && text.matches("\\d{3}\\.[\\w-]+")
+                    && Service.ACCOUNT.checkAccountExists(configuration.getSelectedYear(), text);
         }
     }
 }

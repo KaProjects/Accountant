@@ -6,9 +6,11 @@ import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.component.DatePickerTextField;
 import org.kaleta.accountant.frontend.component.HintValidatedTextField;
 import org.kaleta.accountant.frontend.component.SelectAccountTextField;
+import org.kaleta.accountant.frontend.component.SelectFileTextField;
 import org.kaleta.accountant.frontend.component.ValidatedComboBox;
 
 import javax.swing.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -28,6 +30,7 @@ public class AddAssetDialog extends Dialog {
     private final List<SchemaModel.Class> classList;
 
     private SelectAccountTextField textFieldCreditAcc;
+    private SelectFileTextField textFieldInvoice;
 
     public AddAssetDialog(Configuration configuration, List<SchemaModel.Class.Group> groups, Map<String, List<AccountsModel.Account>> creditAccountMap, List<SchemaModel.Class> classList) {
         super(configuration, "Adding Asset", "Add");
@@ -77,6 +80,13 @@ public class AddAssetDialog extends Dialog {
         textFieldCreditAcc = new SelectAccountTextField(getConfiguration(), creditAccountMap, classList, "Purchased by", this);
 
         JSeparator separator1 = new JSeparator(SwingConstants.HORIZONTAL);
+        JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
+
+        // The invoice is optional: an asset bought years ago may have no document left, and one
+        // bought today may have it arriving by post. So this field takes no part in the dialog's
+        // validation, and the invoice can be attached later from the assets editor.
+        JLabel labelInvoice = new JLabel("Invoice (optional):");
+        textFieldInvoice = new SelectFileTextField();
 
         setContent(layout -> {
             layout.setHorizontalGroup(layout.createParallelGroup()
@@ -90,7 +100,10 @@ public class AddAssetDialog extends Dialog {
                     .addGroup(layout.createSequentialGroup().addComponent(labelDate).addGap(5, 5, Short.MAX_VALUE).addComponent(buttonToday))
                     .addComponent(textFieldDate)
                     .addComponent(labelMonthlyDep)
-                    .addComponent(textFieldMonthlyDep));
+                    .addComponent(textFieldMonthlyDep)
+                    .addComponent(separator2)
+                    .addComponent(labelInvoice)
+                    .addComponent(textFieldInvoice));
             layout.setVerticalGroup(layout.createSequentialGroup()
                     .addGroup(layout.createParallelGroup().addComponent(labelName, 25, 25, 25).addComponent(textFieldName, 25, 25, 25))
                     .addGap(3)
@@ -108,7 +121,12 @@ public class AddAssetDialog extends Dialog {
                     .addComponent(textFieldDate, 25, 25, 25)
                     .addGap(5)
                     .addComponent(labelMonthlyDep, 25, 25, 25)
-                    .addComponent(textFieldMonthlyDep, 25, 25, 25));
+                    .addComponent(textFieldMonthlyDep, 25, 25, 25)
+                    .addGap(5)
+                    .addComponent(separator2, 5, 5, 5)
+                    .addGap(5)
+                    .addComponent(labelInvoice, 25, 25, 25)
+                    .addComponent(textFieldInvoice, 25, 25, 25));
         });
     }
 
@@ -134,5 +152,10 @@ public class AddAssetDialog extends Dialog {
 
     public String getCreditAccount(){
         return textFieldCreditAcc.getSelectedAccount();
+    }
+
+    /** The invoice the user picked or dropped, or null when none was given. */
+    public File getInvoiceFile(){
+        return textFieldInvoice.getSelectedFile();
     }
 }

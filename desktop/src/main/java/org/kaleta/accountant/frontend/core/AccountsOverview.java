@@ -92,7 +92,9 @@ public class AccountsOverview extends JPanel implements Configurable {
         accountTable.setRowSelectionAllowed(true);
         accountTable.setColumnSelectionAllowed(false);
         accountTable.getTableHeader().setReorderingAllowed(false);
-        accountTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        // fills the pane instead of leaving empty space beside it. Every column but the name is
+        // pinned to a fixed width below, so all the spare width necessarily goes to the name.
+        accountTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         accountTable.getSelectionModel().addListSelectionListener(event -> updateTransactionOverview(accountTable.getSelectedRow()));
 
@@ -122,7 +124,9 @@ public class AccountsOverview extends JPanel implements Configurable {
         transactionTable.setRowSelectionAllowed(false);
         transactionTable.setColumnSelectionAllowed(false);
         transactionTable.getTableHeader().setReorderingAllowed(false);
-        transactionTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        // fills the pane, with the spare width going to the description at the end; the account
+        // column before it stays draggable
+        transactionTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
         TableColumnModel trColumnModel = transactionTable.getColumnModel();
         trColumnModel.getColumn(0).setMinWidth(90);

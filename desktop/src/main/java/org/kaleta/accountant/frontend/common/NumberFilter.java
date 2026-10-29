@@ -73,6 +73,8 @@ public class NumberFilter extends DocumentFilter {
     }
 
     private void warnUser(){
-        JOptionPane.showMessageDialog(null, "Only numbers are allowed to enter!","Wrong Number Format", JOptionPane.WARNING_MESSAGE);
+        // on the window being typed in, not on whatever screen a parentless dialog would land
+        JOptionPane.showMessageDialog(WindowPlacement.activeWindow(), "Only numbers are allowed to enter!",
+                "Wrong Number Format", JOptionPane.WARNING_MESSAGE);
     }
 }

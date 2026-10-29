@@ -18,6 +18,8 @@ public class IconLoader {
     public static final String TOGGLE_HIDE = "/icon/toggleHide.png";
     public static final String CHART = "/icon/chart.png";
     public static final String WARNING = "/icon/warning.png";
+    /** An arrow leaving a box: what is behind this is opened outside the app. */
+    public static final String EXTERNAL = "/icon/external.png";
 
 
     public static Icon getIcon(String iconPath){

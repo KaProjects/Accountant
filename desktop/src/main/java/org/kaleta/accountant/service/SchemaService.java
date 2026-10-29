@@ -24,13 +24,14 @@ public class SchemaService {
         // package-private
     }
 
+    /**
+     * The schema is shared by every year, so the year is accepted for call-site compatibility
+     * but is not used to choose a file.
+     */
     private SchemaModel getModel(String year) throws ManagerException {
         synchronized (lock) {
             if (schemaModel == null) {
-                schemaModel = new SchemaManager(year).retrieve();
-            }
-            if (!schemaModel.getYear().equals(year)) {
-                schemaModel = new SchemaManager(year).retrieve();
+                schemaModel = new SchemaManager().retrieve();
             }
             return new SchemaModel(schemaModel);
         }
@@ -129,7 +130,7 @@ public class SchemaService {
         for (SchemaModel.Class clazz : model.getClazz()){
             if (clazz.getId().equals(classId)) return clazz;
         }
-        throw new IllegalArgumentException("Not found: class id=" + classId + " in year=" + model.getYear());
+        throw new IllegalArgumentException("Not found: class id=" + classId + " in the schema");
     }
 
     private SchemaModel.Class.Group getGroupById(SchemaModel.Class clazz, String groupId){
@@ -235,25 +236,11 @@ public class SchemaService {
     }
 
     /**
-     * Returns true if schema group can be deleted, false otherwise.
-     */
-    public boolean isGroupDeletable(String year, String classId, String groupId) {
-        return Service.ACCOUNT.getAccountsBySchemaId(year, classId + groupId).isEmpty();
-    }
-
-    /**
-     * Returns true if schema account can be deleted, false otherwise.
-     */
-    public boolean isAccountDeletable(String year, String classId, String groupId, String accountId) {
-        return Service.ACCOUNT.getAccountsBySchemaId(year, classId + groupId + accountId).isEmpty();
-    }
-
-    /**
      * Creates specified group. Also creates associated accounts where needed.
      */
     public void createGroup(String year, String classId, String groupId, String name) {
         try {
-            Manager<SchemaModel> manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager();
             SchemaModel model = manager.retrieve();
 
             SchemaModel.Class.Group newGroup = new SchemaModel.Class.Group();
@@ -313,7 +300,7 @@ public class SchemaService {
      */
     public void renameGroup(String year, String classId, String groupId, String newName){
         try {
-            Manager<SchemaModel> manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager();
             SchemaModel model = manager.retrieve();
 
             getGroupById(getClassById(model, classId), groupId).setName(newName);
@@ -358,60 +345,11 @@ public class SchemaService {
     }
 
     /**
-     * Deletes specified group. Also renames associated accounts where needed.
-     */
-    public void deleteGroup(String year, String classId, String groupId){
-        try {
-            Manager<SchemaModel> manager = new SchemaManager(year);
-            SchemaModel model = manager.retrieve();
-
-            SchemaModel.Class clazz = getClassById(model, classId);
-            clazz.getGroup().remove(getGroupById(clazz, groupId));
-
-            List<String> logMsgList = new ArrayList<>();
-            logMsgList.add("Schema Group id=" + classId + groupId + " deleted");
-            switch (classId) {
-                case "0": {
-                    SchemaModel.Class.Group groupAccDep = getGroupById(getClassById(model, "0"), Constants.Schema.ACCUMULATED_DEP_GROUP_ID);
-                    groupAccDep.getAccount().remove(getAccountById(groupAccDep, groupId));
-                    logMsgList.add("Schema Account id=" + "0" + Constants.Schema.ACCUMULATED_DEP_GROUP_ID + groupId + " deleted");
-
-                    SchemaModel.Class.Group groupDep = getGroupById(getClassById(model, "5"), Constants.Schema.DEPRECIATION_GROUP_ID);
-                    groupDep.getAccount().remove(getAccountById(groupDep, groupId));
-                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.DEPRECIATION_GROUP_ID + groupId + " deleted");
-                    break;
-                }
-                case "1": {
-                    SchemaModel.Class.Group groupCons = getGroupById(getClassById(model, "5"), Constants.Schema.CONSUMPTION_GROUP_ID);
-                    groupCons.getAccount().remove(getAccountById(groupCons, groupId));
-                    logMsgList.add("Schema Account id=" + "5" + Constants.Schema.CONSUMPTION_GROUP_ID + groupId + " deleted");
-                    break;
-                }
-                case "2":
-                case "3":
-                case "4":
-                case "5":
-                case "6": break;
-                default: throw new IllegalArgumentException("Illegal class id!");
-            }
-
-            manager.update(model);
-            for (String logMsg : logMsgList){
-                Initializer.LOG.info(logMsg);
-            }
-            invalidateModel();
-        } catch (ManagerException e) {
-            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-            throw new ServiceFailureException(e);
-        }
-    }
-
-    /**
      * Creates specified account.
      */
     public void createAccount(String year, String classId, String groupId, String accountId, String name, String type) {
         try {
-            Manager<SchemaModel> manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager();
             SchemaModel model = manager.retrieve();
 
             SchemaModel.Class.Group.Account newAcc = new SchemaModel.Class.Group.Account();
@@ -434,33 +372,13 @@ public class SchemaService {
      */
     public void renameAccount(String year, String classId, String groupId, String accountId, String newName){
         try {
-            Manager<SchemaModel> manager = new SchemaManager(year);
+            Manager<SchemaModel> manager = new SchemaManager();
             SchemaModel model = manager.retrieve();
 
             getAccountById(getGroupById(getClassById(model, classId), groupId), accountId).setName(newName);
 
             manager.update(model);
             Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " renamed to '" + newName + "'");
-            invalidateModel();
-        } catch (ManagerException e) {
-            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-            throw new ServiceFailureException(e);
-        }
-    }
-
-    /**
-     * Deletes specified account.
-     */
-    public void deleteAccount(String year, String classId, String groupId, String accountId){
-        try {
-            Manager<SchemaModel> manager = new SchemaManager(year);
-            SchemaModel model = manager.retrieve();
-
-            SchemaModel.Class.Group group = getGroupById(getClassById(model, classId), groupId);
-            group.getAccount().remove(getAccountById(group, accountId));
-
-            manager.update(model);
-            Initializer.LOG.info("Schema Account id=" + classId + groupId + accountId + " deleted");
             invalidateModel();
         } catch (ManagerException e) {
             Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
@@ -483,20 +401,4 @@ public class SchemaService {
         }
     }
 
-    /**
-     * Imports schema from one year to another.
-     */
-    public void importSchema(String fromYear, String toYear) {
-        try {
-            SchemaModel fromModel = getModel(fromYear);
-            fromModel.setYear(toYear);
-
-            new SchemaManager(toYear).update(fromModel);
-
-            invalidateModel();
-        } catch (ManagerException e) {
-            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
-            throw new ServiceFailureException(e);
-        }
-    }
 }

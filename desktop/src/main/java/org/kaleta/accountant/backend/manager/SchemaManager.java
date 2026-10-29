@@ -6,9 +6,9 @@ import org.kaleta.accountant.common.Constants;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 
@@ -17,18 +17,18 @@ import static org.kaleta.accountant.common.Constants.Schema.*;
 public class SchemaManager implements Manager<SchemaModel> {
     private final String schemaUri;
     private final String schemaFileUri;
-    private final String year;
 
-    public SchemaManager(String year) {
-        this.year = year;
+    /**
+     * The schema is shared by every year and lives in the data root, so this takes no year.
+     */
+    public SchemaManager() {
         schemaUri = "/schema/schema.xsd";
-        schemaFileUri = Initializer.getDataSource() + year + File.separator + "schema.xml";
+        schemaFileUri = Initializer.getDataSource() + "schema.xml";
     }
 
     @Override
     public void create() throws ManagerException {
         SchemaModel newSchemaModel = new SchemaModel();
-        newSchemaModel.setYear(year);
 
         SchemaModel.Class c0 = new SchemaModel.Class();
         c0.setId("0");
@@ -119,6 +119,12 @@ public class SchemaManager implements Manager<SchemaModel> {
         c400Acc.setName(CAPITAL_PERSONAL_ACCOUNT_NAME);
         c400Acc.setType(Constants.AccountType.LIABILITY);
         c4CapitalGroup.getAccount().add(c400Acc);
+        // the profit of every closed year lands here, so the books cannot be closed without it
+        SchemaModel.Class.Group.Account c401Acc = new SchemaModel.Class.Group.Account();
+        c401Acc.setId(ACCUMULATED_EARNINGS_ACCOUNT_ID);
+        c401Acc.setName(ACCUMULATED_EARNINGS_ACCOUNT_NAME);
+        c401Acc.setType(Constants.AccountType.LIABILITY);
+        c4CapitalGroup.getAccount().add(c401Acc);
         c4.getGroup().add(c4CapitalGroup);
         newSchemaModel.getClazz().add(c4);
 

@@ -82,7 +82,8 @@ public class HintValidatedTextField extends JTextField implements FocusListener,
     public void repaint() {
         super.repaint();
         try {
-            this.setBackground(doValidate() ? Color.WHITE : Color.getHSBColor(0/360f,0.25f,1));
+            // a field that is allowed to be empty is not marked as missing
+            this.setBackground(validator() == null ? Color.WHITE : Color.getHSBColor(0/360f,0.25f,1));
         } catch (Exception e) {
             // ignore - repaint before full text field initialization
         }

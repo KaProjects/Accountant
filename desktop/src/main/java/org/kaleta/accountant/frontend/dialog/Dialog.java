@@ -24,6 +24,7 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
 
     private JPanel contentPanel;
     private JButton buttonOk;
+    private JButton buttonCancel;
     private JPanel panelButtons;
 
     private final List<Validable> validableList;
@@ -46,7 +47,7 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
     }
 
     private void initComponents(String confirmationLabel){
-        JButton buttonCancel = new JButton("Cancel");
+        buttonCancel = new JButton("Cancel");
         buttonCancel.addActionListener(a -> {
             result = false;
             dispose();
@@ -119,6 +120,11 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
         buttonOk.setEnabled(true);
     }
 
+    /** A dialog that only shows something - a helper, a palette - is closed, never cancelled. */
+    void hideCancelButton() {
+        buttonCancel.setVisible(false);
+    }
+
     void setDialogValid(String invalidMessage) {
         buttonOk.setEnabled(invalidMessage == null);
         buttonOk.setToolTipText(invalidMessage);
@@ -130,10 +136,15 @@ public abstract class Dialog extends JDialog implements Configurable, DocumentLi
 
     @Override
     public void setVisible(boolean b) {
-        this.setLocation(getParent().getLocationOnScreen().x + getParent().getSize().width/2 - getSize().width/2,
-                getParent().getLocationOnScreen().y + getParent().getSize().height/2 - getSize().height/2);
+        placeOnScreen();
         buttonOk.grabFocus();
         super.setVisible(b);
+    }
+
+    /** Where the dialog appears: over the window it belongs to, unless a subclass wants otherwise. */
+    void placeOnScreen() {
+        this.setLocation(getParent().getLocationOnScreen().x + getParent().getSize().width/2 - getSize().width/2,
+                getParent().getLocationOnScreen().y + getParent().getSize().height/2 - getSize().height/2);
     }
 
     @Override

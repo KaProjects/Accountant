@@ -29,7 +29,7 @@ public class YearPaneYearSelected extends ConfigurationAction {
             JTabbedPane schemaPane = new JTabbedPane();
             pane.addTab("Schema", schemaPane);
             schemaPane.addTab("Overview", new JScrollPane(schemaOverview));
-            schemaPane.addTab("Editor", new JScrollPane(new SchemaEditor(getConfiguration())));
+            schemaPane.addTab("Editor", new SchemaEditor(getConfiguration()));
 
             JTabbedPane accountsPane = new JTabbedPane();
             pane.addTab("Accounts", accountsPane);
@@ -42,10 +42,10 @@ public class YearPaneYearSelected extends ConfigurationAction {
             accountsPane.add("Expenses", new ExpensesEditor(getConfiguration()));
             accountsPane.add("Revenues", new RevenuesEditor(getConfiguration()));
 
-            JTabbedPane transactionsPane = new JTabbedPane();
-            pane.addTab("Transactions", transactionsPane);
-            transactionsPane.addTab("Overview", new JScrollPane(transactionsOverview));
-            transactionsPane.addTab("Editor", new TransactionsEditor(getConfiguration()));
+            // both stand on their own: transactions are the year's ledger, while the procedures are
+            // templates shared by every year, so neither is a view of the other
+            pane.addTab("Transactions", new JScrollPane(transactionsOverview));
+            pane.addTab("Procedures", new ProceduresEditor(getConfiguration()));
         } else {
             pane.addTab("Schema", new JScrollPane(schemaOverview));
             pane.addTab("Accounts", new JScrollPane(accountsOverview));

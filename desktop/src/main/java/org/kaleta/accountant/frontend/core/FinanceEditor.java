@@ -9,8 +9,10 @@ import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
 import org.kaleta.accountant.frontend.action.listener.OpenAddFinAssetDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenFinAssetDialog;
+import org.kaleta.accountant.frontend.action.listener.RenameAccountAction;
+import org.kaleta.accountant.frontend.component.card.CardStyle;
 import org.kaleta.accountant.frontend.common.IconLoader;
-import org.kaleta.accountant.frontend.component.AccountsEditor;
+import org.kaleta.accountant.frontend.component.accounts.AccountsEditor;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -40,6 +42,7 @@ public class FinanceEditor extends JPanel implements Configurable {
                 new JLabel().getFont(),
                 Constants.Color.OVERVIEW_GROUP));
         ltFinItems.setLayout(new BoxLayout(ltFinItems, BoxLayout.Y_AXIS));
+        ltFinItems.setAlignmentX(LEFT_ALIGNMENT); // same alignment as the editor above it, so both fill the width
         this.updateLTFinItems();
 
         JPanel panel = new JPanel();
@@ -127,6 +130,7 @@ public class FinanceEditor extends JPanel implements Configurable {
             JLabel labelAccountName = new JLabel(account.getName());
             labelAccountName.setFont(boldFont);
             labelAccountName.setToolTipText(account.getName());
+            CardStyle.makeRenamable(labelAccountName, new RenameAccountAction(FinanceEditor.this, account));
             JLabel labelAccType = new JLabel(">> " + Service.SCHEMA.getAccountName(year, account.getClassId(), account.getGroupId(), account.getSchemaAccountId()));
             labelAccType.setToolTipText("Account Type");
 
@@ -142,13 +146,19 @@ public class FinanceEditor extends JPanel implements Configurable {
 
             buttonRevalue = new JButton("Revalue");
             buttonRevalue.addActionListener(new OpenFinAssetDialog(FinanceEditor.this, account, OpenFinAssetDialog.REVALUE));
+            buttonRevalue.setAlignmentX(CENTER_ALIGNMENT);
 
-            labelRevInfo = new JLabel();
+            labelRevInfo = new JLabel("", SwingConstants.CENTER);
+            labelRevInfo.setFont(labelRevInfo.getFont().deriveFont(Font.PLAIN, labelRevInfo.getFont().getSize2D() - 1f));
+            labelRevInfo.setForeground(Color.DARK_GRAY);
+            labelRevInfo.setAlignmentX(CENTER_ALIGNMENT);
 
             revPanel = new JPanel();
             revPanel.setLayout(new BoxLayout(revPanel, BoxLayout.Y_AXIS));
             revPanel.add(buttonRevalue);
-            revPanel.add(new JPanel());
+            // directly under the button: an empty panel used to sit here and pushed the line to the
+            // bottom of the row, where it was cut off
+            revPanel.add(Box.createVerticalStrut(3));
             revPanel.add(labelRevInfo);
 
             JPanel panelSeparator = new JPanel();

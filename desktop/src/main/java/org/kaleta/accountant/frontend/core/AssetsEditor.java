@@ -8,9 +8,15 @@ import org.kaleta.accountant.common.Constants;
 import org.kaleta.accountant.common.ErrorHandler;
 import org.kaleta.accountant.frontend.Configurable;
 import org.kaleta.accountant.frontend.Configuration;
+import org.kaleta.accountant.frontend.action.listener.AttachInvoiceAction;
 import org.kaleta.accountant.frontend.action.listener.OpenAddAssetDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenDepreciateDialog;
 import org.kaleta.accountant.frontend.action.listener.OpenExcludeDialog;
+import org.kaleta.accountant.frontend.action.listener.RenameAccountAction;
+import org.kaleta.accountant.frontend.action.listener.RevealInvoiceAction;
+import org.kaleta.accountant.frontend.common.IconLoader;
+import org.kaleta.accountant.frontend.component.LeadingIconButton;
+import org.kaleta.accountant.frontend.component.card.CardStyle;
 import org.kaleta.accountant.service.Service;
 
 import javax.swing.*;
@@ -22,6 +28,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AssetsEditor extends JPanel implements Configurable {
+
+    private static final String REVEAL_INVOICE_LABEL = "Invoice";
+    private static final String ATTACH_INVOICE_LABEL = "Add Invoice";
+    private static final int INVOICE_ICON_SIZE = 11;
+
+    /**
+     * Both states of the invoice button are given this one width, so that a row does not shift
+     * sideways the moment an asset gains an invoice.
+     */
+    private static final int INVOICE_BUTTON_WIDTH = Math.max(
+            revealInvoiceButton().getPreferredSize().width,
+            new JButton(ATTACH_INVOICE_LABEL).getPreferredSize().width);
+
+    /** The invoice button of an asset that has one: the icon says that it leads out of the app. */
+    private static LeadingIconButton revealInvoiceButton() {
+        return new LeadingIconButton(REVEAL_INVOICE_LABEL,
+                IconLoader.getIcon(IconLoader.EXTERNAL, new Dimension(INVOICE_ICON_SIZE, INVOICE_ICON_SIZE)), 5);
+    }
+
     private Configuration configuration;
     private final JPanel panelItems;
     private final JButton buttonDepreciateAll;
@@ -41,7 +66,6 @@ public class AssetsEditor extends JPanel implements Configurable {
         JButton buttonAddItem = new JButton("Add");
         buttonAddItem.addActionListener(new OpenAddAssetDialog(this));
 
-        JCheckBox toggleFilter = new JCheckBox("Toggle Filter");
         JComboBox<Object> cbGroups = new JComboBox<>();
         JComboBox<Object> cbAccounts = new JComboBox<>();
         JComboBox<String> cbActive = new JComboBox<>();
@@ -92,36 +116,26 @@ public class AssetsEditor extends JPanel implements Configurable {
             update();
         });
 
-        JPanel panelFilter = new JPanel();
-        panelFilter.setPreferredSize(new Dimension(Short.MAX_VALUE, 0));
-        panelFilter.setMaximumSize(new Dimension(Short.MAX_VALUE, 25));
-        panelFilter.setLayout(new BoxLayout(panelFilter, BoxLayout.X_AXIS));
-        panelFilter.add(cbActive);
-        panelFilter.add(cbGroups);
-        panelFilter.add(cbAccounts);
-        panelFilter.setVisible(false);
-
-        toggleFilter.addActionListener(e -> {
-            panelFilter.setVisible(toggleFilter.isSelected());
-            if (!toggleFilter.isSelected()) {
-                cbGroups.setSelectedIndex(0);
-                cbActive.setSelectedIndex(0);
-            }
-        });
-
         JScrollPane paneItems = new JScrollPane(panelItems);
 
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(layout.createParallelGroup()
                 .addGroup(layout.createSequentialGroup()
-                        .addComponent(buttonAddItem).addGap(5).addComponent(buttonDepreciateAll).addGap(5).addComponent(toggleFilter))
-                .addComponent(panelFilter)
+                        .addComponent(buttonAddItem).addGap(5)
+                        .addComponent(buttonDepreciateAll).addGap(15)
+                        .addComponent(cbActive, 110, 130, 160).addGap(5)
+                        .addComponent(cbGroups, 140, 200, 260).addGap(5)
+                        .addComponent(cbAccounts, 140, 200, 260))
                 .addComponent(paneItems));
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup()
-                        .addComponent(buttonAddItem, 25, 25, 25).addComponent(buttonDepreciateAll, 25, 25, 25).addComponent(toggleFilter, 25, 25, 25))
-                .addGap(2).addComponent(panelFilter, 25, 25, 25).addGap(2)
+                        .addComponent(buttonAddItem, 25, 25, 25)
+                        .addComponent(buttonDepreciateAll, 25, 25, 25)
+                        .addComponent(cbActive, 25, 25, 25)
+                        .addComponent(cbGroups, 25, 25, 25)
+                        .addComponent(cbAccounts, 25, 25, 25))
+                .addGap(4)
                 .addComponent(paneItems));
 
         this.getActionMap().put(Configuration.ACCOUNT_UPDATED, new AbstractAction() {
@@ -194,9 +208,11 @@ public class AssetsEditor extends JPanel implements Configurable {
         private final JSeparator separator;
         private final JPanel depPanel;
         private final JLabel labelDepInfo;
+        private final JButton buttonInvoice;
         private final JButton buttonExclude;
         private final JButton buttonDep;
 
+        private final boolean hasInvoice;
         private boolean isActive;
         private final AccountsModel.Account account;
 
@@ -210,6 +226,7 @@ public class AssetsEditor extends JPanel implements Configurable {
             JLabel labelAccountName = new JLabel(account.getName());
             labelAccountName.setFont(boldFont);
             labelAccountName.setToolTipText(account.getName());
+            CardStyle.makeRenamable(labelAccountName, new RenameAccountAction(AssetsEditor.this, account));
             JLabel labelGroup = new JLabel("> " + Service.SCHEMA.getGroupName(year, account.getClassId(), account.getGroupId()));
             labelGroup.setToolTipText("Group");
             JLabel labelAccType = new JLabel(">> " + Service.SCHEMA.getAccountName(year, account.getClassId(), account.getGroupId(), account.getSchemaAccountId()));
@@ -225,16 +242,46 @@ public class AssetsEditor extends JPanel implements Configurable {
 
             separator = new JSeparator(SwingConstants.VERTICAL);
 
-            labelDepInfo = new JLabel();
+            labelDepInfo = new JLabel("", SwingConstants.CENTER);
+            labelDepInfo.setFont(labelDepInfo.getFont().deriveFont(Font.PLAIN, labelDepInfo.getFont().getSize2D() - 1f));
+            labelDepInfo.setForeground(Color.DARK_GRAY);
+            labelDepInfo.setAlignmentX(CENTER_ALIGNMENT);
 
             buttonDep = new JButton("Depreciate");
             buttonDep.addActionListener(new OpenDepreciateDialog(AssetsEditor.this, account));
+            buttonDep.setAlignmentX(CENTER_ALIGNMENT);
 
             depPanel = new JPanel();
             depPanel.setLayout(new BoxLayout(depPanel, BoxLayout.Y_AXIS));
             depPanel.add(buttonDep);
-            depPanel.add(new JPanel());
+            // directly under the button: an empty panel used to sit here and pushed the line to the
+            // bottom of the row, where it was cut off
+            depPanel.add(Box.createVerticalStrut(3));
             depPanel.add(labelDepInfo);
+
+            // The invoice is the document that says what the asset cost. The asset either has one
+            // and the button hands it over to the file manager, or it has none and the button asks
+            // for it - a file whose name is recorded but which is no longer in the invoices folder
+            // counts as none, so that a wrong one can be replaced by deleting it.
+            //
+            // The name of the file is not shown. An invoice is named by whoever issued it and
+            // carries the account's id on top of that, so it is nearly always too long to read in
+            // a row of this width; the tooltip says which file it is.
+            hasInvoice = Service.INVOICE.getInvoice(account) != null;
+            String invoiceName = Service.INVOICE.getInvoiceName(account);
+
+            buttonInvoice = hasInvoice ? revealInvoiceButton() : new JButton(ATTACH_INVOICE_LABEL);
+            buttonInvoice.addActionListener(hasInvoice
+                    ? new RevealInvoiceAction(AssetsEditor.this, account)
+                    : new AttachInvoiceAction(AssetsEditor.this, account));
+            if (hasInvoice) {
+                buttonInvoice.setToolTipText("Show '" + invoiceName + "' in the file manager");
+            } else if (invoiceName != null) {
+                buttonInvoice.setToolTipText("'" + invoiceName
+                        + "' is no longer in the invoices folder - choose the invoice again");
+            } else {
+                buttonInvoice.setToolTipText("Attach the invoice of this asset");
+            }
 
             JPanel panelSeparator = new JPanel();
             panelSeparator.setOpaque(false);
@@ -256,6 +303,8 @@ public class AssetsEditor extends JPanel implements Configurable {
                     .addComponent(separator, 5, 5, 5)
                     .addComponent(depPanel, 200, 200, 200)
                     .addComponent(panelSeparator)
+                    .addComponent(buttonInvoice, INVOICE_BUTTON_WIDTH, INVOICE_BUTTON_WIDTH, INVOICE_BUTTON_WIDTH)
+                    .addGap(5)
                     .addComponent(buttonExclude)
                     .addGap(25));
             layout.setVerticalGroup(layout.createSequentialGroup().addGap(5)
@@ -270,6 +319,8 @@ public class AssetsEditor extends JPanel implements Configurable {
                             .addComponent(separator, 60, 60, 60)
                             .addComponent(depPanel, 50, 50, 50)
                             .addComponent(panelSeparator, 50, 50, 50)
+                            .addComponent(buttonInvoice, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(buttonExclude))
                     .addGap(5));
             update();
@@ -318,6 +369,9 @@ public class AssetsEditor extends JPanel implements Configurable {
                 separator.setVisible(false);
                 depPanel.setVisible(false);
                 buttonExclude.setVisible(false);
+                // an asset no longer owned is not carried into the next year, so there is nothing
+                // to attach an invoice to - but the invoice it already has is still its receipt
+                buttonInvoice.setVisible(hasInvoice);
             }
             AssetPanel.this.revalidate();
             AssetPanel.this.repaint();

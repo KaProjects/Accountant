@@ -32,9 +32,19 @@ public class Service {
     public static final ProceduresService PROCEDURES = new ProceduresService();
 
     /**
+     * Instance of the service that closes a year and opens the next one
+     */
+    public static final ClosingService CLOSING = new ClosingService();
+
+    /**
      * Instance of analysis service class
      */
     public static final AnalysisService ANALYSIS = new AnalysisService();
+
+    /**
+     * Instance of the service that keeps the invoices of the fixed assets
+     */
+    public static final InvoiceService INVOICE = new InvoiceService();
 
     /**
      * Instance of Firebase service class

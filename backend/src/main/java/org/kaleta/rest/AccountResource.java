@@ -43,4 +43,9 @@ public class AccountResource
     {
         return Response.ok(accountService.getAccountsOverview(year, schemaId)).build();
     }
+
+    private boolean notClosing(String schemaId)
+    {
+        return !schemaId.equals(Constants.Account.CLOSING_ACC_ID) && !schemaId.equals(Constants.Account.PROFIT_ACC_ID);
+    }
 }

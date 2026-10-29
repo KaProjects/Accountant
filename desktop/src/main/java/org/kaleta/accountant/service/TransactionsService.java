@@ -67,6 +67,38 @@ public class TransactionsService {
     }
 
     /**
+     * Books several transactions in one write, for the times when a single act produces hundreds of
+     * them - closing a year books one for every account there is, and writing the file once per
+     * account would be both slow and half-done if it failed in the middle.
+     *
+     * @param booked date, amount, debit, credit and description, in the order they are to be booked
+     */
+    public void addTransactions(String year, List<String[]> booked) {
+        try {
+            Manager<TransactionsModel> manager = new TransactionsManager(year);
+            TransactionsModel model = manager.retrieve();
+
+            for (String[] entry : booked) {
+                TransactionsModel.Transaction transaction = new TransactionsModel.Transaction();
+                transaction.setId(String.valueOf(model.getTransaction().size()));
+                transaction.setDate(entry[0]);
+                transaction.setAmount(entry[1]);
+                transaction.setDebit(entry[2]);
+                transaction.setCredit(entry[3]);
+                transaction.setDescription(entry[4]);
+                model.getTransaction().add(transaction);
+            }
+
+            manager.update(model);
+            Initializer.LOG.info(booked.size() + " transactions added to year " + year);
+            invalidateModel();
+        } catch (ManagerException e) {
+            Initializer.LOG.severe(ErrorHandler.getThrowableStackTrace(e));
+            throw new ServiceFailureException(e);
+        }
+    }
+
+    /**
      * Returns transactions for specified debit and credit.
      * Use 'null' for debit/credit if you want to list transaction only for credit/debit
      */
